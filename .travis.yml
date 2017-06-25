@@ -1,6 +1,21 @@
 language: groovy
 
-script: ./gradlew deploy groovydoc
+env:
+  global:
+    - MAIN_REPO="$(pwd)"
+    - GH_PAGES_REPO="$(readlink -f ../gh-pages)"
+
+before_script: |
+  if [ "$TRAVIS_TAG" == "" ]; then
+    echo "Not a tagged release, so GitHub pages branch is not cloned!"
+  else
+    git clone --depth=1 --branch=gh-pages https://github.com/floscher/gradle-josm-plugin.git "$GH_PAGES_REPO"
+    # Copy the existing Maven repo to update it instead of recreating it
+    if [ -d "$GH_PAGES_REPO/maven" ]; then
+      cp -rT "$GH_PAGES_REPO/maven" "$MAIN_REPO/build/maven"
+    fi
+  fi
+script: ./gradlew build deploy groovydoc
 after_success: |
   if [ "$TRAVIS_TAG" == "" ]; then
     echo "Not a tagged release, so GitHub pages are not updated!"
@@ -11,16 +26,16 @@ after_success: |
     git config --global credential.helper store
     echo "https://${GH_USERNAME}:${GH_TOKEN}@github.com" > $HOME/.git-credentials
 
-    MAIN_REPO=`pwd`
-    GH_PAGES_REPO=`readlink -f ../gh-pages`
     commitHash=`git describe --always --long --dirty`
+    cd "$GH_PAGES_REPO"
 
-    git clone --depth=1 --branch=gh-pages https://github.com/floscher/gradle-josm-plugin.git ../gh-pages
-    cd "GH_PAGES_REPO"
     git rm -r --ignore-unmatch groovydoc
     cp -r "$MAIN_REPO/build/docs/groovydoc" "$GH_PAGES_REPO"
     git stage groovydoc
+
+    git rm -r --ignore-unmatch maven
     cp -r "$MAIN_REPO/build/maven" "$GH_PAGES_REPO"
+    git stage maven
 
     git commit -a -m "Update Maven repository and Groovy documentation to $commitHash"
     git push origin gh-pages
