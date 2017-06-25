@@ -1,0 +1,21 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+dependencies {
+  compile gradleApi()
+  compile localGroovy()
+}
+
+version = 'v0.1.0'
+
+task deploy(type: Upload) {
+  configuration = configurations.archives
+  repositories {
+    mavenDeployer {
+      repository(url: "file://$buildDir/maven")
+      pom.version = project.version.charAt(0) == 'v' ? project.version.substring(1) : project.version
+      pom.artifactId = 'josm-plugin'
+      pom.groupId = 'org.openstreetmap.josm.gradle.plugin'
+    }
+  }
+}
