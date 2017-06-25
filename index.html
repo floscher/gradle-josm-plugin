@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<title>Gradle plugin for JOSM (plugin) development</title>
+<h1>Gradle plugin for JOSM (plugin) development</h1>
+<p><a href="./groovydoc">Groovydoc of the plugin</a></p>
+<p>There is a Maven repository containing the plugin at <code>https://floscher.github.io/gradle-josm-plugin/maven</code>, you can view its contents at <a href="https://github.com/floscher/gradle-josm-plugin/tree/gh-pages/maven">https://github.com/floscher/gradle-josm-plugin/tree/gh-pages/maven</a>.</p>
+<p>
+  Add the following lines to your <code>build.gradle</code> to start using the plugin:
+<pre>
+buildscript {
+  repositories {
+    maven {
+      url 'https://floscher.github.io/gradle-josm-plugin/maven'
+    }
+  }
+  dependencies {
+    classpath group: 'org.openstreetmap.josm.gradle.plugin', name: 'josm-plugin', version: '0.1.0'
+  }
+}
+</pre>
+</p>
