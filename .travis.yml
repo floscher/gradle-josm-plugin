@@ -1,0 +1,27 @@
+language: groovy
+
+script: ./gradlew deploy groovydoc
+after_success: |
+  if [ "$TRAVIS_TAG" == "" ]; then
+    echo "Not a tagged release, so GitHub pages are not updated!"
+  else
+    git config --global user.email "deploy@travis"
+    git config --global user.name "Travis CI"
+    # This avoids printout of the token when pushing
+    git config --global credential.helper store
+    echo "https://${GH_USERNAME}:${GH_TOKEN}@github.com" > $HOME/.git-credentials
+
+    MAIN_REPO=`pwd`
+    GH_PAGES_REPO=`readlink -f ../gh-pages`
+    commitHash=`git describe --always --long --dirty`
+
+    git clone --depth=1 --branch=gh-pages https://github.com/floscher/gradle-josm-plugin.git ../gh-pages
+    cd "GH_PAGES_REPO"
+    git rm -r --ignore-unmatch groovydoc
+    cp -r "$MAIN_REPO/build/docs/groovydoc" "$GH_PAGES_REPO"
+    git stage groovydoc
+    cp -r "$MAIN_REPO/build/maven" "$GH_PAGES_REPO"
+
+    git commit -a -m "Update Maven repository and Groovy documentation to $commitHash"
+    git push origin gh-pages
+  fi
