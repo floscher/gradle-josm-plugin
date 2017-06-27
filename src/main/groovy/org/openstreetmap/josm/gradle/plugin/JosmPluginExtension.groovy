@@ -40,6 +40,14 @@ class JosmPluginExtension {
   def String jarName
   /**
    * The repositories that are added to the repository list.
+   * <strong>Default value:</strong>
+   * <ul>
+   * <li>https://josm.openstreetmap.de/download/</li>
+   * <li>https://svn.openstreetmap.org/applications/editors/josm/dist/</li>
+   * <li>https://josm.openstreetmap.de/nexus/content/repositories/releases/</li>
+   * <li>https://josm.openstreetmap.de/nexus/content/repositories/snapshots/</li>
+   * </ul>
+   * For details see <a href="https://github.com/floscher/gradle-josm-plugin/tree/master/src/main/groovy/org/openstreetmap/josm/gradle/plugin/JosmPluginExtension.groovy">the source file</a>.
    */
   def Closure repositories = {
     ivy {

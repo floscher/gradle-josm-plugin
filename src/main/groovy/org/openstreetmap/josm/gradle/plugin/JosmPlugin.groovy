@@ -52,7 +52,7 @@ class JosmPlugin implements Plugin<Project> {
     )
     // Init JOSM preferences
     project.task(
-      [type: Copy, group: 'JOSM', description: 'Puts a default preferences.xml file into the temporary JOSM home directory'],
+      [type: Copy, description: 'Puts a default preferences.xml file into the temporary JOSM home directory'],
       'initJosmPrefs',
       {t ->
         project.gradle.projectsEvaluated {

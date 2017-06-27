@@ -14,8 +14,8 @@ task deploy(type: Upload) {
     mavenDeployer {
       repository(url: "file://$buildDir/maven")
       pom.version = project.version.charAt(0) == 'v' ? project.version.substring(1) : project.version
-      pom.artifactId = 'josm-plugin'
-      pom.groupId = 'org.openstreetmap.josm.gradle.plugin'
+      pom.artifactId = 'gradle-plugin'
+      pom.groupId = 'org.openstreetmap.josm'
     }
   }
 }
