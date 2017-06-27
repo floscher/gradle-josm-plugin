@@ -7,10 +7,14 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.TaskExecutionException
 
+/**
+ * Main class of the plugin, sets up the {@code requiredPlugin} configuration, the additional repositories and the custom tasks.
+ */
 class JosmPlugin implements Plugin<Project> {
   /**
    * Set up the JOSM plugin.
    * Creates the tasks this plugin provides, defines the {@code josm} extension, adds the repositories where JOSM specific dependencies can be found.
+   * @see {@link Plugin#apply(T)}
    */
   void apply(Project project) {
     // Apply the Java plugin if not available, because we rely on the `jar` task

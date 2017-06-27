@@ -6,6 +6,14 @@ dependencies {
   compile localGroovy()
 }
 
+groovydoc {
+  links = [
+    new Groovydoc.Link('https://docs.gradle.org/current/javadoc/', 'org.gradle'),
+    new Groovydoc.Link('https://docs.oracle.com/javase/8/docs/api/', 'java', 'javax'),
+    new Groovydoc.Link('http://docs.groovy-lang.org/latest/html/api/', 'groovy')
+  ]
+}
+
 version = 'v0.1.0'
 
 task deploy(type: Upload) {
