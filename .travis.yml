@@ -26,17 +26,17 @@ after_success: |
     git config --global credential.helper store
     echo "https://${GH_USERNAME}:${GH_TOKEN}@github.com" > $HOME/.git-credentials
 
-    commitHash=`git describe --always --long --dirty`
+    version=`git describe --always --dirty`
     cd "$GH_PAGES_REPO"
 
-    git rm -r --ignore-unmatch groovydoc
-    cp -r "$MAIN_REPO/build/docs/groovydoc" "$GH_PAGES_REPO"
+    cp -r -T "$MAIN_REPO/build/docs/groovydoc" "$GH_PAGES_REPO/groovydoc/$version"
+    git rm groovydoc/current
+    ln -s "./$version" "groovydoc/current"
     git stage groovydoc
 
-    git rm -r --ignore-unmatch maven
     cp -r "$MAIN_REPO/build/maven" "$GH_PAGES_REPO"
     git stage maven
 
-    git commit -a -m "Update Maven repository and Groovy documentation to $commitHash"
+    git commit -a -m "Update Maven repository and Groovy documentation to $version"
     git push origin gh-pages
   fi
