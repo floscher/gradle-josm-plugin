@@ -14,6 +14,12 @@ class JosmPluginExtension {
    */
   def boolean isPlugin = true
   /**
+   * The version number of JOSM against which the plugin should be compiled.
+   *
+   * <p><strong>Default:</strong> The value of the property <code>plugin.compile.version</code> or <code>null</code> if that property is not set.</p>
+   */
+  def String josmCompileVersion = project.findProperty("plugin.compile.version")
+  /**
    * This is required, when you want to run the task {@code debugJosm}. Set this to the port
    * on which you want to listen for the debug output.
    */
@@ -40,7 +46,7 @@ class JosmPluginExtension {
   def String jarName
   /**
    * The repositories that are added to the repository list.
-   * <p><strong>Default value:</strong>
+   * <p><strong>Default value (in this order):</strong>
    * <ol>
    * <li><a href="https://josm.openstreetmap.de/download/">https://josm.openstreetmap.de/download/</a></li>
    * <li><a href="https://svn.openstreetmap.org/applications/editors/josm/dist/">https://svn.openstreetmap.org/applications/editors/josm/dist/</a></li>
@@ -72,4 +78,8 @@ class JosmPluginExtension {
       url 'https://josm.openstreetmap.de/nexus/content/repositories/snapshots/'
     }
   }
+  /**
+   * The manifest for the JOSM plugin. This is initialized as soon as the project has been evaluated.
+   */
+  def Manifest manifest
 }

@@ -8,7 +8,8 @@ import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.TaskExecutionException
 
 /**
- * Main class of the plugin, sets up the {@code requiredPlugin} configuration, the additional repositories and the custom tasks.
+ * Main class of the plugin, sets up the {@code requiredPlugin} configuration,
+ * the additional repositories and the custom tasks.
  */
 class JosmPlugin implements Plugin<Project> {
   /**
@@ -27,7 +28,7 @@ class JosmPlugin implements Plugin<Project> {
 
     if (project.josm.isPlugin) {
       project.configurations {
-        compile.extendsFrom(requiredPlugin)
+        implementation.extendsFrom(requiredPlugin)
       }
     }
 
@@ -36,6 +37,21 @@ class JosmPlugin implements Plugin<Project> {
     setupBasicTasks(project)
     if (project.josm.isPlugin) {
       setupPluginTasks(project)
+    }
+
+    project.gradle.projectsEvaluated {
+      project.logger.info '\n\n'
+      project.logger.info "Compiling against JOSM version "+project.josm.josmCompileVersion
+      project.josm.manifest new Manifest(project)
+      project.jar.manifest.attributes project.josm.manifest.createJosmPluginJarManifest()
+      project.logger.info '\n\n'
+
+      // Adding dependencies for JOSM and the required plugins
+      project.dependencies.add('implementation', 'org.openstreetmap.josm:josm:'+project.josm.josmCompileVersion)
+      project.josm.manifest.pluginDependencies.each({ item ->
+        project.dependencies.add('requiredPlugin', 'org.openstreetmap.josm.plugins:'+item+':', {changing = true})
+      })
+
     }
   }
 
@@ -46,11 +62,10 @@ class JosmPlugin implements Plugin<Project> {
       'cleanJosm',
       {t ->
         project.gradle.projectsEvaluated {
-          println "Deleting ${project.josm.tmpJosmHome}"
           delete project.josm.tmpJosmHome
         }
         doFirst {
-          printf 'Delete %s…', delete
+          project.logger.lifecycle 'Delete {}…', delete
         }
       }
     )
@@ -65,11 +80,11 @@ class JosmPlugin implements Plugin<Project> {
         }
         doFirst {
           if (new File("${project.josm.tmpJosmHome}/preferences.xml").exists()) {
-            println "JOSM preferences not copied, file is already present.\nIf you want to replace it, run the task 'cleanJosm' additionally."
+            project.logger.lifecycle "JOSM preferences not copied, file is already present.\nIf you want to replace it, run the task 'cleanJosm' additionally."
             exclude '*'
           } else {
             include 'preferences.xml'
-            printf 'Copy %s to %s…', source.files, destinationDir
+            project.logger.lifecycle 'Copy {} to {}…', source.files, destinationDir
           }
         }
       }
@@ -85,14 +100,14 @@ class JosmPlugin implements Plugin<Project> {
     // Standard run-task
     project.task(
       [
-        type: RunJosmTask,
+        type: RunJosmTask.class,
         description: 'Runs an independent JOSM instance (version specified in project dependencies) with `build/.josm/` as home directory and the freshly compiled Mapillary plugin active.'
       ],
       'runJosm'
     )
     // Debug task
     project.task(
-      [type: RunJosmTask],
+      [type: RunJosmTask.class],
       'debugJosm', { t->
         project.gradle.projectsEvaluated {
           description 'Runs a JOSM instance like the task `runJosm`, but with JDWP (Java debug wire protocol) active' + (

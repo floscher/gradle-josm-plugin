@@ -1,5 +1,9 @@
+import org.gradle.api.tasks.Upload
+import org.gradle.api.tasks.javadoc.Groovydoc
+
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: 'eclipse'
 
 dependencies {
   compile gradleApi()
@@ -14,7 +18,13 @@ groovydoc {
   ]
 }
 
-version = 'v0.1.0'
+def versionStream = new ByteArrayOutputStream()
+exec {
+  commandLine 'git', 'describe', '--dirty', '--always'
+  standardOutput versionStream
+}
+
+version = versionStream.toString().trim()
 
 task deploy(type: Upload) {
   configuration = configurations.archives
@@ -25,5 +35,8 @@ task deploy(type: Upload) {
       pom.artifactId = 'gradle-plugin'
       pom.groupId = 'org.openstreetmap.josm'
     }
+  }
+  doLast {
+    println "Version " + repositories.mavenDeployer.pom.version + " is now deployed!"
   }
 }
