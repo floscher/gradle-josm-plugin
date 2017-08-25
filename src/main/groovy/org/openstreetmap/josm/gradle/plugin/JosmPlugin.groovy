@@ -34,14 +34,9 @@ class JosmPlugin implements Plugin<Project> {
 
     project.repositories(project.josm.repositories)
 
-    setupBasicTasks(project)
-    if (project.josm.isPlugin) {
-      setupPluginTasks(project)
-    }
-
     project.gradle.projectsEvaluated {
       project.logger.info '\n\n'
-      project.logger.info "Compiling against JOSM version "+project.josm.josmCompileVersion
+      project.logger.info "By default you'll compile against JOSM version "+project.josm.josmCompileVersion
       project.josm.manifest new Manifest(project)
       project.jar.manifest.attributes project.josm.manifest.createJosmPluginJarManifest()
       project.logger.info '\n\n'
@@ -51,8 +46,13 @@ class JosmPlugin implements Plugin<Project> {
       project.josm.manifest.pluginDependencies.each({ item ->
         project.dependencies.add('requiredPlugin', 'org.openstreetmap.josm.plugins:'+item+':', {changing = true})
       })
-
     }
+
+    setupBasicTasks(project)
+    if (project.josm.isPlugin) {
+      setupPluginTasks(project)
+    }
+    new MinJosmVersionSetup(project).setup()
   }
 
   private static void setupBasicTasks(final Project project) {
@@ -113,7 +113,7 @@ class JosmPlugin implements Plugin<Project> {
           description 'Runs a JOSM instance like the task `runJosm`, but with JDWP (Java debug wire protocol) active' + (
             project.josm.debugPort == null
             ? ".\n  NOTE: Currently the `debugJosm` task will error out! Set the property `project.josm.debugPort` to enable it!"
-            : 'on port ' + project.josm.debugPort
+            : ' on port ' + project.josm.debugPort
           )
           extraInformation '\nThe application is listening for a remote debugging connection on port ' + project.josm.debugPort + '. It will start execution as soon as the debugger is connected.\n'
           jvmArgs "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=" + project.josm.debugPort

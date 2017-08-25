@@ -1,7 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin
 
 import org.gradle.api.tasks.JavaExec
-import org.gradle.api.artifacts.SelfResolvingDependency
 
 /**
  * A task that can execute a JOSM instance. Both the {@code runJosm} task and the {@code debugJosm} task extend this type of task.
