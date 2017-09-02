@@ -1,3 +1,6 @@
+plugins {
+  id "com.gradle.plugin-publish" version "0.9.7"
+}
 import org.gradle.api.tasks.Upload
 import org.gradle.api.tasks.javadoc.Groovydoc
 
@@ -23,15 +26,29 @@ exec {
   commandLine 'git', 'describe', '--dirty', '--always'
   standardOutput versionStream
 }
-
+group = 'org.openstreetmap.josm.gradle.plugin'
 version = versionStream.toString().trim()
+version = version.charAt(0) == 'v' ? version.substring(1) : version
+
+pluginBundle {
+  website = 'https://floscher.github.io/gradle-josm-plugin'
+  vcsUrl = 'https://github.com/floscher/gradle-josm-plugin'
+  description = 'This plugin helps with developing for the JOSM project.'
+  tags = ['josm', 'openstreetmap', 'osm']
+
+  plugins {
+    josmPlugin {
+      id = 'org.openstreetmap.josm.gradle.plugin'
+      displayName = 'Gradle JOSM plugin'
+    }
+  }
+}
 
 task deploy(type: Upload) {
   configuration = configurations.archives
   repositories {
     mavenDeployer {
       repository(url: "file://$buildDir/maven")
-      pom.version = project.version.charAt(0) == 'v' ? project.version.substring(1) : project.version
       pom.artifactId = 'gradle-plugin'
       pom.groupId = 'org.openstreetmap.josm'
     }
