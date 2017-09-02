@@ -62,13 +62,19 @@ public class Manifest {
    *
    * <p><strong>Default:</strong> the value of property <code>plugin.requires</code> split at every semicolon (do not rely on the order, as it is not necessarily maintained) or <code>null</code> if that property is not set.</p>
    */
-  def Set<String> pluginDependencies = new HashSet<>()
+  final def Set<String> pluginDependencies = new HashSet<>()
   /**
    * A URL pointing to a web resource describing the plugin.
    *
    * <p><strong>Default:</strong> The value of property <code>plugin.link</code> as URL (might error out on malformed URLs), or <code>null</code> if that property is not set.</p>
    */
   def URL website = project.hasProperty('plugin.link') ? new URL(project.findProperty('plugin.link')) : null
+  /**
+   * For compatibility with older JOSM versions, that are not supported by the current version of the plugin,
+   * this field contains URLs where versions of the plugin can be downloaded, which are compatible with older JOSM versions.
+   * The URL value points to a location where the plugin can be downloaded from and the integer key denotes the minimum JOSM version that the plugin at that location is compatible with.
+   */
+  final def Map<Integer, URL> oldVersionDownloadURLs = [:]
 
   /**
    * Initialize the manifest for the given project
@@ -129,6 +135,9 @@ public class Manifest {
       "Plugin-Early": loadEarly,
       "Plugin-Canloadatruntime": canLoadAtRuntime
     ]
+    oldVersionDownloadURLs.each { key, value ->
+      manifestAtts << [ (key+"_Plugin-Url") : value.toString()]
+    }
 
     // Optional attributes
     if (author != null) {
