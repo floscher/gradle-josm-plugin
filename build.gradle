@@ -26,7 +26,7 @@ exec {
   commandLine 'git', 'describe', '--dirty', '--always'
   standardOutput versionStream
 }
-group = 'org.openstreetmap.josm.gradle.plugin'
+group = 'org.openstreetmap.josm'
 version = versionStream.toString().trim()
 version = version.charAt(0) == 'v' ? version.substring(1) : version
 
@@ -50,7 +50,6 @@ task deploy(type: Upload) {
     mavenDeployer {
       repository(url: "file://$buildDir/maven")
       pom.artifactId = 'gradle-plugin'
-      pom.groupId = 'org.openstreetmap.josm'
     }
   }
   doLast {

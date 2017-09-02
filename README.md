@@ -9,44 +9,31 @@ Naturally this plugin only makes sense, if you build your JOSM plugin with Gradl
 Add the following to the beginning of your `build.gradle` file:
 
 ```gradle
-buildscript {
-  repository {
-    maven {
-      url "https://floscher.github.io/gradle-josm-plugin/maven"
-    }
-  }
-  dependencies {
-    classpath 'org.openstreetmap.josm:gradle-plugin:0.1.0'
-  }
+plugins {
+  id "org.openstreetmap.josm.gradle.plugin" version "0.1.4"
 }
-apply plugin: 'org.openstreetmap.josm.gradle.plugin'
 ```
 
 ### Configuration
 
-You'll need to add JOSM as a dependency:
+Add the following to your `build.gradle`:
 ```gradle
-dependencies {
-  implementation(name: 'josm', version: '12345')
-}
-```
-Instead of `12345`, please use any (up-to-date) version of JOSM available [for download as *.jar](https://josm.openstreetmap.de/download).
-
-Then also add the following:
-```gradle
+version = '‹pluginVersion›'
 josm {
-  jarName 'MyAwesomePluginName.jar'
+  jarName '‹MyAwesomePluginName›.jar'
+  josmCompileVersion ‹josmVersionToCompileAgainst›
+  manifest.description '‹descriptionOfPlugin›'
+  manifest.mainClass '‹fullNameOfMainPluginClass›'
+  manifest.minJosmVersion ‹minCompatibleJosmVersion›
 }
 ```
-This tells us, how the resulting \*.jar file will be called in the plugins directory.
+Replace all parts enclosed in `‹›` by the appropriate values.
 
-There are more configuration options you can set in that josm{} block, see [the documentation](https://floscher.github.io/gradle-josm-plugin/groovydoc/org/openstreetmap/josm/gradle/plugin/JosmPluginExtension.html#prop_detail) for all available options.
+There are more configuration options you can set in that josm{} block, see [the documentation](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/JosmPluginExtension.html#prop_detail) for all available options.
 
-If your JOSM plugin requires other JOSM plugins, simply add them to your dependencies:
+E.g., if your JOSM plugin requires other JOSM plugins, simply add them to your dependencies:
 ```gradle
-dependencies {
-  requiredPlugin(name: 'NameOfTheAwesomePluginIDependOn'){changing=true}
-}
+josm.manifest.pluginDependencies << ['AwesomePluginName1', 'AwesomePluginName2', 'AwesomePluginName3']
 ```
 
 ### Usage
