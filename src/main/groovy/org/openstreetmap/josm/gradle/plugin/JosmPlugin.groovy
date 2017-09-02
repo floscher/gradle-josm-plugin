@@ -37,7 +37,6 @@ class JosmPlugin implements Plugin<Project> {
     project.gradle.projectsEvaluated {
       project.logger.info '\n\n'
       project.logger.info "By default you'll compile against JOSM version "+project.josm.josmCompileVersion
-      project.josm.manifest new Manifest(project)
       project.jar.manifest.attributes project.josm.manifest.createJosmPluginJarManifest()
       project.logger.info '\n\n'
 

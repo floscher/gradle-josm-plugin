@@ -77,14 +77,16 @@ public class Manifest {
   public Manifest(final Project project) {
     this.project = project
 
-    boolean missesRequiredFields =
-      isRequiredFieldMissing(minJosmVersion == null, "the minimum JOSM version your plugin is compatible with", "josm.manifest.minJosmVersion = ‹a JOSM version›") |
-      isRequiredFieldMissing(project.version == Project.DEFAULT_VERSION, "the version of your plugin", "version = ‹a version number›") |
-      isRequiredFieldMissing(mainClass == null, "the main class of your plugin", "josm.manifest.mainClass = ‹full name of main class›") |
-      isRequiredFieldMissing(description == null, "the description of your plugin", "josm.manifest.description = ‹a textual description›")
+    project.gradle.projectsEvaluated {
+      boolean missesRequiredFields =
+        isRequiredFieldMissing(minJosmVersion == null, "the minimum JOSM version your plugin is compatible with", "josm.manifest.minJosmVersion = ‹a JOSM version›") |
+        isRequiredFieldMissing(project.version == Project.DEFAULT_VERSION, "the version of your plugin", "version = ‹a version number›") |
+        isRequiredFieldMissing(mainClass == null, "the main class of your plugin", "josm.manifest.mainClass = ‹full name of main class›") |
+        isRequiredFieldMissing(description == null, "the description of your plugin", "josm.manifest.description = ‹a textual description›")
 
-    if (missesRequiredFields) {
-      throw new PluginInstantiationException("The JOSM plugin misses required configuration options. See above for which options are missing.")
+      if (missesRequiredFields) {
+        throw new PluginInstantiationException("The JOSM plugin misses required configuration options. See above for which options are missing.")
+      }
     }
 
     // Fill the map containing the plugin dependencies

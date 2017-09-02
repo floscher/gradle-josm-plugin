@@ -81,5 +81,5 @@ class JosmPluginExtension {
   /**
    * The manifest for the JOSM plugin. This is initialized as soon as the project has been evaluated.
    */
-  def Manifest manifest
+  def Manifest manifest = new Manifest(project)
 }
