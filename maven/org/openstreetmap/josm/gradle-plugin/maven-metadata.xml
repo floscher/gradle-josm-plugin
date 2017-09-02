@@ -3,13 +3,14 @@
   <groupId>org.openstreetmap.josm</groupId>
   <artifactId>gradle-plugin</artifactId>
   <versioning>
-    <release>0.1.3</release>
+    <release>0.1.4</release>
     <versions>
       <version>0.1.0</version>
       <version>0.1.1</version>
       <version>0.1.2</version>
       <version>0.1.3</version>
+      <version>0.1.4</version>
     </versions>
-    <lastUpdated>20170902161327</lastUpdated>
+    <lastUpdated>20170902213606</lastUpdated>
   </versioning>
 </metadata>
