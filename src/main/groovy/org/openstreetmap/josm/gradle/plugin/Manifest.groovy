@@ -70,11 +70,17 @@ public class Manifest {
    */
   def URL website = project.hasProperty('plugin.link') ? new URL(project.findProperty('plugin.link')) : null
   /**
-   * For compatibility with older JOSM versions, that are not supported by the current version of the plugin,
-   * this field contains URLs where versions of the plugin can be downloaded, which are compatible with older JOSM versions.
+   * For compatibility with older JOSM versions, that are not supported by the current version of the plugin.
+   * This field contains URLs where versions of the plugin can be downloaded, which are compatible with older JOSM versions.
    * The URL value points to a location where the plugin can be downloaded from and the integer key denotes the minimum JOSM version that the plugin at that location is compatible with.
    */
-  final def Map<Integer, URL> oldVersionDownloadURLs = [:]
+  private final def Set<PluginDownloadLink> oldVersionDownloadLinks = []
+
+  private class PluginDownloadLink {
+    def String pluginVersion
+    def int minJosmVersion
+    def URL downloadURL
+  }
 
   /**
    * Initialize the manifest for the given project
@@ -109,6 +115,16 @@ public class Manifest {
   }
 
   /**
+   * Add a link to an earlier release of the plugin, that is compatible with JOSM versions, with which the current version is no longer compatible.
+   * @param minJosmVersion the minimum JOSM version with which the linked plugin is compatible
+   * @param pluginVersion the version number of the linked plugin
+   * @param the URL where the linked plugin is located
+   */
+  public void oldVersionDownloadLink(int minJosmVersion, String pluginVersion, URL downloadURL) {
+    oldVersionDownloadLinks << new PluginDownloadLink(minJosmVersion: minJosmVersion, pluginVersion: pluginVersion, downloadURL: downloadURL)
+  }
+
+  /**
    *
    * @param checkResult
    * @param fieldDescription a textual description of the field (e.g. "the version of your plugin")
@@ -135,8 +151,8 @@ public class Manifest {
       "Plugin-Early": loadEarly,
       "Plugin-Canloadatruntime": canLoadAtRuntime
     ]
-    oldVersionDownloadURLs.each { key, value ->
-      manifestAtts << [ (key+"_Plugin-Url") : value.toString()]
+    oldVersionDownloadLinks.each { value ->
+      manifestAtts << [ (value.minJosmVersion+"_Plugin-Url") : value.pluginVersion+';'+value.downloadURL.toString()]
     }
 
     // Optional attributes
