@@ -18,8 +18,14 @@ before_script: |
 script: ./gradlew build deploy groovydoc
 after_success: |
   if [ "$TRAVIS_TAG" == "" ]; then
-    echo "Not a tagged release, so GitHub pages are not updated!"
+    echo "Not a tagged release, so GitHub pages are not updated! This version is also _not_ released to https://plugins.gradle.org ."
   else
+    if [ "$GRADLE_PUBLISH_SECRET" == "" ] || [ "$GRADLE_PUBLISH_KEY" == "" ]; then
+      echo "Gradle credentials not set. Not publishing to the Gradle plugins repo"
+    else
+      echo "Publishing the project to https://plugins.gradle.org …"
+      ./gradlew -Pgradle.publish.secret="$GRADLE_PUBLISH_SECRET" -Pgradle.publish.key="$GRADLE_PUBLISH_KEY" publishPlugins
+    fi
     git config --global user.email "deploy@travis"
     git config --global user.name "Travis CI"
     # This avoids printout of the token when pushing
