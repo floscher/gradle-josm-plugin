@@ -13,6 +13,7 @@ public final class MinJosmVersionSetup {
   public void setup() {
     pro.configurations {
       minJosmVersionImplementation.extendsFrom(requiredPlugin)
+      minJosmVersionImplementation.extendsFrom(packIntoJar)
     }
 
     pro.task(
