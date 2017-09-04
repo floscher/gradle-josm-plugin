@@ -28,7 +28,10 @@ class JosmPlugin implements Plugin<Project> {
 
     if (project.josm.isPlugin) {
       project.configurations {
+        // Configuration for JOSM plugins that are required for this plugin. Normally there's no need to set these manually, these are set based on the manifest configuration
         implementation.extendsFrom(requiredPlugin)
+        // Configuration for libraries on which the project depends and which should be packed into the built *.jar file.
+        implementation.extendsFrom(packIntoJar)
       }
     }
 
@@ -45,6 +48,10 @@ class JosmPlugin implements Plugin<Project> {
       project.josm.manifest.pluginDependencies.each({ item ->
         project.dependencies.add('requiredPlugin', 'org.openstreetmap.josm.plugins:'+item+':', {changing = true})
       })
+
+      project.jar {
+        from project.configurations.packIntoJar.collect { it.isDirectory() ? it : project.zipTree(it) }
+      }
     }
 
     setupBasicTasks(project)
