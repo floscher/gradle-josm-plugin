@@ -1,14 +1,10 @@
-package org.openstreetmap.josm.gradle.plugin
+package org.openstreetmap.josm.gradle.plugin.setup
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 
 public final class MinJosmVersionSetup {
-  private final Project pro
-
-  public MinJosmVersionSetup(Project pro) {
-    this.pro = pro
-  }
+  Project pro
 
   public void setup() {
     pro.configurations {
