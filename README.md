@@ -1,5 +1,9 @@
 # Gradle plugin for developing JOSM plugins
 
+[![build status](https://img.shields.io/travis/floscher/gradle-josm-plugin/master.svg?style=flat-square)](https://travis-ci.org/floscher/gradle-josm-plugin)
+[![latest release](https://img.shields.io/github/tag/floscher/gradle-josm-plugin.svg?style=flat-square)](https://plugins.gradle.org/plugin/org.openstreetmap.josm.gradle.plugin)
+[![license](https://img.shields.io/github/license/floscher/gradle-josm-plugin.svg?style=flat-square)](https://github.com/floscher/gradle-josm-plugin/blob/master/LICENSE)
+
 ## Getting started
 ### Prerequisites
 Naturally this plugin only makes sense, if you build your JOSM plugin with Gradle.
