@@ -10,7 +10,7 @@ Add the following to the beginning of your `build.gradle` file:
 
 ```gradle
 plugins {
-  id "org.openstreetmap.josm.gradle.plugin" version "0.1.4"
+  id "org.openstreetmap.josm.gradle.plugin" version "0.1.7"
 }
 ```
 
@@ -20,11 +20,12 @@ Add the following to your `build.gradle`:
 ```gradle
 version = '‹pluginVersion›'
 josm {
-  jarName '‹MyAwesomePluginName›.jar'
-  josmCompileVersion ‹josmVersionToCompileAgainst›
-  manifest.description '‹descriptionOfPlugin›'
-  manifest.mainClass '‹fullNameOfMainPluginClass›'
-  manifest.minJosmVersion ‹minCompatibleJosmVersion›
+  josmCompileVersion = ‹josmVersionToCompileAgainst›
+  manifest {
+    description = '‹descriptionOfPlugin›'
+    mainClass = '‹fullNameOfMainPluginClass›'
+    minJosmVersion = ‹minCompatibleJosmVersion›
+  }
 }
 ```
 Replace all parts enclosed in `‹›` by the appropriate values.
@@ -52,4 +53,7 @@ By default the separate JOSM home directory is kept between separate executions 
 For external debugging (e.g. using Eclipse), you can use the task `debugJosm`.
 
 ## Projects using this Gradle plugin
+* [iandees/josm-fieldpapers](https://github.com/iandees/josm-fieldpapers)
+* [iandees/josm-mbtiles](https://github.com/iandees/josm-mbtiles)
+* [JOSM/geojson](https://github.com/JOSM/geojson)
 * [JOSM/Mapillary](https://github.com/JOSM/Mapillary)

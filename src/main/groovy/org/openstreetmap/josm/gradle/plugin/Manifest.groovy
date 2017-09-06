@@ -17,7 +17,7 @@ public class Manifest {
   /**
    * Determines if the plugin needs a restart after installation. <code>true</code> if no restart is required, <code>false</code> otherwise.
    *
-   * <p><strong>Default:</strong> the value of property <code>plugin.canloadatruntime</code> or <code>null</code> if that property is not set.</p>
+   * <p><strong>Default:</strong> the value of property <code>plugin.canloadatruntime</code> or <code>false</code> if that property is not set.</p>
    */
   def boolean canLoadAtRuntime = Boolean.valueOf(project.findProperty('plugin.canloadatruntime'))
   /**
@@ -45,7 +45,7 @@ public class Manifest {
    */
   def Integer loadPriority = project.hasProperty('plugin.stage') ? Integer.valueOf(project.findProperty('plugin.stage')) : null
   /**
-   * The main class of the plugin
+   * The full name of the main class of the plugin
    *
    * <p><strong>Default:</strong> the value of property <code>plugin.class</code> or <code>null</code> if that property is not set.</p>
    */
@@ -86,7 +86,7 @@ public class Manifest {
    * Initialize the manifest for the given project
    * @param project the {@link Project} for which the manifest should be initialized
    */
-  public Manifest(final Project project) {
+  protected Manifest(final Project project) {
     this.project = project
 
     project.gradle.projectsEvaluated {
@@ -138,6 +138,10 @@ public class Manifest {
     return checkResult
   }
 
+  /**
+   * Returns a map containing all Manifest attributes, which are set.
+   * This map can then be fed into {@link org.gradle.api.java.archives.Manifest#attributes(java.util.Map)}
+   */
   public Map<String,String> createJosmPluginJarManifest() {
     // Required attributes
     def manifestAtts = [

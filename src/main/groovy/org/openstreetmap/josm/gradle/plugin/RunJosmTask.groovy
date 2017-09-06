@@ -6,7 +6,14 @@ import org.gradle.api.tasks.JavaExec
  * A task that can execute a JOSM instance. Both the {@code runJosm} task and the {@code debugJosm} task extend this type of task.
  */
 class RunJosmTask extends JavaExec {
-  def String extraInformation = ''
+  /**
+   * Text that should be displayed in the console output right before JOSM is started up. Defaults to the empty string.
+   */
+  String extraInformation = ''
+  /**
+   * Instantiates a new task for running a JOSM instance.
+   * By default the source set <code>main</code> is added to
+   */
   public RunJosmTask() {
     def arguments = project.hasProperty('josmArgs') ? project.josmArgs.split('\\\\') : []
     arguments << "--load-preferences=" + new File("build/josm-custom-config/requiredPlugins.xml").toURI().toURL().toString()
