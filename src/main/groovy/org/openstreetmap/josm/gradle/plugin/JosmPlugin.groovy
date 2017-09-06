@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin
 
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
@@ -7,6 +8,9 @@ import org.gradle.api.plugins.JavaPlugin
 import org.openstreetmap.josm.gradle.plugin.setup.BasicTaskSetup
 import org.openstreetmap.josm.gradle.plugin.setup.MinJosmVersionSetup
 import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup
+
+import java.util.zip.ZipFile
+import java.util.zip.ZipEntry
 
 /**
  * Main class of the plugin, sets up the {@code requiredPlugin} configuration,
@@ -46,9 +50,7 @@ class JosmPlugin implements Plugin<Project> {
 
       // Adding dependencies for JOSM and the required plugins
       project.dependencies.add('implementation', 'org.openstreetmap.josm:josm:'+project.josm.josmCompileVersion)
-      project.josm.manifest.pluginDependencies.each({ item ->
-        project.dependencies.add('requiredPlugin', 'org.openstreetmap.josm.plugins:'+item+':', {changing = true})
-      })
+      requirePlugins(project, project.josm.manifest.pluginDependencies.toArray(new String[0]))
 
       project.jar {
         from project.configurations.packIntoJar.collect { it.isDirectory() ? it : project.zipTree(it) }
@@ -60,5 +62,47 @@ class JosmPlugin implements Plugin<Project> {
       new PluginTaskSetup(pro: project).setup()
     }
     new MinJosmVersionSetup(pro: project).setup()
+  }
+
+  /**
+   * Convenience method
+   */
+  private void requirePlugins(Project pro, String... pluginNames) {
+    requirePlugins(0, pro, pluginNames)
+  }
+  /**
+   * Recursively add the required plugins and any plugins that these in turn require to the configuration `requiredPlugin`
+   */
+  private void requirePlugins(int recursionDepth, Project pro, String... pluginNames) {
+    if (recursionDepth >= 10) {
+      throw new GradleException("Dependency tree of required JOSM plugins is too deep. Aborting resolution of required JOSM plugins.")
+    }
+    pluginNames.each({ pluginName ->
+      pluginName = pluginName.trim()
+      pro.logger.info "Add required JOSM plugin '{}' to classpath…", pluginName
+
+      final def tmpConf = pro.configurations.create('tmpConf'+recursionDepth)
+      final def pluginDep = pro.dependencies.add('tmpConf'+recursionDepth, 'org.openstreetmap.josm.plugins:' + pluginName + ':', {changing = true})
+      if (pro.configurations.requiredPlugin.dependencies.contains(pluginDep)) {
+        pro.logger.info "JOSM plugin '{}' is already on the classpath.", pluginName
+      } else {
+        tmpConf.fileCollection(pluginDep).files.each { jarFile ->
+          def zipFile = new ZipFile(jarFile)
+          def zipEntries = zipFile.entries()
+          while (zipEntries.hasMoreElements()) {
+            def zipEntry = zipEntries.nextElement()
+            if ('META-INF/MANIFEST.MF'.equals(zipEntry.name)) {
+              def requirements = new java.util.jar.Manifest(zipFile.getInputStream(zipEntry)).mainAttributes.getValue("Plugin-Requires")
+              if (requirements != null) {
+                // If the plugin itself requires more plugins, recursively add them too.
+                requirePlugins(recursionDepth + 1, pro, requirements.split(';'))
+              }
+            }
+          }
+        }
+        pro.configurations.requiredPlugin.dependencies.add(pluginDep)
+      }
+      pro.configurations.remove(tmpConf)
+    })
   }
 }
