@@ -20,11 +20,7 @@ class RunJosmTask extends JavaExec {
 
       doFirst {
         println "Running version ${project.version} of ${project.name}"
-        for (def dep : project.configurations.runtimeClasspath.allDependencies) {
-          if ("josm".equals(dep.name)) { // TODO: Is there a better way of finding the JOSM dependency than by name?
-            println "\nUsing JOSM version " + dep.version
-          }
-        }
+        println "\nUsing JOSM version " + project.josm.josmCompileVersion
 
         println '\nThese system properties are set:'
         for (def entry : systemProperties.entrySet()) {
