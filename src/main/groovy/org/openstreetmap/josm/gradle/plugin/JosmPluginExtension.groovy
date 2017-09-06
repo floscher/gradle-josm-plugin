@@ -39,12 +39,6 @@ class JosmPluginExtension {
    */
   def File josmConfigDir = new File("${project.projectDir}/config/josm")
   /**
-   * This property defines, how the resulting *.jar file should be called in the <code>$JOSM_HOME/plugins/</code>
-   * directory, e.g. <code>MyAwesomePlugin.jar</code>. If this is not set (or set to null), the default name determined by
-   * Gradle would be used (<code>${baseName}-${appendix}-${version}-${classifier}.jar</code>).
-   */
-  def String jarName
-  /**
    * The repositories that are added to the repository list.
    * <p><strong>Default value (in this order):</strong>
    * <ol>

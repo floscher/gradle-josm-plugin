@@ -8,9 +8,12 @@ import org.gradle.api.tasks.JavaExec
 class RunJosmTask extends JavaExec {
   def String extraInformation = ''
   public RunJosmTask() {
+    def arguments = project.hasProperty('josmArgs') ? project.josmArgs.split('\\\\') : []
+    arguments << "--load-preferences=" + new File("build/josm-custom-config/requiredPlugins.xml").toURI().toURL().toString()
+
     group 'JOSM'
     main 'org.openstreetmap.josm.gui.MainApplication'
-    args (project.hasProperty('josmArgs') ? project.josmArgs.split('\\\\') : [])
+    args arguments
     shouldRunAfter project.tasks.cleanJosm
 
     dependsOn project.tasks.updateJosmPlugins
