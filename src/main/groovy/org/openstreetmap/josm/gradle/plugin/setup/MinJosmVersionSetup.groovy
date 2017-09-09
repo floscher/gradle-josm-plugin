@@ -41,7 +41,7 @@ public final class MinJosmVersionSetup {
       }
       pro.minJosmVersionClasses.setGroup('JOSM')
       pro.minJosmVersionClasses.setDescription('Try to compile against the version of JOSM that is specified in the manifest as the minimum compatible version')
-      pro.compileMinJosmVersionJava.dependsOn pro.addMinJosmVersionDependency
+      pro.tasks.compileMinJosmVersionJava.dependsOn pro.tasks.addMinJosmVersionDependency
     }
 
 

@@ -75,7 +75,7 @@ class JosmPluginExtension {
   /**
    * The manifest for the JOSM plugin. This is initialized as soon as the project has been evaluated.
    */
-  final def Manifest manifest = new Manifest(project)
+  final def JosmManifest manifest = new JosmManifest(project)
 
   public void manifest(final Closure c) {
     project.configure(manifest, c)

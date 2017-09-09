@@ -6,7 +6,7 @@ import org.gradle.api.plugins.PluginInstantiationException
 /**
  * The info that will be written into the manifest file of the plugin *.jar
  */
-public class Manifest {
+public class JosmManifest {
   protected final Project project;
   /**
    * The author of the plugin.
@@ -86,7 +86,7 @@ public class Manifest {
    * Initialize the manifest for the given project
    * @param project the {@link Project} for which the manifest should be initialized
    */
-  protected Manifest(final Project project) {
+  protected JosmManifest(final Project project) {
     this.project = project
 
     project.gradle.projectsEvaluated {
@@ -139,8 +139,8 @@ public class Manifest {
   }
 
   /**
-   * Returns a map containing all Manifest attributes, which are set.
-   * This map can then be fed into {@link org.gradle.api.java.archives.Manifest#attributes(java.util.Map)}
+   * Returns a map containing all manifest attributes, which are set.
+   * This map can then be fed into {@link Manifest#attributes(java.util.Map)}
    */
   public Map<String,String> createJosmPluginJarManifest() {
     // Required attributes

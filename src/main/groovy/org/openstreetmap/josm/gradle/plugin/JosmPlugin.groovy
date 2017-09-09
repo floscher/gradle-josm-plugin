@@ -11,6 +11,7 @@ import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup
 
 import java.util.zip.ZipFile
 import java.util.zip.ZipEntry
+import java.util.jar.Manifest
 
 /**
  * Main class of the plugin, sets up the {@code requiredPlugin} configuration,
@@ -92,7 +93,7 @@ class JosmPlugin implements Plugin<Project> {
           while (zipEntries.hasMoreElements()) {
             def zipEntry = zipEntries.nextElement()
             if ('META-INF/MANIFEST.MF'.equals(zipEntry.name)) {
-              def requirements = new java.util.jar.Manifest(zipFile.getInputStream(zipEntry)).mainAttributes.getValue("Plugin-Requires")
+              def requirements = new Manifest(zipFile.getInputStream(zipEntry)).mainAttributes.getValue("Plugin-Requires")
               if (requirements != null) {
                 // If the plugin itself requires more plugins, recursively add them too.
                 requirePlugins(recursionDepth + 1, pro, requirements.split(';'))

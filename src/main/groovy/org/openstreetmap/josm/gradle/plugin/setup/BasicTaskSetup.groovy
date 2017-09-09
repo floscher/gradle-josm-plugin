@@ -65,7 +65,8 @@ class BasicTaskSetup extends AbstractSetup {
     // Debug task
     pro.task(
       [type: RunJosmTask.class],
-      'debugJosm', { t->
+      'debugJosm',
+      {t ->
         pro.gradle.projectsEvaluated {
           description 'Runs a JOSM instance like the task `runJosm`, but with JDWP (Java debug wire protocol) active' + (
             pro.josm.debugPort == null

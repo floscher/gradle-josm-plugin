@@ -43,7 +43,7 @@ josm {
 ```
 Some of these options are commented out, that means that they are optional, the others have to be set.
 
-For documentation on what each of these means, see the documentation for [`josm{ }`](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/JosmPluginExtension.html) and for [`manifest{ }`](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/Manifest.html).
+For documentation on what each of these means, see the documentation for [`josm{ }`](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/JosmPluginExtension.html) and for [`manifest{ }`](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/JosmManifest.html).
 
 
 
