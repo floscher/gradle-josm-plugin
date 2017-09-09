@@ -38,7 +38,7 @@ There are more configuration options you can set in that josm{} block, see [the 
 
 E.g., if your JOSM plugin requires other JOSM plugins, simply add them to your dependencies:
 ```gradle
-josm.manifest.pluginDependencies << ['AwesomePluginName1', 'AwesomePluginName2', 'AwesomePluginName3']
+josm.manifest.pluginDependencies << 'AwesomePluginName1' << 'AwesomePluginName2' << 'AwesomePluginName3'
 ```
 
 ### Usage
