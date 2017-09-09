@@ -147,6 +147,7 @@ public class Manifest {
     def manifestAtts = [
       "Created-By": System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")",
       "Gradle-Version": project.gradle.getGradleVersion(),
+      "Groovy-Version": GroovySystem.getVersion(),
       "Plugin-Class": mainClass,
       "Plugin-Date": String.format("%1\$tY-%1\$tm-%1\$tdT%1\$tH:%1\$tM:%1\$tS%1\$tz", new GregorianCalendar()),
       "Plugin-Description": description,
