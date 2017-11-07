@@ -3,6 +3,7 @@ package org.openstreetmap.josm.gradle.plugin.setup
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
+import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskExecutionException
 
 import org.openstreetmap.josm.gradle.plugin.RunJosmTask
@@ -50,9 +51,14 @@ class BasicTaskSetup extends AbstractSetup {
     // All RunJosmTasks by default depend on this task.
     pro.task(
       [
-        description: 'Put all needed plugin *.jar files into the plugins directory. This task itself does nothing, but all tasks that copy the needed files (should) be set as dependencies of this task.'
+        type: Sync,
+        description: 'Put all needed plugin *.jar files into the plugins directory. This task copies files into the temporary JOSM home directory.'
       ],
-      'updateJosmPlugins'
+      'updateJosmPlugins',
+      {t ->
+        t.into "${pro.josm.tmpJosmHome}/plugins"
+        // the rest of the configuration (e.g. from where the files come, that should be copied) is done later (e.g. in the file `PluginTaskSetup.groovy`)
+      }
     )
     // Standard run-task
     pro.task(
