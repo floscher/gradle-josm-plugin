@@ -114,7 +114,6 @@ class PluginTaskSetup extends AbstractSetup {
       [type: Sync],
       "dist",
       {t ->
-        finalizedBy pro.tasks.generatePluginList
         from pro.tasks.jar.outputs
         into "${pro.buildDir}/dist"
         pro.gradle.projectsEvaluated {
@@ -123,5 +122,6 @@ class PluginTaskSetup extends AbstractSetup {
       }
     )
     pro.tasks.jar.finalizedBy pro.tasks.dist
+    pro.tasks.jar.finalizedBy pro.tasks.localDist
   }
 }
