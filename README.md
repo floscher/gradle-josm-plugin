@@ -18,3 +18,4 @@ Also, the [Groovydoc of this plugin is available online](https://floscher.github
 * [iandees/josm-mbtiles](https://github.com/iandees/josm-mbtiles)
 * [JOSM/geojson](https://github.com/JOSM/geojson)
 * [JOSM/Mapillary](https://github.com/JOSM/Mapillary)
+* [matsim-org/josm-matsim-plugin](https://github.com/matsim-org/josm-matsim-plugin)

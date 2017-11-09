@@ -64,7 +64,7 @@ class BasicTaskSetup extends AbstractSetup {
     pro.task(
       [
         type: RunJosmTask.class,
-        description: 'Runs an independent JOSM instance (version specified in project dependencies) with `build/.josm/` as home directory and the freshly compiled Mapillary plugin active.'
+        description: 'Runs an independent JOSM instance (version specified in project dependencies) with `build/.josm/` as home directory and the freshly compiled plugin active.'
       ],
       'runJosm'
     )

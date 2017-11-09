@@ -14,7 +14,7 @@ plugins {
   id 'org.openstreetmap.josm.gradle.plugin' version '‹insertCurrentVersionNumber›'
 }
 ```
-(replace `‹insertCurrentVersionNumber›` by the latest version number that is displayed at [the Gradle plugin repository](https://plugins.gradle.org/plugin/org.openstreetmap.josm.gradle.plugin))
+(replace `‹insertCurrentVersionNumber›` with [![the latest available version number](https://img.shields.io/github/tag/floscher/gradle-josm-plugin.svg?style=flat-square&label=%20)](https://plugins.gradle.org/plugin/org.openstreetmap.josm.gradle.plugin))
 
 ## Option 1: My project does not have a `build.xml` file in the project root
 
