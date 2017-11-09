@@ -64,7 +64,7 @@ class PluginTaskSetup extends AbstractSetup {
           if (localDistListFile.exists()) {
             localDistListFile.delete()
           }
-          // First line containing the
+          // First line containing the name of the plugin and the URL to the *.jar file
           localDistListFile << String.format(
             '%s;%s%n',
             localDistName,

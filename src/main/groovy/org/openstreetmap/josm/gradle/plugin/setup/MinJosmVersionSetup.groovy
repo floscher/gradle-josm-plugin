@@ -13,6 +13,7 @@ public final class MinJosmVersionSetup {
     }
 
     pro.task(
+      [description: 'Adds dependency for the minimum required JOSM version to the configuration `minJosmVersionImplementation`.'],
       'addMinJosmVersionDependency',
       {t ->
         doFirst {
