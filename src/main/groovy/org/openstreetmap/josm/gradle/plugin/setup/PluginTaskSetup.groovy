@@ -10,7 +10,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class PluginTaskSetup extends AbstractSetup {
-  Project pro
 
   public void setup() {
     pro.task(
@@ -18,7 +17,7 @@ class PluginTaskSetup extends AbstractSetup {
       'writePluginConfig',
       {t ->
         t.doFirst {
-          def customConfig = new File("${pro.buildDir}/josm-custom-config/requiredPlugins.xml")
+          def customConfig = new File(pro.buildDir, "/josm-custom-config/requiredPlugins.xml")
           customConfig.parentFile.mkdirs()
           pro.logger.lifecycle 'Write required plugins to {}…', customConfig.absolutePath
           customConfig.withWriter ('UTF-8') { out ->

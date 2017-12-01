@@ -18,12 +18,23 @@ import java.util.jar.Manifest
  * the additional repositories and the custom tasks.
  */
 class JosmPlugin implements Plugin<Project> {
+  private static Project currentProject;
+
+  public static Project getCurrentProject() {
+    if (currentProject == null) {
+      throw new IllegalStateException("Currently the gradle-josm-plugin is not applied to a Gradle project, but you want to access the project to which the gradle-josm-plugin is applied. This should not happen ;).")
+    }
+    return currentProject
+  }
+
   /**
    * Set up the JOSM plugin.
    * Creates the tasks this plugin provides, defines the {@code josm} extension, adds the repositories where JOSM specific dependencies can be found.
    * @see {@link Plugin#apply(T)}
    */
-  void apply(Project project) {
+  synchronized void apply(final Project project) {
+    JosmPlugin.currentProject = project;
+
     // Apply the Java plugin if not available, because we rely on the `jar` task
     if (project.plugins.findPlugin(JavaPlugin) == null) {
       project.apply plugin: 'java'
@@ -58,11 +69,12 @@ class JosmPlugin implements Plugin<Project> {
       }
     }
 
-    new BasicTaskSetup(pro: project).setup()
+    new BasicTaskSetup().setup()
     if (project.josm.isPlugin) {
-      new PluginTaskSetup(pro: project).setup()
+      new PluginTaskSetup().setup()
     }
-    new MinJosmVersionSetup(pro: project).setup()
+    new MinJosmVersionSetup().setup()
+    JosmPlugin.currentProject = null;
   }
 
   /**

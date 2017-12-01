@@ -1,6 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin
 
 import org.gradle.api.tasks.JavaExec
+import org.openstreetmap.josm.gradle.plugin.JosmPlugin
 
 /**
  * A task that can execute a JOSM instance. Both the {@code runJosm} task and the {@code debugJosm} task extend this type of task.
@@ -16,7 +17,7 @@ class RunJosmTask extends JavaExec {
    */
   public RunJosmTask() {
     def arguments = project.hasProperty('josmArgs') ? project.josmArgs.split('\\\\') : []
-    arguments << "--load-preferences=" + new File("build/josm-custom-config/requiredPlugins.xml").toURI().toURL().toString()
+    arguments << "--load-preferences=" + new File(JosmPlugin.currentProject.buildDir, "/josm-custom-config/requiredPlugins.xml").toURI().toURL().toString()
 
     group 'JOSM'
     main 'org.openstreetmap.josm.gui.MainApplication'

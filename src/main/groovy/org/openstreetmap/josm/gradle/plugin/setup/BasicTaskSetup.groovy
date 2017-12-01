@@ -9,7 +9,6 @@ import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.RunJosmTask
 
 class BasicTaskSetup extends AbstractSetup {
-  Project pro
 
   public void setup() {
     // Clean JOSM
