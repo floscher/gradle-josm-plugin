@@ -14,7 +14,7 @@ And if you need external dependencies for your plugin, maybe [`docs/Dependencies
 Also, the [Groovydoc of this plugin is available online](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/package-summary.html).
 
 ## Projects using this Gradle plugin
-* [iandees/josm-fieldpapers](https://github.com/iandees/josm-fieldpapers)
+* [fieldpapers/josm-fieldpapers](https://github.com/fieldpapers/josm-fieldpapers)
 * [iandees/josm-mbtiles](https://github.com/iandees/josm-mbtiles)
 * [JOSM/geojson](https://github.com/JOSM/geojson)
 * [JOSM/Mapillary](https://github.com/JOSM/Mapillary)
