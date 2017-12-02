@@ -15,7 +15,7 @@ before_script: |
       cp -rT "$GH_PAGES_REPO/maven" "$MAIN_REPO/build/maven"
     fi
   fi
-script: ./gradlew build deploy groovydoc
+script: ./gradlew build publish groovydoc
 after_success: |
   if [ "$TRAVIS_TAG" == "" ]; then
     echo "Not a tagged release, so GitHub pages are not updated! This version is also _not_ released to https://plugins.gradle.org ."

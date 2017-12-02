@@ -1,15 +1,15 @@
 plugins {
-  id "com.gradle.plugin-publish" version "0.9.7"
+  id "com.gradle.plugin-publish" version "0.9.9"
+  id "groovy"
+  id "maven"
+  id "eclipse"
+
+  id "java-gradle-plugin"
+  id "maven-publish"
 }
-import org.gradle.api.tasks.Upload
 import org.gradle.api.tasks.javadoc.Groovydoc
 
-apply plugin: 'groovy'
-apply plugin: 'maven'
-apply plugin: 'eclipse'
-
 dependencies {
-  compile gradleApi()
   compile localGroovy()
 }
 
@@ -31,6 +31,7 @@ group = 'org.openstreetmap.josm'
 version = versionStream.toString().trim()
 version = version.charAt(0) == 'v' ? version.substring(1) : version
 
+// for the plugin-publish (publish to plugins.gradle.org)
 pluginBundle {
   website = 'https://floscher.github.io/gradle-josm-plugin'
   vcsUrl = 'https://github.com/floscher/gradle-josm-plugin'
@@ -44,16 +45,26 @@ pluginBundle {
     }
   }
 }
-
-task deploy(type: Upload) {
-  configuration = configurations.archives
-  repositories {
-    mavenDeployer {
-      repository(url: "file://$buildDir/maven")
-      pom.artifactId = 'gradle-plugin'
+// for the java-gradle-plugin (local publishing)
+gradlePlugin {
+  plugins {
+    josmPlugin {
+      id = 'org.openstreetmap.josm.gradle.plugin'
+      implementationClass = 'org.openstreetmap.josm.gradle.plugin.JosmPlugin'
     }
   }
+}
+
+publishing {
+  repositories {
+    maven {
+      url "$buildDir/maven"
+    }
+  }
+}
+
+tasks.publish {
   doLast {
-    println "Version " + repositories.mavenDeployer.pom.version + " is now deployed!"
+    println "Version " + project.version + " is now deployed!"
   }
 }

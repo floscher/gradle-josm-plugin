@@ -34,7 +34,7 @@ class BasicTaskSetup extends AbstractSetup {
           into "${pro.josm.tmpJosmHome}"
           include 'preferences.xml'
           if (source.size() <= 0) {
-            pro.logger.lifecycle "No default JOSM preference file found in ${pro.josm.josmConfigDir}/preferences.xml."
+            pro.logger.debug "No default JOSM preference file found in ${pro.josm.josmConfigDir}/preferences.xml."
           }
         }
         doFirst {
