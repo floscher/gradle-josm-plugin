@@ -118,29 +118,29 @@ public class JosmManifest {
    * Add a link to an earlier release of the plugin, that is compatible with JOSM versions, with which the current version is no longer compatible.
    * @param minJosmVersion the minimum JOSM version with which the linked plugin is compatible
    * @param pluginVersion the version number of the linked plugin
-   * @param the URL where the linked plugin is located
+   * @param downloadURL the URL where the linked plugin can be downloaded from
    */
   public void oldVersionDownloadLink(int minJosmVersion, String pluginVersion, URL downloadURL) {
     oldVersionDownloadLinks << new PluginDownloadLink(minJosmVersion: minJosmVersion, pluginVersion: pluginVersion, downloadURL: downloadURL)
   }
 
   /**
-   *
-   * @param checkResult
+   * Logs an error message when the parameter {@code checkResult} is true.
+   * @param checkResult a boolean value that is true when the field in question is missing
    * @param fieldDescription a textual description of the field (e.g. "the version of your plugin")
    * @param requiredValue the property which needs to be set in order to correct for this error (e.g. "josm.manifest.requiredValue = ‹some value›")
-   * @return <code>true</code> if the required field is <code>null</code>, <code>false</code> otherwise
+   * @return always returns the parameter {@code checkResult}
    */
   private boolean isRequiredFieldMissing(boolean checkResult, String fieldDescription, String requiredValue) {
     if (checkResult) {
-      System.err.printf("You haven't configured %s. Please add %s to your build.gradle file.\n", fieldDescription, requiredValue)
+      project.logger.error "You haven't configured %s. Please add %s to your build.gradle file.", fieldDescription, requiredValue
     }
     return checkResult
   }
 
   /**
    * Returns a map containing all manifest attributes, which are set.
-   * This map can then be fed into {@link Manifest#attributes(java.util.Map)}
+   * This map can then be fed into {@link org.gradle.api.java.archives.Manifest#attributes(java.util.Map)}. That's already done automatically by the gradle-josm-plugin, so you normally don't need to call this yourself.
    */
   public Map<String,String> createJosmPluginJarManifest() {
     // Required attributes

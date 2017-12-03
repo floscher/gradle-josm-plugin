@@ -43,8 +43,6 @@ public final class MinJosmVersionSetup extends AbstractSetup {
       pro.minJosmVersionClasses.setDescription('Try to compile against the version of JOSM that is specified in the manifest as the minimum compatible version')
       pro.tasks.compileMinJosmVersionJava.dependsOn pro.tasks.addMinJosmVersionDependency
     }
-
-
   }
 
   /**

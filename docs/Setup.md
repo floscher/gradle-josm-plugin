@@ -11,7 +11,7 @@ But let's start with what you have to set up in both of these cases:
 Add the following to the beginning of your `build.gradle`:
 ```gradle
 plugins {
-  id 'org.openstreetmap.josm.gradle.plugin' version '‹insertCurrentVersionNumber›'
+  id 'org.openstreetmap.josm' version '‹insertCurrentVersionNumber›'
 }
 ```
 Replace `‹insertCurrentVersionNumber›` with [![the latest available version number](https://img.shields.io/github/tag/floscher/gradle-josm-plugin.svg?style=flat-square&label=%20)](https://plugins.gradle.org/plugin/org.openstreetmap.josm.gradle.plugin), but do not include the leading `v` character.
@@ -21,7 +21,7 @@ Replace `‹insertCurrentVersionNumber›` with [![the latest available version 
 Add the following to your `build.gradle`:
 ```gradle
 version = 'v1.2.3'
-project.archivesBaseName = 'MyAwesomePluginName'
+archivesBaseName = 'MyAwesomePluginName'
 josm {
   // debugport = ‹insertDebugPortNumber›
   josmCompileVersion = 1234
@@ -49,7 +49,7 @@ For documentation on what each of these means, see the documentation for [`josm{
 
 ## Option 2: My project has a `build.xml` file in the project root
 
-Remove each of the properties below from your `build.xml` file and put them into a `gradle.properties` file (except `plugin.description`, you need to **copy** that over, or it won't get translated), like this. These are by the way all example values, replace with your own ones:
+Remove each of the properties below from your `build.xml` file and put them into a `gradle.properties` file, as done below (except `plugin.description`: You need to **copy** that over, or it won't get translated). These are by the way all example values, replace with your own ones:
 ```properties
 plugin.class=org.openstreetmap.josm.plugins.myawesomeplugin.MyAwesomePlugin
 plugin.compile.version=1234
