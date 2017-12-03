@@ -9,11 +9,6 @@ class JosmPluginExtension {
   protected static def Project project = null;
 
   /**
-   * If this is set to {@code true}, the *.jar file built for the project is put into the
-   * {@code $JOSM_HOME/plugins/} directory for the tasks {@code runJosm} or {@code debugJosm}
-   */
-  def boolean isPlugin = true
-  /**
    * The version number of JOSM against which the plugin should be compiled.
    *
    * <p><strong>Default:</strong> The value of the property <code>plugin.compile.version</code> or <code>null</code> if that property is not set.</p>

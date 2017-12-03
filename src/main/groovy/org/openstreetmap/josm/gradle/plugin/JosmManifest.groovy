@@ -64,6 +64,11 @@ public class JosmManifest {
    */
   final def Set<String> pluginDependencies = new HashSet<>()
   /**
+   * Contains the {@link #description} translated to languages other than English.
+   *
+   */
+  private final Map<String, String> translatedDescriptions = new HashMap<>()
+  /**
    * A URL pointing to a web resource describing the plugin.
    *
    * <p><strong>Default:</strong> The value of property <code>plugin.link</code> as URL (might error out on malformed URLs), or <code>null</code> if that property is not set.</p>
@@ -159,6 +164,9 @@ public class JosmManifest {
     oldVersionDownloadLinks.each { value ->
       manifestAtts << [ (value.minJosmVersion+"_Plugin-Url") : value.pluginVersion+';'+value.downloadURL.toString()]
     }
+    translatedDescriptions.each { lang, desc ->
+      manifestAtts << [ (lang+"_Plugin-Description") : desc ]
+    }
 
     // Optional attributes
     if (author != null) {
@@ -182,5 +190,20 @@ public class JosmManifest {
       project.logger.info "  "+e.key+": "+e.value
     }
     return manifestAtts
+  }
+
+  /**
+   * Adds a translation of the plugin description for a certain language.
+   * @param language the language abbreviation (e.g. {@code de_AT} or {@code es})
+   * @param translatedDescription the description in the language given by the {@code language} parameter
+   */
+  public void translatedDescription(String language, String translatedDescription) {
+    if (language == null || !language.matches("[a-z]{2,3}(_[A-Z]{2})?")) {
+      throw new IllegalArgumentException(String.format("The given language string '%s' is not a valid abbreviation for a language.", language))
+    }
+    if (translatedDescription == null || translatedDescription.length() <= 0) {
+      throw new IllegalArgumentException("The translated description must not be empty")
+    }
+    translatedDescriptions.put(language, translatedDescription)
   }
 }

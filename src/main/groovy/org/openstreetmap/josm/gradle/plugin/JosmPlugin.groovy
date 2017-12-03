@@ -43,13 +43,11 @@ class JosmPlugin implements Plugin<Project> {
     JosmPluginExtension.project = project
     project.extensions.create("josm", JosmPluginExtension)
 
-    if (project.josm.isPlugin) {
-      project.configurations {
-        // Configuration for JOSM plugins that are required for this plugin. Normally there's no need to set these manually, these are set based on the manifest configuration
-        implementation.extendsFrom(requiredPlugin)
-        // Configuration for libraries on which the project depends and which should be packed into the built *.jar file.
-        implementation.extendsFrom(packIntoJar)
-      }
+    project.configurations {
+      // Configuration for JOSM plugins that are required for this plugin. Normally there's no need to set these manually, these are set based on the manifest configuration
+      implementation.extendsFrom(requiredPlugin)
+      // Configuration for libraries on which the project depends and which should be packed into the built *.jar file.
+      implementation.extendsFrom(packIntoJar)
     }
 
     project.repositories(project.josm.repositories)
@@ -70,9 +68,7 @@ class JosmPlugin implements Plugin<Project> {
     }
 
     new BasicTaskSetup().setup()
-    if (project.josm.isPlugin) {
-      new PluginTaskSetup().setup()
-    }
+    new PluginTaskSetup().setup()
     new MinJosmVersionSetup().setup()
     JosmPlugin.currentProject = null;
   }
