@@ -34,7 +34,7 @@ version = version.charAt(0) == 'v' ? version.substring(1) : version
 
 // for the plugin-publish (publish to plugins.gradle.org)
 pluginBundle {
-  website = 'https://floscher.github.io/gradle-josm-plugin'
+  website = 'https://github.com/floscher/gradle-josm-plugin#readme'
   vcsUrl = 'https://github.com/floscher/gradle-josm-plugin'
   description = 'This plugin helps with developing for the JOSM project.'
   tags = ['josm', 'openstreetmap', 'osm']
