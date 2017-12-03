@@ -5,62 +5,101 @@ import org.gradle.api.plugins.PluginInstantiationException
 
 /**
  * The info that will be written into the manifest file of the plugin *.jar
+ *
+ * <p>Most of the attributes are corresponding to the ones listed in
+ * <a href="https://josm.openstreetmap.de/wiki/DevelopersGuide/DevelopingPlugins#ThemanifestfileforaJOSMplugin">the documentation for developing JOSM plugins</a>.
+ * But note that some of them have been renamed a bit to better express what each attribute is good for.</p>
+ *
+ * <p>The properties used by the Ant build (e.g. {@code plugin.author} or {@code plugin.description}) are automatically picked up by both Ant and Gradle, if you define them in your {@gradle.properties} file and load them into your {@code build.xml} file using the following snippet:
+ * <pre>
+ * &lt;!-- edit the properties of this plugin in the file `gradle.properties` -->
+ * &lt;property file="${basedir}/gradle.properties"/>
+ * </pre></p>
+ *
+ * <p>The detailed documentation for each field below tells you, which one corresponds to which Ant/Gradle property and to which attribute in the MANIFEST.MF file.</p>
  */
 public class JosmManifest {
-  protected final Project project;
+  private final Project project = JosmPlugin.currentProject;
   /**
    * The author of the plugin.
    *
-   * <p><strong>Default:</strong> the value of property <code>plugin.author</code> or <code>null</code> if that property is not set.</p>
+   * <dl>
+   *   <dt><strong>Default value:</strong></dt><dd>the value of property <code>plugin.author</code> or <code>null</code> if that property is not set.</dd>
+   *   <dt><strong>Influenced MANIFEST.MF attribute:</strong></dt><dd>{@code Author}</dd>
+   * </dl>
    */
   def String author = project.findProperty('plugin.author')
   /**
    * Determines if the plugin needs a restart after installation. <code>true</code> if no restart is required, <code>false</code> otherwise.
    *
-   * <p><strong>Default:</strong> the value of property <code>plugin.canloadatruntime</code> or <code>false</code> if that property is not set.</p>
+   * <p>
+   *   <dt><strong>Default value:</strong></dt><dd>the value of property <code>plugin.canloadatruntime</code> or <code>false</code> if that property is not set.</dd>
+   *   <dt><strong>Influenced MANIFEST.MF attribute:</strong></dt><dd>{@code Plugin-Canloadatruntime}</dd>
+   * </p>
    */
   def boolean canLoadAtRuntime = Boolean.valueOf(project.findProperty('plugin.canloadatruntime'))
   /**
    * The description of what the plugin does.
    *
-   * <p><strong>Default:</strong> the value of property <code>plugin.description</code> or <code>null</code> if that property is not set.</p>
+   * <dl>
+   *   <dt><strong>Default value:</strong></dt><dd>the value of property <code>plugin.description</code> or <code>null</code> if that property is not set.</dd>
+   *   <dt><strong>Influenced MANIFEST.MF attribute:</strong></dt><dd>{@code Plugin-Description}</dd>
+   * </dl>
    */
   def String description = project.findProperty('plugin.description')
   /**
    * Path to the logo of the plugin. Relative to the root of the released jar-file, so that it can be loaded via <code>getClass.getResource()</code>.
    *
-   * <p><strong>Default:</strong> the value of property <code>plugin.icon</code> or <code>null</code> if that property is not set.</p>
+   * <dl>
+   *   <dt>Default value:</dt><dd>the value of property <code>plugin.icon</code> or <code>null</code> if that property is not set.</dd>
+   *   <dt>Influenced MANIFEST.MF attribute:</dt><dd>{@code Plugin-Icon}</dd>
+   * </dl>
    */
   def String iconPath = project.findProperty('plugin.icon')
   /**
    * This can be set to <code>true</code>, when the plugin should load before the GUI classes of JOSM.
    *
-   * <p><strong>Default:</strong> The value of property <code>plugin.early</code> or <code>false</code> if that property is not set.</p>
+   * <dl>
+   *   <dt><strong>Default:</strong></dt><dd>The value of property <code>plugin.early</code> or <code>false</code> if that property is not set.</dd>
+   *   <dt>Influenced MANIFEST.MF attribute:</dt><dd>{@code Plugin-Early}</dd>
+   * </dl>
    */
   def boolean loadEarly = Boolean.valueOf(project.findProperty('plugin.early'))
   /**
    * A number indicating the order in which the plugins should be loaded. Lower numbers first, higher numbers later, then the plugins with this field set to <code>null</code>.
    *
-   * <p><strong>Default:</strong> The value of property <code>plugin.stage</code> or <code>null</code> if that property is not set.</p>
+   * <dl>
+   *   <dt><strong>Default:</strong></dt><dd>The integer value of property <code>plugin.stage</code> or <code>null</code> if that property is not set.</dd>
+   *   <dt>Influenced MANIFEST.MF attribute:</dt><dd>{@code Plugin-Stage}</dd>
+   * </dl>
    */
   def Integer loadPriority = project.hasProperty('plugin.stage') ? Integer.valueOf(project.findProperty('plugin.stage')) : null
   /**
    * The full name of the main class of the plugin
    *
-   * <p><strong>Default:</strong> the value of property <code>plugin.class</code> or <code>null</code> if that property is not set.</p>
+   * <dl>
+   *   <dt><strong>Default:</strong></dt><dd>the value of property <code>plugin.class</code> or <code>null</code> if that property is not set.</dd>
+   *   <dt>Influenced MANIFEST.MF attribute:</dt><dd>{@code Plugin-Class}</dd>
+   * </dl>
    */
   def String mainClass = project.findProperty('plugin.class')
   /**
    * The minimum JOSM version with which the plugin is compatible.<br>
    * This field is required!
    *
-   * <p><strong>Default:</strong> the value of property <code>plugin.main.version</code> or <code>null</code> if that property is not set.</p>
+   * <dl>
+   *   <dt><strong>Default:</strong></dt><dd>the value of property <code>plugin.main.version</code> or <code>null</code> if that property is not set.</dd>
+   *   <dt>Influenced MANIFEST.MF attribute:</dt><dd>{@code Plugin-Mainversion}</dd>
+   * </dl>
    */
   def String minJosmVersion = project.findProperty('plugin.main.version')
   /**
    * A collection of the names of all JOSM plugins that must be installed for this JOSM plugin to work
    *
-   * <p><strong>Default:</strong> the value of property <code>plugin.requires</code> split at every semicolon (do not rely on the order, as it is not necessarily maintained) or <code>null</code> if that property is not set.</p>
+   * <dl>
+   *   <dt><strong>Default:</strong></dt><dd>the value of property <code>plugin.requires</code> split at every semicolon (do not rely on the order, as it is not necessarily maintained) or <code>null</code> if that property is not set.</dd>
+   *   <dt>Influenced MANIFEST.MF attribute:</dt><dd>Plugin-Requires</dd>
+   * </dl>
    */
   final def Set<String> pluginDependencies = new HashSet<>()
   /**
@@ -71,12 +110,16 @@ public class JosmManifest {
   /**
    * A URL pointing to a web resource describing the plugin.
    *
-   * <p><strong>Default:</strong> The value of property <code>plugin.link</code> as URL (might error out on malformed URLs), or <code>null</code> if that property is not set.</p>
+   * <dl>
+   *   <dt><strong>Default:</strong></dt><dd>The value of property <code>plugin.link</code> as URL (might error out with a {@link java.net.MalformedURLException} on malformed URLs), or <code>null</code> if that property is not set.</dd>
+   *   <dt>Influenced MANIFEST.MF attribute:</dt><dd>{@code Plugin-Link}</dd>
+   * </dl>
    */
   def URL website = project.hasProperty('plugin.link') ? new URL(project.findProperty('plugin.link')) : null
   /**
    * For compatibility with older JOSM versions, that are not supported by the current version of the plugin.
-   * This field contains URLs where versions of the plugin can be downloaded, which are compatible with older JOSM versions.
+   * This field contains URLs where versions of the plugin can be downloaded, which are compatible with certain older JOSM versions.
+   * @see {@link #oldVersionDownloadLink(int, String, URL)} on how to add entries to this attribute.
    * The URL value points to a location where the plugin can be downloaded from and the integer key denotes the minimum JOSM version that the plugin at that location is compatible with.
    */
   private final def Set<PluginDownloadLink> oldVersionDownloadLinks = []
@@ -88,12 +131,9 @@ public class JosmManifest {
   }
 
   /**
-   * Initialize the manifest for the given project
-   * @param project the {@link Project} for which the manifest should be initialized
+   * Initialize the manifest for the project, that is currently being modified by the gradle-josm-plugin
    */
-  protected JosmManifest(final Project project) {
-    this.project = project
-
+  protected JosmManifest() {
     project.gradle.projectsEvaluated {
       boolean missesRequiredFields =
         isRequiredFieldMissing(minJosmVersion == null, "the minimum JOSM version your plugin is compatible with", "josm.manifest.minJosmVersion = ‹a JOSM version›") |
@@ -121,6 +161,10 @@ public class JosmManifest {
 
   /**
    * Add a link to an earlier release of the plugin, that is compatible with JOSM versions, with which the current version is no longer compatible.
+   * <dl>
+   *   <dt><strong>Influenced MANIFEST.MF attribute:</strong></dt><dd>{@code ([1-9][0-9]*)_Plugin-Url} (Any attribute that matches this <a href="https://en.wikipedia.org/wiki/Regular_expression">RegEx</a>. The number in the beginning is determined by the parameter {@code minJosmVersion}.)</dd>
+   * </dl>
+   *
    * @param minJosmVersion the minimum JOSM version with which the linked plugin is compatible
    * @param pluginVersion the version number of the linked plugin
    * @param downloadURL the URL where the linked plugin can be downloaded from

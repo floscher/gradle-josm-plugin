@@ -6,8 +6,7 @@ import org.gradle.api.Project
  * Contains the available configuration options for the Gradle plugin.
  */
 class JosmPluginExtension {
-  protected static def Project project = null;
-
+  private final Project project = JosmPlugin.currentProject;
   /**
    * The version number of JOSM against which the plugin should be compiled.
    *
@@ -70,7 +69,7 @@ class JosmPluginExtension {
   /**
    * The manifest for the JOSM plugin. This is initialized as soon as the project has been evaluated.
    */
-  final def JosmManifest manifest = new JosmManifest(project)
+  final def JosmManifest manifest = new JosmManifest()
 
   public void manifest(final Closure c) {
     project.configure(manifest, c)

@@ -40,7 +40,6 @@ class JosmPlugin implements Plugin<Project> {
       project.apply plugin: 'java'
     }
     // Define 'josm' extension
-    JosmPluginExtension.project = project
     project.extensions.create("josm", JosmPluginExtension)
 
     project.configurations {
