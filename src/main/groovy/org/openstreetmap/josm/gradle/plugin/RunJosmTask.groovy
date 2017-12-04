@@ -10,7 +10,7 @@ class RunJosmTask extends JavaExec {
   /**
    * Text that should be displayed in the console output right before JOSM is started up. Defaults to the empty string.
    */
-  String extraInformation = ''
+  private String extraInformation = ''
   /**
    * Instantiates a new task for running a JOSM instance.
    * By default the source set <code>main</code> is added to
@@ -50,5 +50,13 @@ class RunJosmTask extends JavaExec {
         println '\nOutput of JOSM starts with the line after the three equality signs\n==='
       }
     }
+  }
+
+  /**
+   * Set the text that should be displayed right before the console output of JOSM when starting JOSM.
+   * This is used e.g. to display the remote debugging port.
+   */
+  public void extraInformation(final String extraInformation) {
+    this.extraInformation = extraInformation;
   }
 }
