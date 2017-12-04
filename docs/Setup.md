@@ -39,11 +39,18 @@ josm {
     // oldVersionDownloadLink 123, 'v1.2.0', new URL('https://example.org/download/v1.2.0/MyAwesomePlugin.jar')
     // oldVersionDownloadLink  42, 'v1.0.0', new URL('https://example.org/download/v1.0.0/MyAwesomePlugin.jar')
   }
+  // i18n {
+  //   bugReportEmail = 'me@example.com'
+  //   copyrightHolder = 'John Doe'
+  // }
 }
 ```
 Some of these options are commented out, that means that they are optional, the others have to be set.
 
-For documentation on what each of these means, see the documentation for [`josm{ }`](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/JosmPluginExtension.html) and for [`manifest{ }`](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/JosmManifest.html).
+For documentation on what each of these means, see the documentation for
+[`josm{ }`](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/config/JosmPluginExtension.html),
+[`manifest{ }`](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/config/JosmManifest.html) and for
+[`i18n{ }`](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/config/I18nConfig.html).
 
 
 
