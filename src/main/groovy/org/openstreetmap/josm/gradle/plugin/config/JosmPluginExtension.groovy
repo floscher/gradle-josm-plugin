@@ -1,6 +1,7 @@
-package org.openstreetmap.josm.gradle.plugin
+package org.openstreetmap.josm.gradle.plugin.config
 
 import org.gradle.api.Project
+import org.openstreetmap.josm.gradle.plugin.JosmPlugin
 
 /**
  * Contains the available configuration options for the Gradle plugin.
@@ -65,6 +66,18 @@ class JosmPluginExtension {
     maven {
       url 'https://josm.openstreetmap.de/nexus/content/repositories/snapshots/'
     }
+  }
+
+  /**
+   * Configuration options for i18n
+   */
+  final def I18nConfig i18n = new I18nConfig();
+
+  /**
+   * Change the i18n options by supplying a {@link Closure} to this method
+   */
+  public void i18n(final Closure c) {
+    project.configure(i18n, c)
   }
 
   /**

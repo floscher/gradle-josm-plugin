@@ -5,6 +5,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 
+import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.setup.BasicTaskSetup
 import org.openstreetmap.josm.gradle.plugin.setup.I18nTaskSetup
 import org.openstreetmap.josm.gradle.plugin.setup.MinJosmVersionSetup

@@ -2,6 +2,7 @@ package org.openstreetmap.josm.gradle.plugin.setup
 
 import org.gradle.api.tasks.Exec
 import groovy.io.FileType
+import java.time.Year
 
 class I18nTaskSetup extends AbstractSetup {
   public void setup() {
@@ -15,6 +16,7 @@ class I18nTaskSetup extends AbstractSetup {
         }
         doFirst {
           outFile.delete()
+          outFile.parentFile.mkdirs()
           pro.sourceSets.main.java.srcDirs.each { dir ->
             dir.eachFileRecurse(FileType.FILES) { f ->
               outFile << f.absolutePath + "\n"
@@ -29,7 +31,7 @@ class I18nTaskSetup extends AbstractSetup {
       'i18n-xgettext',
       {t ->
         def outDir = new File("${pro.buildDir}/po")
-        def outBaseName = "plugin_${pro.name}"
+        def outBaseName = "josm-plugin_${pro.name}"
         t.inputs.files(pro.sourceSets.main.java.srcDirs)
         t.outputs.dir(outDir)
 
@@ -38,26 +40,52 @@ class I18nTaskSetup extends AbstractSetup {
         args '--from-code=UTF-8', '--language=Java',
         "--files-from=${pro.buildDir}/srcFileList.txt",
         "--output-dir=${outDir.absolutePath}",
-        "--default-domain=plugin_${pro.name}",
-        "--package-name=plugin/${pro.name}",
+        "--default-domain=${outBaseName}",
+        "--package-name=josm-plugin/${pro.name}",
         '-k', '-ktrc:1c,2', '-kmarktrc:1c,2', '-ktr', '-kmarktr', '-ktrn:1,2', '-ktrnc:1c,2,3'
 
         pro.gradle.projectsEvaluated {
           args "--package-version=${pro.version}"
+          if (pro.josm.i18n.bugReportEmail != null) {
+            args '--msgid-bugs-address=' + pro.josm.i18n.bugReportEmail
+          }
+          if (pro.josm.i18n.copyrightHolder != null) {
+            args '--copyright-holder=' + pro.josm.i18n.copyrightHolder
+          }
         }
 
         doFirst {
           outDir.mkdirs()
-          print executable
+          println executable
           args.each { a ->
-            print ' ' + a
+            println "  " + a
           }
-          println ''
         }
         doLast {
-          new File(outDir, outBaseName + ".po").renameTo(new File(outDir, outBaseName + ".pot"))
+          moveFileAndReplaceStrings(
+            new File(outDir, outBaseName + ".po"),
+            new File(outDir, outBaseName + ".pot"),
+            [
+              "(C) YEAR": "(C) " + Year.now().value,
+              "charset=CHARSET": "charset=UTF-8"
+            ])
         }
       }
     )
+  }
+  private void moveFileAndReplaceStrings(final File src, final File dest, final Map<String,String> replacements) {
+    dest.withWriter { writer ->
+      src.eachLine { line ->
+        final String[] keys = replacements.keySet().toArray(new String[replacements.size()])
+        for (final String key : keys) {
+          if (line.contains(key) && replacements.containsKey(key)) {
+            line = line.replace(key, replacements.get(key))
+            replacements.remove(key)
+          }
+        }
+        writer << line + "\n"
+      }
+    }
+    src.delete()
   }
 }

@@ -1,7 +1,8 @@
-package org.openstreetmap.josm.gradle.plugin
+package org.openstreetmap.josm.gradle.plugin.config
 
 import org.gradle.api.Project
 import org.gradle.api.plugins.PluginInstantiationException
+import org.openstreetmap.josm.gradle.plugin.JosmPlugin
 
 /**
  * The info that will be written into the manifest file of the plugin *.jar
