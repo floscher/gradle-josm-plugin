@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 
 import org.openstreetmap.josm.gradle.plugin.setup.BasicTaskSetup
+import org.openstreetmap.josm.gradle.plugin.setup.I18nTaskSetup
 import org.openstreetmap.josm.gradle.plugin.setup.MinJosmVersionSetup
 import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup
 
@@ -67,6 +68,7 @@ class JosmPlugin implements Plugin<Project> {
     }
 
     new BasicTaskSetup().setup()
+    new I18nTaskSetup().setup()
     new PluginTaskSetup().setup()
     new MinJosmVersionSetup().setup()
     JosmPlugin.currentProject = null;
