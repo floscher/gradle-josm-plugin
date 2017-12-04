@@ -33,6 +33,7 @@ after_success: |
     echo "https://${GH_USERNAME}:${GH_TOKEN}@github.com" > $HOME/.git-credentials
 
     version=`git describe --always --dirty`
+    longVersion=`git describe --always --long --dirty`
     cd "$GH_PAGES_REPO"
 
     cp -r -T "$MAIN_REPO/build/docs/groovydoc" "$GH_PAGES_REPO/groovydoc/$version"
@@ -43,6 +44,6 @@ after_success: |
     cp -r "$MAIN_REPO/build/maven" "$GH_PAGES_REPO"
     git stage maven
 
-    git commit -a -m "Update Maven repository and Groovy documentation to $version"
+    git commit -a -m "Update Maven repository and Groovy documentation to $longVersion"
     git push origin gh-pages
   fi
