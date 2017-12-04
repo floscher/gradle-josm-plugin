@@ -62,13 +62,16 @@ class I18nTaskSetup extends AbstractSetup {
           }
         }
         doLast {
+          final File destFile = new File(outDir, outBaseName + ".pot");
           moveFileAndReplaceStrings(
             new File(outDir, outBaseName + ".po"),
-            new File(outDir, outBaseName + ".pot"),
+            destFile,
             [
               "(C) YEAR": "(C) " + Year.now().value,
               "charset=CHARSET": "charset=UTF-8"
-            ])
+            ]
+          )
+          destFile << "\n#. Plugin description for " << pro.name << "\nmsgid \"" << pro.josm.manifest.description << "\"\nmsgstr \"\"\n"
         }
       }
     )
