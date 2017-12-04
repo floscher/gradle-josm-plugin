@@ -37,14 +37,17 @@ class JosmPluginExtension {
    * The repositories that are added to the repository list.
    * <p><strong>Default value (in this order):</strong>
    * <ol>
+   * <li><a href="https://josm.openstreetmap.de/nexus/content/repositories/releases/">https://josm.openstreetmap.de/nexus/content/repositories/releases/</a></li>
    * <li><a href="https://josm.openstreetmap.de/download/">https://josm.openstreetmap.de/download/</a></li>
    * <li><a href="https://svn.openstreetmap.org/applications/editors/josm/dist/">https://svn.openstreetmap.org/applications/editors/josm/dist/</a></li>
-   * <li><a href="https://josm.openstreetmap.de/nexus/content/repositories/releases/">https://josm.openstreetmap.de/nexus/content/repositories/releases/</a></li>
    * <li><a href="https://josm.openstreetmap.de/nexus/content/repositories/snapshots/">https://josm.openstreetmap.de/nexus/content/repositories/snapshots/</a></li>
    * </ol></p>
    * For details see <a href="https://github.com/floscher/gradle-josm-plugin/tree/master/src/main/groovy/org/openstreetmap/josm/gradle/plugin/JosmPluginExtension.groovy">the source file</a>.
    */
   def Closure repositories = {
+    maven {
+      url 'https://josm.openstreetmap.de/nexus/content/repositories/releases/'
+    }
     ivy {
       url 'https://josm.openstreetmap.de/download/'
       layout 'pattern', {
@@ -59,9 +62,6 @@ class JosmPluginExtension {
       layout "pattern", {
         artifact "[artifact].jar"
       }
-    }
-    maven {
-      url 'https://josm.openstreetmap.de/nexus/content/repositories/releases/'
     }
     maven {
       url 'https://josm.openstreetmap.de/nexus/content/repositories/snapshots/'
