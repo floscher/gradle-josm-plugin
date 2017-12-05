@@ -55,8 +55,10 @@ class BasicTaskSetup extends AbstractSetup {
       ],
       'updateJosmPlugins',
       {t ->
-        t.into "${pro.josm.tmpJosmHome}/plugins"
-        // the rest of the configuration (e.g. from where the files come, that should be copied) is done later (e.g. in the file `PluginTaskSetup.groovy`)
+        pro.gradle.projectsEvaluated {
+          t.into "${pro.josm.tmpJosmHome}/plugins"
+          // the rest of the configuration (e.g. from where the files come, that should be copied) is done later (e.g. in the file `PluginTaskSetup.groovy`)
+        }
       }
     )
     // Standard run-task
