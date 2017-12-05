@@ -45,7 +45,7 @@ class RunJosmTask extends JavaExec {
           println args.join('\n')
         }
 
-        print extraInformation
+        print this.extraInformation
 
         println '\nOutput of JOSM starts with the line after the three equality signs\n==='
       }
@@ -56,7 +56,15 @@ class RunJosmTask extends JavaExec {
    * Set the text that should be displayed right before the console output of JOSM when starting JOSM.
    * This is used e.g. to display the remote debugging port.
    */
-  public void extraInformation(final String extraInformation) {
+  public void setExtraInformation(final String extraInformation) {
     this.extraInformation = extraInformation;
   }
+
+  /**
+   * Getter method for the field {@code extraInformation}
+   */
+  public String getExtraInformation() {
+    return this.extraInformation
+  }
+
 }
