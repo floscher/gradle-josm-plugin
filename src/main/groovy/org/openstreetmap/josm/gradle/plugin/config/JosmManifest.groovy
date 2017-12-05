@@ -183,7 +183,7 @@ public class JosmManifest {
    */
   private boolean isRequiredFieldMissing(boolean checkResult, String fieldDescription, String requiredValue) {
     if (checkResult) {
-      project.logger.error "You haven't configured %s. Please add %s to your build.gradle file.", fieldDescription, requiredValue
+      project.logger.error "You haven't configured {}. Please add {} to your build.gradle file.", fieldDescription, requiredValue
     }
     return checkResult
   }
