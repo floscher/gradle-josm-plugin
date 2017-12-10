@@ -42,6 +42,7 @@ class I18nTaskSetup extends AbstractSetup {
         "--output-dir=${outDir.absolutePath}",
         "--default-domain=${outBaseName}",
         "--package-name=josm-plugin/${pro.name}",
+        "--add-comments=i18n:",
         '-k', '-ktrc:1c,2', '-kmarktrc:1c,2', '-ktr', '-kmarktr', '-ktrn:1,2', '-ktrnc:1c,2,3'
 
         pro.gradle.projectsEvaluated {
@@ -66,6 +67,11 @@ class I18nTaskSetup extends AbstractSetup {
           moveFileAndReplaceStrings(
             new File(outDir, outBaseName + ".po"),
             destFile,
+            { line ->
+              line.startsWith("#: ")
+                ? line.substring(0, 3) + pro.josm.i18n.pathTransformer(line.substring(3))
+                : line
+            },
             [
               "(C) YEAR": "(C) " + Year.now().value,
               "charset=CHARSET": "charset=UTF-8"
@@ -76,9 +82,10 @@ class I18nTaskSetup extends AbstractSetup {
       }
     )
   }
-  private void moveFileAndReplaceStrings(final File src, final File dest, final Map<String,String> replacements) {
+  private void moveFileAndReplaceStrings(final File src, final File dest, final Closure lineTransform, final Map<String,String> replacements) {
     dest.withWriter { writer ->
       src.eachLine { line ->
+        line = lineTransform(line)
         final String[] keys = replacements.keySet().toArray(new String[replacements.size()])
         for (final String key : keys) {
           if (line.contains(key) && replacements.containsKey(key)) {
@@ -86,7 +93,7 @@ class I18nTaskSetup extends AbstractSetup {
             replacements.remove(key)
           }
         }
-        writer << line + "\n"
+        writer << line << "\n"
       }
     }
     src.delete()
