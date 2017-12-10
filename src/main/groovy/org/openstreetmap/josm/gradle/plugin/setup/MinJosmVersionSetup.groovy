@@ -7,8 +7,7 @@ public final class MinJosmVersionSetup extends AbstractSetup {
 
   public void setup() {
     pro.configurations {
-      minJosmVersionImplementation.extendsFrom(requiredPlugin)
-      minJosmVersionImplementation.extendsFrom(packIntoJar)
+      minJosmVersionImplementation.extendsFrom(implementation)
     }
 
     pro.task(
