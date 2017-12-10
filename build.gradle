@@ -15,7 +15,7 @@ dependencies {
 }
 
 groovydoc {
-  exclude 'org/openstreetmap/josm/gradle/plugin/*/*' // only create documentation for the root package
+  exclude 'org/openstreetmap/josm/gradle/plugin/setup/*' // don't create documentation for the setup package
   links = [
     new Groovydoc.Link('https://docs.gradle.org/current/javadoc/', 'org.gradle'),
     new Groovydoc.Link('https://docs.oracle.com/javase/9/docs/api/', 'java', 'javax'),
@@ -35,7 +35,7 @@ version = version.charAt(0) == 'v' ? version.substring(1) : version
 // for the plugin-publish (publish to plugins.gradle.org)
 pluginBundle {
   website = 'https://github.com/floscher/gradle-josm-plugin#readme'
-  vcsUrl = 'https://github.com/floscher/gradle-josm-plugin'
+  vcsUrl = 'https://github.com/floscher/gradle-josm-plugin.git'
   description = 'This plugin helps with developing for the JOSM project.'
   tags = ['josm', 'openstreetmap', 'osm']
 
