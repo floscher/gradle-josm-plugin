@@ -94,14 +94,15 @@ class JosmPlugin implements Plugin<Project> {
     if (recursionDepth >= pro.josm.maxPluginDependencyDepth) {
       throw new GradleException(sprintf("Dependency tree of required JOSM plugins is too deep (>= %d steps). Aborting resolution of required JOSM plugins.", pro.josm.maxPluginDependencyDepth))
     }
+    final String indention = "  " * recursionDepth
     pluginNames.each({ pluginName ->
       pluginName = pluginName.trim()
-      pro.logger.info "  " * recursionDepth + "Add required JOSM plugin '{}' to classpath…", pluginName
+      pro.logger.info indention + "Add required JOSM plugin '{}' to classpath…", pluginName
 
       final def tmpConf = pro.configurations.create('tmpConf'+recursionDepth)
       final def pluginDep = pro.dependencies.add('tmpConf'+recursionDepth, 'org.openstreetmap.josm.plugins:' + pluginName + ':', {changing = true})
       if (pro.configurations.requiredPlugin.dependencies.contains(pluginDep)) {
-        pro.logger.info "JOSM plugin '{}' is already on the classpath.", pluginName
+        pro.logger.info indention + "JOSM plugin '{}' is already on the classpath.", pluginName
       } else {
         tmpConf.fileCollection(pluginDep).files.each { jarFile ->
           def zipFile = new ZipFile(jarFile)
