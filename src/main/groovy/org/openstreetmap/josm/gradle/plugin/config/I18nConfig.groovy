@@ -37,7 +37,6 @@ public class I18nConfig {
   def Closure pathTransformer = Closure.IDENTITY
 
   public final Closure getGithubPathTransformer(final String repoSlug) {
-    println 'Get Github transformer for ' + repoSlug
     return { final String path ->
       Matcher lineNumberMatcher = Pattern.compile(".*:([1-9][0-9]*)").matcher(path)
       String lineNumber = null

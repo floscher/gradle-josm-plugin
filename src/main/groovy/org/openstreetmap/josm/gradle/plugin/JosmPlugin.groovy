@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin
 
+import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -69,7 +70,18 @@ class JosmPlugin implements Plugin<Project> {
 
     project.afterEvaluate {
       // Adding dependencies for JOSM and the required plugins
-      project.dependencies.add('implementation', 'org.openstreetmap.josm:josm:'+project.josm.josmCompileVersion)
+      project.dependencies.add(
+        'implementation',
+        'org.openstreetmap.josm:josm:' + project.josm.josmCompileVersion,
+        {ExternalModuleDependency d ->
+          if ("latest".equals(project.josm.josmCompileVersion) || "tested".equals(project.josm.josmCompileVersion)) {
+            project.logger.info 'Compile against the variable JOSM version ' + project.josm.josmCompileVersion
+            d.changing = true
+          } else {
+            project.logger.info 'Compile against the JOSM version ' + project.josm.josmCompileVersion
+          }
+        }
+      )
       requirePlugins(project, project.josm.manifest.pluginDependencies.toArray(new String[project.josm.manifest.pluginDependencies.size()]))
     }
 
