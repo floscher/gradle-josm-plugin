@@ -46,8 +46,7 @@ class BasicTaskSetup extends AbstractSetup {
         }
       }
     )
-    // "Virtual task" that depends on all tasks, which put the desired plugin *.jar files into the plugins directory
-    // All RunJosmTasks by default depend on this task.
+    // Copy all needed JOSM plugin *.jar files into the directory in {@code $JOSM_HOME}
     pro.task(
       [
         type: Sync,
