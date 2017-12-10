@@ -58,8 +58,8 @@ class JosmPlugin implements Plugin<Project> {
         manifest.attributes it.project.josm.manifest.createJosmPluginJarManifest(it.project)
         from project.configurations.packIntoJar.collect{
           it.isDirectory()
-          ? project.fileTree(it)
-          : project.zipTree(it)
+          ? project.fileTree(it).matching(project.josm.packIntoJarFileFilter)
+          : project.zipTree(it).matching(project.josm.packIntoJarFileFilter)
         }
       }
     }
@@ -84,15 +84,19 @@ class JosmPlugin implements Plugin<Project> {
     requirePlugins(0, pro, pluginNames)
   }
   /**
-   * Recursively add the required plugins and any plugins that these in turn require to the configuration `requiredPlugin`
+   * Recursively add the required plugins and any plugins that these in turn require to the configuration `requiredPlugin`.
+   * @param recursionDepth starts at 0, each time this method is called from within itself, this is incremented by one
+   * @param pro the project, which requires the JOSM plugins given with the last parameter
+   * @param pluginNames the names of all required JOSM plugins. Transitive dependencies can be omitted, these will be filled in by this method.
+   * @throws GradleException if the parameter {@code recursionDepth} reaches the current limit of 10
    */
-  private void requirePlugins(int recursionDepth, Project pro, String... pluginNames) {
-    if (recursionDepth >= 10) {
-      throw new GradleException("Dependency tree of required JOSM plugins is too deep. Aborting resolution of required JOSM plugins.")
+  private void requirePlugins(final int recursionDepth, final Project pro, final String... pluginNames) {
+    if (recursionDepth >= pro.josm.maxPluginDependencyDepth) {
+      throw new GradleException(sprintf("Dependency tree of required JOSM plugins is too deep (>= %d steps). Aborting resolution of required JOSM plugins.", pro.josm.maxPluginDependencyDepth))
     }
     pluginNames.each({ pluginName ->
       pluginName = pluginName.trim()
-      pro.logger.info "Add required JOSM plugin '{}' to classpath…", pluginName
+      pro.logger.info "  " * recursionDepth + "Add required JOSM plugin '{}' to classpath…", pluginName
 
       final def tmpConf = pro.configurations.create('tmpConf'+recursionDepth)
       final def pluginDep = pro.dependencies.add('tmpConf'+recursionDepth, 'org.openstreetmap.josm.plugins:' + pluginName + ':', {changing = true})
@@ -108,7 +112,7 @@ class JosmPlugin implements Plugin<Project> {
               def requirements = new Manifest(zipFile.getInputStream(zipEntry)).mainAttributes.getValue("Plugin-Requires")
               if (requirements != null) {
                 // If the plugin itself requires more plugins, recursively add them too.
-                requirePlugins(recursionDepth + 1, pro, requirements.split(';'))
+                requirePlugins(Math.max(1, recursionDepth + 1), pro, requirements.split(';'))
               }
             }
           }

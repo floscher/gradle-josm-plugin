@@ -34,6 +34,21 @@ class JosmPluginExtension {
    */
   def File josmConfigDir = new File("${project.projectDir}/config/josm")
   /**
+   * When determining on which JOSM plugins this project depends, dependency chains are followed this number of steps.
+   * This number is the termination criterion when recursively searching for JOSM plugins that are required through {@link JosmManifest#pluginDependencies}.
+   */
+  def int maxPluginDependencyDepth = 10
+  /**
+   * When packing the dependencies of the {@code packIntoJar} configuration into the distribution *.jar,
+   * this closure is applied to the file tree. If you want to exclude certain files in your dependencies into
+   * your release, you can modify this.
+   * By default the {@code META-INF} directory of dependencies is discarded.
+   * <p><strong>Default value:</strong> {@code { !it.path.startsWith("META-INF/") }}</p>
+   * @see org.gradle.api.file.FileTree#matching(groovy.lang.Closure)
+   * @see org.gradle.api.tasks.util.PatternFilterable
+   */
+  def Closure packIntoJarFileFilter = { it.exclude("META-INF/**/*") }
+  /**
    * The repositories that are added to the repository list.
    * <p><strong>Default value (in this order):</strong>
    * <ol>
