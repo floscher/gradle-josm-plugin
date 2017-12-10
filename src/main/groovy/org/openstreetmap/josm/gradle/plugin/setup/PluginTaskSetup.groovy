@@ -45,14 +45,13 @@ class PluginTaskSetup extends AbstractSetup {
 
     pro.tasks.updateJosmPlugins.dependsOn pro.tasks.writePluginConfig, pro.tasks.initJosmPrefs
     pro.tasks.updateJosmPlugins.rename('(.*)-\\.jar', '$1.jar')
-    pro.gradle.projectsEvaluated {
+    pro.afterEvaluate {
       pro.tasks.updateJosmPlugins.from pro.tasks.dist.outputs
       pro.tasks.updateJosmPlugins.from pro.configurations.requiredPlugin.resolve()
     }
 
 
     def localDistPath = "${pro.buildDir}/localDist"
-    def localDistName = "${pro.archivesBaseName}-dev.${pro.jar.extension}"
     def localDistListFile = new File("$localDistPath/list")
 
     pro.task(
@@ -66,8 +65,8 @@ class PluginTaskSetup extends AbstractSetup {
           // First line containing the name of the plugin and the URL to the *.jar file
           localDistListFile << String.format(
             '%s;%s%n',
-            localDistName,
-            new File("$localDistPath/$localDistName").toURI().toURL().toString()
+            pro.tasks.localDist.fileName,
+            new File("$localDistPath/${pro.tasks.localDist.fileName}").toURI().toURL().toString()
           )
           // Manifest indented by one tab character
           pro.jar.manifest.effectiveManifest.attributes.each {a ->
@@ -100,11 +99,13 @@ class PluginTaskSetup extends AbstractSetup {
       [type: Sync, group: "JOSM", description: "Generates a plugin site. Add '${localDistListFile.toURI().toURL()}'as plugin site in JOSM preferences (expert mode) and you'll be able to install the current development state as plugin '${pro.archivesBaseName}-dev'."],
       "localDist",
       {t ->
+        t.ext.fileName = null
         finalizedBy pro.tasks.generatePluginList
         from pro.tasks.jar.outputs
         into localDistPath
-        pro.gradle.projectsEvaluated {
-          rename('.*', localDistName)
+        doFirst {
+          t.ext.fileName = "${pro.archivesBaseName}-dev.${pro.jar.extension}"
+          rename('.*', fileName)
         }
       }
     )
@@ -115,7 +116,7 @@ class PluginTaskSetup extends AbstractSetup {
       {t ->
         from pro.tasks.jar.outputs
         into "${pro.buildDir}/dist"
-        pro.gradle.projectsEvaluated {
+        doFirst {
           rename('.*', pro.archivesBaseName + '.' + pro.jar.extension)
         }
       }
