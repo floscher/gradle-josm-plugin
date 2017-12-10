@@ -20,6 +20,7 @@ import org.openstreetmap.josm.gradle.plugin.JosmPlugin
  *
  * <p>The detailed documentation for each field below tells you, which one corresponds to which Ant/Gradle property and to which attribute in the MANIFEST.MF file.</p>
  */
+@groovy.transform.CompileStatic
 public class JosmManifest {
   private final Project project = JosmPlugin.currentProject;
   /**
@@ -39,7 +40,7 @@ public class JosmManifest {
    *   <dt><strong>Influenced MANIFEST.MF attribute:</strong></dt><dd>{@code Plugin-Canloadatruntime}</dd>
    * </p>
    */
-  def boolean canLoadAtRuntime = Boolean.valueOf(project.findProperty('plugin.canloadatruntime'))
+  def boolean canLoadAtRuntime = Boolean.valueOf(project.findProperty('plugin.canloadatruntime').toString())
   /**
    * The description of what the plugin does.
    *
@@ -66,7 +67,7 @@ public class JosmManifest {
    *   <dt>Influenced MANIFEST.MF attribute:</dt><dd>{@code Plugin-Early}</dd>
    * </dl>
    */
-  def boolean loadEarly = Boolean.valueOf(project.findProperty('plugin.early'))
+  def boolean loadEarly = Boolean.valueOf(project.findProperty('plugin.early').toString())
   /**
    * A number indicating the order in which the plugins should be loaded. Lower numbers first, higher numbers later, then the plugins with this field set to <code>null</code>.
    *
@@ -75,7 +76,7 @@ public class JosmManifest {
    *   <dt>Influenced MANIFEST.MF attribute:</dt><dd>{@code Plugin-Stage}</dd>
    * </dl>
    */
-  def Integer loadPriority = project.hasProperty('plugin.stage') ? Integer.valueOf(project.findProperty('plugin.stage')) : null
+  def Integer loadPriority = project.hasProperty('plugin.stage') ? Integer.valueOf(project.findProperty('plugin.stage').toString()) : null
   /**
    * The full name of the main class of the plugin
    *
@@ -117,19 +118,24 @@ public class JosmManifest {
    *   <dt>Influenced MANIFEST.MF attribute:</dt><dd>{@code Plugin-Link}</dd>
    * </dl>
    */
-  def URL website = project.hasProperty('plugin.link') ? new URL(project.findProperty('plugin.link')) : null
+  def URL website = project.hasProperty('plugin.link') ? new URL(project.findProperty('plugin.link').toString()) : null
   /**
    * For compatibility with older JOSM versions, that are not supported by the current version of the plugin.
    * This field contains URLs where versions of the plugin can be downloaded, which are compatible with certain older JOSM versions.
    * @see {@link #oldVersionDownloadLink(int, String, URL)} on how to add entries to this attribute.
    * The URL value points to a location where the plugin can be downloaded from and the integer key denotes the minimum JOSM version that the plugin at that location is compatible with.
    */
-  private final def Set<PluginDownloadLink> oldVersionDownloadLinks = []
+  private final Set<PluginDownloadLink> oldVersionDownloadLinks = []
 
   private class PluginDownloadLink {
-    def String pluginVersion
-    def int minJosmVersion
-    def URL downloadURL
+    final def String pluginVersion
+    final def int minJosmVersion
+    final def URL downloadURL
+    public PluginDownloadLink(final int minJosmVersion, final String pluginVersion, final URL downloadURL) {
+      this.minJosmVersion = minJosmVersion
+      this.pluginVersion = pluginVersion
+      this.downloadURL = downloadURL
+    }
   }
 
   /**
@@ -137,7 +143,7 @@ public class JosmManifest {
    */
   protected JosmManifest() {
     // Fill the map containing the plugin dependencies
-    final def requirements = project.findProperty('plugin.requires')
+    final String requirements = project.findProperty('plugin.requires')
     if (requirements != null) {
       String[] dependencyArray = requirements.split(';')
       for (String dependency : dependencyArray) {
@@ -159,8 +165,8 @@ public class JosmManifest {
    * @param pluginVersion the version number of the linked plugin
    * @param downloadURL the URL where the linked plugin can be downloaded from
    */
-  public void oldVersionDownloadLink(int minJosmVersion, String pluginVersion, URL downloadURL) {
-    oldVersionDownloadLinks << new PluginDownloadLink(minJosmVersion: minJosmVersion, pluginVersion: pluginVersion, downloadURL: downloadURL)
+  public void oldVersionDownloadLink(final int minJosmVersion, final String pluginVersion, final URL downloadURL) {
+    oldVersionDownloadLinks << new PluginDownloadLink(minJosmVersion, pluginVersion, downloadURL)
   }
 
   /**
@@ -193,7 +199,7 @@ public class JosmManifest {
     }
 
     // Required attributes
-    def manifestAtts = [
+    final Map<String,String> manifestAtts = [
       "Created-By": System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")",
       "Gradle-Version": project.gradle.getGradleVersion(),
       "Groovy-Version": GroovySystem.getVersion(),
@@ -204,12 +210,16 @@ public class JosmManifest {
       "Plugin-Version": project.version,
       "Plugin-Early": loadEarly,
       "Plugin-Canloadatruntime": canLoadAtRuntime
-    ]
+    ] as HashMap<String,String>
+
+    // Add links to older versions of the plugin
     oldVersionDownloadLinks.each { value ->
-      manifestAtts << [ (value.minJosmVersion+"_Plugin-Url") : value.pluginVersion+';'+value.downloadURL.toString()]
+      manifestAtts[value.minJosmVersion+"_Plugin-Url"] = value.pluginVersion+';'+value.downloadURL
     }
-    translatedDescriptions.each { lang, desc ->
-      manifestAtts << [ (lang+"_Plugin-Description") : desc ]
+
+    // Add translated versions of the project description
+    translatedDescriptions.each { String lang, String desc ->
+      manifestAtts[lang+"_Plugin-Description"] = desc
     }
 
     // Optional attributes
@@ -220,19 +230,22 @@ public class JosmManifest {
       manifestAtts["Plugin-Icon"] = iconPath
     }
     if (website != null) {
-      manifestAtts["Plugin-Link"] = website
+      manifestAtts["Plugin-Link"] = website.toString()
     }
     if (pluginDependencies.size() >= 1) {
       manifestAtts["Plugin-Requires"] = pluginDependencies.join(';')
     }
     if (loadPriority != null) {
-      manifestAtts["Plugin-Stage"] = loadPriority
+      manifestAtts["Plugin-Stage"] = String.valueOf(loadPriority)
     }
 
-    project.logger.info "The following lines will be added to the manifest of the plugin *.jar file:"
-    manifestAtts.sort().each { e ->
-      project.logger.info "  "+e.key+": "+e.value
+    if (project.logger.isInfoEnabled()) {
+      project.logger.info "The following lines will be added to the manifest of the plugin *.jar file:"
+      manifestAtts.sort().each { e ->
+        project.logger.info "  "+String.valueOf(e.key)+": "+String.valueOf(e.value)
+      }
     }
+
     return manifestAtts
   }
 
