@@ -25,11 +25,13 @@ And if you need external dependencies for your plugin, maybe [`docs/Dependencies
 Also, the [Groovydoc of this plugin is available online](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/index.html?org/openstreetmap/josm/gradle/plugin/package-summary.html).
 
 ## Projects using this Gradle plugin
-* [fieldpapers/josm-fieldpapers](https://github.com/fieldpapers/josm-fieldpapers)
-* [iandees/josm-mbtiles](https://github.com/iandees/josm-mbtiles)
-* [JOSM/geojson](https://github.com/JOSM/geojson)
-* [JOSM/Mapillary](https://github.com/JOSM/Mapillary)
-* [matsim-org/josm-matsim-plugin](https://github.com/matsim-org/josm-matsim-plugin)
+* [Gubaer/josm-**contourmerge**-plugin](https://github.com/Gubaer/josm-contourmerge-plugin)
+* [fieldpapers/josm-**fieldpapers**](https://github.com/fieldpapers/josm-fieldpapers)
+* [JOSM/**geojson**](https://github.com/JOSM/geojson)
+* [JOSM/**Mapillary**](https://github.com/JOSM/Mapillary)
+* [matsim-org/josm-**matsim**-plugin](https://github.com/matsim-org/josm-matsim-plugin)
+* [iandees/josm-**mbtiles**](https://github.com/iandees/josm-mbtiles)
+* [Gubaer/josm-**scripting**-plugin](https://github.com/Gubaer/josm-scripting-plugin)
 
 ## Deprecated links
 Alternatively to the default Gradle plugin repository, you can download this plugin from a Maven repository at `https://floscher.github.io/gradle-josm-plugin/maven`.

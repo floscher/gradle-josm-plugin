@@ -22,6 +22,9 @@ import java.util.jar.Manifest
 class JosmPlugin implements Plugin<Project> {
   private static Project currentProject;
 
+  /**
+   * The Gradle project to which the gradle-josm-plugin is currently applied
+   */
   public static Project getCurrentProject() {
     if (currentProject == null) {
       throw new IllegalStateException("Currently the gradle-josm-plugin is not applied to a Gradle project, but you want to access the project to which the gradle-josm-plugin is applied. This should not happen ;).")
