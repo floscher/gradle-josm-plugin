@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.plugins.PluginInstantiationException
 import org.openstreetmap.josm.gradle.plugin.JosmPlugin
@@ -135,18 +136,6 @@ public class JosmManifest {
    * Initialize the manifest for the project, that is currently being modified by the gradle-josm-plugin
    */
   protected JosmManifest() {
-    project.gradle.projectsEvaluated {
-      boolean missesRequiredFields =
-        isRequiredFieldMissing(minJosmVersion == null, "the minimum JOSM version your plugin is compatible with", "josm.manifest.minJosmVersion = ‹a JOSM version›") |
-        isRequiredFieldMissing(project.version == Project.DEFAULT_VERSION, "the version of your plugin", "version = ‹a version number›") |
-        isRequiredFieldMissing(mainClass == null, "the main class of your plugin", "josm.manifest.mainClass = ‹full name of main class›") |
-        isRequiredFieldMissing(description == null, "the description of your plugin", "josm.manifest.description = ‹a textual description›")
-
-      if (missesRequiredFields) {
-        throw new PluginInstantiationException("The JOSM plugin misses required configuration options. See above for which options are missing.")
-      }
-    }
-
     // Fill the map containing the plugin dependencies
     final def requirements = project.findProperty('plugin.requires')
     if (requirements != null) {
@@ -192,7 +181,17 @@ public class JosmManifest {
    * Returns a map containing all manifest attributes, which are set.
    * This map can then be fed into {@link org.gradle.api.java.archives.Manifest#attributes(java.util.Map)}. That's already done automatically by the gradle-josm-plugin, so you normally don't need to call this yourself.
    */
-  public Map<String,String> createJosmPluginJarManifest() {
+  public Map<String,String> createJosmPluginJarManifest(final Project project) {
+    boolean missesRequiredFields =
+      isRequiredFieldMissing(minJosmVersion == null, "the minimum JOSM version your plugin is compatible with", "josm.manifest.minJosmVersion = ‹a JOSM version›") |
+      isRequiredFieldMissing(project.version == Project.DEFAULT_VERSION, "the version of your plugin", "version = ‹a version number›") |
+      isRequiredFieldMissing(mainClass == null, "the main class of your plugin", "josm.manifest.mainClass = ‹full name of main class›") |
+      isRequiredFieldMissing(description == null, "the description of your plugin", "josm.manifest.description = ‹a textual description›")
+
+    if (missesRequiredFields) {
+      throw new GradleException(String.format("The JOSM plugin %s misses required configuration options. See above for which options are missing.", project.name))
+    }
+
     // Required attributes
     def manifestAtts = [
       "Created-By": System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")",

@@ -53,19 +53,21 @@ class JosmPlugin implements Plugin<Project> {
 
     project.repositories(project.josm.repositories)
 
-    project.gradle.projectsEvaluated {
-      project.logger.info '\n\n'
-      project.logger.info "By default you'll compile against JOSM version "+project.josm.josmCompileVersion
-      project.jar.manifest.attributes project.josm.manifest.createJosmPluginJarManifest()
-      project.logger.info '\n\n'
+    project.tasks.jar.doFirst {
+      it.project.jar {
+        manifest.attributes it.project.josm.manifest.createJosmPluginJarManifest(it.project)
+        from project.configurations.packIntoJar.collect{
+          it.isDirectory()
+          ? project.fileTree(it)
+          : project.zipTree(it)
+        }
+      }
+    }
 
+    project.afterEvaluate {
       // Adding dependencies for JOSM and the required plugins
       project.dependencies.add('implementation', 'org.openstreetmap.josm:josm:'+project.josm.josmCompileVersion)
-      requirePlugins(project, project.josm.manifest.pluginDependencies.toArray(new String[0]))
-
-      project.jar {
-        from project.configurations.packIntoJar.collect { it.isDirectory() ? it : project.zipTree(it) }
-      }
+      requirePlugins(project, project.josm.manifest.pluginDependencies.toArray(new String[project.josm.manifest.pluginDependencies.size()]))
     }
 
     new BasicTaskSetup().setup()
