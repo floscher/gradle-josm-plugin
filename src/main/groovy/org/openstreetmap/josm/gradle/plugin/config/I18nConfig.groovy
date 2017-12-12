@@ -50,9 +50,9 @@ public class I18nConfig {
       if (gitProcess.exitValue() == 0) {
         def projectPath = project.projectDir.absolutePath
         if (filePath.startsWith(projectPath)) {
-          return "https://github.com/$repoSlug/blob/${gitProcess.in.text.trim()}" +
+          return "github.com/$repoSlug/blob/${gitProcess.in.text.trim()}" +
             filePath.substring(projectPath.length()) +
-            (lineNumber == null ? '' : '#L' + lineNumber)
+            (lineNumber == null ? '' : '#L' + lineNumber + ':' + lineNumber)
         }
         return path
       }
