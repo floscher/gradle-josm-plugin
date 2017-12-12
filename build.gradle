@@ -9,9 +9,18 @@ plugins {
   id "maven-publish"
 }
 import org.gradle.api.tasks.javadoc.Groovydoc
+import java.time.Instant
+import java.time.Duration
+
+gradle.taskGraph.beforeTask { task ->
+  task.ext.setProperty("startTime", Instant.now())
+}
+gradle.taskGraph.afterTask { task, state ->
+  project.logger.lifecycle "Finished after " + String.format("%.2f", Duration.between(task.ext.startTime, Instant.now()).toSeconds()) + " seconds."
+}
 
 dependencies {
-  compile localGroovy()
+  implementation localGroovy()
 }
 
 groovydoc {
