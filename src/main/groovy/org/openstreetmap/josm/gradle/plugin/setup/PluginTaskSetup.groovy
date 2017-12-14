@@ -120,16 +120,23 @@ public class PluginTaskSetup extends AbstractSetup {
       task.setProperty("fileName", pro.getConvention().getPlugin(BasePluginConvention.class).getArchivesBaseName() + "-dev." + pro.getTasks().withType(Jar.class).getByName("jar").getExtension());
       localDist.rename(".*", task.property("fileName").toString());
     };
+    localDist.doLast{ task ->
+      task.getLogger().lifecycle("Local JOSM update-site for plugin version {} has been written to {}", task.getProject().getVersion(), localDistListFile.toURI());
+    }
 
     final Sync dist = pro.getTasks().create("dist", Sync.class);
+    final File outDir = new File(pro.getBuildDir(), "dist");
     dist.from(pro.getTasks().getByName("jar").getOutputs());
-    dist.into(new File(pro.getBuildDir(), "dist"));
+    dist.into(outDir);
     dist.doFirst{ task ->
       dist.rename(
         ".*",
         pro.getConvention().getPlugin(BasePluginConvention.class).getArchivesBaseName() + '.' + pro.getTasks().withType(Jar.class).getByName("jar").getExtension()
       );
     };
+    dist.doLast{ task ->
+      task.getLogger().lifecycle("Distribution *.jar (version {}) has ben written into {}", task.getProject().getVersion(), outDir.getAbsolutePath());
+    }
     pro.getTasks().getByName("jar").finalizedBy(dist, localDist);
   }
 }
