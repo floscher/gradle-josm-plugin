@@ -1,95 +1,86 @@
-package org.openstreetmap.josm.gradle.plugin.setup
+package org.openstreetmap.josm.gradle.plugin.setup;
 
-import org.gradle.api.Project
-import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.Delete
-import org.gradle.api.tasks.Sync
-import org.gradle.api.tasks.TaskExecutionException
+import java.io.File;
+import java.util.stream.Collectors;
+import org.gradle.api.Project;
+import org.gradle.api.Task;
+import org.gradle.api.tasks.Copy;
+import org.gradle.api.tasks.Delete;
+import org.gradle.api.tasks.JavaExec;
+import org.gradle.api.tasks.Sync;
+import org.gradle.api.tasks.TaskExecutionException;
+import org.openstreetmap.josm.gradle.plugin.RunJosmTask;
+import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
 
-import org.openstreetmap.josm.gradle.plugin.RunJosmTask
-
-class BasicTaskSetup extends AbstractSetup {
+public class BasicTaskSetup extends AbstractSetup {
 
   public void setup() {
+
     // Clean JOSM
-    pro.task(
-      [type: Delete, group: 'JOSM', description: 'Delete JOSM configuration in `build/.josm/`'],
-      'cleanJosm',
-      {t ->
-        pro.gradle.projectsEvaluated {
-          delete pro.josm.tmpJosmHome
-        }
-        doFirst {
-          pro.logger.lifecycle 'Delete {}…', delete
-        }
+    final Delete cleanJosm = pro.getTasks().create("cleanJosm", Delete.class);
+    cleanJosm.setDescription("Delete JOSM configuration in `build/.josm/`");
+    cleanJosm.setGroup("JOSM");
+    pro.afterEvaluate{p ->
+      cleanJosm.delete(JosmPluginExtension.forProject(p).getTmpJosmHome())
+    };
+    cleanJosm.doFirst{task ->
+      task.getLogger().lifecycle("Delete [{}]…", String.join(", ", cleanJosm.getDelete().stream().map{it.getAbsolutePath()}.collect(Collectors.toList())));
+    };
+
+    // Init JOSM preferences.xml file
+    final Copy initJosmPrefs = pro.getTasks().create("initJosmPrefs", Copy.class);
+    initJosmPrefs.setDescription("Puts a default preferences.xml file into the temporary JOSM home directory");
+    initJosmPrefs.include("preferences.xml");
+    pro.afterEvaluate{ p ->
+      initJosmPrefs.from(JosmPluginExtension.forProject(p).getJosmConfigDir());
+      initJosmPrefs.into(JosmPluginExtension.forProject(p).getTmpJosmHome());
+      if (initJosmPrefs.getSource().isEmpty()) {
+        initJosmPrefs.getLogger().debug("No default JOSM preference file found in {}/preferences.xml.", JosmPluginExtension.forProject(p).getJosmConfigDir().getAbsolutePath());
       }
-    )
-    // Init JOSM preferences
-    pro.task(
-      [type: Copy, description: 'Puts a default preferences.xml file into the temporary JOSM home directory'],
-      'initJosmPrefs',
-      {t ->
-        pro.gradle.projectsEvaluated {
-          from "${pro.josm.josmConfigDir}"
-          into "${pro.josm.tmpJosmHome}"
-          include 'preferences.xml'
-          if (source.size() <= 0) {
-            pro.logger.debug "No default JOSM preference file found in ${pro.josm.josmConfigDir}/preferences.xml."
-          }
-        }
-        doFirst {
-          if (new File("${destinationDir}/preferences.xml").exists()) {
-            pro.logger.lifecycle "JOSM preferences not copied, file is already present.\nIf you want to replace it, run the task 'cleanJosm' additionally."
-            return 0
-          }
-          pro.logger.lifecycle 'Copy {} to {}…', source.files, destinationDir
-        }
+    };
+    initJosmPrefs.doFirst{ task ->
+      if (new File(initJosmPrefs.getDestinationDir(), "preferences.xml").exists()) {
+        task.getLogger().lifecycle("JOSM preferences not copied, file is already present.\nIf you want to replace it, run the task 'cleanJosm' additionally.");
+      } else {
+        task.getLogger().lifecycle("Copy [{}] to {}…", String.join(", ", initJosmPrefs.getSource().getFiles().stream().map{it.getAbsolutePath()}.collect(Collectors.toList())), initJosmPrefs.getDestinationDir().getAbsolutePath());
       }
-    )
+    };
+
     // Copy all needed JOSM plugin *.jar files into the directory in {@code $JOSM_HOME}
-    pro.task(
-      [
-        type: Sync,
-        description: 'Put all needed plugin *.jar files into the plugins directory. This task copies files into the temporary JOSM home directory.'
-      ],
-      'updateJosmPlugins',
-      {t ->
-        pro.gradle.projectsEvaluated {
-          t.into "${pro.josm.tmpJosmHome}/plugins"
-          // the rest of the configuration (e.g. from where the files come, that should be copied) is done later (e.g. in the file `PluginTaskSetup.groovy`)
-        }
-      }
-    )
+    final Sync updateJosmPlugins = pro.getTasks().create("updateJosmPlugins", Sync.class);
+    updateJosmPlugins.setDescription("Put all needed plugin *.jar files into the plugins directory. This task copies files into the temporary JOSM home directory.");
+    updateJosmPlugins.dependsOn(initJosmPrefs);
+    pro.afterEvaluate{ p ->
+      updateJosmPlugins.into(new File(JosmPluginExtension.forProject(p).getTmpJosmHome(), "plugins"));
+      // the rest of the configuration (e.g. from where the files come, that should be copied) is done later (e.g. in the file `PluginTaskSetup.java`)
+    };
+
     // Standard run-task
-    pro.task(
-      [
-        type: RunJosmTask.class,
-        description: 'Runs an independent JOSM instance (version specified in project dependencies) with `build/.josm/` as home directory and the freshly compiled plugin active.'
-      ],
-      'runJosm'
-    )
+    final Task runJosm = pro.getTasks().create("runJosm", RunJosmTask.class);
+    runJosm.setDescription("Runs an independent JOSM instance (version specified in project dependencies) with `build/.josm/` as home directory and the freshly compiled plugin active.");
+
     // Debug task
-    pro.task(
-      [type: RunJosmTask.class],
-      'debugJosm',
-      {t ->
-        pro.gradle.projectsEvaluated {
-          description 'Runs a JOSM instance like the task `runJosm`, but with JDWP (Java debug wire protocol) active' + (
-            pro.josm.debugPort == null
-            ? ".\n  NOTE: Currently the `debugJosm` task will error out! Set the property `project.josm.debugPort` to enable it!"
-            : ' on port ' + pro.josm.debugPort
-          )
-          extraInformation '\nThe application is listening for a remote debugging connection on port ' + pro.josm.debugPort + '. It will start execution as soon as the debugger is connected.\n'
-          jvmArgs "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=" + pro.josm.debugPort
-        }
-        doFirst {
-          if (pro.josm.debugPort == null) {
-            throw new TaskExecutionException(t, new NullPointerException(
-              "You have to set the property `project.josm.debugPort` to the port on which you'll listen for debug output. If you don't want to debug, simply use the task `runJosm` instead of `debugJosm`."
-            ));
-          }
-        }
+    final RunJosmTask debugJosm = pro.getTasks().create("debugJosm", RunJosmTask.class);
+    pro.afterEvaluate{ task ->
+      final Integer debugPort = JosmPluginExtension.forProject(task.getProject()).getDebugPort();
+      task.setDescription("Runs a JOSM instance like the task `runJosm`, but with JDWP (Java debug wire protocol) active" + (
+        debugPort == null
+        ? ".\n  NOTE: Currently the `debugJosm` task will error out! Set the property `project.josm.debugPort` to enable it!"
+        : " on port " + debugPort
+      ));
+    };
+    debugJosm.doFirst{ task ->
+      final Integer debugPort = JosmPluginExtension.forProject(task.getProject()).getDebugPort();
+      if (debugPort == null) {
+        throw new TaskExecutionException(task, new NullPointerException(
+          "You have to set the property `project.josm.debugPort` to the port on which you'll listen for debug output. If you don't want to debug, simply use the task `runJosm` instead of `debugJosm`."
+        ));
       }
-    )
+      debugJosm.setExtraInformation(
+        "\nThe application is listening for a remote debugging connection on port " +
+        debugPort + ". It will start execution as soon as the debugger is connected.\n"
+      );
+      debugJosm.jvmArgs("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=" + debugPort);
+    };
   }
 }

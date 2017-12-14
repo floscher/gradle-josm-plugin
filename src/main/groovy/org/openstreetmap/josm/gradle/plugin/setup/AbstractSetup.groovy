@@ -1,10 +1,10 @@
-package org.openstreetmap.josm.gradle.plugin.setup
+package org.openstreetmap.josm.gradle.plugin.setup;
 
-import org.gradle.api.Project
-import org.openstreetmap.josm.gradle.plugin.JosmPlugin
+import org.gradle.api.Project;
+import org.openstreetmap.josm.gradle.plugin.JosmPlugin;
 
 @groovy.transform.CompileStatic
-protected abstract class AbstractSetup {
-  protected Project pro = JosmPlugin.currentProject
+public abstract class AbstractSetup {
+  protected Project pro = JosmPlugin.getCurrentProject();
   abstract void setup();
 }
