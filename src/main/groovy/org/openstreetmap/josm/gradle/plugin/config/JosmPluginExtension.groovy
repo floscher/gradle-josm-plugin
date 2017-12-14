@@ -115,4 +115,8 @@ class JosmPluginExtension {
   public void manifest(final Closure c) {
     project.configure(manifest, c)
   }
+
+  public static JosmPluginExtension forProject(final Project project) {
+    return project.getExtensions().getByType(JosmPluginExtension);
+  }
 }
