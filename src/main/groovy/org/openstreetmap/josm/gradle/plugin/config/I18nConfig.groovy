@@ -6,6 +6,7 @@ import org.openstreetmap.josm.gradle.plugin.JosmPlugin
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import java.util.function.Function
 
 @groovy.transform.CompileStatic
 public class I18nConfig {
@@ -30,33 +31,35 @@ public class I18nConfig {
    * source code (lines starting with <code>#: </code>).
    * Each of those lines is put through this transformer (without the leading
    * <code>#: </code>).
-   * <p><strong>Default value:</strong> {@link Closure#IDENTITY}</p>
+   * <p><strong>Default value:</strong> {@link Function#identity()}</p>
    * @see #getGithubPathTransformer(String) if your project is hosted on GitHub,
    *   you can retrieve a suitable pathTransformer via this method
    */
-  def Closure pathTransformer = Closure.IDENTITY
+  def Function<String, String> pathTransformer = Function.identity();
 
-  public final Closure getGithubPathTransformer(final String repoSlug) {
-    return { final String path ->
-      Matcher lineNumberMatcher = Pattern.compile(".*:([1-9][0-9]*)").matcher(path)
-      String lineNumber = null
-      String filePath = path
-      if (lineNumberMatcher.matches()) {
-        lineNumber = lineNumberMatcher.group(1)
-        filePath = path.substring(0, path.length() - lineNumber.length() - 1)
-      }
-      def gitProcess = ['git', 'rev-parse', '--short', 'HEAD'].execute()
-      gitProcess.waitFor()
-      if (gitProcess.exitValue() == 0) {
-        def projectPath = project.projectDir.absolutePath
-        if (filePath.startsWith(projectPath)) {
-          return "github.com/$repoSlug/blob/${gitProcess.in.text.trim()}" +
-            filePath.substring(projectPath.length()) +
-            (lineNumber == null ? '' : '#L' + lineNumber + ':' + lineNumber)
+  public final Function<String, String> getGithubPathTransformer(final String repoSlug) {
+    return new Function<String, String>() {
+      public String apply(String path) {
+        Matcher lineNumberMatcher = Pattern.compile(".*:([1-9][0-9]*)").matcher(path)
+        String lineNumber = null
+        String filePath = path
+        if (lineNumberMatcher.matches()) {
+          lineNumber = lineNumberMatcher.group(1)
+          filePath = path.substring(0, path.length() - lineNumber.length() - 1)
         }
-        return path
+        def gitProcess = ['git', 'rev-parse', '--short', 'HEAD'].execute()
+        gitProcess.waitFor()
+        if (gitProcess.exitValue() == 0) {
+          def projectPath = project.projectDir.absolutePath
+          if (filePath.startsWith(projectPath)) {
+            return "github.com/$repoSlug/blob/${gitProcess.in.text.trim()}" +
+              filePath.substring(projectPath.length()) +
+              (lineNumber == null ? '' : '#L' + lineNumber + ':' + lineNumber)
+          }
+          return path
+        }
+        throw new GradleException("Failed to determine current commit hash!\n" + gitProcess.err.text)
       }
-      throw new GradleException("Failed to determine current commit hash!\n" + gitProcess.err.text)
-    }
+    };
   }
 }

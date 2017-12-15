@@ -20,40 +20,40 @@ public class BasicTaskSetup extends AbstractSetup {
     final Delete cleanJosm = pro.getTasks().create("cleanJosm", Delete.class);
     cleanJosm.setDescription("Delete JOSM configuration in `build/.josm/`");
     cleanJosm.setGroup("JOSM");
-    pro.afterEvaluate{p ->
-      cleanJosm.delete(JosmPluginExtension.forProject(p).getTmpJosmHome())
-    };
-    cleanJosm.doFirst{task ->
-      task.getLogger().lifecycle("Delete [{}]…", String.join(", ", cleanJosm.getDelete().stream().map{it.getAbsolutePath()}.collect(Collectors.toList())));
-    };
+    pro.afterEvaluate(p -> {
+      cleanJosm.delete(JosmPluginExtension.forProject(p).getTmpJosmHome());
+    });
+    cleanJosm.doFirst(task -> {
+      task.getLogger().lifecycle("Delete [{}]…", String.join(", ", cleanJosm.getTargetFiles().getFiles().stream().map(File::getAbsolutePath).collect(Collectors.toList())));
+    });
 
     // Init JOSM preferences.xml file
     final Copy initJosmPrefs = pro.getTasks().create("initJosmPrefs", Copy.class);
     initJosmPrefs.setDescription("Puts a default preferences.xml file into the temporary JOSM home directory");
     initJosmPrefs.include("preferences.xml");
-    pro.afterEvaluate{ p ->
+    pro.afterEvaluate(p -> {
       initJosmPrefs.from(JosmPluginExtension.forProject(p).getJosmConfigDir());
       initJosmPrefs.into(JosmPluginExtension.forProject(p).getTmpJosmHome());
       if (initJosmPrefs.getSource().isEmpty()) {
         initJosmPrefs.getLogger().debug("No default JOSM preference file found in {}/preferences.xml.", JosmPluginExtension.forProject(p).getJosmConfigDir().getAbsolutePath());
       }
-    };
-    initJosmPrefs.doFirst{ task ->
+    });
+    initJosmPrefs.doFirst(task -> {
       if (new File(initJosmPrefs.getDestinationDir(), "preferences.xml").exists()) {
         task.getLogger().lifecycle("JOSM preferences not copied, file is already present.\nIf you want to replace it, run the task 'cleanJosm' additionally.");
       } else {
-        task.getLogger().lifecycle("Copy [{}] to {}…", String.join(", ", initJosmPrefs.getSource().getFiles().stream().map{it.getAbsolutePath()}.collect(Collectors.toList())), initJosmPrefs.getDestinationDir().getAbsolutePath());
+        task.getLogger().lifecycle("Copy [{}] to {}…", String.join(", ", initJosmPrefs.getSource().getFiles().stream().map(File::getAbsolutePath).collect(Collectors.toList())), initJosmPrefs.getDestinationDir().getAbsolutePath());
       }
-    };
+    });
 
     // Copy all needed JOSM plugin *.jar files into the directory in {@code $JOSM_HOME}
     final Sync updateJosmPlugins = pro.getTasks().create("updateJosmPlugins", Sync.class);
     updateJosmPlugins.setDescription("Put all needed plugin *.jar files into the plugins directory. This task copies files into the temporary JOSM home directory.");
     updateJosmPlugins.dependsOn(initJosmPrefs);
-    pro.afterEvaluate{ p ->
+    pro.afterEvaluate(p -> {
       updateJosmPlugins.into(new File(JosmPluginExtension.forProject(p).getTmpJosmHome(), "plugins"));
       // the rest of the configuration (e.g. from where the files come, that should be copied) is done later (e.g. in the file `PluginTaskSetup.java`)
-    };
+    });
 
     // Standard run-task
     final Task runJosm = pro.getTasks().create("runJosm", RunJosmTask.class);
@@ -61,15 +61,15 @@ public class BasicTaskSetup extends AbstractSetup {
 
     // Debug task
     final RunJosmTask debugJosm = pro.getTasks().create("debugJosm", RunJosmTask.class);
-    pro.afterEvaluate{ task ->
+    pro.afterEvaluate(task -> {
       final Integer debugPort = JosmPluginExtension.forProject(task.getProject()).getDebugPort();
       task.setDescription("Runs a JOSM instance like the task `runJosm`, but with JDWP (Java debug wire protocol) active" + (
         debugPort == null
         ? ".\n  NOTE: Currently the `debugJosm` task will error out! Set the property `project.josm.debugPort` to enable it!"
         : " on port " + debugPort
       ));
-    };
-    debugJosm.doFirst{ task ->
+    });
+    debugJosm.doFirst(task -> {
       final Integer debugPort = JosmPluginExtension.forProject(task.getProject()).getDebugPort();
       if (debugPort == null) {
         throw new TaskExecutionException(task, new NullPointerException(
@@ -81,6 +81,6 @@ public class BasicTaskSetup extends AbstractSetup {
         debugPort + ". It will start execution as soon as the debugger is connected.\n"
       );
       debugJosm.jvmArgs("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=" + debugPort);
-    };
+    });
   }
 }

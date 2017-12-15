@@ -37,9 +37,9 @@ public class RunJosmTask extends JavaExec {
     mustRunAfter(getProject().getTasks().getByName("cleanJosm"));
     dependsOn(getProject().getTasks().getByName("updateJosmPlugins"));
 
-    getProject().afterEvaluate{ project ->
+    getProject().afterEvaluate(project -> {
       // doFirst has to be added after the project initialized, otherwise it won't be executed before the main part of the JavaExec task is run.
-      doFirst{ task ->
+      doFirst(task -> {
         systemProperty("josm.home", task.getProject().getExtensions().getByType(JosmPluginExtension.class).getTmpJosmHome());
         setClasspath(task.getProject().getConvention().getPlugin(JavaPluginConvention.class).getSourceSets().getByName("main").getRuntimeClasspath());
 
@@ -60,8 +60,8 @@ public class RunJosmTask extends JavaExec {
         }
         L.lifecycle(getExtraInformation());
         L.lifecycle("\nOutput of JOSM starts with the line after the three equality signs\n===");
-      };
-    }
+      });
+    });
   }
 
   /**

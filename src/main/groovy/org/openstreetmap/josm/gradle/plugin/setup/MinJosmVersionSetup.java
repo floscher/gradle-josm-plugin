@@ -21,7 +21,7 @@ public final class MinJosmVersionSetup extends AbstractSetup {
 
     final Task addMinJosmVersionDependency = pro.task("addMinJosmVersionDependency");
     addMinJosmVersionDependency.setDescription("Adds dependency for the minimum required JOSM version to the configuration `minJosmVersionImplementation`.");
-    addMinJosmVersionDependency.doFirst{ task ->
+    addMinJosmVersionDependency.doFirst(task -> {
       // Find the next available version from the one specified in the manifest
       final Integer minJosmVersion = getNextJosmVersion(JosmPluginExtension.forProject(task.getProject()).getManifest().getMinJosmVersion());
       if (minJosmVersion == null) {
@@ -29,22 +29,22 @@ public final class MinJosmVersionSetup extends AbstractSetup {
       }
       task.getLogger().lifecycle("Use JOSM version {} for compiling against the minimum required version", minJosmVersion);
       task.getProject().getDependencies().add("minJosmVersionImplementation", "org.openstreetmap.josm:josm:"+ minJosmVersion);
-    };
+    });
 
-    pro.afterEvaluate{ p ->
+    pro.afterEvaluate(p -> {
       final SourceSetContainer sourceSets = p.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets();
       final SourceSet mainSourceSet = sourceSets.getByName("main");
       final SourceSet minJosmVersion = sourceSets.create("minJosmVersion");
       minJosmVersion.getJava().setSrcDirs(mainSourceSet.getJava().getSrcDirs());
-      minJosmVersion.resources{ resources ->
+      minJosmVersion.resources(resources -> {
         resources.setSrcDirs(mainSourceSet.getResources().getSrcDirs());
         resources.setIncludes(mainSourceSet.getResources().getIncludes());
-      };
+      });
 
       p.getTasks().getByName("minJosmVersionClasses").setGroup("JOSM");
       p.getTasks().getByName("minJosmVersionClasses").setDescription("Try to compile against the version of JOSM that is specified in the manifest as the minimum compatible version");
       p.getTasks().getByName("compileMinJosmVersionJava").dependsOn(addMinJosmVersionDependency);
-    };
+    });
   }
 
   /**

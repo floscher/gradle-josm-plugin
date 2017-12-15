@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Set;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -52,7 +53,7 @@ public class JosmPlugin implements Plugin<Project> {
 
     // Apply the Java plugin if not available, because we rely on the `jar` task
     if (project.getPlugins().findPlugin(JavaPlugin.class) == null) {
-      project.apply{ it.plugin(JavaPlugin.class)};
+      project.apply(conf -> conf.plugin(JavaPlugin.class));
     }
     // Define 'josm' extension
     project.getExtensions().create("josm", JosmPluginExtension.class);
@@ -64,19 +65,20 @@ public class JosmPlugin implements Plugin<Project> {
 
     project.repositories(JosmPluginExtension.forProject(project).getRepositories());
 
-    project.getTasks().withType(Jar.class).getByName("jar").doFirst { task ->
-      task.getManifest().attributes(JosmPluginExtension.forProject(task.getProject()).getManifest().createJosmPluginJarManifest(task.getProject()));
-      task.from(
-        task.getProject().getConfigurations().getByName("packIntoJar").getFiles().stream().<FileTree>map({ file ->
+    final Jar jarTask = project.getTasks().withType(Jar.class).getByName("jar");
+    jarTask.doFirst(task -> {
+      jarTask.getManifest().attributes(JosmPluginExtension.forProject(task.getProject()).getManifest().createJosmPluginJarManifest(task.getProject()));
+      jarTask.from(
+        task.getProject().getConfigurations().getByName("packIntoJar").getFiles().stream().<FileTree>map(file ->
           (file.isDirectory()
             ? task.getProject().fileTree(file)
             : task.getProject().zipTree(file)
           ).matching(JosmPluginExtension.forProject(task.getProject()).getPackIntoJarFileFilter())
-        }).toArray()
+        ).toArray()
       );
-    };
+    });
 
-    project.afterEvaluate { p ->
+    project.afterEvaluate(p -> {
       // Adding dependencies for JOSM and the required plugins
       final Dependency dep = p.getDependencies().add("implementation", "org.openstreetmap.josm:josm:" + JosmPluginExtension.forProject(p).getJosmCompileVersion());
       if ("latest".equals(JosmPluginExtension.forProject(p).getJosmCompileVersion()) || "tested".equals(JosmPluginExtension.forProject(p).getJosmCompileVersion())) {
@@ -91,7 +93,7 @@ public class JosmPlugin implements Plugin<Project> {
       } catch (IOException e) {
         throw new GradleException("Could not determine required JOSM plugins!", e);
       }
-    }
+    });
 
     new BasicTaskSetup().setup();
     new I18nTaskSetup().setup();
