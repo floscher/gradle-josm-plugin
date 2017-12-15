@@ -6,14 +6,18 @@ import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.artifacts.repositories.IvyPatternRepositoryLayout
 import org.gradle.api.Project
 import org.gradle.api.tasks.util.PatternFilterable
-import org.openstreetmap.josm.gradle.plugin.JosmPlugin
 
 /**
  * Contains the available configuration options for the Gradle plugin.
  */
 @groovy.transform.CompileStatic
 class JosmPluginExtension {
-  private final Project project = JosmPlugin.currentProject;
+  private final Project project;
+
+  public JosmPluginExtension (final Project project) {
+    this.project = project;
+  }
+
   /**
    * The version number of JOSM against which the plugin should be compiled.
    *
@@ -94,7 +98,7 @@ class JosmPluginExtension {
    * Configuration options for i18n (read-only)
    * @see #i18n(Closure)
    */
-  final def I18nConfig i18n = new I18nConfig();
+  final def I18nConfig i18n = new I18nConfig(project);
 
   /**
    * Supply a {@link Closure} to this method, which configures the field {@link #i18n}.
@@ -107,7 +111,7 @@ class JosmPluginExtension {
    * The manifest for the JOSM plugin (read-only)
    * @see #manifest(Closure)
    */
-  final def JosmManifest manifest = new JosmManifest()
+  final def JosmManifest manifest = new JosmManifest(project);
 
   /**
    * Supply a {@link Closure} to this method, which configures the field {@link #manifest}.

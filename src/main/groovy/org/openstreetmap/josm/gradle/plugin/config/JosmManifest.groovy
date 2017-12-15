@@ -3,7 +3,6 @@ package org.openstreetmap.josm.gradle.plugin.config
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.plugins.PluginInstantiationException
-import org.openstreetmap.josm.gradle.plugin.JosmPlugin
 
 /**
  * The info that will be written into the manifest file of the plugin *.jar
@@ -22,7 +21,7 @@ import org.openstreetmap.josm.gradle.plugin.JosmPlugin
  */
 @groovy.transform.CompileStatic
 public class JosmManifest {
-  private final Project project = JosmPlugin.currentProject;
+  private final Project project;
   /**
    * The author of the plugin.
    *
@@ -141,7 +140,8 @@ public class JosmManifest {
   /**
    * Initialize the manifest for the project, that is currently being modified by the gradle-josm-plugin
    */
-  protected JosmManifest() {
+  public JosmManifest(final Project project) {
+    this.project = project;
     // Fill the map containing the plugin dependencies
     final String requirements = project.findProperty('plugin.requires')
     if (requirements != null) {

@@ -56,7 +56,7 @@ public class JosmPlugin implements Plugin<Project> {
       project.apply(conf -> conf.plugin(JavaPlugin.class));
     }
     // Define 'josm' extension
-    project.getExtensions().create("josm", JosmPluginExtension.class);
+    project.getExtensions().create("josm", JosmPluginExtension.class, project);
 
     // Configuration for JOSM plugins that are required for this plugin. Normally there's no need to set these manually, these are set based on the manifest configuration
     project.getConfigurations().getByName("implementation").extendsFrom(project.getConfigurations().create("requiredPlugin"));

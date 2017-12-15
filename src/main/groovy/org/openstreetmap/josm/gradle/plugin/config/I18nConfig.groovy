@@ -2,7 +2,6 @@ package org.openstreetmap.josm.gradle.plugin.config;
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.openstreetmap.josm.gradle.plugin.JosmPlugin
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -10,7 +9,12 @@ import java.util.function.Function
 
 @groovy.transform.CompileStatic
 public class I18nConfig {
-  private final Project project = JosmPlugin.currentProject;
+  private final Project project;
+
+  public I18nConfig(final Project project) {
+    this.project = project;
+  }
+
   /**
    * E-Mail address to which bugs regarding i18n should be reported.
    * This will be put into the *.pot files that are forwarded to the translators.
