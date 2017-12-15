@@ -5,6 +5,7 @@ import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.Task;
+import org.gradle.api.Project;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import java.io.IOException;
@@ -15,6 +16,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public final class MinJosmVersionSetup extends AbstractSetup {
+
+  public MinJosmVersionSetup(final Project project) {
+    super(project);
+  }
 
   public void setup() {
     pro.getConfigurations().create("minJosmVersionImplementation").extendsFrom(pro.getConfigurations().getByName("implementation"));

@@ -31,26 +31,13 @@ import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup;
  * the additional repositories and the custom tasks.
  */
 public class JosmPlugin implements Plugin<Project> {
-  private static Project currentProject;
-
-  /**
-   * The Gradle project to which the gradle-josm-plugin is currently applied
-   */
-  public static Project getCurrentProject() {
-    if (currentProject == null) {
-      throw new IllegalStateException("Currently the gradle-josm-plugin is not applied to a Gradle project, but you want to access the project to which the gradle-josm-plugin is applied. This should not happen ;).");
-    }
-    return currentProject;
-  }
 
   /**
    * Set up the JOSM plugin.
    * Creates the tasks this plugin provides, defines the {@code josm} extension, adds the repositories where JOSM specific dependencies can be found.
-   * @see {@link Plugin#apply(T)}
+   * @see Plugin#apply(Object)
    */
   public synchronized void apply(final Project project) {
-    JosmPlugin.currentProject = project;
-
     // Apply the Java plugin if not available, because we rely on the `jar` task
     if (project.getPlugins().findPlugin(JavaPlugin.class) == null) {
       project.apply(conf -> conf.plugin(JavaPlugin.class));
@@ -95,11 +82,10 @@ public class JosmPlugin implements Plugin<Project> {
       }
     });
 
-    new BasicTaskSetup().setup();
-    new I18nTaskSetup().setup();
-    new PluginTaskSetup().setup();
-    new MinJosmVersionSetup().setup();
-    JosmPlugin.currentProject = null;
+    new BasicTaskSetup(project).setup();
+    new I18nTaskSetup(project).setup();
+    new PluginTaskSetup(project).setup();
+    new MinJosmVersionSetup(project).setup();
   }
 
   /**

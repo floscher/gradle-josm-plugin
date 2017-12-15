@@ -29,7 +29,7 @@ public class RunJosmTask extends JavaExec {
    */
   public RunJosmTask() throws MalformedURLException {
     List<String> arguments = getProject().hasProperty("josmArgs") ? Arrays.asList(getProject().property("josmArgs").toString().split("\\\\")) : new ArrayList<>();
-    arguments.add("--load-preferences=" + new File(JosmPlugin.getCurrentProject().getBuildDir(), "/josm-custom-config/requiredPlugins.xml").toURI().toURL().toString());
+    arguments.add("--load-preferences=" + new File(getProject().getBuildDir(), "/josm-custom-config/requiredPlugins.xml").toURI().toURL().toString());
 
     setGroup("JOSM");
     setMain("org.openstreetmap.josm.gui.MainApplication");

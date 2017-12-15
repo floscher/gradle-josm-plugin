@@ -1,9 +1,11 @@
 package org.openstreetmap.josm.gradle.plugin.setup;
 
 import org.gradle.api.Project;
-import org.openstreetmap.josm.gradle.plugin.JosmPlugin;
 
 public abstract class AbstractSetup {
-  protected Project pro = JosmPlugin.getCurrentProject();
+  protected final Project pro;
+  public AbstractSetup(final Project project) {
+    this.pro = project;
+  }
   abstract void setup();
 }

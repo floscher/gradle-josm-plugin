@@ -14,6 +14,10 @@ import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
 
 public class BasicTaskSetup extends AbstractSetup {
 
+  public BasicTaskSetup(final Project project) {
+    super(project);
+  }
+
   public void setup() {
 
     // Clean JOSM

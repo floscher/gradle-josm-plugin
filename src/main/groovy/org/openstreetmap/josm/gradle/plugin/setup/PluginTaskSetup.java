@@ -31,6 +31,10 @@ import java.util.stream.Collectors;
 
 public class PluginTaskSetup extends AbstractSetup {
 
+  public PluginTaskSetup(final Project project) {
+    super(project);
+  }
+
   public void setup() {
     final Task writePluginConfig = pro.task("writePluginConfig");
     writePluginConfig.setDescription("Creates the configuration that tells JOSM which plugins to load (which is later automatically loaded by e.g. `runJosm`)");

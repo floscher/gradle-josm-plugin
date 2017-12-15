@@ -26,6 +26,10 @@ import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
 
 public class I18nTaskSetup extends AbstractSetup {
 
+  public I18nTaskSetup(final Project project) {
+    super(project);
+  }
+
   private Set<File> getMainJavaSrcDirs(final Project project) {
     return project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets().getByName("main").getJava().getSrcDirs();
   }
