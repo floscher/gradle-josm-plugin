@@ -1,12 +1,14 @@
-package org.openstreetmap.josm.gradle.plugin.config;
+package org.openstreetmap.josm.gradle.plugin.config
 
+import java.util.function.Function
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-import java.util.function.Function
-
+/**
+ * Holds configuration options regarding internationalization.
+ */
 @groovy.transform.CompileStatic
 public class I18nConfig {
   private final Project project;
