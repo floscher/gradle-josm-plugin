@@ -31,6 +31,9 @@ groovydoc {
     new Groovydoc.Link('http://docs.groovy-lang.org/latest/html/api/', 'groovy')
   ]
 }
+tasks.withType(Javadoc) {
+  failOnError false
+}
 
 def versionStream = new ByteArrayOutputStream()
 exec {
