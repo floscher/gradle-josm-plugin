@@ -114,7 +114,7 @@ public class I18nTaskSetup extends AbstractSetup {
         destFile,
         line -> (
           line.startsWith("#: ")
-            ? line.substring(0, 3) + JosmPluginExtension.forProject(pro).getI18n().getPathTransformer().apply(line.substring(3))
+            ? line.substring(0, 3) + JosmPluginExtension.forProject(pro).getI18n().getPathTransformer().invoke(line.substring(3))
             : line
         ),
         replacements,

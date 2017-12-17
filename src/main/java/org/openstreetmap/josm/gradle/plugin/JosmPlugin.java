@@ -50,7 +50,7 @@ public class JosmPlugin implements Plugin<Project> {
     // Configuration for libraries on which the project depends and which should be packed into the built *.jar file.
     project.getConfigurations().getByName("implementation").extendsFrom(project.getConfigurations().create("packIntoJar"));
 
-    project.repositories(JosmPluginExtension.forProject(project).getRepositories());
+    JosmPluginExtension.forProject(project).getRepositories().invoke(project.getRepositories());
 
     final Jar jarTask = project.getTasks().withType(Jar.class).getByName("jar");
     jarTask.doFirst(task -> {
@@ -60,7 +60,7 @@ public class JosmPlugin implements Plugin<Project> {
           (file.isDirectory()
             ? task.getProject().fileTree(file)
             : task.getProject().zipTree(file)
-          ).matching(JosmPluginExtension.forProject(task.getProject()).getPackIntoJarFileFilter())
+          ).matching(it -> JosmPluginExtension.forProject(task.getProject()).getPackIntoJarFileFilter().invoke(it))
         ).toArray()
       );
     });

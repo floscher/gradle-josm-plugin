@@ -1,5 +1,8 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
+import groovy.lang.Closure
+import java.lang.Process
+import java.lang.ProcessBuilder
 import java.util.function.Function
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -9,26 +12,22 @@ import org.gradle.api.Project
 /**
  * Holds configuration options regarding internationalization.
  */
-@groovy.transform.CompileStatic
-public class I18nConfig {
-  private final Project project;
-
-  public I18nConfig(final Project project) {
-    this.project = project;
-  }
-
+class I18nConfig(project: Project) {
+  private val project: Project = project
   /**
    * E-Mail address to which bugs regarding i18n should be reported.
    * This will be put into the *.pot files that are forwarded to the translators.
    * <p><strong>Default value:</strong> {@code null}</p>
    */
-  def String bugReportEmail = null;
+  var bugReportEmail: String? = null
+
   /**
    * Person or organization that holds the copyright on the project.
    * This will appear in the header of the *.pot file as follows:
    * <pre># Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER</pre>
    */
-  def String copyrightHolder = null;
+  var copyrightHolder: String? = null
+
   /**
    * Replaces the {@link Project#projectDir} in all file paths of the generated
    * *.pot file.
@@ -41,31 +40,38 @@ public class I18nConfig {
    * @see #getGithubPathTransformer(String) if your project is hosted on GitHub,
    *   you can retrieve a suitable pathTransformer via this method
    */
-  def Function<String, String> pathTransformer = Function.identity();
+  var pathTransformer: (String) -> String = {a -> a};
 
-  public final Function<String, String> getGithubPathTransformer(final String repoSlug) {
-    return new Function<String, String>() {
-      public String apply(String path) {
-        Matcher lineNumberMatcher = Pattern.compile(".*:([1-9][0-9]*)").matcher(path)
-        String lineNumber = null
-        String filePath = path
+  /**
+   * Set the [pathTransformer] field using a Groovy [Closure].
+   */
+  fun pathTransformer(closure: Closure<String>) {
+    pathTransformer = { string ->
+      closure.call(string)
+    }
+  }
+
+  fun getGithubPathTransformer(repoSlug: String): (String) -> String {
+    return lambda@ { path ->
+        val lineNumberMatcher: Matcher = Pattern.compile(".*:([1-9][0-9]*)").matcher(path)
+        var lineNumber: String? = null
+        var filePath: String = path
         if (lineNumberMatcher.matches()) {
           lineNumber = lineNumberMatcher.group(1)
-          filePath = path.substring(0, path.length() - lineNumber.length() - 1)
+          filePath = path.substring(0, path.length - lineNumber.length - 1)
         }
-        def gitProcess = ['git', 'rev-parse', '--short', 'HEAD'].execute()
+        val gitProcess: Process = ProcessBuilder("git", "rev-parse", "--short", "HEAD").start()
         gitProcess.waitFor()
         if (gitProcess.exitValue() == 0) {
-          def projectPath = project.projectDir.absolutePath
+          val projectPath: String = project.projectDir.absolutePath
           if (filePath.startsWith(projectPath)) {
-            return "github.com/$repoSlug/blob/${gitProcess.in.text.trim()}" +
-              filePath.substring(projectPath.length()) +
-              (lineNumber == null ? '' : '#L' + lineNumber + ':' + lineNumber)
+            return@lambda "github.com/$repoSlug/blob/${gitProcess.inputStream.bufferedReader().readText().trim()}" +
+              filePath.substring(projectPath.length) +
+              (if (lineNumber == null ) "" else "#L" + lineNumber + ':' + lineNumber)
           }
-          return path
+          return@lambda path
         }
-        throw new GradleException("Failed to determine current commit hash!\n" + gitProcess.err.text)
-      }
+        throw GradleException("Failed to determine current commit hash!\n" + gitProcess.errorStream.bufferedReader().readText())
     };
   }
 }

@@ -1,6 +1,13 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+}
 plugins {
   id "com.gradle.plugin-publish" version "0.9.9"
   id "com.github.ben-manes.versions" version "0.17.0"
+  id "org.jetbrains.kotlin.jvm" version "1.2.10"
+  id "org.jetbrains.dokka" version "0.9.15"
   id "groovy"
   id "maven"
   id "eclipse"
@@ -16,12 +23,28 @@ gradle.taskGraph.beforeTask { task ->
   task.ext.setProperty("startTime", Instant.now())
 }
 gradle.taskGraph.afterTask { task, state ->
-  project.logger.lifecycle "Finished after " + String.format("%.2f", Duration.between(task.ext.startTime, Instant.now()).toSeconds()) + " seconds."
+  if (!state.skipped) {
+    project.logger.lifecycle "  🏁 Finished after " + String.format("%.3f", Duration.between(task.ext.startTime, Instant.now()).toSeconds()) + " seconds."
+  }
+}
+
+repositories {
+  jcenter()
 }
 
 dependencies {
   implementation localGroovy()
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
+
+dokka {
+  outputFormat = "html"
+  outputDirectory = "$buildDir/docs/dokka"
+  externalDocumentationLink { url = new URL("https://docs.gradle.org/current/javadoc/") }
+  externalDocumentationLink { url = new URL("https://docs.oracle.com/javase/8/docs/api/") }
+  externalDocumentationLink { url = new URL("http://docs.groovy-lang.org/latest/html/api/") }
+}
+tasks.assemble.dependsOn dokka
 
 groovydoc {
   exclude 'org/openstreetmap/josm/gradle/plugin/setup/*' // don't create documentation for the setup package
@@ -31,6 +54,7 @@ groovydoc {
     new Groovydoc.Link('http://docs.groovy-lang.org/latest/html/api/', 'groovy')
   ]
 }
+
 tasks.withType(Javadoc) {
   failOnError false
 }
