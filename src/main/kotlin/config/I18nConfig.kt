@@ -17,42 +17,53 @@ class I18nConfig(project: Project) {
   /**
    * E-Mail address to which bugs regarding i18n should be reported.
    * This will be put into the *.pot files that are forwarded to the translators.
-   * <p><strong>Default value:</strong> {@code null}</p>
+   *
+   * **Default value:** `null`
+   * @since v0.2.0
    */
   var bugReportEmail: String? = null
 
   /**
    * Person or organization that holds the copyright on the project.
    * This will appear in the header of the *.pot file as follows:
-   * <pre># Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER</pre>
+   * ```
+   * # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+   * ```
+   *
+   * **Default value:** `null`
+   * @since v0.2.0
    */
   var copyrightHolder: String? = null
 
   /**
-   * Replaces the {@link Project#projectDir} in all file paths of the generated
-   * *.pot file.
+   * Replaces each occurence of the value of [Project.getProjectDir()] in all
+   * file paths of the generated *.pot file.
    *
    * For each translated string the *.pot file points to the location in the
-   * source code (lines starting with <code>#: </code>).
+   * source code (lines starting with `#: `).
    * Each of those lines is put through this transformer (without the leading
-   * <code>#: </code>).
-   * <p><strong>Default value:</strong> {@link Function#identity()}</p>
-   * @see #getGithubPathTransformer(String) if your project is hosted on GitHub,
-   *   you can retrieve a suitable pathTransformer via this method
+   * `#: `).
+   *
+   * **Default value:** `{a -> a}` (identity)
+   * @see getGithubPathTransformer
    */
   var pathTransformer: (String) -> String = {a -> a};
 
   /**
-   * Set the [pathTransformer] field using a Groovy [Closure].
+   * Alternative to [setPathTransformer()], can set the [pathTransformer]
+   * field using a Groovy [Closure].
    */
   fun pathTransformer(closure: Closure<String>) {
-    pathTransformer = { string ->
-      closure.call(string)
-    }
+    pathTransformer = { closure.call(it) }
   }
 
+  /**
+   * Creates a path transformer for a project hosted on GitHub.
+   * Supply a repo slug (`username/repo`) and this method will return a function,
+   * which you can use as value for the field [pathTransformer].
+   */
   fun getGithubPathTransformer(repoSlug: String): (String) -> String {
-    return lambda@ { path ->
+    return fun(path: String): String {
         val lineNumberMatcher: Matcher = Pattern.compile(".*:([1-9][0-9]*)").matcher(path)
         var lineNumber: String? = null
         var filePath: String = path
@@ -65,11 +76,11 @@ class I18nConfig(project: Project) {
         if (gitProcess.exitValue() == 0) {
           val projectPath: String = project.projectDir.absolutePath
           if (filePath.startsWith(projectPath)) {
-            return@lambda "github.com/$repoSlug/blob/${gitProcess.inputStream.bufferedReader().readText().trim()}" +
+            return "github.com/$repoSlug/blob/${gitProcess.inputStream.bufferedReader().readText().trim()}" +
               filePath.substring(projectPath.length) +
               (if (lineNumber == null ) "" else "#L" + lineNumber + ':' + lineNumber)
           }
-          return@lambda path
+          return path
         }
         throw GradleException("Failed to determine current commit hash!\n" + gitProcess.errorStream.bufferedReader().readText())
     };

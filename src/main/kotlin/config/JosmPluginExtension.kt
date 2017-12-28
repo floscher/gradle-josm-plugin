@@ -10,34 +10,38 @@ import org.gradle.api.artifacts.repositories.IvyPatternRepositoryLayout
 import org.gradle.api.artifacts.repositories.RepositoryLayout
 import org.gradle.api.tasks.util.PatternFilterable
 
-class JosmPluginExtension(project: Project) {
-  private val project: Project = project
+/**
+ * This extension is added to the project as `project.josm`
+ *
+ * @constructor instantiates the extension, takes project properties into account
+ */
+class JosmPluginExtension(private val project: Project) {
   /**
    * The version number of JOSM against which the plugin should be compiled.
    *
-   * <p><strong>Default value:</strong> The value of the property <code>plugin.compile.version</code> or <code>null</code> if that property is not set.</p>
+   * **Default value:** The value of the property `plugin.compile.version` or `null` if that property is not set.
    */
   var josmCompileVersion: String? = project.findProperty("plugin.compile.version")?.toString()
 
   /**
-   * This is required, when you want to run the task {@code debugJosm}. Set this to the port
+   * This is required, when you want to run the task `debugJosm`. Set this to the port
    * on which you want to listen for the debug output.
    */
   var debugPort: Int? = null
 
   /**
-   * The directory which should be used as JOSM home directory when executing the {@code runJosm} or
-   * {@code debugJosm} tasks.
+   * The directory which should be used as JOSM home directory when executing the `runJosm` or
+   * `debugJosm` tasks.
    *
-   * <p><strong>Default value:</strong> <code>$buildDir/.josm</code></p>
+   * **Default value:** `$buildDir/.josm`
    */
   var tmpJosmHome: File = File("${project.buildDir}/.josm")
 
   /**
-   * The directory where the default {@code preferences.xml} file is located, which will be used
-   * when the directory defined in {@code tmpJosmHome} is empty.
+   * The directory where the default `preferences.xml` file is located, which will be used
+   * when the directory defined in `tmpJosmHome` is empty.
    *
-   * <p><strong>Default value:</strong> <code>$projectDir/config/josm</code></p>
+   * **Default value:** `$projectDir/config/josm`
    */
   var josmConfigDir: File = File("${project.projectDir}/config/josm")
 
@@ -51,15 +55,16 @@ class JosmPluginExtension(project: Project) {
     }
 
   /**
-   * When packing the dependencies of the {@code packIntoJar} configuration into the distribution *.jar,
+   * When packing the dependencies of the `packIntoJar` configuration into the distribution *.jar,
    * this closure is applied to the file tree. If you want to exclude certain files in your dependencies into
    * your release, you can modify this.
-   * By default the {@code META-INF} directory of dependencies is discarded.
-   * <p><strong>Default value:</strong> <code>{ it.exclude("META-INF/&#42;&#42;/&#42;") }</code></p>
-   * @see org.gradle.api.file.FileTree#matching(groovy.lang.Closure)
-   * @see PatternFilterable the closure takes an instance of PatternFilterable as argument
+   * By default the `/META-INF/` directory of dependencies is discarded.
+   *
+   * **Default value:** `{ it.exclude("META-INF/&#42;&#42;/&#42;") }`
+   * @see org.gradle.api.file.FileTree.matching(groovy.lang.Closure)
+   * @see PatternFilterable
    */
-  var packIntoJarFileFilter: (PatternFilterable) -> PatternFilterable = { pf: PatternFilterable -> pf.exclude("META-INF/**/*") }
+  var packIntoJarFileFilter: (PatternFilterable) -> PatternFilterable = { it.exclude("META-INF/**/*") }
 
   /**
    * Set the [packIntoJarFileFilter] with a Groovy [Closure]
@@ -70,17 +75,16 @@ class JosmPluginExtension(project: Project) {
 
   /**
    * The repositories that are added to the repository list.
-   * <p><strong>Default value (in this order):</strong>
-   * <ol>
-   * <li><a href="https://josm.openstreetmap.de/nexus/content/repositories/releases/">https://josm.openstreetmap.de/nexus/content/repositories/releases/</a></li>
-   * <li><a href="https://josm.openstreetmap.de/download/">https://josm.openstreetmap.de/download/</a></li>
-   * <li><a href="https://svn.openstreetmap.org/applications/editors/josm/dist/">https://svn.openstreetmap.org/applications/editors/josm/dist/</a></li>
-   * <li><a href="https://josm.openstreetmap.de/nexus/content/repositories/snapshots/">https://josm.openstreetmap.de/nexus/content/repositories/snapshots/</a></li>
-   * </ol></p>
-   * For details see <a href="https://github.com/floscher/gradle-josm-plugin/tree/master/src/main/groovy/org/openstreetmap/josm/gradle/plugin/JosmPluginExtension.groovy">the source file</a>.
-   * @see RepositoryHandler the closure takes an instance of RepositoryHandler as argument
+   *
+   * **Default value (in this order):**
+   * 1. Nexus repo for JOSM releases: [https://josm.openstreetmap.de/nexus/content/repositories/releases/](https://josm.openstreetmap.de/nexus/content/repositories/releases/) (as Maven repo)
+   * 2. Download page for JOSM releases and snapshots: [https://josm.openstreetmap.de/download/](https://josm.openstreetmap.de/download/) (as custom Ivy repo, the `Archiv` subdirectory is also included)
+   * 3. Directory in SVN repo where JOSM plugins are published: [https://svn.openstreetmap.org/applications/editors/josm/dist/](https://svn.openstreetmap.org/applications/editors/josm/dist/) (as custom Ivy repo)
+   * 4. Nexus repo for JOSM snapshots: [https://josm.openstreetmap.de/nexus/content/repositories/snapshots/](https://josm.openstreetmap.de/nexus/content/repositories/snapshots/) (as Maven repo)
+   *
+   * @see RepositoryHandler
    */
-  var repositories = fun (rh: RepositoryHandler) {
+  var repositories: (RepositoryHandler) -> Unit = fun (rh: RepositoryHandler) {
     rh.maven {
       it.url = URI("https://josm.openstreetmap.de/nexus/content/repositories/releases/")
     }
@@ -112,8 +116,7 @@ class JosmPluginExtension(project: Project) {
   }
 
   /**
-   * Configuration options for i18n (read-only)
-   * @see #i18n(Closure)
+   * Configuration options for i18n
    */
   val i18n: I18nConfig = I18nConfig(project)
 
@@ -125,18 +128,18 @@ class JosmPluginExtension(project: Project) {
   }
 
   /**
-   * The manifest for the JOSM plugin (read-only)
-   * @see #manifest(Closure)
+   * The manifest for the JOSM plugin
    */
   val manifest: JosmManifest = JosmManifest(project)
 
   /**
-   * Supply a {@link Closure} to this method, which configures the field {@link #manifest}.
+   * Set the field [manifest] using a Groovy [Closure].
    */
   public fun manifest(c: Closure<JosmManifest>) {
     project.configure(manifest, c)
   }
 
+  /** @suppress */
   companion object {
     /**
      * Returns the [JosmPluginExtension] for a particular [Project].

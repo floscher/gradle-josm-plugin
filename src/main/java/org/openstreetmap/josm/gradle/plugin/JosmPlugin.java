@@ -27,17 +27,18 @@ import org.openstreetmap.josm.gradle.plugin.setup.MinJosmVersionSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup;
 
 /**
- * Main class of the plugin, sets up the {@code requiredPlugin} configuration,
+ * Main class of the plugin, sets up the custom configurations <code>requiredPlugin</code> and <code>packIntoJar</code>,
  * the additional repositories and the custom tasks.
  */
 public class JosmPlugin implements Plugin<Project> {
 
   /**
    * Set up the JOSM plugin.
-   * Creates the tasks this plugin provides, defines the {@code josm} extension, adds the repositories where JOSM specific dependencies can be found.
-   * @see Plugin#apply(Object)
+   *
+   * Creates the tasks this plugin provides, defines the <code>josm</code> extension, adds the repositories where JOSM specific dependencies can be found.
+   * Overrides <a href="https://docs.gradle.org/current/javadoc/org/gradle/api/Plugin.html#apply-T-">Plugin.apply()</a>.
    */
-  public synchronized void apply(final Project project) {
+  public void apply(final Project project) {
     // Apply the Java plugin if not available, because we rely on the `jar` task
     if (project.getPlugins().findPlugin(JavaPlugin.class) == null) {
       project.apply(conf -> conf.plugin(JavaPlugin.class));
@@ -54,7 +55,7 @@ public class JosmPlugin implements Plugin<Project> {
 
     final Jar jarTask = project.getTasks().withType(Jar.class).getByName("jar");
     jarTask.doFirst(task -> {
-      jarTask.getManifest().attributes(JosmPluginExtension.forProject(task.getProject()).getManifest().createJosmPluginJarManifest(task.getProject()));
+      jarTask.getManifest().attributes(JosmPluginExtension.forProject(task.getProject()).getManifest().createJosmPluginJarManifest());
       jarTask.from(
         task.getProject().getConfigurations().getByName("packIntoJar").getFiles().stream().<FileTree>map(file ->
           (file.isDirectory()
@@ -95,7 +96,7 @@ public class JosmPlugin implements Plugin<Project> {
     requirePlugins(0, pro, pluginNames);
   }
   /**
-   * Recursively add the required plugins and any plugins that these in turn require to the configuration `requiredPlugin`.
+   * Recursively add the required plugins and any plugins that these in turn require to the configuration <code>requiredPlugin</code>.
    * @param recursionDepth starts at 0, each time this method is called from within itself, this is incremented by one
    * @param pro the project, which requires the JOSM plugins given with the last parameter
    * @param pluginNames the names of all required JOSM plugins. Transitive dependencies can be omitted, these will be filled in by this method.

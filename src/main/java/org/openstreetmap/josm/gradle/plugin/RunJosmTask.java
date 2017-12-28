@@ -25,7 +25,7 @@ public class RunJosmTask extends JavaExec {
   private String extraInformation = "";
   /**
    * Instantiates a new task for running a JOSM instance.
-   * By default the source set <code>main</code> is added to
+   * By default the source set <code>main</code> is added to the classpath.
    */
   public RunJosmTask() throws MalformedURLException {
     List<String> arguments = getProject().hasProperty("josmArgs") ? Arrays.asList(getProject().property("josmArgs").toString().split("\\\\")) : new ArrayList<>();
