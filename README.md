@@ -22,7 +22,7 @@ See [`docs/Tasks.md`](docs/Tasks.md) for information, from which tasks you can c
 
 And if you need external dependencies for your plugin, maybe [`docs/Dependencies.md`](docs/Dependencies.md) can help.
 
-Also, the [Groovydoc of this plugin is available online](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/index.html?org/openstreetmap/josm/gradle/plugin/package-summary.html).
+Also, the [Javadoc](https://floscher.github.io/gradle-josm-plugin/javadoc/current/index.html?org/openstreetmap/josm/gradle/plugin/package-summary.html)/[KDoc](https://floscher.github.io/gradle-josm-plugin/javadoc/current/gradle-josm-plugin/)(same content, different formatting) for this Gradle plugin are available online.
 
 ## Projects using this Gradle plugin
 * [Gubaer/josm-**contourmerge**-plugin](https://github.com/Gubaer/josm-contourmerge-plugin)

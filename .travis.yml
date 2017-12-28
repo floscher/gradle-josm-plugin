@@ -1,4 +1,4 @@
-language: groovy
+language: java
 
 env:
   global:
@@ -15,7 +15,7 @@ before_script: |
       cp -rT "$GH_PAGES_REPO/maven" "$MAIN_REPO/build/maven"
     fi
   fi
-script: ./gradlew build publish groovydoc
+script: ./gradlew build publish dokka
 after_success: |
   if [ "$TRAVIS_TAG" == "" ]; then
     echo "Not a tagged release, so GitHub pages are not updated! This version is also _not_ released to https://plugins.gradle.org ."
@@ -36,14 +36,17 @@ after_success: |
     longVersion=`git describe --always --long --dirty`
     cd "$GH_PAGES_REPO"
 
-    cp -r -T "$MAIN_REPO/build/docs/groovydoc" "$GH_PAGES_REPO/groovydoc/$version"
-    git rm groovydoc/current
-    ln -s "./$version" "groovydoc/current"
-    git stage groovydoc
+    mkdir -p "$GH_PAGES_REPO/javadoc" "$GH_PAGES_REPO/kdoc"
+    cp -r -T "$MAIN_REPO/build/docs/javadoc" "$GH_PAGES_REPO/javadoc/$version"
+    cp -r -T "$MAIN_REPO/build/docs/kdoc" "$GH_PAGES_REPO/kdoc/$version"
+    git rm javadoc/current kdoc/current
+    ln -s "./$version" "$GH_PAGES_REPO/javadoc/current"
+    ln -s "./$version" "$GH_PAGES_REPO/kdoc/current"
+    git stage javadoc kdoc
 
     cp -r "$MAIN_REPO/build/maven" "$GH_PAGES_REPO"
     git stage maven
 
-    git commit -a -m "Update Maven repository and Groovy documentation to $longVersion"
+    git commit -a -m "Update Maven repository and Javadoc/KDoc documentation to $longVersion"
     git push origin gh-pages
   fi
