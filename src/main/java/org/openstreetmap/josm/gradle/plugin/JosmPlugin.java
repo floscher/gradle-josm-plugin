@@ -2,7 +2,6 @@ package org.openstreetmap.josm.gradle.plugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Set;
@@ -14,7 +13,6 @@ import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.ExternalModuleDependency;
 import org.gradle.api.file.FileTree;
@@ -118,15 +116,16 @@ public class JosmPlugin implements Plugin<Project> {
         pro.getLogger().info("{}JOSM plugin '{}' is already on the classpath.", indention, pluginName);
       } else {
         for (File jarFile : tmpConf.fileCollection(pluginDep).getFiles()) {
-          final ZipFile zipFile = new ZipFile(jarFile);
-          final Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
-          while (zipEntries.hasMoreElements()) {
-            final ZipEntry zipEntry = zipEntries.nextElement();
-            if ("META-INF/MANIFEST.MF".equals(zipEntry.getName())) {
-              final String requirements = new Manifest(zipFile.getInputStream(zipEntry)).getMainAttributes().getValue("Plugin-Requires");
-              if (requirements != null) {
-                // If the plugin itself requires more plugins, recursively add them too.
-                requirePlugins(Math.max(1, recursionDepth + 1), pro, requirements.split(";"));
+          try (ZipFile zipFile = new ZipFile(jarFile)) {
+            final Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
+            while (zipEntries.hasMoreElements()) {
+              final ZipEntry zipEntry = zipEntries.nextElement();
+              if ("META-INF/MANIFEST.MF".equals(zipEntry.getName())) {
+                final String requirements = new Manifest(zipFile.getInputStream(zipEntry)).getMainAttributes().getValue("Plugin-Requires");
+                if (requirements != null) {
+                  // If the plugin itself requires more plugins, recursively add them too.
+                  requirePlugins(Math.max(1, recursionDepth + 1), pro, requirements.split(";"));
+                }
               }
             }
           }
