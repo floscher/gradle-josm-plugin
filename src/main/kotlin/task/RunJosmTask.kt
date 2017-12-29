@@ -13,7 +13,7 @@ import java.io.File
  *
  * By default the source set `main` is added to the classpath.
  */
-class RunJosmTask : JavaExec() {
+open class RunJosmTask : JavaExec() {
 
   /**
    * Text that should be displayed in the console output right before JOSM is started up. Defaults to the empty string.

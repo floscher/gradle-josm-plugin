@@ -79,9 +79,9 @@ public class PluginTaskSetup extends AbstractSetup {
       StringBuilder localDistListBuilder = new StringBuilder();
       // First line containing the name of the plugin and the URL to the *.jar file
       localDistListBuilder
-        .append(pro.getTasks().getByName("localDist").property("fileName"))
+        .append(getLocalDistFileName(pro))
         .append(';')
-        .append(new File(localDistPath, pro.getTasks().getByName("localDist").property("fileName").toString()).toURI().toURL())
+        .append(new File(localDistPath, getLocalDistFileName(pro)).toURI().toURL())
         .append('\n');
       // Manifest indented by one tab character
       for (Entry<String, Object> att : pro.getTasks().withType(Jar.class).getByName("jar").getManifest().getEffectiveManifest().getAttributes().entrySet()) {
@@ -127,13 +127,11 @@ public class PluginTaskSetup extends AbstractSetup {
       pro.getLogger().error("URL to local update-site seems to be malformed!", e);
       localDist.setDescription("Generates a plugin site.");
     }
-    localDist.getExtensions().getExtraProperties().set("fileName", null);
     localDist.finalizedBy(generatePluginList);
     localDist.from(pro.getTasks().getByName("jar").getOutputs());
     localDist.into(localDistPath);
     localDist.doFirst(task -> {
-      task.setProperty("fileName", pro.getConvention().getPlugin(BasePluginConvention.class).getArchivesBaseName() + "-dev." + pro.getTasks().withType(Jar.class).getByName("jar").getExtension());
-      localDist.rename(".*", task.property("fileName").toString());
+      localDist.rename(".*", getLocalDistFileName(pro));
     });
     localDist.doLast(task -> {
       task.getLogger().lifecycle("Local JOSM update-site for plugin version {} has been written to {}", task.getProject().getVersion(), localDistListFile.toURI());
@@ -153,5 +151,9 @@ public class PluginTaskSetup extends AbstractSetup {
       task.getLogger().lifecycle("Distribution *.jar (version {}) has ben written into {}", task.getProject().getVersion(), outDir.getAbsolutePath());
     });
     pro.getTasks().getByName("jar").finalizedBy(dist, localDist);
+  }
+
+  private String getLocalDistFileName(final Project p) {
+    return p.getConvention().getPlugin(BasePluginConvention.class).getArchivesBaseName() + "-dev." + p.getTasks().withType(Jar.class).getByName("jar").getExtension();
   }
 }

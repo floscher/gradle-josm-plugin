@@ -15,7 +15,7 @@ import org.gradle.api.tasks.util.PatternFilterable
  *
  * @constructor instantiates the extension, takes project properties into account
  */
-class JosmPluginExtension(private val project: Project) {
+open class JosmPluginExtension(private val project: Project) {
   /**
    * The version number of JOSM against which the plugin should be compiled.
    *
