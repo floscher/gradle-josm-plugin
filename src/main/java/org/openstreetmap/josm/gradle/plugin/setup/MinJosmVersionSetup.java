@@ -30,16 +30,23 @@ public final class MinJosmVersionSetup extends AbstractSetup {
     pro.afterEvaluate(p -> {
       final SourceSetContainer sourceSets = p.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets();
       final SourceSet mainSourceSet = sourceSets.getByName("main");
-      final SourceSet minJosmVersion = sourceSets.create("minJosmVersion");
-      minJosmVersion.getJava().setSrcDirs(mainSourceSet.getJava().getSrcDirs());
-      minJosmVersion.resources(resources -> {
-        resources.setSrcDirs(mainSourceSet.getResources().getSrcDirs());
-        resources.setIncludes(mainSourceSet.getResources().getIncludes());
-      });
+      final SourceSet minJosmVersion = sourceSets.create("minJosmVersion", (sourceSet) -> {
+        sourceSet.getJava().setSrcDirs(mainSourceSet.getJava().getSrcDirs());
 
-      p.getTasks().getByName("minJosmVersionClasses").setGroup("JOSM");
-      p.getTasks().getByName("minJosmVersionClasses").setDescription("Try to compile against the version of JOSM that is specified in the manifest as the minimum compatible version");
-      p.getTasks().getByName("compileMinJosmVersionJava").dependsOn(addMinJosmVersionDependency);
+        sourceSet.resources(resources -> {
+          resources.setSrcDirs(mainSourceSet.getResources().getSrcDirs());
+          resources.setIncludes(mainSourceSet.getResources().getIncludes());
+          resources.setExcludes(mainSourceSet.getResources().getExcludes());
+        });
+
+        // Add group/description for minJosmVersionClasses task
+        final Task classesTask = p.getTasks().getByName(sourceSet.getClassesTaskName());
+        classesTask.setGroup("JOSM");
+        classesTask.setDescription("Try to compile against the version of JOSM that is specified in the manifest as the minimum compatible version");
+
+        // Add dependency compileMinJosmVersionJava → addMinJosmVersionDependency
+        p.getTasks().getByName(sourceSet.getCompileJavaTaskName()).dependsOn(addMinJosmVersionDependency);
+      });
     });
   }
 }
