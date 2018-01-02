@@ -193,9 +193,12 @@ class JosmManifest(project: Project) {
     val missingException: GradleException = GradleException("The JOSM plugin ${project.name} misses required configuration options. See above for which options are missing.")
 
     val minJosmVersion: String = minJosmVersion ?: throw missingException
-    val projectVersion: String = project.version?.toString() ?: throw missingException
     val mainClass: String = mainClass ?: throw missingException
     val description: String = description ?: throw missingException
+    val projectVersion: String = project.version.toString()
+    if (projectVersion == Project.DEFAULT_VERSION) {
+      throw missingException
+    }
 
     // Required attributes
     val manifestAtts: MutableMap<String,String> = mutableMapOf<String, String>(
