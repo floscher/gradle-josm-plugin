@@ -1,6 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.JavaExec
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import java.io.File
@@ -20,6 +21,7 @@ open class RunJosmTask : JavaExec() {
    *
    * This is used e.g. to display the remote debugging port for task `debugJosm`.
    */
+  @Internal
   var extraInformation: String = ""
 
 
