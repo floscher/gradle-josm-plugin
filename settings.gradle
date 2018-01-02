@@ -1,0 +1,13 @@
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    jcenter()
+  }
+  resolutionStrategy {
+    eachPlugin {
+      if (requested.id.namespace == 'org.junit.platform.gradle') {
+        useModule("org.junit.platform:junit-platform-gradle-plugin:${requested.version}")
+      }
+    }
+  }
+}

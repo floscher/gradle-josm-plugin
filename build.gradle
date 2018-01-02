@@ -1,13 +1,9 @@
-buildscript {
-  repositories {
-    jcenter()
-  }
-}
 plugins {
   id "com.gradle.plugin-publish" version "0.9.9"
   id "com.github.ben-manes.versions" version "0.17.0"
   id "org.jetbrains.kotlin.jvm" version "1.2.10"
   id "org.jetbrains.dokka" version "0.9.15"
+  id "org.junit.platform.gradle.plugin" version "1.0.2"
   id "maven"
   id "eclipse"
 
@@ -50,6 +46,9 @@ repositories {
 dependencies {
   implementation localGroovy()
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.10"
+
+  testImplementation "org.junit.jupiter:junit-jupiter-api:5.0.2"
+  testRuntime "org.junit.jupiter:junit-jupiter-engine:5.0.2"
 }
 
 import org.jetbrains.dokka.gradle.DokkaTask
