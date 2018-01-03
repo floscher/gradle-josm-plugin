@@ -16,6 +16,7 @@ import kotlin.math.max
 
 /**
  * Finds the next JOSM version available in the repositories known to Gradle, starting with a given version number.
+ *
  * If the number can be parsed as an integer, 50 version numbers beginning with the given number are checked.
  * Otherwise only the given version is checked.
  *
@@ -61,6 +62,7 @@ private fun Project.resolveJosm(version: String): Dependency {
 /**
  * Resolves the JOSM plugin names given as parameter, using the available repositories for this project.
  * Not only are the given plugin names resolved to Dependencies, but also all JOSM plugins on which these plugins depend.
+ *
  * The resolution is aborted, if a dependency chain exceeds 10 plugins (plugin 1 depends on plugin 2 … depends on plugin 10). This limit can be changed by [JosmPluginExtension.maxPluginDependencyDepth]
  * @param [directlyRequiredPlugins] a [Set] of [String]s representing the names of JOSM plugins.
  *   These plugins (and their dependencies) will be resolved
@@ -122,6 +124,10 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
   return result
 }
 
+/**
+ * Access method for the `project.josm{}` extension.
+ * @return the [JosmPluginExtension] for this project.
+ */
 fun Project.getJosmExtension(): JosmPluginExtension {
   return extensions.getByType(JosmPluginExtension::class.java)
 }
