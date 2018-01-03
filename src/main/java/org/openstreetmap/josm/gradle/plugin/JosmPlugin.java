@@ -63,7 +63,7 @@ public class JosmPlugin implements Plugin<Project> {
       } else {
         p.getLogger().info("Compile against the JOSM version " + JosmPluginExtension.forProject(p).getJosmCompileVersion());
       }
-      p.getDependencies().add("requiredPlugin", ProjectKt.getAllRequiredJosmPlugins(p, JosmPluginExtension.forProject(p).getManifest().getPluginDependencies()));
+      ProjectKt.getAllRequiredJosmPlugins(p, JosmPluginExtension.forProject(p).getManifest().getPluginDependencies()).forEach(it -> p.getDependencies().add("requiredPlugin", it));
     });
 
     new BasicTaskSetup(project).setup();
