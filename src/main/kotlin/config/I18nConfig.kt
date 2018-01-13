@@ -1,13 +1,10 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
 import groovy.lang.Closure
-import java.lang.Process
-import java.lang.ProcessBuilder
-import java.util.function.Function
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 /**
  * Holds configuration options regarding internationalization.

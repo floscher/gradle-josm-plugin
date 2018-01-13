@@ -1,14 +1,13 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
 import groovy.lang.Closure
-import java.io.File
-import java.net.URI
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.IvyPatternRepositoryLayout
-import org.gradle.api.artifacts.repositories.RepositoryLayout
 import org.gradle.api.tasks.util.PatternFilterable
+import java.io.File
+import java.net.URI
 
 /**
  * This extension is added to the project as `project.josm`

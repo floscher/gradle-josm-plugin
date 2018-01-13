@@ -1,10 +1,10 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
 import groovy.lang.GroovySystem
-import java.net.URL
-import java.util.GregorianCalendar
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import java.net.URL
+import java.util.GregorianCalendar
 
 /**
  * The info that will be written into the manifest file of the plugin *.jar

@@ -6,11 +6,10 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.Delete;
-import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.Sync;
 import org.gradle.api.tasks.TaskExecutionException;
-import org.openstreetmap.josm.gradle.plugin.task.RunJosmTask;
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
+import org.openstreetmap.josm.gradle.plugin.task.RunJosmTask;
 
 public class BasicTaskSetup extends AbstractSetup {
 

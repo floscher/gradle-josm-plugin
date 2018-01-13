@@ -6,16 +6,14 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.IvyPatternRepositoryLayout
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
-
 
 class ProjectExtensionsTest {
 
   private fun createGradleJosmProjectWithoutRepos(): Project {
     val pro = ProjectBuilder.builder().build()
-    JosmPlugin().apply(pro)
+    JosmPlugin(null).apply(pro)
     pro.repositories.removeIf { true }
     return pro
   }

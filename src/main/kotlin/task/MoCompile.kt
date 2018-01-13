@@ -3,7 +3,6 @@ package task
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.openstreetmap.josm.gradle.plugin.getJosmExtension
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet

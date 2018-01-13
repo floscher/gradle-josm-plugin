@@ -1,24 +1,37 @@
 package org.openstreetmap.josm.gradle.plugin;
 
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.ExternalModuleDependency;
 import org.gradle.api.file.FileTree;
+import org.gradle.api.internal.file.SourceDirectorySetFactory;
+import org.gradle.api.internal.plugins.DslObject;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.bundling.Jar;
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
+import org.openstreetmap.josm.gradle.plugin.i18n.DefaultI18nSourceSet;
 import org.openstreetmap.josm.gradle.plugin.setup.BasicTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.I18nTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.MinJosmVersionSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup;
-import javax.annotation.Nonnull;
+import org.openstreetmap.josm.gradle.plugin.task.PoCompile;
+import task.MoCompile;
 
 /**
  * Main class of the plugin, sets up the custom configurations <code>requiredPlugin</code> and <code>packIntoJar</code>,
  * the additional repositories and the custom tasks.
  */
 public class JosmPlugin implements Plugin<Project> {
+  private final SourceDirectorySetFactory sourceDirectorySetFactory;
+
+  @Inject
+  public JosmPlugin(SourceDirectorySetFactory sourceDirectorySetFactory) {
+    this.sourceDirectorySetFactory = sourceDirectorySetFactory;
+  }
 
   /**
    * Set up the JOSM plugin.
@@ -70,5 +83,23 @@ public class JosmPlugin implements Plugin<Project> {
     new I18nTaskSetup(project).setup();
     new PluginTaskSetup(project).setup();
     new MinJosmVersionSetup(project).setup();
+
+    if (sourceDirectorySetFactory == null) {
+      project.getLogger().lifecycle("No source directory set factory given! The i18n source sets are not configured.");
+    } else {
+      // Inspired by https://github.com/gradle/gradle/blob/9d86f98b01acb6496d05e05deddbc88c1e35d038/subprojects/plugins/src/main/java/org/gradle/api/plugins/GroovyBasePlugin.java#L88-L113
+      project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets().all(s -> {
+        if (!"minJosmVersion".equals(s.getName())) {
+          final DefaultI18nSourceSet i18nSourceSet = new DefaultI18nSourceSet("i18n", s, sourceDirectorySetFactory);
+          new DslObject(s).getConvention().getPlugins().put("i18n", i18nSourceSet);
+          final PoCompile poCompileTask = project.getTasks().create(s.getCompileTaskName("po"), PoCompile.class, t -> t.setup(i18nSourceSet));
+          final MoCompile moCompileTask = project.getTasks().create(s.getCompileTaskName("mo"), MoCompile.class, t -> t.setup(i18nSourceSet, poCompileTask));
+
+          s.getOutput().dir(moCompileTask.getOutDir());
+          i18nSourceSet.getLang().getSourceDirectories().forEach(sd -> s.getOutput().dir(sd));
+          project.getTasks().getByName(s.getProcessResourcesTaskName()).getInputs().files(moCompileTask);
+        }
+      });
+    }
   }
 }

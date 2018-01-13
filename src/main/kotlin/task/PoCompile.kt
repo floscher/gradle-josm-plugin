@@ -2,10 +2,8 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
-import org.openstreetmap.josm.gradle.plugin.JosmPlugin
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 import java.io.File
 import java.io.IOException
