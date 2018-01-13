@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>org.openstreetmap.josm.gradle.plugin.org.gradle.api.Project - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin</a>&nbsp;/&nbsp;<a href=".">org.gradle.api.Project</a><br/>
+<br/>
+<h3>Extensions for org.gradle.api.Project</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="get-all-required-josm-plugins.html">getAllRequiredJosmPlugins</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><a href="https://docs.gradle.org/4.4.1/javadoc/org/gradle/api/Project.html"><span class="identifier">Project</span></a><span class="symbol">.</span><span class="identifier">getAllRequiredJosmPlugins</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin$getAllRequiredJosmPlugins(org.gradle.api.Project, kotlin.collections.Collection((kotlin.String)))/directlyRequiredPlugins">directlyRequiredPlugins</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-collection/index.html"><span class="identifier">Collection</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html"><span class="identifier">Set</span></a><span class="symbol">&lt;</span><a href="https://docs.gradle.org/4.4.1/javadoc/org/gradle/api/artifacts/Dependency.html"><span class="identifier">Dependency</span></a><span class="symbol">&gt;</span></code>
+<p>Resolves the JOSM plugin names given as parameter, using the available repositories for this project.
+Not only are the given plugin names resolved to Dependencies, but also all JOSM plugins on which these plugins depend.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-josm-extension.html">getJosmExtension</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><a href="https://docs.gradle.org/4.4.1/javadoc/org/gradle/api/Project.html"><span class="identifier">Project</span></a><span class="symbol">.</span><span class="identifier">getJosmExtension</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="../../org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/index.html"><span class="identifier">JosmPluginExtension</span></a></code>
+<p>Access method for the <code>project.josm{}</code> extension.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-next-josm-version.html">getNextJosmVersion</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><a href="https://docs.gradle.org/4.4.1/javadoc/org/gradle/api/Project.html"><span class="identifier">Project</span></a><span class="symbol">.</span><span class="identifier">getNextJosmVersion</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin$getNextJosmVersion(org.gradle.api.Project, kotlin.String)/startVersion">startVersion</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://docs.gradle.org/4.4.1/javadoc/org/gradle/api/artifacts/Dependency.html"><span class="identifier">Dependency</span></a></code>
+<p>Finds the next JOSM version available in the repositories known to Gradle, starting with a given version number.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
