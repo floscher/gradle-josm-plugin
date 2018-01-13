@@ -2,7 +2,7 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 import java.io.File
@@ -15,7 +15,7 @@ open class PoCompile: DefaultTask() {
   lateinit var outDir: File
     private set
 
-  @InputDirectory
+  @InputFiles
   lateinit var source: SourceDirectorySet
   private lateinit var sourceSetName: String
 
