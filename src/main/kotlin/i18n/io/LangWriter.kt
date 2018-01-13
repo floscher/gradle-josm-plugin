@@ -13,7 +13,11 @@ class LangWriter {
     // Otherwise collect all the msgids from all the files.
     val originalMsgIds = languageMaps.get(originLang)?.keys ?: languageMaps.flatMap { it.value.keys }
     langFileDir.mkdirs()
-    languageMaps.entries.forEach { langEntry ->
+    languageMaps
+      // Adds a *.lang file for the original language even if no *.mo or *.po file is available
+      .plus(if (!languageMaps.containsKey(originLang)) mapOf(originLang to originalMsgIds.associate{ Pair(it, it.id) }) else mapOf())
+      .entries.forEach { langEntry ->
+
       BufferedOutputStream(FileOutputStream(File(langFileDir, "${langEntry.key}.lang"))).use { stream ->
         originalMsgIds.filter { it.id.numPlurals <= 0 }.forEach { msgid ->
 
