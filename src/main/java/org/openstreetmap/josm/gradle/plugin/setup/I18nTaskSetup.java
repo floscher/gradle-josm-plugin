@@ -69,7 +69,7 @@ public class I18nTaskSetup extends AbstractSetup {
 
     final String propOutBaseName = "outBaseName";
     i18nXgettext.getExtensions().getExtraProperties().set(propOutBaseName, null); // Value is set after project is evaluated
-    final File outDir = new File(pro.getBuildDir(), "po");
+    final File outDir = new File(pro.getBuildDir(), "i18n");
     i18nXgettext.getInputs().files(getMainJavaSrcDirs(pro));
     i18nXgettext.getOutputs().dir(outDir);
     i18nXgettext.setWorkingDir(pro.getProjectDir());
