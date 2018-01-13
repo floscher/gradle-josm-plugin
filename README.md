@@ -22,6 +22,8 @@ See [`docs/Tasks.md`](docs/Tasks.md) for information, from which tasks you can c
 
 And if you need external dependencies for your plugin, maybe [`docs/Dependencies.md`](docs/Dependencies.md) can help.
 
+If you want to know how i18n works, have a look at [`docs/I18n.md`](docs/I18n.md).
+
 Also, the [Javadoc](https://floscher.github.io/gradle-josm-plugin/javadoc/current/index.html?org/openstreetmap/josm/gradle/plugin/package-summary.html)/[KDoc](https://floscher.github.io/gradle-josm-plugin/kdoc/current/gradle-josm-plugin/)(same content, different formatting) for this Gradle plugin are available online.
 
 ## Projects using this Gradle plugin
