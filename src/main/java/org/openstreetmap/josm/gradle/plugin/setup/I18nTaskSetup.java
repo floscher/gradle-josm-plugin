@@ -62,7 +62,7 @@ public class I18nTaskSetup extends AbstractSetup {
       }
     });
 
-    final Exec i18nXgettext = pro.getTasks().create("i18n-xgettext", Exec.class);
+    final Exec i18nXgettext = pro.getTasks().create("generatePot", Exec.class);
     i18nXgettext.setGroup("JOSM-i18n");
     i18nXgettext.setDescription("Extracts translatable strings from the source code");
     i18nXgettext.dependsOn(genSrcFileList);

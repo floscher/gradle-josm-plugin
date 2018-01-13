@@ -49,9 +49,9 @@ This task creates a 'plugin site' inside your `build/localDist/` directory. Poin
 
 The task `runJosm` is the preferred (and easier) method to test drive your plugin, but in some circumstances you might not want to test in an isolated environment, but in your normal JOSM setup. If that's the case, this task is for you.
 
-## i18n-xgettext
+## generatePot
 ```bash
-./gradlew i18n-xgettext
+./gradlew generatePot
 ```
 This task extracts the translatable strings from your source code and writes them to the file `$buildDir/po/josm-plugin_MyAwesomePlugin.pot`.
-Note that you have to have `xgettext` installed on your machine in order for this task to work.
+> **Note:** You have to have `xgettext` installed on your machine in order for this task to work.
