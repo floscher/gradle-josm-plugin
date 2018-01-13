@@ -29,13 +29,13 @@ open class RunJosmTask : JavaExec() {
     val arguments: MutableList<String> = if (getProject().hasProperty("josmArgs")) getProject().property("josmArgs").toString().split("\\\\").toMutableList() else ArrayList()
     arguments.add("--load-preferences=" + File(getProject().getBuildDir(), "/josm-custom-config/requiredPlugins.xml").toURI().toURL().toString());
 
-    setGroup("JOSM");
-    setMain("org.openstreetmap.josm.gui.MainApplication");
-    setArgs(arguments);
-    mustRunAfter(getProject().getTasks().getByName("cleanJosm"));
-    dependsOn(getProject().getTasks().getByName("updateJosmPlugins"));
+    super.setGroup("JOSM");
+    super.setMain("org.openstreetmap.josm.gui.MainApplication");
+    super.setArgs(arguments);
+    super.mustRunAfter(super.getProject().getTasks().getByName("cleanJosm"));
+    super.dependsOn(super.getProject().getTasks().getByName("updateJosmPlugins"));
 
-    getProject().afterEvaluate{ project ->
+    super.getProject().afterEvaluate{ project ->
       // doFirst has to be added after the project initialized, otherwise it won't be executed before the main part of the JavaExec task is run.
       doFirst{ task ->
         systemProperty("josm.home", task.getProject().getExtensions().getByType(JosmPluginExtension::class.java).tmpJosmHome);
@@ -65,5 +65,4 @@ open class RunJosmTask : JavaExec() {
       }
     }
   }
-
 }
