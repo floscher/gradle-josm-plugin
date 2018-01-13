@@ -34,6 +34,7 @@ open class PoCompile: DefaultTask() {
 
       if (source.isEmpty) {
         this.logger.lifecycle("No *.po files found for this source set '{}'.", source.name)
+        return@doFirst
       }
       project.fileTree(outDir).filter { it.isFile && it.name.endsWith(".mo") }.forEach { it.delete() }
       source.asFileTree.forEach {

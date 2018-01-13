@@ -40,13 +40,14 @@ open class MoCompile : DefaultTask() {
 
   init {
     doFirst {
-      logger.lifecycle("Compiling the *.lang files for ${outDir.absolutePath}…")
       outDir.mkdirs()
 
       val files = source.asFileTree.files.plus(poCompileTask.outputs.files.asFileTree.files).filter{ it.isFile }
       if (files.isEmpty()) {
         this.logger.lifecycle("No *.mo files found for this source set '{}'.", sourceSetName)
+        return@doFirst
       }
+      logger.lifecycle("Compiling the *.lang files for ${outDir.absolutePath}…")
       project.fileTree(outDir).filter { it.isFile && it.name.endsWith(".lang") }.forEach { it.delete() }
       val langMap = mutableMapOf<String, Map<MsgId, MsgStr>>()
       files.forEach {
