@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin;
 
+import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.gradle.api.Plugin;
@@ -19,6 +20,7 @@ import org.openstreetmap.josm.gradle.plugin.setup.I18nTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.MinJosmVersionSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.task.PoCompile;
+import org.openstreetmap.josm.gradle.plugin.task.ShortenPoFiles;
 import task.MoCompile;
 
 /**
@@ -89,9 +91,14 @@ public class JosmPlugin implements Plugin<Project> {
     } else {
       // Inspired by https://github.com/gradle/gradle/blob/9d86f98b01acb6496d05e05deddbc88c1e35d038/subprojects/plugins/src/main/java/org/gradle/api/plugins/GroovyBasePlugin.java#L88-L113
       project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets().all(s -> {
-        if (!"minJosmVersion".equals(s.getName())) {
+        if (!"minJosmVersion".equals(s.getName()) && !s.getName().isEmpty()) {
           final DefaultI18nSourceSet i18nSourceSet = new DefaultI18nSourceSet("i18n", s, sourceDirectorySetFactory);
           new DslObject(s).getConvention().getPlugins().put("i18n", i18nSourceSet);
+          project.getTasks().create(
+            "main".equals(s.getName()) ? "shortenPoFiles" : "shorten" + s.getName().substring(0, 1).toUpperCase(Locale.UK) + s.getName().substring(1) + "PoFiles",
+            ShortenPoFiles.class,
+            t -> t.setSourceSet(i18nSourceSet)
+          );
           final PoCompile poCompileTask = project.getTasks().create(s.getCompileTaskName("po"), PoCompile.class, t -> t.setup(i18nSourceSet));
           final MoCompile moCompileTask = project.getTasks().create(s.getCompileTaskName("mo"), MoCompile.class, t -> t.setup(i18nSourceSet, poCompileTask));
 

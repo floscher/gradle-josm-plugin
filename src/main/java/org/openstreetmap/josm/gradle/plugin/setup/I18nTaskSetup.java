@@ -1,29 +1,20 @@
 package org.openstreetmap.josm.gradle.plugin.setup;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.Year;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.api.plugins.BasePluginConvention;
 import org.gradle.api.plugins.JavaPluginConvention;
-import org.gradle.api.tasks.Exec;
 import org.gradle.api.tasks.TaskExecutionException;
-import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
 import org.openstreetmap.josm.gradle.plugin.task.GeneratePot;
+import org.openstreetmap.josm.gradle.plugin.task.TransifexDownload;
 
 public class I18nTaskSetup extends AbstractSetup {
 
@@ -67,5 +58,7 @@ public class I18nTaskSetup extends AbstractSetup {
       task.dependsOn(genSrcFileList);
       task.getInputs().files(getMainJavaSrcDirs(pro));
     });
+
+    pro.getTasks().create("transifexDownload", TransifexDownload.class);
   }
 }
