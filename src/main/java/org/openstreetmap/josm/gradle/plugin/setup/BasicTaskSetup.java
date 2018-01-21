@@ -63,27 +63,28 @@ public class BasicTaskSetup extends AbstractSetup {
     runJosm.setDescription("Runs an independent JOSM instance (version specified in project dependencies) with `build/.josm/` as home directory and the freshly compiled plugin active.");
 
     // Debug task
-    final RunJosmTask debugJosm = pro.getTasks().create("debugJosm", RunJosmTask.class);
-    pro.afterEvaluate(task -> {
-      final Integer debugPort = JosmPluginExtension.forProject(task.getProject()).getDebugPort();
-      task.setDescription("Runs a JOSM instance like the task `runJosm`, but with JDWP (Java debug wire protocol) active" + (
-        debugPort == null
-        ? ".\n  NOTE: Currently the `debugJosm` task will error out! Set the property `project.josm.debugPort` to enable it!"
-        : " on port " + debugPort
-      ));
-    });
-    debugJosm.doFirst(task -> {
-      final Integer debugPort = JosmPluginExtension.forProject(task.getProject()).getDebugPort();
-      if (debugPort == null) {
-        throw new TaskExecutionException(task, new NullPointerException(
-          "You have to set the property `project.josm.debugPort` to the port on which you'll listen for debug output. If you don't want to debug, simply use the task `runJosm` instead of `debugJosm`."
+    final RunJosmTask debugJosm = pro.getTasks().create("debugJosm", RunJosmTask.class, task -> {
+      task.getProject().afterEvaluate(p -> {
+        final Integer debugPort = JosmPluginExtension.forProject(p).getDebugPort();
+        task.setDescription("Runs a JOSM instance like the task `runJosm`, but with JDWP (Java debug wire protocol) active" + (
+          debugPort == null
+            ? ".\n  NOTE: Currently the `debugJosm` task will error out! Set the property `project.josm.debugPort` to enable it!"
+            : " on port " + debugPort
         ));
-      }
-      debugJosm.setExtraInformation(
-        "\nThe application is listening for a remote debugging connection on port " +
-        debugPort + ". It will start execution as soon as the debugger is connected.\n"
-      );
-      debugJosm.jvmArgs("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=" + debugPort);
+      });
+      task.doFirst(taskA -> {
+        final Integer debugPort = JosmPluginExtension.forProject(task.getProject()).getDebugPort();
+        if (debugPort == null) {
+          throw new TaskExecutionException(task, new NullPointerException(
+            "You have to set the property `project.josm.debugPort` to the port on which you'll listen for debug output. If you don't want to debug, simply use the task `runJosm` instead of `debugJosm`."
+          ));
+        }
+        task.setExtraInformation(
+          "\nThe application is listening for a remote debugging connection on port " +
+            debugPort + ". It will start execution as soon as the debugger is connected.\n"
+        );
+        task.jvmArgs("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=" + debugPort);
+      });
     });
   }
 }
