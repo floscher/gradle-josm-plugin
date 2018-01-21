@@ -27,11 +27,11 @@ open class MoCompile : DefaultTask() {
 
   private lateinit var poCompileTask: Task
 
-  fun setup(source: I18nSourceSet, poCompileTask: PoCompile) {
-    this.outDir = File(project.buildDir, "i18n/mo/" + source.name)
-    this.source = source.mo
-    inputs.files(source.mo.files)
-    this.sourceSetName = source.name
+  fun setup(sourceSet: I18nSourceSet, poCompileTask: PoCompile) {
+    this.outDir = File(project.buildDir, "i18n/mo/" + sourceSet.name)
+    this.source = sourceSet.mo
+    inputs.files(sourceSet.mo.files)
+    this.sourceSetName = sourceSet.name
     inputs.files(poCompileTask)
     this.poCompileTask = poCompileTask
 

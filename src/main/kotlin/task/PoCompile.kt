@@ -21,11 +21,11 @@ open class PoCompile: DefaultTask() {
 
   private var compilationFailed: Boolean = false
 
-  fun setup(source: I18nSourceSet) {
-    this.outDir = File(project.buildDir, "i18n/po/" + source.name)
-    this.source = source.po
-    this.sourceSetName = source.name
-    description = "Compile the *.po text files of source set ${source.name} to the binary *.mo files"
+  fun setup(sourceSet: I18nSourceSet) {
+    this.outDir = File(project.buildDir, "i18n/po/" + sourceSet.name)
+    this.source = sourceSet.po
+    this.sourceSetName = sourceSet.name
+    description = "Compile the *.po text files of source set ${sourceSet.name} to the binary *.mo files"
   }
 
   init {
@@ -33,7 +33,7 @@ open class PoCompile: DefaultTask() {
       outDir.mkdirs();
 
       if (source.isEmpty) {
-        this.logger.lifecycle("No *.po files found for this source set '{}'.", source.name)
+        this.logger.lifecycle("No *.po files found for this source set '{}'.", sourceSetName)
         return@doFirst
       }
       project.fileTree(outDir).filter { it.isFile && it.name.endsWith(".mo") }.forEach { it.delete() }
