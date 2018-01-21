@@ -22,16 +22,16 @@ interface I18nSourceSet {
   fun po(configureAction: Action<in SourceDirectorySet>): I18nSourceSet
 }
 
-class DefaultI18nSourceSet(name: String, sourceSet: SourceSet, sourceDirectorySetFactory: SourceDirectorySetFactory) : I18nSourceSet {
+class DefaultI18nSourceSet(sourceSet: SourceSet, sourceDirectorySetFactory: SourceDirectorySetFactory) : I18nSourceSet {
   override val po: SourceDirectorySet = sourceDirectorySetFactory.create(
-    name + "Po",
+    "i18nPo",
     (sourceSet as? DefaultSourceSet)?.displayName ?: sourceSet.name  + " I18n (*.po) source (gettext)")
   override val mo: SourceDirectorySet = sourceDirectorySetFactory.create(
-    name + "Mo",
+    "i18nMo",
     (sourceSet as? DefaultSourceSet)?.displayName ?: sourceSet.name  + " I18n (*.mo) source (gettext)")
   override val lang: SourceDirectorySet = sourceDirectorySetFactory.create(
-    name + "Lang",
-    (sourceSet as? DefaultSourceSet)?.displayName ?: sourceSet.name  + " I18n (*.lang) source (gettext)")
+    "i18nLang",
+    (sourceSet as? DefaultSourceSet)?.displayName ?: sourceSet.name  + " I18n (*.lang) source (custom binary format for JOSM translations)")
   init {
     po.filter{ it.isFile }
     mo.filter{ it.isFile }
