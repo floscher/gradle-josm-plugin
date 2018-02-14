@@ -30,6 +30,7 @@ Also, the [Javadoc](https://floscher.github.io/gradle-josm-plugin/javadoc/curren
 * [Gubaer/josm-**contourmerge**-plugin](https://github.com/Gubaer/josm-contourmerge-plugin)
 * [fieldpapers/josm-**fieldpapers**](https://github.com/fieldpapers/josm-fieldpapers)
 * [JOSM/**geojson**](https://github.com/JOSM/geojson)
+* [osmlab/**josm-atlas**](https://github.com/osmlab/josm-atlas)
 * [JOSM/**Mapillary**](https://github.com/JOSM/Mapillary)
 * [matsim-org/josm-**matsim**-plugin](https://github.com/matsim-org/josm-matsim-plugin)
 * [iandees/josm-**mbtiles**](https://github.com/iandees/josm-mbtiles)
