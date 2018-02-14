@@ -2,8 +2,10 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.plugins.BasePluginConvention
 import org.gradle.api.tasks.Exec
+import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.getJosmExtension
+import task.GenerateFileList
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
@@ -16,7 +18,8 @@ import java.nio.charset.StandardCharsets
 import java.time.Year
 
 open class GeneratePot: Exec() {
-  lateinit var outBaseName: String
+  private lateinit var outBaseName: String
+  lateinit var fileListGenTask: GenerateFileList
 
   init {
     group = "JOSM-i18n"
@@ -29,16 +32,19 @@ open class GeneratePot: Exec() {
     executable = "xgettext"
     args(
       "--from-code=UTF-8", "--language=Java",
-      "--files-from=" + project.buildDir + "/srcFileList.txt",
-      "--output-dir=" + outDir.getAbsolutePath(),
+      "--output-dir=" + outDir.absolutePath,
       "--add-comments",
       "--sort-output",
       "-k", "-ktrc:1c,2", "-kmarktrc:1c,2", "-ktr", "-kmarktr", "-ktrn:1,2", "-ktrnc:1c,2,3"
     )
 
     project.afterEvaluate {
+      dependsOn(fileListGenTask)
+      inputs.files(fileListGenTask.sourceFiles)
+
       outBaseName = "josm-plugin_" + it.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName
       args(
+        "--files-from=" + fileListGenTask.outFile.absolutePath,
         "--default-domain=" + outBaseName,
         "--package-name=" + outBaseName,
         "--package-version=" + it.version
