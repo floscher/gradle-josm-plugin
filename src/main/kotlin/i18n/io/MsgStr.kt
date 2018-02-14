@@ -1,6 +1,8 @@
 package org.openstreetmap.josm.gradle.plugin.i18n.io
 
 data class MsgStr(val strings: List<String>) {
-  val singularString = strings[0]
-  val numPlurals = strings.size - 1
+  constructor(vararg strings: String): this(strings.toList())
+  init {
+    require(strings.size >= 1){"A MsgStr has to consist of at least one string!"}
+  }
 }

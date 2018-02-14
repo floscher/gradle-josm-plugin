@@ -19,7 +19,8 @@ class LangWriter {
   fun writeLangFile(langFileDir: File, languageMaps: Map<String, Map<MsgId, MsgStr>>, originLang: String = "en") {
     // If the original language is present in the languageMaps, then use the msgids from that file.
     // Otherwise collect all the msgids from all the files.
-    val originalMsgIds = (languageMaps.get(originLang)?.keys ?: languageMaps.flatMap { it.value.keys }).filter { it.id.singularString != "" }
+    val originalMsgIds = (languageMaps.get(originLang)?.keys
+      ?: languageMaps.flatMap { it.value.keys }).filter { it.id.strings.first() != "" }
     langFileDir.mkdirs()
     languageMaps
       // Adds a *.lang file for the original language even if no *.mo or *.po file is available
@@ -29,19 +30,19 @@ class LangWriter {
 
       BufferedOutputStream(FileOutputStream(File(langFileDir, "${langEntry.key}.lang"))).use { stream ->
         // Iterate over the translatable messages in the original language without plural
-        originalMsgIds.filter { it.id.numPlurals <= 0 }.forEach { msgid ->
+        originalMsgIds.filter { it.id.strings.size <= 1 }.forEach { msgid ->
           val stringBytes =
             if (langEntry.key == originLang) {
-              msgid.id.singularString
+              msgid.id.strings.first()
             } else {
-              langEntry.value.get(msgid)?.singularString
+              langEntry.value.get(msgid)?.strings?.first()
             }?.toByteArray(StandardCharsets.UTF_8)
 
           if (stringBytes == null) {
             stream.write(0, 0)
           } else if (stringBytes.size >= 65534) {
             throw IOException("Strings longer than 65533 bytes int UTF-8 are not supported by the *.lang file format!")
-          } else if (langEntry.key != originLang && stringBytes contentEquals msgid.id.singularString.toByteArray(StandardCharsets.UTF_8)) {
+          } else if (langEntry.key != originLang && stringBytes contentEquals msgid.id.strings.first().toByteArray(StandardCharsets.UTF_8)) {
             stream.write(0xFF, 0xFE)
           } else {
             stream.write(stringBytes.size.shr(8), stringBytes.size)
@@ -51,8 +52,8 @@ class LangWriter {
         // Write the separator between singular-only and pluralized messages
         stream.write(0xFF, 0xFF)
         // Iterate over the translatable messages in the original language with plural(s)
-        originalMsgIds.filter { it.id.numPlurals >= 1 }.forEach { msgid ->
-          if (1 + msgid.id.numPlurals >= 254) {
+        originalMsgIds.filter { it.id.strings.size > 1 }.forEach { msgid ->
+          if (msgid.id.strings.size >= 254) {
             throw IOException("More than 253 plural forms are not supported by the *.lang file format!")
           }
           val msgstr = if (langEntry.key == originLang) msgid.id else langEntry.value.get(msgid)
@@ -65,7 +66,7 @@ class LangWriter {
             stream.write(0xFE)
           } else {
             // Write the number of forms (singular form plus one or more plural forms)
-            stream.write(1 + msgstr.numPlurals)
+            stream.write(msgstr.strings.size)
             // For each form write the size as 2 bytes, then write the string in UTF-8 encoding
             msgstr.strings.map { it.toByteArray(StandardCharsets.UTF_8) }.forEach { stringBytes ->
               if (stringBytes.size >= 65534) {

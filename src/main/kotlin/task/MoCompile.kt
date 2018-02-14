@@ -57,7 +57,7 @@ open class MoCompile : DefaultTask() {
       val projectDescription = project.getJosmExtension().manifest.description
       if (projectDescription != null) {
         langMap.forEach {lang, map ->
-          val translation = map.get(MsgId(MsgStr(listOf(projectDescription)), null))
+          val translation = map.get(MsgId(MsgStr(projectDescription)))
           if (translation != null) {
             project.getJosmExtension().manifest.translatedDescription(lang, translation.strings.first());
           }
