@@ -79,6 +79,9 @@ class MoReader(val moFileURL: URL) {
     return stringMap.toMap()
   }
 
+  /**
+   * Read the file header from the given input stream
+   */
   private fun readHeader(stream: InputStream): Long {
     val header = ByteArray(28, { 0.toByte() })
     if (stream.read(header) < 28) {
@@ -104,6 +107,10 @@ class MoReader(val moFileURL: URL) {
   }
 }
 
+/**
+ * Read bytes from the input stream into the array. If there are not enough
+ * bytes to fill the array, an exception is thrown.
+ */
 private fun safeRead(stream: InputStream, b: ByteArray): Int {
   val readBytes = stream.read(b)
   if (readBytes < b.size) {
@@ -112,6 +119,9 @@ private fun safeRead(stream: InputStream, b: ByteArray): Int {
   return readBytes
 }
 
+/**
+ * Skips over `n` bytes, if there are only less than `n` bytes, an exception is thrown.
+ */
 private fun safeSkip(stream: InputStream, n: Long): Long {
   val skippedBytes = stream.skip(n)
   if (skippedBytes < n) {
@@ -132,6 +142,11 @@ private fun ByteArray.toMsgId(): MsgId {
   return MsgId(MsgStr(string.split('\u0000')), null)
 }
 
+/**
+ * Converts a list of bytes to a list of long values.
+ * Four [Byte] values are combined to form one [Long] value (either as little endian or as big endian).
+ * See [FourBytes] for details on how the byte values are combined.
+ */
 private fun List<Byte>.toLongList(bigEndian: Boolean): List<Long> {
   val result = mutableListOf<Long>()
   for (i in 0 until size step 4) {
@@ -140,6 +155,9 @@ private fun List<Byte>.toLongList(bigEndian: Boolean): List<Long> {
   return result.toList()
 }
 
+/**
+ * Container class for four bytes, that can then be converted to a [Long] value, either as big endian or little endian.
+ */
 private class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) {
   fun getLongValue(bigEndian: Boolean): Long {
     if (bigEndian) {
@@ -150,6 +168,10 @@ private class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) {
   }
 }
 
+/**
+ * Convert a signed byte value to an unsigned byte value.
+ * @return the value of the unsigned byte (as [Long])
+ */
 private fun Byte.toUnsigned(): Long {
   return toLong().and(0xFF)
 }
