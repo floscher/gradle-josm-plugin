@@ -51,8 +51,17 @@ open class MoCompile : DefaultTask() {
       project.fileTree(outDir).filter { it.isFile && it.name.endsWith(".lang") }.forEach { it.delete() }
       val langMap = mutableMapOf<String, Map<MsgId, MsgStr>>()
       files.forEach {
-        logger.lifecycle("Compiling ${it.absolutePath}…")
+        logger.lifecycle("Reading ${it.absolutePath}…")
         langMap[it.nameWithoutExtension] = MoReader(it.toURI().toURL()).readFile()
+      }
+      val projectDescription = project.getJosmExtension().manifest.description
+      if (projectDescription != null) {
+        langMap.forEach {lang, map ->
+          val translation = map.get(MsgId(MsgStr(listOf(projectDescription)), null))
+          if (translation != null) {
+            project.getJosmExtension().manifest.translatedDescription(lang, translation.strings.first());
+          }
+        }
       }
       logger.lifecycle("Write *.lang files…")
       LangWriter().writeLangFile(File(outDir, "data"), langMap, project.getJosmExtension().i18n.mainLanguage)
