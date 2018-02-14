@@ -1,9 +1,9 @@
 plugins {
   id "com.gradle.plugin-publish" version "0.9.9"
   id "com.github.ben-manes.versions" version "0.17.0"
-  id "org.jetbrains.kotlin.jvm" version "1.2.10"
+  id "org.jetbrains.kotlin.jvm" version "1.2.21"
   id "org.jetbrains.dokka" version "0.9.15"
-  id "org.junit.platform.gradle.plugin" version "1.0.2"
+  id "org.junit.platform.gradle.plugin" version "1.0.3"
   id "maven"
   id "eclipse"
 
@@ -18,7 +18,7 @@ gradle.taskGraph.beforeTask { task ->
 }
 gradle.taskGraph.afterTask { task, state ->
   if (!state.skipped) {
-    project.logger.lifecycle "  🏁 Finished after " + String.format("%.3f", Duration.between(task.ext.startTime, Instant.now()).toSeconds()) + " seconds."
+    project.logger.lifecycle String.format("  🏁 Finished after %.3f seconds.", Duration.between(task.ext.startTime, Instant.now()).toMillis() / 1e3)
   }
 }
 gradle.buildFinished {
@@ -45,10 +45,10 @@ repositories {
 
 dependencies {
   implementation localGroovy()
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.10"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
 
-  testImplementation "org.junit.jupiter:junit-jupiter-api:5.0.2"
-  testRuntime "org.junit.jupiter:junit-jupiter-engine:5.0.2"
+  testImplementation "org.junit.jupiter:junit-jupiter-api:5.0.3"
+  testRuntime "org.junit.jupiter:junit-jupiter-engine:5.0.3"
 }
 
 import org.jetbrains.dokka.gradle.DokkaTask

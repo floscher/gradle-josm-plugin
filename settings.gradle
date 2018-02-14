@@ -5,6 +5,9 @@ pluginManagement {
   }
   resolutionStrategy {
     eachPlugin {
+      if (requested.id.namespace == 'org.jetbrains.kotlin') {
+        gradle.rootProject.ext.kotlinVersion = requested.version
+      }
       if (requested.id.namespace == 'org.junit.platform.gradle') {
         useModule("org.junit.platform:junit-platform-gradle-plugin:${requested.version}")
       }
