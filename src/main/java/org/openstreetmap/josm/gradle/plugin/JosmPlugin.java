@@ -57,8 +57,10 @@ public class JosmPlugin implements Plugin<Project> {
     JosmPluginExtension.forProject(project).getRepositories().invoke(project.getRepositories());
 
     final Jar jarTask = project.getTasks().withType(Jar.class).getByName("jar");
+    project.afterEvaluate(p -> {
+      jarTask.getManifest().attributes(JosmPluginExtension.forProject(project).getManifest().createJosmPluginJarManifest());
+    });
     jarTask.doFirst(task -> {
-      jarTask.getManifest().attributes(JosmPluginExtension.forProject(task.getProject()).getManifest().createJosmPluginJarManifest());
       jarTask.from(
         task.getProject().getConfigurations().getByName("packIntoJar").getFiles().stream().<FileTree>map(file ->
           (file.isDirectory()

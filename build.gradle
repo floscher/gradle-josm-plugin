@@ -113,7 +113,7 @@ publishing {
 tasks.publish {
   description 'Deploys the gradle-josm-plugin to a local Maven repository inside the $buildDir'
   doLast {
-    printf "Version %s is now deployed to %s", project.version, publishing.repositories.maven.url
+    printf "Version %s is now deployed to %s%n", project.version, publishing.repositories.maven.url
   }
 }
 
