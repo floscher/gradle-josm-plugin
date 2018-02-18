@@ -2,10 +2,8 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.plugins.BasePluginConvention
 import org.gradle.api.tasks.Exec
-import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.getJosmExtension
-import task.GenerateFileList
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File

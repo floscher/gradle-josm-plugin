@@ -4,9 +4,9 @@ import java.io.File;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
+import org.openstreetmap.josm.gradle.plugin.task.GenerateFileList;
 import org.openstreetmap.josm.gradle.plugin.task.GeneratePot;
 import org.openstreetmap.josm.gradle.plugin.task.TransifexDownload;
-import task.GenerateFileList;
 
 public class I18nTaskSetup extends AbstractSetup {
 

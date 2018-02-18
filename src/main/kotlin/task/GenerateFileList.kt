@@ -1,9 +1,8 @@
-package task
+package org.openstreetmap.josm.gradle.plugin.task
 
-import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.SourceSet
-import java.nio.file.Files
+import java.io.File
 
 open class GenerateFileList: DefaultTask() {
   lateinit var outFile: File

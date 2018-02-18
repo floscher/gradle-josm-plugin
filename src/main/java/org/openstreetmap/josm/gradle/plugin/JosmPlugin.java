@@ -19,9 +19,9 @@ import org.openstreetmap.josm.gradle.plugin.setup.BasicTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.I18nTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.MinJosmVersionSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup;
+import org.openstreetmap.josm.gradle.plugin.task.MoCompile;
 import org.openstreetmap.josm.gradle.plugin.task.PoCompile;
 import org.openstreetmap.josm.gradle.plugin.task.ShortenPoFiles;
-import task.MoCompile;
 
 /**
  * Main class of the plugin, sets up the custom configurations <code>requiredPlugin</code> and <code>packIntoJar</code>,

@@ -1,4 +1,4 @@
-package task
+package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
@@ -10,7 +10,6 @@ import org.openstreetmap.josm.gradle.plugin.i18n.io.LangWriter
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MoReader
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
-import org.openstreetmap.josm.gradle.plugin.task.PoCompile
 import java.io.File
 
 /**
