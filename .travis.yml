@@ -5,6 +5,14 @@ env:
     - MAIN_REPO="$(pwd)"
     - GH_PAGES_REPO="$(readlink -f ../gh-pages)"
 
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
 before_script: |
   if [ "$TRAVIS_TAG" == "" ]; then
     echo "Not a tagged release, so GitHub pages branch is not cloned!"
@@ -15,7 +23,7 @@ before_script: |
       cp -rT "$GH_PAGES_REPO/maven" "$MAIN_REPO/build/maven"
     fi
   fi
-script: ./gradlew build publish dokka
+script: ./gradlew --build-cache build publish dokka
 after_success: |
   if [ "$TRAVIS_TAG" == "" ]; then
     echo "Not a tagged release, so GitHub pages are not updated! This version is also _not_ released to https://plugins.gradle.org ."
@@ -24,7 +32,7 @@ after_success: |
       echo "Gradle credentials not set. Not publishing to the Gradle plugins repo"
     else
       echo "Publishing the project to https://plugins.gradle.org …"
-      ./gradlew -Pgradle.publish.secret="$GRADLE_PUBLISH_SECRET" -Pgradle.publish.key="$GRADLE_PUBLISH_KEY" publishPlugins
+      ./gradlew -Pgradle.publish.secret="$GRADLE_PUBLISH_SECRET" -Pgradle.publish.key="$GRADLE_PUBLISH_KEY" --build-cache publishPlugins
     fi
     git config --global user.email "deploy@travis"
     git config --global user.name "Travis CI"
@@ -36,17 +44,15 @@ after_success: |
     longVersion=`git describe --always --long --dirty`
     cd "$GH_PAGES_REPO"
 
-    mkdir -p "$GH_PAGES_REPO/javadoc" "$GH_PAGES_REPO/kdoc"
-    cp -r -T "$MAIN_REPO/build/docs/javadoc" "$GH_PAGES_REPO/javadoc/$version"
+    mkdir -p "$GH_PAGES_REPO/kdoc"
     cp -r -T "$MAIN_REPO/build/docs/kdoc" "$GH_PAGES_REPO/kdoc/$version"
     git rm javadoc/current kdoc/current
-    ln -s "./$version" "$GH_PAGES_REPO/javadoc/current"
     ln -s "./$version" "$GH_PAGES_REPO/kdoc/current"
-    git stage javadoc kdoc
+    git stage kdoc
 
     cp -r "$MAIN_REPO/build/maven" "$GH_PAGES_REPO"
     git stage maven
 
-    git commit -a -m "Update Maven repository and Javadoc/KDoc documentation to $longVersion"
+    git commit -a -m "Update Maven repository and KDoc documentation to $longVersion"
     git push origin gh-pages
   fi
