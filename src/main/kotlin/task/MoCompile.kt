@@ -29,7 +29,7 @@ open class MoCompile : DefaultTask() {
     this.outDir = File(project.buildDir, "i18n/mo/" + sourceSet.name)
 
     this.sourceFiles = sourceSet.mo.asFileTree.files.plus(poCompileTask.outputs.files.asFileTree.files).filter { it.isFile }.toSet()
-    inputs.files(sourceSet.mo.files)
+    inputs.files(sourceFiles)
     this.sourceSetName = sourceSet.name
     inputs.files(poCompileTask)
 
