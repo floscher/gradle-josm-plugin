@@ -7,7 +7,6 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.ExternalModuleDependency;
-import org.gradle.api.file.FileTree;
 import org.gradle.api.internal.file.SourceDirectorySetFactory;
 import org.gradle.api.internal.plugins.DslObject;
 import org.gradle.api.plugins.JavaPlugin;
@@ -57,12 +56,10 @@ public class JosmPlugin implements Plugin<Project> {
     JosmPluginExtension.forProject(project).getRepositories().invoke(project.getRepositories());
 
     final Jar jarTask = project.getTasks().withType(Jar.class).getByName("jar");
-    project.afterEvaluate(p -> {
-      jarTask.getManifest().attributes(JosmPluginExtension.forProject(project).getManifest().createJosmPluginJarManifest());
-    });
     jarTask.doFirst(task -> {
+      jarTask.getManifest().attributes(JosmPluginExtension.forProject(project).getManifest().createJosmPluginJarManifest());
       jarTask.from(
-        task.getProject().getConfigurations().getByName("packIntoJar").getFiles().stream().<FileTree>map(file ->
+        task.getProject().getConfigurations().getByName("packIntoJar").getFiles().stream().map(file ->
           (file.isDirectory()
             ? task.getProject().fileTree(file)
             : task.getProject().zipTree(file)

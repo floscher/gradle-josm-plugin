@@ -27,6 +27,7 @@ import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.Sync;
 import org.gradle.api.tasks.TaskExecutionException;
 import org.gradle.api.tasks.bundling.Jar;
+import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
 
 public class PluginTaskSetup extends AbstractSetup {
 
@@ -83,11 +84,11 @@ public class PluginTaskSetup extends AbstractSetup {
         .append(new File(localDistPath, getLocalDistFileName(pro)).toURI().toURL())
         .append('\n');
       // Manifest indented by one tab character
-      for (Entry<String, Object> att : pro.getTasks().withType(Jar.class).getByName("jar").getManifest().getEffectiveManifest().getAttributes().entrySet()) {
+      for (Entry<String, String> att : JosmPluginExtension.forProject(pro).getManifest().createJosmPluginJarManifest().entrySet()) {
         // Base64-encode the icon
         if ("Plugin-Icon".equals(att.getKey())) {
           for (final DirectoryTree tree : task.getProject().getConvention().getPlugin(JavaPluginConvention.class).getSourceSets().getByName("main").getResources().getSrcDirTrees()) {
-            final File iconFile = new File(tree.getDir(), att.getValue().toString());
+            final File iconFile = new File(tree.getDir(), att.getValue());
             if (iconFile.exists()) {
               String contentType = Files.probeContentType(Paths.get(iconFile.getAbsolutePath()));
               if (contentType == null) {
