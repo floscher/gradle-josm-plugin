@@ -1,8 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.Task
-import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.openstreetmap.josm.gradle.plugin.getJosmExtension
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
@@ -21,18 +20,18 @@ open class MoCompile : DefaultTask() {
   @OutputDirectory
   lateinit var outDir: File
 
-  private lateinit var source: SourceDirectorySet
+  @Internal
   private lateinit var sourceSetName: String
-
-  private lateinit var poCompileTask: Task
+  @Internal
+  private lateinit var sourceFiles: Set<File>
 
   fun setup(sourceSet: I18nSourceSet, poCompileTask: PoCompile) {
     this.outDir = File(project.buildDir, "i18n/mo/" + sourceSet.name)
-    this.source = sourceSet.mo
+
+    this.sourceFiles = sourceSet.mo.asFileTree.files.plus(poCompileTask.outputs.files.asFileTree.files).filter { it.isFile }.toSet()
     inputs.files(sourceSet.mo.files)
     this.sourceSetName = sourceSet.name
     inputs.files(poCompileTask)
-    this.poCompileTask = poCompileTask
 
     description = "Compile the *.mo gettext files of source set $sourceSetName to the *.lang format used by JOSM"
   }
@@ -41,15 +40,14 @@ open class MoCompile : DefaultTask() {
     doFirst {
       outDir.mkdirs()
 
-      val files = source.asFileTree.files.plus(poCompileTask.outputs.files.asFileTree.files).filter{ it.isFile }
-      if (files.isEmpty()) {
+      if (sourceFiles.isEmpty()) {
         this.logger.lifecycle("No *.mo files found for this source set '{}'.", sourceSetName)
         return@doFirst
       }
       logger.lifecycle("Compiling the *.lang files for ${outDir.absolutePath}…")
       project.fileTree(outDir).filter { it.isFile && it.name.endsWith(".lang") }.forEach { it.delete() }
       val langMap = mutableMapOf<String, Map<MsgId, MsgStr>>()
-      files.forEach {
+      sourceFiles.forEach {
         logger.lifecycle("Reading ${it.absolutePath}…")
         langMap[it.nameWithoutExtension] = MoReader(it.toURI().toURL()).readFile()
       }

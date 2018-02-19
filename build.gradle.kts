@@ -127,7 +127,7 @@ tasks {
   "publish" {
     description = "Deploys the gradle-josm-plugin to a local Maven repository inside the $buildDir"
     doLast {
-      printf("Version %s is now deployed to %s%n", project.version.toString(), publishing.repositories.withType(MavenArtifactRepository::class.java)[0].url)
+      logger.lifecycle("Version {} is now deployed to {}", project.version.toString(), publishing.repositories.withType(MavenArtifactRepository::class.java)[0].url)
     }
   }
 }

@@ -26,42 +26,40 @@ open class RunJosmTask : JavaExec() {
 
 
   init {
-    val arguments: MutableList<String> = if (getProject().hasProperty("josmArgs")) getProject().property("josmArgs").toString().split("\\\\").toMutableList() else ArrayList()
-    arguments.add("--load-preferences=" + File(getProject().getBuildDir(), "/josm-custom-config/requiredPlugins.xml").toURI().toURL().toString());
+    val arguments: MutableList<String> = if (project.hasProperty("josmArgs")) project.property("josmArgs").toString().split("\\\\").toMutableList() else ArrayList()
+    arguments.add("--load-preferences=" + File(project.buildDir, "/josm-custom-config/requiredPlugins.xml").toURI().toURL().toString());
 
-    super.setGroup("JOSM");
-    super.setMain("org.openstreetmap.josm.gui.MainApplication");
-    super.setArgs(arguments);
-    super.mustRunAfter(super.getProject().getTasks().getByName("cleanJosm"));
-    super.dependsOn(super.getProject().getTasks().getByName("updateJosmPlugins"));
+    group = "JOSM"
+    main = "org.openstreetmap.josm.gui.MainApplication"
+    args = arguments
+    super.mustRunAfter(project.tasks.getByName("cleanJosm"));
+    super.dependsOn(project.tasks.getByName("updateJosmPlugins"));
 
-    super.getProject().afterEvaluate{ project ->
+    project.afterEvaluate{
       // doFirst has to be added after the project initialized, otherwise it won't be executed before the main part of the JavaExec task is run.
-      doFirst{ task ->
-        systemProperty("josm.home", task.getProject().getExtensions().getByType(JosmPluginExtension::class.java).tmpJosmHome);
-        setClasspath(task.getProject().getConvention().getPlugin(JavaPluginConvention::class.java).getSourceSets().getByName("main").getRuntimeClasspath());
+      doFirst{
+        systemProperty("josm.home", project.extensions.getByType(JosmPluginExtension::class.java).tmpJosmHome);
+        classpath = project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.getByName("main").runtimeClasspath
 
-        val L = task.getLogger()
+        logger.lifecycle("Running version {} of {}", project.version, project.name);
+        logger.lifecycle("\nUsing JOSM version {}", project.extensions.getByType(JosmPluginExtension::class.java).josmCompileVersion);
 
-        L.lifecycle("Running version {} of {}", task.getProject().getVersion(), task.getProject().getName());
-        L.lifecycle("\nUsing JOSM version {}", task.getProject().getExtensions().getByType(JosmPluginExtension::class.java).josmCompileVersion);
-
-        L.lifecycle("\nThese system properties are set:");
-        for (entry in getSystemProperties().entries) {
-          L.lifecycle("  {} = {}", entry.key, entry.value);
+        logger.lifecycle("\nThese system properties are set:");
+        for ((key, value) in systemProperties) {
+          logger.lifecycle("  {} = {}", key, value);
         }
 
-        if (getArgs().isEmpty()) {
-          L.lifecycle("\nNo command line arguments are passed to JOSM.");
+        if (args.isEmpty()) {
+          logger.lifecycle("\nNo command line arguments are passed to JOSM.");
         } else {
-          L.lifecycle("\nPassing these arguments to JOSM:\n  {}", getArgs().joinToString("\n  "));
+          logger.lifecycle("\nPassing these arguments to JOSM:\n  {}", args.joinToString("\n  "));
         }
         if (!project.hasProperty("josmArgs")) {
-          L.lifecycle("\nIf you want to pass additional arguments to JOSM add '-PjosmArgs=\"arg0\\\\arg1\\\\arg2\\\\...\"' when starting Gradle from the commandline (separate the arguments with double-backslashes).")
+          logger.lifecycle("\nIf you want to pass additional arguments to JOSM add '-PjosmArgs=\"arg0\\\\arg1\\\\arg2\\\\...\"' when starting Gradle from the commandline (separate the arguments with double-backslashes).")
         }
 
-        L.lifecycle(extraInformation);
-        L.lifecycle("\nOutput of JOSM starts with the line after the three equality signs\n===");
+        logger.lifecycle(extraInformation);
+        logger.lifecycle("\nOutput of JOSM starts with the line after the three equality signs\n===");
       }
     }
   }
