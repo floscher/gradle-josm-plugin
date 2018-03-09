@@ -9,22 +9,13 @@ import java.time.Duration
 import java.time.Instant
 import java.net.URL
 
-buildscript {
-  repositories {
-    jcenter()
-  }
-  dependencies {
-    classpath("org.jetbrains.kotlin:kotlin-reflect:1.2.21")
-  }
-}
-
 plugins {
   id("com.gradle.plugin-publish").version("0.9.10")
   id("com.github.ben-manes.versions").version("0.17.0")
-  kotlin("jvm").version("1.2.21")
-  id("org.jetbrains.dokka").version("0.9.16-eap-3")
-  id("org.junit.platform.gradle.plugin").version("1.0.3")
+  kotlin("jvm").version("1.2.30")
+  id("org.jetbrains.dokka").version("0.9.16")
 
+  `jacoco`
   `maven`
   `eclipse`
   `java-gradle-plugin`
@@ -68,9 +59,18 @@ dependencies {
   val kotlinVersion: String by project.extra
   implementation(localGroovy())
   implementation("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", kotlinVersion)
-  testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.0.3")
-  testRuntime("org.junit.jupiter", "junit-jupiter-engine", "5.0.3")
+  testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.1.0")
+  testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.1.0")
 }
+
+jacoco {
+  toolVersion = "0.8.0"
+}
+
+tasks.withType(Test::class.java) {
+  useJUnitPlatform()
+}
+tasks.findByName("jacocoTestReport")?.dependsOn(tasks.findByName("test"))
 
 tasks {
   "dokka"(DokkaTask::class) {
