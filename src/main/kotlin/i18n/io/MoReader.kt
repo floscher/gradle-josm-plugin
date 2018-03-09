@@ -8,9 +8,9 @@ import java.nio.charset.StandardCharsets
 class MoReader(val moFileURL: URL) {
   companion object {
     /**
-     * The little-endian magic bytes (big-endian would be reversed)
+     * The big-endian magic bytes (little-endian would be reversed)
      */
-    val MAGIC: List<Byte> = listOf(/* 0x95 */ -107, /* 0x04 */ 4, /* 0x12 */ 18, /* 0xde */ -34)
+    val BE_MAGIC: List<Byte> = listOf(/* 0x95 */ -107, /* 0x04 */ 4, /* 0x12 */ 18, /* 0xde */ -34)
   }
 
   var bigEndian: Boolean = true
@@ -87,12 +87,13 @@ class MoReader(val moFileURL: URL) {
     if (stream.read(header) < 28) {
       throw IOException("Can't read header of MO file, input stream ends before header is complete!")
     }
-    val magic = header.slice(0 until MAGIC.size)
-    bigEndian = if (magic == MAGIC) false
-      else if (magic == MAGIC.reversed()) true
-      else throw IOException("Not a MO file, magic bytes are incorrect!")
-
-    val headerInts = header.slice(MAGIC.size until header.size).toLongList(bigEndian)
+    val magic = header.slice(0 until BE_MAGIC.size)
+    bigEndian = when (magic) {
+      BE_MAGIC -> true
+      BE_MAGIC.reversed() -> false
+      else -> throw IOException("Not a MO file, magic bytes are incorrect!")
+    }
+    val headerInts = header.slice(BE_MAGIC.size until header.size).toLongList(bigEndian)
 
     formatRev = headerInts[0]
     numStrings = if (headerInts[1] > Int.MAX_VALUE)
