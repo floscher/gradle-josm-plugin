@@ -134,13 +134,15 @@ private fun safeSkip(stream: InputStream, n: Long): Long {
 /**
  * Returns a MsgId for a string as it is saved in a *.mo file (context and EOT byte, then the string)
  */
-private fun ByteArray.toMsgId(): MsgId {
+private fun ByteArray.toMsgId(contextSeparator: Char = '\u0004', pluralSeparator: Char = '\u0000'): MsgId {
   val string = this.toString(StandardCharsets.UTF_8)
-  val eotIndex = string.indexOf('\u0004')
-  if (eotIndex >= 0) {
-    return MsgId(MsgStr(string.substring(eotIndex + 1).split('\u0000')), string.substring(0, eotIndex))
+  val csIndex = string.indexOf(contextSeparator)
+  val parts = if (csIndex >= 0) {
+    Pair(string.substring(csIndex + 1), string.substring(0, csIndex))
+  } else {
+    Pair(string, null)
   }
-  return MsgId(MsgStr(string.split('\u0000')), null)
+  return MsgId(MsgStr(parts.first.split(pluralSeparator)), parts.second)
 }
 
 /**
