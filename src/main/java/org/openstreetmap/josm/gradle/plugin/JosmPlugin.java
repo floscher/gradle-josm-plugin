@@ -53,8 +53,6 @@ public class JosmPlugin implements Plugin<Project> {
     // Configuration for libraries on which the project depends and which should be packed into the built *.jar file.
     project.getConfigurations().getByName("implementation").extendsFrom(project.getConfigurations().create("packIntoJar"));
 
-    JosmPluginExtension.forProject(project).getRepositories().invoke(project.getRepositories());
-
     final Jar jarTask = project.getTasks().withType(Jar.class).getByName("jar");
     jarTask.doFirst(task -> {
       jarTask.getManifest().attributes(JosmPluginExtension.forProject(project).getManifest().createJosmPluginJarManifest());
@@ -69,6 +67,9 @@ public class JosmPlugin implements Plugin<Project> {
     });
 
     project.afterEvaluate(p -> {
+      // Add the repositories defined in the JOSM configuration
+      JosmPluginExtension.forProject(project).getRepositories().invoke(project.getRepositories());
+
       // Adding dependencies for JOSM and the required plugins
       final Dependency dep = p.getDependencies().add("implementation", "org.openstreetmap.josm:josm:" + JosmPluginExtension.forProject(p).getJosmCompileVersion());
       if ("latest".equals(JosmPluginExtension.forProject(p).getJosmCompileVersion()) || "tested".equals(JosmPluginExtension.forProject(p).getJosmCompileVersion())) {
@@ -86,7 +87,7 @@ public class JosmPlugin implements Plugin<Project> {
     new MinJosmVersionSetup(project).setup();
 
     if (sourceDirectorySetFactory == null) {
-      project.getLogger().lifecycle("No source directory set factory given! The i18n source sets are not configured.");
+      project.getLogger().warn("No source directory set factory given! The i18n source sets are not configured.");
     } else {
       // Inspired by https://github.com/gradle/gradle/blob/9d86f98b01acb6496d05e05deddbc88c1e35d038/subprojects/plugins/src/main/java/org/gradle/api/plugins/GroovyBasePlugin.java#L88-L113
       project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets().all(s -> {
