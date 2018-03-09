@@ -18,6 +18,7 @@ import org.openstreetmap.josm.gradle.plugin.setup.BasicTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.I18nTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.MinJosmVersionSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup;
+import org.openstreetmap.josm.gradle.plugin.task.ListJosmVersions;
 import org.openstreetmap.josm.gradle.plugin.task.MoCompile;
 import org.openstreetmap.josm.gradle.plugin.task.PoCompile;
 import org.openstreetmap.josm.gradle.plugin.task.ShortenPoFiles;
@@ -85,6 +86,7 @@ public class JosmPlugin implements Plugin<Project> {
     new I18nTaskSetup(project).setup();
     new PluginTaskSetup(project).setup();
     new MinJosmVersionSetup(project).setup();
+    project.getTasks().create("listJosmVersions", ListJosmVersions.class);
 
     if (sourceDirectorySetFactory == null) {
       project.getLogger().warn("No source directory set factory given! The i18n source sets are not configured.");
