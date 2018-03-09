@@ -50,7 +50,7 @@ open class JosmPluginExtension(private val project: Project) {
    */
   var maxPluginDependencyDepth: Int = 10
     set(value) {
-      maxPluginDependencyDepth = Math.max(0, value)
+      require(value >= 0)
     }
 
   /**

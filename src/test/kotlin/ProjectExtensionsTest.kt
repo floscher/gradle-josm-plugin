@@ -14,7 +14,7 @@ class ProjectExtensionsTest {
   private fun createGradleJosmProjectWithoutRepos(): Project {
     val pro = ProjectBuilder.builder().build()
     JosmPlugin(null).apply(pro)
-    pro.repositories.removeIf { true }
+    pro.repositories.clear()
     return pro
   }
 

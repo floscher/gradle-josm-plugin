@@ -28,8 +28,7 @@ import java.util.GregorianCalendar
  * [mainClass], [description], [minJosmVersion]
  * Your project also has to set a value for [Project.getVersion()]
  */
-class JosmManifest(project: Project) {
-  private val project: Project = project
+class JosmManifest(private val project: Project) {
 
   /**
    * The author of the plugin.
@@ -147,11 +146,7 @@ class JosmManifest(project: Project) {
    */
   private val oldVersionDownloadLinks: MutableSet<PluginDownloadLink> = mutableSetOf()
 
-  private inner class PluginDownloadLink(minJosmVersion: Int, pluginVersion: String, downloadURL: URL) {
-    val downloadURL: URL = downloadURL
-    val minJosmVersion: Int = minJosmVersion
-    val pluginVersion: String = pluginVersion
-  }
+  private inner class PluginDownloadLink(val minJosmVersion: Int, val pluginVersion: String, val downloadURL: URL)
 
   /**
    * Add a link to an earlier release of the plugin, that is compatible with JOSM versions, with which the current version is no longer compatible.

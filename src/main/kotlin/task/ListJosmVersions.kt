@@ -1,7 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.artifacts.ExternalModuleDependency
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
