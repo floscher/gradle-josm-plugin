@@ -37,8 +37,8 @@ open class ShortenPoFiles : DefaultTask() {
                 isHeader = false
               }
             }
-            // Write all lines to the temporary file except the ones containing pointers to the source code
-            if (!modifiedLine.startsWith("#: ")) {
+            // Write all lines to the temporary file except the ones containing pointers to the source code or the last translator
+            if (!modifiedLine.startsWith("#: ") && !modifiedLine.startsWith("\"Last-Translator:")) {
               out.write(modifiedLine)
               out.newLine()
             }
