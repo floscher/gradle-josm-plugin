@@ -2,6 +2,7 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.plugins.BasePluginConvention
 import org.gradle.api.tasks.Exec
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.getJosmExtension
 import java.io.BufferedReader
@@ -17,6 +18,7 @@ import java.time.Year
 
 open class GeneratePot: Exec() {
   private lateinit var outBaseName: String
+  @Internal
   lateinit var fileListGenTask: GenerateFileList
 
   init {
