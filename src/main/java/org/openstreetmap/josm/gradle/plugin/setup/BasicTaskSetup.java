@@ -9,6 +9,7 @@ import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.Sync;
 import org.gradle.api.tasks.TaskExecutionException;
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
+import org.openstreetmap.josm.gradle.plugin.task.CleanJosm;
 import org.openstreetmap.josm.gradle.plugin.task.RunJosmTask;
 
 public class BasicTaskSetup extends AbstractSetup {
@@ -20,15 +21,7 @@ public class BasicTaskSetup extends AbstractSetup {
   public void setup() {
 
     // Clean JOSM
-    final Delete cleanJosm = pro.getTasks().create("cleanJosm", Delete.class);
-    cleanJosm.setDescription("Delete JOSM configuration in `build/.josm/`");
-    cleanJosm.setGroup("JOSM");
-    pro.afterEvaluate(p -> {
-      cleanJosm.delete(JosmPluginExtension.forProject(p).getTmpJosmHome());
-    });
-    cleanJosm.doFirst(task -> {
-      task.getLogger().lifecycle("Delete [{}]…", String.join(", ", cleanJosm.getTargetFiles().getFiles().stream().map(File::getAbsolutePath).collect(Collectors.toList())));
-    });
+    final Delete cleanJosm = pro.getTasks().create("cleanJosm", CleanJosm.class);
 
     // Init JOSM preferences.xml file
     final Copy initJosmPrefs = pro.getTasks().create("initJosmPrefs", Copy.class);
