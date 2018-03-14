@@ -51,7 +51,7 @@ public class PluginTaskSetup extends AbstractSetup {
 
       final String xmlTemplate = new BufferedReader(new InputStreamReader(PluginTaskSetup.class.getResourceAsStream("/requiredPluginConfigTemplate.xml"), StandardCharsets.UTF_8)).lines().collect(Collectors.joining("\n"));
       try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(customConfig), StandardCharsets.UTF_8))) {
-        writer.write(xmlTemplate.replace("{{{PLUGIN_LIST_ENTRIES}}}", pluginListEntries.toString()));
+        writer.write(xmlTemplate.replace("{{{PLUGIN_LIST_ENTRIES}}}", pluginListEntries.toString()).replace("{{{tmpJosmPrefDir}}}", JosmPluginExtension.forProject(pro).getTmpJosmPrefDir().getAbsolutePath()));
       } catch (IOException e) {
         throw new TaskExecutionException(task, e);
       }

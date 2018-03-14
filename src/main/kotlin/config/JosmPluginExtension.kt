@@ -6,6 +6,8 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.IvyPatternRepositoryLayout
 import org.gradle.api.tasks.util.PatternFilterable
+import org.openstreetmap.josm.gradle.plugin.getJosmExtension
+import org.openstreetmap.josm.gradle.plugin.useSeparateTmpJosmDirs
 import java.io.File
 import java.net.URI
 
@@ -29,12 +31,39 @@ open class JosmPluginExtension(private val project: Project) {
   var debugPort: Int? = null
 
   /**
-   * The directory which should be used as JOSM home directory when executing the `runJosm` or
-   * `debugJosm` tasks.
+   * The directory in which the JOSM preferences for the JOSM instance used by `runJosm` and `debugJosm` are stored.
    *
-   * **Default value:** `$buildDir/.josm`
+   * **Default value:** `$buildDir/.josm/pref`
+   * @since v0.4.0
    */
-  var tmpJosmHome: File = File("${project.buildDir}/.josm")
+  var tmpJosmPrefDir = File(project.buildDir, ".josm/pref")
+
+  /**
+   * The directory in which the JOSM cache for the JOSM instance used by `runJosm` and `debugJosm` is stored.
+   *
+   * **Default value:** `$buildDir/.josm/cache` (for JOSM versions < 7841, `${josm.tmpJosmPrefDir}/cache` is used)
+   * @since v0.4.0
+   */
+  var tmpJosmCacheDir = File(project.buildDir, ".josm/cache")
+
+  /**
+   * The directory in which the JOSM user data for the JOSM instance used by `runJosm` and `debugJosm` is stored.
+   *
+   * **Default value:** `$buildDir/.josm/userdata` (for JOSM versions < 7841,  `${josm.tmpJosmPrefDir}` is used)
+   * @since v0.4.0
+   */
+  var tmpJosmUserdataDir = File(project.buildDir, ".josm/userdata")
+
+  init {
+    project.afterEvaluate {
+      if (!it.useSeparateTmpJosmDirs()) {
+        it.logger.warn("You are using a very old version of JOSM (< 7841) that doesn't have separate directories for cache and user data.")
+        project.getJosmExtension().tmpJosmCacheDir = File(project.getJosmExtension().tmpJosmPrefDir, "cache")
+        project.getJosmExtension().tmpJosmUserdataDir = project.getJosmExtension().tmpJosmPrefDir
+        it.logger.warn("These settings are now overwritten as follows: tmpJosmCacheDir=${tmpJosmCacheDir.absolutePath} tmpJosmUserdataDir=${tmpJosmUserdataDir.absolutePath}")
+      }
+    }
+  }
 
   /**
    * The directory where the default `preferences.xml` file is located, which will be used

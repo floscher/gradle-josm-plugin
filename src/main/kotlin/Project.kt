@@ -125,6 +125,14 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
 }
 
 /**
+ * @return true if a JOSM version of 7841 or later is used that can be configured to use separate directories for cache, preferences and userdata
+ */
+fun Project.useSeparateTmpJosmDirs(): Boolean {
+  val josmVersionNum = project.getJosmExtension().josmCompileVersion?.toIntOrNull()
+  return josmVersionNum == null || josmVersionNum >= 7841
+}
+
+/**
  * Access method for the `project.josm{}` extension.
  * @return the [JosmPluginExtension] for this project.
  */

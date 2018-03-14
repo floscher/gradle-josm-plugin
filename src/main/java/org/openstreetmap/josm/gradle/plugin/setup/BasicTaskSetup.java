@@ -2,6 +2,7 @@ package org.openstreetmap.josm.gradle.plugin.setup;
 
 import java.io.File;
 import java.util.stream.Collectors;
+import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.tasks.Copy;
@@ -22,7 +23,7 @@ public class BasicTaskSetup extends AbstractSetup {
   public void setup() {
 
     // Clean JOSM
-    final Delete cleanJosm = pro.getTasks().create("cleanJosm", CleanJosm.class);
+    final DefaultTask cleanJosm = pro.getTasks().create("cleanJosm", CleanJosm.class);
 
     // Init JOSM preferences.xml file
     final Copy initJosmPrefs = pro.getTasks().create("initJosmPrefs", InitJosmPrefs.class);
@@ -32,13 +33,13 @@ public class BasicTaskSetup extends AbstractSetup {
     updateJosmPlugins.setDescription("Put all needed plugin *.jar files into the plugins directory. This task copies files into the temporary JOSM home directory.");
     updateJosmPlugins.dependsOn(initJosmPrefs);
     pro.afterEvaluate(p -> {
-      updateJosmPlugins.into(new File(JosmPluginExtension.forProject(p).getTmpJosmHome(), "plugins"));
+      updateJosmPlugins.into(new File(JosmPluginExtension.forProject(p).getTmpJosmUserdataDir(), "plugins"));
       // the rest of the configuration (e.g. from where the files come, that should be copied) is done later (e.g. in the file `PluginTaskSetup.java`)
     });
 
     // Standard run-task
     final Task runJosm = pro.getTasks().create("runJosm", RunJosmTask.class);
-    runJosm.setDescription("Runs an independent JOSM instance (version specified in project dependencies) with `build/.josm/` as home directory and the freshly compiled plugin active.");
+    runJosm.setDescription("Runs an independent JOSM instance (version specified in project dependencies) with temporary JOSM directories (by default inside `build/.josm/`) and the freshly compiled plugin active.");
 
     // Debug task
     final RunJosmTask debugJosm = pro.getTasks().create("debugJosm", RunJosmTask.class, task -> {

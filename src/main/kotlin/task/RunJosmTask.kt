@@ -4,6 +4,8 @@ import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.JavaExec
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
+import org.openstreetmap.josm.gradle.plugin.getJosmExtension
+import org.openstreetmap.josm.gradle.plugin.useSeparateTmpJosmDirs
 import java.io.File
 
 /**
@@ -38,7 +40,13 @@ open class RunJosmTask : JavaExec() {
     project.afterEvaluate{
       // doFirst has to be added after the project initialized, otherwise it won't be executed before the main part of the JavaExec task is run.
       doFirst{
-        systemProperty("josm.home", project.extensions.getByType(JosmPluginExtension::class.java).tmpJosmHome);
+        if (project.useSeparateTmpJosmDirs()) {
+          systemProperty("josm.cache", project.getJosmExtension().tmpJosmCacheDir)
+          systemProperty("josm.pref", project.getJosmExtension().tmpJosmPrefDir)
+          systemProperty("josm.userdata", project.getJosmExtension().tmpJosmUserdataDir)
+        } else {
+          systemProperty("josm.home", project.getJosmExtension().tmpJosmPrefDir)
+        }
         classpath = project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.getByName("main").runtimeClasspath
 
         logger.lifecycle("Running version {} of {}", project.version, project.name);

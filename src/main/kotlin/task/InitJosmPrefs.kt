@@ -12,7 +12,7 @@ open class InitJosmPrefs: Copy() {
 
     project.afterEvaluate {
       from(project.getJosmExtension().josmConfigDir)
-      into(project.getJosmExtension().tmpJosmHome)
+      into(project.getJosmExtension().tmpJosmPrefDir)
       if (source.isEmpty) {
         logger.debug("No default JOSM preference file found in ${project.getJosmExtension().josmConfigDir}/preferences.xml.")
       }
