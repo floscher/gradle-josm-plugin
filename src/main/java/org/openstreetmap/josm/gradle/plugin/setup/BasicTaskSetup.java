@@ -10,6 +10,7 @@ import org.gradle.api.tasks.Sync;
 import org.gradle.api.tasks.TaskExecutionException;
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
 import org.openstreetmap.josm.gradle.plugin.task.CleanJosm;
+import org.openstreetmap.josm.gradle.plugin.task.InitJosmPrefs;
 import org.openstreetmap.josm.gradle.plugin.task.RunJosmTask;
 
 public class BasicTaskSetup extends AbstractSetup {
@@ -24,23 +25,7 @@ public class BasicTaskSetup extends AbstractSetup {
     final Delete cleanJosm = pro.getTasks().create("cleanJosm", CleanJosm.class);
 
     // Init JOSM preferences.xml file
-    final Copy initJosmPrefs = pro.getTasks().create("initJosmPrefs", Copy.class);
-    initJosmPrefs.setDescription("Puts a default preferences.xml file into the temporary JOSM home directory");
-    initJosmPrefs.include("preferences.xml");
-    pro.afterEvaluate(p -> {
-      initJosmPrefs.from(JosmPluginExtension.forProject(p).getJosmConfigDir());
-      initJosmPrefs.into(JosmPluginExtension.forProject(p).getTmpJosmHome());
-      if (initJosmPrefs.getSource().isEmpty()) {
-        initJosmPrefs.getLogger().debug("No default JOSM preference file found in {}/preferences.xml.", JosmPluginExtension.forProject(p).getJosmConfigDir().getAbsolutePath());
-      }
-    });
-    initJosmPrefs.doFirst(task -> {
-      if (new File(initJosmPrefs.getDestinationDir(), "preferences.xml").exists()) {
-        task.getLogger().lifecycle("JOSM preferences not copied, file is already present.\nIf you want to replace it, run the task 'cleanJosm' additionally.");
-      } else {
-        task.getLogger().lifecycle("Copy [{}] to {}…", String.join(", ", initJosmPrefs.getSource().getFiles().stream().map(File::getAbsolutePath).collect(Collectors.toList())), initJosmPrefs.getDestinationDir().getAbsolutePath());
-      }
-    });
+    final Copy initJosmPrefs = pro.getTasks().create("initJosmPrefs", InitJosmPrefs.class);
 
     // Copy all needed JOSM plugin *.jar files into the directory in {@code $JOSM_HOME}
     final Sync updateJosmPlugins = pro.getTasks().create("updateJosmPlugins", Sync.class);
