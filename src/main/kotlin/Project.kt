@@ -9,7 +9,9 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.ExtensionContainer
+import org.gradle.api.plugins.JavaPluginConvention
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import java.util.jar.Manifest
 import java.util.zip.ZipFile
@@ -139,3 +141,9 @@ fun Project.useSeparateTmpJosmDirs(): Boolean {
  */
 val ExtensionContainer.josm
   get() = getByType(JosmPluginExtension::class.java)
+/**
+ * Convenience method to access the Java plugin convention.
+ * @return the [JavaPluginConvention] of the project
+ */
+val Convention.java
+  get() = getPlugin(JavaPluginConvention::class.java)
