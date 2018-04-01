@@ -14,7 +14,6 @@ import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.bundling.Jar;
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
 import org.openstreetmap.josm.gradle.plugin.i18n.DefaultI18nSourceSet;
-import org.openstreetmap.josm.gradle.plugin.setup.BasicTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.I18nTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.MinJosmVersionSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup;
@@ -22,6 +21,7 @@ import org.openstreetmap.josm.gradle.plugin.task.ListJosmVersions;
 import org.openstreetmap.josm.gradle.plugin.task.MoCompile;
 import org.openstreetmap.josm.gradle.plugin.task.PoCompile;
 import org.openstreetmap.josm.gradle.plugin.task.ShortenPoFiles;
+import org.openstreetmap.josm.gradle.plugin.task.TaskSetupKt;
 
 /**
  * Main class of the plugin, sets up the custom configurations <code>requiredPlugin</code> and <code>packIntoJar</code>,
@@ -82,7 +82,7 @@ public class JosmPlugin implements Plugin<Project> {
       ProjectKt.getAllRequiredJosmPlugins(p, JosmPluginExtension.forProject(p).getManifest().getPluginDependencies()).forEach(it -> p.getDependencies().add("requiredPlugin", it));
     });
 
-    new BasicTaskSetup(project).setup();
+    TaskSetupKt.setupJosmTasks(project);
     new I18nTaskSetup(project).setup();
     new PluginTaskSetup(project).setup();
     new MinJosmVersionSetup(project).setup();

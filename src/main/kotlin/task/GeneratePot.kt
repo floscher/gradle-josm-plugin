@@ -4,7 +4,7 @@ import org.gradle.api.plugins.BasePluginConvention
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskExecutionException
-import org.openstreetmap.josm.gradle.plugin.getJosmExtension
+import org.openstreetmap.josm.gradle.plugin.josm
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
@@ -49,11 +49,11 @@ open class GeneratePot: Exec() {
         "--package-name=" + outBaseName,
         "--package-version=" + it.version
       )
-      if (it.getJosmExtension().i18n.bugReportEmail != null) {
-        args("--msgid-bugs-address=" + it.getJosmExtension().i18n.bugReportEmail)
+      if (it.extensions.josm.i18n.bugReportEmail != null) {
+        args("--msgid-bugs-address=" + it.extensions.josm.i18n.bugReportEmail)
       }
-      if (it.getJosmExtension().i18n.copyrightHolder != null) {
-        args("--copyright-holder=" + it.getJosmExtension().i18n.copyrightHolder)
+      if (it.extensions.josm.i18n.copyrightHolder != null) {
+        args("--copyright-holder=" + it.extensions.josm.i18n.copyrightHolder)
       }
 
       doFirst {
@@ -76,11 +76,11 @@ open class GeneratePot: Exec() {
           destFile,
           { line ->
             if (line.startsWith("#: ")) {
-              line.substring(0, 3) + project.getJosmExtension().i18n.pathTransformer.invoke(line.substring(3))
+              line.substring(0, 3) + project.extensions.josm.i18n.pathTransformer.invoke(line.substring(3))
             } else line
           },
           replacements,
-          "\n#. Plugin description for " + project.getName() + "\nmsgid \"" + project.getJosmExtension().manifest.description + "\"\nmsgstr \"\"\n"
+          "\n#. Plugin description for " + project.getName() + "\nmsgid \"" + project.extensions.josm.manifest.description + "\"\nmsgstr \"\"\n"
         )
       } catch (e: IOException) {
         throw TaskExecutionException(this, e)

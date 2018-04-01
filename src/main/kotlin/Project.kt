@@ -9,6 +9,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.plugins.ExtensionContainer
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import java.util.jar.Manifest
 import java.util.zip.ZipFile
@@ -78,10 +79,10 @@ fun Project.getAllRequiredJosmPlugins(directlyRequiredPlugins: Collection<String
 
 private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolvedPlugins: MutableSet<String>, directlyRequiredPlugins: Set<String>): Set<Dependency> {
   val realRecursionDepth = max(0, recursionDepth)
-  if (realRecursionDepth >= getJosmExtension().maxPluginDependencyDepth) {
+  if (realRecursionDepth >= extensions.josm.maxPluginDependencyDepth) {
     throw GradleException(
       "Dependency tree of required JOSM plugins is too deep (>= %d steps). Aborting resolution of required JOSM plugins."
-        .format(getJosmExtension().maxPluginDependencyDepth)
+        .format(extensions.josm.maxPluginDependencyDepth)
     )
   }
 
@@ -128,7 +129,7 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
  * @return true if a JOSM version of 7841 or later is used that can be configured to use separate directories for cache, preferences and userdata
  */
 fun Project.useSeparateTmpJosmDirs(): Boolean {
-  val josmVersionNum = project.getJosmExtension().josmCompileVersion?.toIntOrNull()
+  val josmVersionNum = extensions.josm.josmCompileVersion?.toIntOrNull()
   return josmVersionNum == null || josmVersionNum >= 7841
 }
 
@@ -136,6 +137,5 @@ fun Project.useSeparateTmpJosmDirs(): Boolean {
  * Access method for the `project.josm{}` extension.
  * @return the [JosmPluginExtension] for this project.
  */
-fun Project.getJosmExtension(): JosmPluginExtension {
-  return extensions.getByType(JosmPluginExtension::class.java)
-}
+val ExtensionContainer.josm
+  get() = getByType(JosmPluginExtension::class.java)

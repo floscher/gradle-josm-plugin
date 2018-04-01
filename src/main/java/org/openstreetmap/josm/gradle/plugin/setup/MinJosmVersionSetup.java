@@ -23,7 +23,7 @@ public final class MinJosmVersionSetup extends AbstractSetup {
       // Find the next available version from the one specified in the manifest
       task.getProject().getDependencies().add(
         minJosmVersionImplementation.getName(),
-        ProjectKt.getNextJosmVersion(pro, ProjectKt.getJosmExtension(task.getProject()).getManifest().getMinJosmVersion())
+        ProjectKt.getNextJosmVersion(pro, ProjectKt.getJosm(task.getProject().getExtensions()).getManifest().getMinJosmVersion())
       );
     });
 

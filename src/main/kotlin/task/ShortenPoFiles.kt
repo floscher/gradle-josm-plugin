@@ -2,8 +2,8 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.plugins.BasePluginConvention
-import org.openstreetmap.josm.gradle.plugin.getJosmExtension
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
+import org.openstreetmap.josm.gradle.plugin.josm
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
@@ -31,7 +31,7 @@ open class ShortenPoFiles : DefaultTask() {
               if (modifiedLine.startsWith("# ")) {
                 val projectName = project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName
                 modifiedLine = modifiedLine.replace("SOME DESCRIPTIVE TITLE.", "Translations for the JOSM plugin '$projectName' (${file.nameWithoutExtension})")
-                modifiedLine = modifiedLine.replace("THE PACKAGE'S COPYRIGHT HOLDER", project.getJosmExtension().i18n.copyrightHolder ?: "")
+                modifiedLine = modifiedLine.replace("THE PACKAGE'S COPYRIGHT HOLDER", project.extensions.josm.i18n.copyrightHolder ?: "")
                 modifiedLine = modifiedLine.replace("PACKAGE package", "josm-plugin_$projectName package")
               } else {
                 isHeader = false

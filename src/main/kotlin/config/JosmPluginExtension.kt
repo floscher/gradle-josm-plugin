@@ -6,7 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.IvyPatternRepositoryLayout
 import org.gradle.api.tasks.util.PatternFilterable
-import org.openstreetmap.josm.gradle.plugin.getJosmExtension
+import org.openstreetmap.josm.gradle.plugin.josm
 import org.openstreetmap.josm.gradle.plugin.useSeparateTmpJosmDirs
 import java.io.File
 import java.net.URI
@@ -58,8 +58,8 @@ open class JosmPluginExtension(private val project: Project) {
     project.afterEvaluate {
       if (!it.useSeparateTmpJosmDirs()) {
         it.logger.warn("You are using a very old version of JOSM (< 7841) that doesn't have separate directories for cache and user data.")
-        project.getJosmExtension().tmpJosmCacheDir = File(project.getJosmExtension().tmpJosmPrefDir, "cache")
-        project.getJosmExtension().tmpJosmUserdataDir = project.getJosmExtension().tmpJosmPrefDir
+        project.extensions.josm.tmpJosmCacheDir = File(project.extensions.josm.tmpJosmPrefDir, "cache")
+        project.extensions.josm.tmpJosmUserdataDir = project.extensions.josm.tmpJosmPrefDir
         it.logger.warn("These settings are now overwritten as follows: tmpJosmCacheDir=${tmpJosmCacheDir.absolutePath} tmpJosmUserdataDir=${tmpJosmUserdataDir.absolutePath}")
       }
     }

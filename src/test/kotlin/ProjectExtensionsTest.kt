@@ -93,6 +93,6 @@ class ProjectExtensionsTest {
    */
   @Test
   fun testJosmExtension() {
-    createGradleJosmProjectWithoutRepos().getJosmExtension()
+    createGradleJosmProjectWithoutRepos().extensions.josm
   }
 }

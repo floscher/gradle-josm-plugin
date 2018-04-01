@@ -3,8 +3,7 @@ package org.openstreetmap.josm.gradle.plugin.task
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.JavaExec
-import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
-import org.openstreetmap.josm.gradle.plugin.getJosmExtension
+import org.openstreetmap.josm.gradle.plugin.josm
 import org.openstreetmap.josm.gradle.plugin.useSeparateTmpJosmDirs
 import java.io.File
 
@@ -40,17 +39,18 @@ open class RunJosmTask : JavaExec() {
     project.afterEvaluate{
       // doFirst has to be added after the project initialized, otherwise it won't be executed before the main part of the JavaExec task is run.
       doFirst{
+        description = "Runs an independent clean JOSM instance (v${project.extensions.josm.josmCompileVersion}) with temporary JOSM home directories (by default inside `build/.josm/`) and the freshly compiled plugin active."
         if (project.useSeparateTmpJosmDirs()) {
-          systemProperty("josm.cache", project.getJosmExtension().tmpJosmCacheDir)
-          systemProperty("josm.pref", project.getJosmExtension().tmpJosmPrefDir)
-          systemProperty("josm.userdata", project.getJosmExtension().tmpJosmUserdataDir)
+          systemProperty("josm.cache", project.extensions.josm.tmpJosmCacheDir)
+          systemProperty("josm.pref", project.extensions.josm.tmpJosmPrefDir)
+          systemProperty("josm.userdata", project.extensions.josm.tmpJosmUserdataDir)
         } else {
-          systemProperty("josm.home", project.getJosmExtension().tmpJosmPrefDir)
+          systemProperty("josm.home", project.extensions.josm.tmpJosmPrefDir)
         }
         classpath = project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.getByName("main").runtimeClasspath
 
         logger.lifecycle("Running version {} of {}", project.version, project.name);
-        logger.lifecycle("\nUsing JOSM version {}", project.extensions.getByType(JosmPluginExtension::class.java).josmCompileVersion);
+        logger.lifecycle("\nUsing JOSM version {}", project.extensions.josm.josmCompileVersion);
 
         logger.lifecycle("\nThese system properties are set:");
         for ((key, value) in systemProperties) {

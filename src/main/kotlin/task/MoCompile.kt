@@ -3,12 +3,12 @@ package org.openstreetmap.josm.gradle.plugin.task
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
-import org.openstreetmap.josm.gradle.plugin.getJosmExtension
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangWriter
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MoReader
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
+import org.openstreetmap.josm.gradle.plugin.josm
 import java.io.File
 
 /**
@@ -51,17 +51,17 @@ open class MoCompile : DefaultTask() {
         logger.lifecycle("Reading ${it.absolutePath}…")
         langMap[it.nameWithoutExtension] = MoReader(it.toURI().toURL()).readFile()
       }
-      val projectDescription = project.getJosmExtension().manifest.description
+      val projectDescription = project.extensions.josm.manifest.description
       if (projectDescription != null) {
         langMap.forEach {lang, map ->
           val translation = map.get(MsgId(MsgStr(projectDescription)))
           if (translation != null) {
-            project.getJosmExtension().manifest.translatedDescription(lang, translation.strings.first());
+            project.extensions.josm.manifest.translatedDescription(lang, translation.strings.first());
           }
         }
       }
       logger.lifecycle("Write *.lang files…")
-      LangWriter().writeLangFile(File(outDir, "data"), langMap, project.getJosmExtension().i18n.mainLanguage)
+      LangWriter().writeLangFile(File(outDir, "data"), langMap, project.extensions.josm.i18n.mainLanguage)
     }
   }
 }

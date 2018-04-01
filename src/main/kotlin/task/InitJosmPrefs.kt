@@ -1,7 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.tasks.Copy
-import org.openstreetmap.josm.gradle.plugin.getJosmExtension
+import org.openstreetmap.josm.gradle.plugin.josm
 import java.io.File
 
 open class InitJosmPrefs: Copy() {
@@ -11,10 +11,10 @@ open class InitJosmPrefs: Copy() {
     include(PREF_FILE_NAME)
 
     project.afterEvaluate {
-      from(project.getJosmExtension().josmConfigDir)
-      into(project.getJosmExtension().tmpJosmPrefDir)
+      from(project.extensions.josm.josmConfigDir)
+      into(project.extensions.josm.tmpJosmPrefDir)
       if (source.isEmpty) {
-        logger.debug("No default JOSM preference file found in ${project.getJosmExtension().josmConfigDir}/preferences.xml.")
+        logger.debug("No default JOSM preference file found in ${project.extensions.josm.josmConfigDir}/preferences.xml.")
       }
     }
 
