@@ -7,6 +7,7 @@ import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.openstreetmap.josm.gradle.plugin.ProjectKt;
+import org.openstreetmap.josm.gradle.plugin.task.AddMinJosmVersionDependency;
 
 public final class MinJosmVersionSetup extends AbstractSetup {
 
@@ -15,16 +16,8 @@ public final class MinJosmVersionSetup extends AbstractSetup {
   }
 
   public void setup() {
-    final Configuration minJosmVersionImplementation = pro.getConfigurations().create("minJosmVersionImplementation").extendsFrom(pro.getConfigurations().getByName("implementation"));
-
-    final Task addMinJosmVersionDependency = pro.task("addMinJosmVersionDependency");
-    addMinJosmVersionDependency.setDescription("Adds dependency for the minimum required JOSM version to the configuration `minJosmVersionImplementation`.");
-    addMinJosmVersionDependency.doFirst(task -> {
-      // Find the next available version from the one specified in the manifest
-      task.getProject().getDependencies().add(
-        minJosmVersionImplementation.getName(),
-        ProjectKt.getNextJosmVersion(pro, ProjectKt.getJosm(task.getProject().getExtensions()).getManifest().getMinJosmVersion())
-      );
+    final Task addMinJosmVersionDependency = pro.getTasks().create("addMinJosmVersionDependency", AddMinJosmVersionDependency.class, task -> {
+      task.init(pro.getConfigurations().getByName("implementation"));
     });
 
     pro.afterEvaluate(p -> {
