@@ -16,7 +16,7 @@ open class CleanJosm : DefaultTask() {
       description = "Delete temporary JOSM directories used for the `runJosm` and `debugJosm` tasks (for preferences, cache and userdata). Run `cleanJosmCache`, `cleanJosmPref` or `cleanJosmUserdata` to delete only one of them."
     }
   }
-  fun addDependentTask(taskSuffix: String, dir: File) {
+  private fun addDependentTask(taskSuffix: String, dir: File) {
     val task = project.tasks.create("$name$taskSuffix", Delete::class.java)
     task.description = "Delete ${taskSuffix.toLowerCase(Locale.UK)} directory (${dir.absolutePath})"
     task.delete(dir)

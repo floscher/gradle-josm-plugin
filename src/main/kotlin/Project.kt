@@ -141,6 +141,7 @@ fun Project.useSeparateTmpJosmDirs(): Boolean {
  */
 val ExtensionContainer.josm
   get() = getByType(JosmPluginExtension::class.java)
+
 /**
  * Convenience method to access the Java plugin convention.
  * @return the [JavaPluginConvention] of the project

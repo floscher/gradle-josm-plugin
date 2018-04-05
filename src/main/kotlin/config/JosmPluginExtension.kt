@@ -79,7 +79,9 @@ open class JosmPluginExtension(private val project: Project) {
    */
   var maxPluginDependencyDepth: Int = 10
     set(value) {
-      require(value >= 0)
+      require(value >= 0) {
+        "For property `maxPluginDependencyDepth` only nonnegative integer values are allowed! You are trying to set it to $value."
+      }
     }
 
   /**

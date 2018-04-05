@@ -47,15 +47,18 @@ open class PoCompile: DefaultTask() {
         this.logger.lifecycle(commandLine.joinToString("  "))
         try {
           val process: Process = ProcessBuilder(commandLine).redirectErrorStream(true).start()
-          process.waitFor(2, TimeUnit.MINUTES)
-          this.logger.lifecycle(" > " + process.inputStream.bufferedReader(StandardCharsets.UTF_8).readText())
+          if (process.waitFor(2, TimeUnit.MINUTES)) {
+            this.logger.lifecycle(" > " + process.inputStream.bufferedReader(StandardCharsets.UTF_8).readText())
+          } else {
+            logger.warn("WARNING: msgfmt takes longer than 2 minutes to convert ${it.absolutePath} . Aborting now!")
+          }
         } catch (e: IOException) {
           compilationFailed = true
-          logger.lifecycle("Failed to convert *.po file to *.mo file. Probably xgettext is not installed on your machine!")
+          logger.warn("Failed to convert *.po file to *.mo file. Probably xgettext is not installed on your machine!")
         }
       }
       if (compilationFailed) {
-        project.gradle.buildFinished { project.logger.error("WARNING: Not all i18n files have been built! Some *.po files could not be converted to *.mo files!\nWARNING: The program xgettext might not be installed on your machine, which is required for processing *.po files.") }
+        project.gradle.buildFinished { project.logger.error("WARNING: Not all i18n files have been built! Some *.po files could not be converted to *.mo files!\nWARNING: Maybe the program xgettext is not installed on your machine! It is required for processing *.po files.") }
       }
     }
   }

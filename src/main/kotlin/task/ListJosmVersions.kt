@@ -21,10 +21,10 @@ open class ListJosmVersions : DefaultTask() {
     }
   }
 
-  fun readTestedVersion() = readNumericVersionAsString(URL("$BASE_URL/tested"))
-  fun readLatestVersion() = readNumericVersionAsString(URL("$BASE_URL/latest"))
+  private fun readTestedVersion() = readNumericVersionAsString(URL("$BASE_URL/tested"))
+  private fun readLatestVersion() = readNumericVersionAsString(URL("$BASE_URL/latest"))
 
-  fun readNumericVersionAsString(url: URL) = try {
+  private fun readNumericVersionAsString(url: URL) = try {
     readNumericVersion(url).toString()
   } catch (e: NumberFormatException) {
     "‹invalid version format›"
@@ -36,7 +36,7 @@ open class ListJosmVersions : DefaultTask() {
    * @throws IOException
    * @throws NumberFormatException
    */
-  fun readNumericVersion(url: URL): Int {
+  private fun readNumericVersion(url: URL): Int {
     url.openStream().use {
       return BufferedReader(InputStreamReader(it, StandardCharsets.UTF_8)).readLine().toInt()
     }

@@ -1,6 +1,8 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.Sync
 import org.openstreetmap.josm.gradle.plugin.java
 import org.openstreetmap.josm.gradle.plugin.josm

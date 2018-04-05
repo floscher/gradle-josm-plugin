@@ -9,8 +9,7 @@ import java.util.regex.Pattern
 /**
  * Holds configuration options regarding internationalization.
  */
-class I18nConfig(project: Project) {
-  private val project: Project = project
+class I18nConfig(private val project: Project) {
   /**
    * E-Mail address to which bugs regarding i18n should be reported.
    * This will be put into the *.pot files that are forwarded to the translators.

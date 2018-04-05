@@ -1,10 +1,13 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskExecutionException
+import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.josm
 
 open class DebugJosm : RunJosmTask() {
-  var debugPort: Int? = null
+  @Input
+  private var debugPort: Int? = null
   init {
     project.afterEvaluate {
       debugPort = project.extensions.josm.debugPort

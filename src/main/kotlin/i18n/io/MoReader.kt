@@ -13,19 +13,19 @@ class MoReader(val moFileURL: URL) {
     val BE_MAGIC: List<Byte> = listOf(/* 0x95 */ -107, /* 0x04 */ 4, /* 0x12 */ 18, /* 0xde */ -34)
   }
 
-  var bigEndian: Boolean = true
+  private var bigEndian: Boolean = true
     private set
-  var formatRev: Long = 0
+  private var formatRev: Long = 0
     private set
-  var numStrings: Int = 0
+  private var numStrings: Int = 0
     private set
-  var offsetOrigStrings: Long = 0
+  private var offsetOrigStrings: Long = 0
     private set
-  var offsetTranslatedStrings: Long = 0
+  private var offsetTranslatedStrings: Long = 0
     private set
-  var sizeHashingTable: Long = 0
+  private var sizeHashingTable: Long = 0
     private set
-  var offsetHashingTable: Long = 0
+  private var offsetHashingTable: Long = 0
     private set
 
   fun readFile(): Map<MsgId, MsgStr> {

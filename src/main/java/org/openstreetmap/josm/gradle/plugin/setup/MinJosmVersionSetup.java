@@ -2,11 +2,9 @@ package org.openstreetmap.josm.gradle.plugin.setup;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
-import org.openstreetmap.josm.gradle.plugin.ProjectKt;
 import org.openstreetmap.josm.gradle.plugin.task.AddMinJosmVersionDependency;
 
 public final class MinJosmVersionSetup extends AbstractSetup {

@@ -12,12 +12,12 @@ import java.net.URL
 plugins {
   id("com.gradle.plugin-publish").version("0.9.10")
   id("com.github.ben-manes.versions").version("0.17.0")
-  kotlin("jvm").version("1.2.30")
+  kotlin("jvm").version("1.2.31")
   id("org.jetbrains.dokka").version("0.9.16")
 
-  `jacoco`
-  `maven`
-  `eclipse`
+  jacoco
+  maven
+  eclipse
   `java-gradle-plugin`
   `maven-publish`
 }

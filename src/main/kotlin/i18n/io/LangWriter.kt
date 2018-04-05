@@ -34,7 +34,7 @@ class LangWriter {
     }
   }
 
-  fun writeLangStream(stream: OutputStream, originalMsgIds: List<MsgId>, translations: Map<MsgId, MsgStr>, isOriginLanguage: Boolean = false) {
+  private fun writeLangStream(stream: OutputStream, originalMsgIds: List<MsgId>, translations: Map<MsgId, MsgStr>, isOriginLanguage: Boolean = false) {
     // Iterate over the translatable messages in the original language without plural
     originalMsgIds.filter { it.id.strings.size <= 1 }.forEach { msgid ->
       val stringBytes = (

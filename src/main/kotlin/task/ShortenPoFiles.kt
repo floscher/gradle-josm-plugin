@@ -2,18 +2,20 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.plugins.BasePluginConvention
+import org.gradle.api.tasks.Input
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 import org.openstreetmap.josm.gradle.plugin.josm
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
 open class ShortenPoFiles : DefaultTask() {
+  @Input
   lateinit var sourceSet: I18nSourceSet
 
   init {
     group = "JOSM-i18n"
     project.afterEvaluate {
-      description = "Remove the paths to where a string can be found in the source code from the *.po files of source set '${sourceSet.name}'. Also replaces placeholders in the *.po header."
+      description = "Remove the paths to where a string can be found in the source code from the *.po files of source set `${sourceSet.name}`. Also replaces placeholders in the *.po header."
     }
     doFirst {
       // Go through all *.po files in the "po source sets"
