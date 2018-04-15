@@ -16,6 +16,7 @@ import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
 import org.openstreetmap.josm.gradle.plugin.i18n.DefaultI18nSourceSet;
 import org.openstreetmap.josm.gradle.plugin.setup.MinJosmVersionSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup;
+import org.openstreetmap.josm.gradle.plugin.task.LangCompile;
 import org.openstreetmap.josm.gradle.plugin.task.ListJosmVersions;
 import org.openstreetmap.josm.gradle.plugin.task.MoCompile;
 import org.openstreetmap.josm.gradle.plugin.task.PoCompile;
@@ -101,10 +102,10 @@ public class JosmPlugin implements Plugin<Project> {
           );
           final PoCompile poCompileTask = project.getTasks().create(s.getCompileTaskName("po"), PoCompile.class, t -> t.setup(i18nSourceSet));
           final MoCompile moCompileTask = project.getTasks().create(s.getCompileTaskName("mo"), MoCompile.class, t -> t.setup(i18nSourceSet, poCompileTask));
+          final LangCompile langCompileTask = project.getTasks().create(s.getCompileTaskName("lang"), LangCompile.class, t -> t.init(i18nSourceSet, moCompileTask));
 
-          s.getOutput().dir(moCompileTask.getOutDir());
-          i18nSourceSet.getLang().getSourceDirectories().forEach(sd -> s.getOutput().dir(sd));
-          project.getTasks().getByName(s.getProcessResourcesTaskName()).getInputs().files(moCompileTask);
+          s.getOutput().dir(langCompileTask);
+
         }
       });
     }
