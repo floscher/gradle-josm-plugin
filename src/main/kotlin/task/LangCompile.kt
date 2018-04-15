@@ -14,15 +14,10 @@ import java.io.File
 open class LangCompile : Sync() {
 
   @Internal
-  private lateinit var sourceSet: I18nSourceSet
+  lateinit var sourceSet: I18nSourceSet
 
   @Internal
-  private lateinit var moCompile: MoCompile
-
-  fun init(sourceSet: I18nSourceSet, moCompile: MoCompile) {
-    this.sourceSet = sourceSet
-    this.moCompile = moCompile
-  }
+  lateinit var moCompile: MoCompile
 
   init {
     project.afterEvaluate {

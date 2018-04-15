@@ -14,11 +14,7 @@ import java.util.concurrent.TimeUnit
 open class PoCompile: DefaultTask() {
 
   @Internal
-  private lateinit var sourceSet: I18nSourceSet
-
-  fun init(sourceSet: I18nSourceSet) {
-    this.sourceSet = sourceSet
-  }
+  lateinit var sourceSet: I18nSourceSet
 
   init {
     project.afterEvaluate {

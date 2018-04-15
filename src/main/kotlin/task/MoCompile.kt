@@ -18,26 +18,19 @@ import java.io.File
  */
 open class MoCompile : DefaultTask() {
   @Internal
-  private lateinit var poCompileTask: PoCompile
-
-  @Internal
-  private lateinit var sourceSet: I18nSourceSet
+  lateinit var poCompile: PoCompile
 
   /**
-   * Initialize the task
-   * @param sourceSet the [I18nSourceSet] for which the *.mo files will be compiled.
-   * @param poCompileTask the task for compiling *.po files to *.mo files. Its outputs are used as inputs for this task.
+   * The [I18nSourceSet] for which the *.mo files will be compiled.
    */
-  fun init(sourceSet: I18nSourceSet, poCompileTask: PoCompile) {
-    this.sourceSet = sourceSet
-    this.poCompileTask = poCompileTask
-  }
+  @Internal
+  lateinit var sourceSet: I18nSourceSet
 
   init {
     project.afterEvaluate {
       val outDir = File(project.buildDir, "i18n/mo/" + sourceSet.name)
 
-      inputs.files(poCompileTask)
+      inputs.files(poCompile)
       inputs.files(sourceSet.mo.asFileTree.files)
       outputs.dir(outDir)
 

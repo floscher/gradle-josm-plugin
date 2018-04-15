@@ -40,14 +40,14 @@ open class GeneratePot: Exec() {
 
     project.afterEvaluate {
       dependsOn(fileListGenTask)
-      inputs.files(fileListGenTask.sourceFiles)
+      inputs.files(fileListGenTask.inputs.files)
 
       outBaseName = "josm-plugin_" + it.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName
       args(
-        "--files-from=" + fileListGenTask.outFile.absolutePath,
-        "--default-domain=" + outBaseName,
-        "--package-name=" + outBaseName,
-        "--package-version=" + it.version
+        "--files-from=${fileListGenTask.outFile.absolutePath}",
+        "--default-domain=$outBaseName",
+        "--package-name=$outBaseName",
+        "--package-version=${it.version}"
       )
       if (it.extensions.josm.i18n.bugReportEmail != null) {
         args("--msgid-bugs-address=" + it.extensions.josm.i18n.bugReportEmail)
