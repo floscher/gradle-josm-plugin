@@ -10,9 +10,15 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Compile *.po files (textual gettext files) to *.mo files (binary gettext files).
+ *
+ * This task requires the command line tool `msgfmt` (part of GNU gettext) to work properly! If the tool is not
+ * installed, it will only issue a warning (not fail), but translations from *.po files won't be available.
  */
 open class PoCompile: DefaultTask() {
 
+  /**
+   * The source set, for which all *.po files will be compiled to *.mo files.
+   */
   @Internal
   lateinit var sourceSet: I18nSourceSet
 

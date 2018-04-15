@@ -17,6 +17,9 @@ import java.io.File
  * For the other languages, the "msgstr" is used (the text which is already translated to this language).
  */
 open class MoCompile : DefaultTask() {
+  /**
+   * The task for compiling *.po files to *.mo files. Its outputs are used as inputs for this task.
+   */
   @Internal
   lateinit var poCompile: PoCompile
 

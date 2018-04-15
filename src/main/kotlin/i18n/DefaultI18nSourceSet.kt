@@ -8,6 +8,9 @@ import org.gradle.api.internal.tasks.DefaultSourceSet
 import org.gradle.api.tasks.SourceSet
 import org.gradle.util.ConfigureUtil
 
+/**
+ * Implementation for a combination of one [SourceDirectorySet]s for each of the three supported translation formats.
+ */
 class DefaultI18nSourceSet(sourceSet: SourceSet, sourceDirectorySetFactory: SourceDirectorySetFactory) : I18nSourceSet {
   override val po: SourceDirectorySet = sourceDirectorySetFactory.create(
     "i18nPo",

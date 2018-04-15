@@ -13,9 +13,15 @@ import java.io.File
  */
 open class LangCompile : Sync() {
 
+  /**
+   * The source set from which all *.lang files are synced to the destination
+   */
   @Internal
   lateinit var sourceSet: I18nSourceSet
 
+  /**
+   * The task for compiling *.mo files to *.lang files. These outputs are then used as inputs for this task.
+   */
   @Internal
   lateinit var moCompile: MoCompile
 

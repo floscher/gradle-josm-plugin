@@ -16,8 +16,17 @@ import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 import java.time.Year
 
+/**
+ * Create *.pot file (gettext file format), which contains all translatable strings.
+ * This file can then be handed to the translators to translate into other languages.
+ *
+ * For this task to work the command line tool `xgettext` is required!
+ */
 open class GeneratePot: Exec() {
   private lateinit var outBaseName: String
+  /**
+   * The task that generates a list of all source files. That file is needed to tell xgettext, which files it should examine.
+   */
   @Internal
   lateinit var fileListGenTask: GenerateFileList
 

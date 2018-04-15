@@ -151,7 +151,7 @@ open class JosmPluginExtension(private val project: Project) {
   val i18n: I18nConfig = I18nConfig(project)
 
   /**
-   * Set the field [i18n] using a Groovy [Closure]
+   * Set the field [JosmPluginExtension.i18n] using a Groovy [Closure]
    */
   public fun i18n(c: Closure<I18nConfig>) {
     project.configure(i18n, c)

@@ -5,10 +5,14 @@ import java.io.InputStream
 import java.net.URL
 import java.nio.charset.StandardCharsets
 
+/**
+ * Reads the strings contained inside a *.mo file.
+ * @param moFileURL the URL of the *.mo file that you want to read
+ */
 class MoReader(val moFileURL: URL) {
   companion object {
     /**
-     * The big-endian magic bytes (little-endian would be reversed)
+     * The big-endian magic bytes of *.mo files (little-endian would be reversed)
      */
     val BE_MAGIC: List<Byte> = listOf(/* 0x95 */ -107, /* 0x04 */ 4, /* 0x12 */ 18, /* 0xde */ -34)
   }
@@ -28,6 +32,11 @@ class MoReader(val moFileURL: URL) {
   private var offsetHashingTable: Long = 0
     private set
 
+  /**
+   * Reads the *.mo file at the given [URL] and returns the contained strings as a [Map] from [MsgId]s to [MsgStr]s.
+   * @throws NotImplementedError If the file contains a string longer than [Int.MAX_VALUE]
+   * @throws IOException If the
+   */
   fun readFile(): Map<MsgId, MsgStr> {
     // Stream 1 reads the indices of the strings
     val stream1 = moFileURL.openStream()
@@ -111,6 +120,8 @@ class MoReader(val moFileURL: URL) {
 /**
  * Read bytes from the input stream into the array. If there are not enough
  * bytes to fill the array, an exception is thrown.
+ * @throws IOException if reading from the [InputStream] fails (see [InputStream.read]) or if the number of bytes that
+ *   can be read is below the parameter [b].
  */
 private fun safeRead(stream: InputStream, b: ByteArray): Int {
   val readBytes = stream.read(b)

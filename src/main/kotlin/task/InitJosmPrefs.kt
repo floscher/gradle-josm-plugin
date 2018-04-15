@@ -1,9 +1,16 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.tasks.Copy
+import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.josm
 import java.io.File
 
+/**
+ * A simple copy task that copies a `preferences.xml` file from [JosmPluginExtension.josmConfigDir] to
+ * [JosmPluginExtension.tmpJosmPrefDir] if there is not already one in the destination.
+ *
+ * This way you can provide a default JOSM configuration for the [RunJosmTask].
+ */
 open class InitJosmPrefs: Copy() {
   private val PREF_FILE_NAME = "preferences.xml"
   init {

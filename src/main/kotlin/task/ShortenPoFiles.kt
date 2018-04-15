@@ -8,7 +8,19 @@ import org.openstreetmap.josm.gradle.plugin.josm
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
+/**
+ * Shortens the *.po files in the given source set.
+ *
+ * This means all occurences of the source code locations of the translated strings are stripped, as well as the
+ * last translator of the *.po file.
+ * Also some fields in the file header are filled out (package name, copyright holder and a descriptive title).
+ *
+ * This task should be run after downloading fresh translations from Transifex (e.g. with [TransifexDownload]).
+ */
 open class ShortenPoFiles : DefaultTask() {
+  /**
+   * The source set for which this task will shorten the *.po files.
+   */
   @Input
   lateinit var sourceSet: I18nSourceSet
 

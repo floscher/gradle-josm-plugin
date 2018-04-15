@@ -57,8 +57,7 @@ class I18nConfig(private val project: Project) {
   var pathTransformer: (String) -> String = {a -> a};
 
   /**
-   * Alternative to [setPathTransformer()], can set the [pathTransformer]
-   * field using a Groovy [Closure].
+   * Alternative to the setter of property [pathTransformer] using a Groovy [Closure].
    */
   fun pathTransformer(closure: Closure<String>) {
     pathTransformer = { closure.call(it) }

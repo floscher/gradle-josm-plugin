@@ -8,7 +8,8 @@ import org.openstreetmap.josm.gradle.plugin.useSeparateTmpJosmDirs
 import java.io.File
 
 /**
- * A task that can execute a JOSM instance. Both the {@code runJosm} task and the `debugJosm` task extend this type of task.
+ * A task that can execute a JOSM instance. There's also the class [DebugJosm], which extends this class and allows to
+ * remote debug via JDWP (Java debug wire protocol).
  *
  * @constructor
  * Instantiates a new task for running a JOSM instance.

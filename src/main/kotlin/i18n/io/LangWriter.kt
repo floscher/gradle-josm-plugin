@@ -7,6 +7,9 @@ import java.io.IOException
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets
 
+/**
+ * Writer for creating *.lang files from a [Map] of [MsgId]s to [MsgStr]s, which e.g. [MoReader.readFile] can produce.
+ */
 class LangWriter {
   /**
    * Takes translation definitions in the form of [MsgId]s and [MsgStr]s for multiple languages.
@@ -15,6 +18,7 @@ class LangWriter {
    * @param [languageMaps] a map with language codes as keys and maps as values.
    *   These maps associates each [MsgId] a [MsgStr], which is the translation of the [MsgId].
    * @param [originLang] the language code of the language in which the strings were written in the source code.
+   * @throws IOException if writing the file is not successful
    */
   fun writeLangFile(langFileDir: File, languageMaps: Map<String, Map<MsgId, MsgStr>>, originLang: String = "en") {
     // If the original language is present in the languageMaps, then use the msgids from that file.

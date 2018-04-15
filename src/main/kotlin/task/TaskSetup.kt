@@ -8,6 +8,9 @@ import org.openstreetmap.josm.gradle.plugin.java
 import org.openstreetmap.josm.gradle.plugin.josm
 import java.io.File
 
+/**
+ * This method sets up all the [Task]s (and [Configuration]s) for a given project that should be there by default.
+ */
 fun Project.setupJosmTasks() {
   tasks.create("cleanJosm", CleanJosm::class.java)
 

@@ -5,10 +5,19 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.SourceSet
 import java.io.File
 
+/**
+ * Outputs a file containing the absolute paths of all Java source files
+ */
 open class GenerateFileList: DefaultTask() {
+  /**
+   * The file to which the file list is written. Gets overwritten when this task executes.
+   */
   @Internal
   lateinit var outFile: File
 
+  /**
+   * The source set for which the file list is generated.
+   */
   @Internal
   lateinit var srcSet: SourceSet
 

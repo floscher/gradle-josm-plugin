@@ -5,6 +5,9 @@ import org.gradle.api.tasks.TaskExecutionException
 import java.io.File
 import java.io.FileNotFoundException
 
+/**
+ * Task for downloading the current state of the translations from transifex.com
+ */
 open class TransifexDownload : Exec() {
   init {
     group = "JOSM-i18n"

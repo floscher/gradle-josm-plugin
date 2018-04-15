@@ -7,6 +7,9 @@ import java.io.InputStreamReader
 import java.net.URL
 import java.nio.charset.StandardCharsets
 
+/**
+ * Task for showing the current `latest` and `tested` JOSM versions
+ */
 open class ListJosmVersions : DefaultTask() {
   private val BASE_URL = "https://josm.openstreetmap.de"
 
