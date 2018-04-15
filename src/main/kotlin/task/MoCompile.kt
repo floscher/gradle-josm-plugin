@@ -2,7 +2,6 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.OutputDirectory
 import org.openstreetmap.josm.gradle.plugin.config.I18nConfig
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangWriter
@@ -18,51 +17,64 @@ import java.io.File
  * For the other languages, the "msgstr" is used (the text which is already translated to this language).
  */
 open class MoCompile : DefaultTask() {
-  @OutputDirectory
-  lateinit var outDir: File
+  @Internal
+  private lateinit var poCompileTask: PoCompile
 
   @Internal
-  private lateinit var sourceSetName: String
-  @Internal
-  private lateinit var sourceFiles: Set<File>
+  private lateinit var sourceSet: I18nSourceSet
 
-  fun setup(sourceSet: I18nSourceSet, poCompileTask: PoCompile) {
-    this.outDir = File(project.buildDir, "i18n/mo/" + sourceSet.name)
-
-    this.sourceFiles = sourceSet.mo.asFileTree.files.plus(poCompileTask.outputs.files.asFileTree.files).filter { it.isFile }.toSet()
-    inputs.files(sourceFiles)
-    this.sourceSetName = sourceSet.name
-    inputs.files(poCompileTask)
-
-    description = "Compile the *.mo gettext files of source set $sourceSetName to the *.lang format used by JOSM"
+  /**
+   * Initialize the task
+   * @param sourceSet the [I18nSourceSet] for which the *.mo files will be compiled.
+   * @param poCompileTask the task for compiling *.po files to *.mo files. Its outputs are used as inputs for this task.
+   */
+  fun init(sourceSet: I18nSourceSet, poCompileTask: PoCompile) {
+    this.sourceSet = sourceSet
+    this.poCompileTask = poCompileTask
   }
 
   init {
-    doFirst {
-      outDir.mkdirs()
+    project.afterEvaluate {
+      val outDir = File(project.buildDir, "i18n/mo/" + sourceSet.name)
 
-      if (sourceFiles.isEmpty()) {
-        this.logger.lifecycle("No *.mo files found for this source set '{}'.", sourceSetName)
-        return@doFirst
-      }
-      logger.lifecycle("Compiling the *.lang files for ${outDir.absolutePath}…")
-      project.fileTree(outDir).filter { it.isFile && it.name.endsWith(".lang") }.forEach { it.delete() }
-      val langMap = mutableMapOf<String, Map<MsgId, MsgStr>>()
-      sourceFiles.forEach {
-        logger.lifecycle("Reading ${it.absolutePath}…")
-        langMap[it.nameWithoutExtension] = MoReader(it.toURI().toURL()).readFile()
-      }
-      val projectDescription = project.extensions.josm.manifest.description
-      if (projectDescription != null) {
-        langMap.forEach {lang, map ->
-          val translation = map.get(MsgId(MsgStr(projectDescription)))
-          if (translation != null) {
-            project.extensions.josm.manifest.translatedDescription(lang, translation.strings.first());
+      inputs.files(poCompileTask)
+      inputs.files(sourceSet.mo.asFileTree.files)
+      outputs.dir(outDir)
+
+      description = "Compile the *.mo gettext files of source set `${sourceSet.name}` to the *.lang format used by JOSM"
+
+      doFirst {
+        outDir.mkdirs()
+        val inputFiles = inputs.files.asFileTree.files
+
+        if (inputFiles.isEmpty()) {
+          this.logger.lifecycle("No *.mo files found for this source set '{}'.", sourceSet.name)
+        } else {
+          logger.lifecycle("Reading the *.mo files…")
+          project.fileTree(outDir).filter { it.isFile && it.name.endsWith(".lang") }.forEach { it.delete() }
+          val langMap = mutableMapOf<String, Map<MsgId, MsgStr>>()
+          inputFiles.forEach {
+            logger.lifecycle("  ${it.absolutePath} …" + if (langMap.containsKey(it.nameWithoutExtension)) {
+              " (will overwrite existing file!)"
+            } else {
+              ""
+            })
+            langMap[it.nameWithoutExtension] = MoReader(it.toURI().toURL()).readFile()
           }
+          val projectDescription = project.extensions.josm.manifest.description
+          if (projectDescription != null) {
+            langMap.forEach { lang, map ->
+              val translation = map.get(MsgId(MsgStr(projectDescription)))
+              if (translation != null) {
+                project.extensions.josm.manifest.translatedDescription(lang, translation.strings.first());
+              }
+            }
+          }
+
+          logger.lifecycle("Writing the *.lang files into ${outDir.absolutePath} …")
+          LangWriter().writeLangFile(outDir, langMap, project.extensions.josm.i18n.mainLanguage)
         }
       }
-      logger.lifecycle("Write *.lang files…")
-      LangWriter().writeLangFile(File(outDir, "data"), langMap, project.extensions.josm.i18n.mainLanguage)
     }
   }
 }

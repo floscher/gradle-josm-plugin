@@ -100,8 +100,8 @@ public class JosmPlugin implements Plugin<Project> {
             ShortenPoFiles.class,
             t -> t.setSourceSet(i18nSourceSet)
           );
-          final PoCompile poCompileTask = project.getTasks().create(s.getCompileTaskName("po"), PoCompile.class, t -> t.setup(i18nSourceSet));
-          final MoCompile moCompileTask = project.getTasks().create(s.getCompileTaskName("mo"), MoCompile.class, t -> t.setup(i18nSourceSet, poCompileTask));
+          final PoCompile poCompileTask = project.getTasks().create(s.getCompileTaskName("po"), PoCompile.class, t -> t.init(i18nSourceSet));
+          final MoCompile moCompileTask = project.getTasks().create(s.getCompileTaskName("mo"), MoCompile.class, t -> t.init(i18nSourceSet, poCompileTask));
           final LangCompile langCompileTask = project.getTasks().create(s.getCompileTaskName("lang"), LangCompile.class, t -> t.init(i18nSourceSet, moCompileTask));
 
           s.getOutput().dir(langCompileTask);
