@@ -14,7 +14,6 @@ import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.bundling.Jar;
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
 import org.openstreetmap.josm.gradle.plugin.i18n.DefaultI18nSourceSet;
-import org.openstreetmap.josm.gradle.plugin.setup.MinJosmVersionSetup;
 import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.task.LangCompile;
 import org.openstreetmap.josm.gradle.plugin.task.ListJosmVersions;
@@ -84,7 +83,6 @@ public class JosmPlugin implements Plugin<Project> {
 
     TaskSetupKt.setupJosmTasks(project);
     new PluginTaskSetup(project).setup();
-    new MinJosmVersionSetup(project).setup();
     project.getTasks().create("listJosmVersions", ListJosmVersions.class);
 
     if (sourceDirectorySetFactory == null) {

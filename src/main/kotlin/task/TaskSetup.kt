@@ -28,6 +28,10 @@ fun Project.setupJosmTasks() {
   tasks.create("runJosm", RunJosmTask::class.java)
   tasks.create("debugJosm", DebugJosm::class.java)
 
+  tasks.create("addMinJosmVersionDependency", AddMinJosmVersionDependency::class.java, {
+    it.init(convention.java.sourceSets.getByName("main"), "minJosmVersion")
+  })
+
   setupI18nTasks(this)
 }
 
