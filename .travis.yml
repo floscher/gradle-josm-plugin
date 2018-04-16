@@ -46,8 +46,7 @@ after_success: |
 
     mkdir -p "$GH_PAGES_REPO/kdoc"
     cp -r -T "$MAIN_REPO/build/docs/kdoc" "$GH_PAGES_REPO/kdoc/$version"
-    git rm javadoc/current kdoc/current
-    ln -s "./$version" "$GH_PAGES_REPO/kdoc/current"
+    git rm "$GH_PAGES_REPO/kdoc/current" && ln -s "./$version" "$GH_PAGES_REPO/kdoc/current"
     git stage kdoc
 
     cp -r "$MAIN_REPO/build/maven" "$GH_PAGES_REPO"
