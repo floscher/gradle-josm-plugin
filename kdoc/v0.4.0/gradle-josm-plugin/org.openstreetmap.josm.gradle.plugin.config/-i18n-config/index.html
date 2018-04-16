@@ -1,0 +1,100 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>I18nConfig - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.config</a>&nbsp;/&nbsp;<a href="./index.html">I18nConfig</a><br/>
+<br/>
+<h1>I18nConfig</h1>
+<code><span class="keyword">class </span><span class="identifier">I18nConfig</span></code>
+<p>Holds configuration options regarding internationalization.</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">I18nConfig</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.I18nConfig$<init>(org.gradle.api.Project)/project">project</span><span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/4.6/javadoc/org/gradle/api/Project.html"><span class="identifier">Project</span></a><span class="symbol">)</span></code>
+<p>Holds configuration options regarding internationalization.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="bug-report-email.html">bugReportEmail</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">bugReportEmail</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>E-Mail address to which bugs regarding i18n should be reported.
+This will be put into the *.pot files that are forwarded to the translators.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="copyright-holder.html">copyrightHolder</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">copyrightHolder</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Person or organization that holds the copyright on the project.
+This will appear in the header of the *.pot file as follows:</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="main-language.html">mainLanguage</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">mainLanguage</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>The main language is in this context the language used in the raw strings
+occuring in the source code.
+It's the starting point on which the translators will base their translations.
+Use the language codes, which you also use to name the *.po, *.mo or *.lang files.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="path-transformer.html">pathTransformer</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">pathTransformer</span><span class="symbol">: </span><span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Replaces each occurence of the value of <a href="https://docs.gradle.org/4.6/javadoc/org/gradle/api/Project.html#getProjectDir()">Project.getProjectDir</a> in all
+file paths of the generated *.pot file.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="get-github-path-transformer.html">getGithubPathTransformer</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getGithubPathTransformer</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.I18nConfig$getGithubPathTransformer(kotlin.String)/repoSlug">repoSlug</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Creates a path transformer for a project hosted on GitHub.
+Supply a repo slug (<code>username/repo</code>) and this method will return a function,
+which you can use as value for the field <a href="path-transformer.html">pathTransformer</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="path-transformer.html">pathTransformer</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">pathTransformer</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.I18nConfig$pathTransformer(groovy.lang.Closure((kotlin.String)))/closure">closure</span><span class="symbol">:</span>&nbsp;<a href="http://docs.groovy-lang.org/2.4.12/html/api/groovy/lang/Closure.html"><span class="identifier">Closure</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Alternative to the setter of property <a href="path-transformer.html">pathTransformer</a> using a Groovy <a href="http://docs.groovy-lang.org/2.4.12/html/api/groovy/lang/Closure.html">Closure</a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
