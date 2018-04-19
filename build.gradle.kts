@@ -74,8 +74,12 @@ dependencies {
 
   implementation(localGroovy())
   implementation(kotlin("stdlib-jdk8", kotlinVersion))
+  implementation("com.squareup.okhttp3", "okhttp", "3.10.0")
+  implementation("com.beust","klaxon", "2.1.14")
   implementation("com.vladsch.flexmark:flexmark-all:0.34.46")
   testImplementation("org.junit.jupiter", "junit-jupiter-api", junitVersion)
+  testImplementation("com.github.tomakehurst","wiremock","2.16.0")
+  testImplementation("ru.lanwen.wiremock", "wiremock-junit5", "1.1.1")
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", junitVersion)
 }
 
