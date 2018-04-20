@@ -13,13 +13,13 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.extension.ExtendWith
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.WireMockServer
 
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock
 import ru.lanwen.wiremock.ext.WiremockUriResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver.WiremockUri
+
 
 import com.beust.klaxon.JsonObject
 
@@ -113,6 +113,7 @@ class GithubReleasesClientTest {
       WiremockResolver::class,
       WiremockUriResolver::class
     )
+    @Disabled
     fun `getLatestRelease should throw for an illegal http status code`(@Wiremock server: WireMockServer,
                                                            @WiremockUri uri: String) {
       val client = buildClient(uri)
@@ -135,6 +136,63 @@ class GithubReleasesClientTest {
           throw e
         }
       })
+    }
+
+    @Test
+    @ExtendWith(
+      WiremockResolver::class,
+      WiremockUriResolver::class
+    )
+    @Disabled
+    fun `createRelease with only a tag name should work`(@Wiremock server: WireMockServer,
+                                                        @WiremockUri uri: String) {
+        val client = buildClient(uri)
+        val path = "/repos/${client.user}/${client.repository}/releases"
+
+        val tagName = "v0.0.1"
+
+        // replies two release in the first page
+        server.stubFor(post(urlPathEqualTo(path))
+          .withRequestBody(matchingJsonPath("$[?(@.tag_name == '${tagName}')]"))
+            .willReturn(aResponse()
+              .withStatus(200)
+              .withBody("""{"id": 1}""")
+            )
+        )
+        val newRelease = client.createRelease(tagName)
+        assertEquals(newRelease["id"], 1)
+    }
+
+    @Test
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+    fun `createRelease should acept optional parameters`(@Wiremock server: WireMockServer,
+                                                         @WiremockUri uri: String) {
+        val client = buildClient(uri)
+        val path = "/repos/${client.user}/${client.repository}/releases"
+
+        val tagName = "v0.0.1"
+        val name = "aname"
+        val targetCommitish = "acommitish"
+        val body = "abody"
+        val draft = true
+        val prerelease = true
+
+        // replies two release in the first page
+        server.stubFor(post(urlPathEqualTo(path))
+            .withRequestBody(matchingJsonPath("$[?(@.tag_name == '${tagName}')]"))
+            .withRequestBody(matchingJsonPath("$[?(@.name == '${name}')]"))
+            .withRequestBody(matchingJsonPath("$[?(@.target_commitish == '${targetCommitish}')]"))
+            .withRequestBody(matchingJsonPath("$[?(@.body == '${body}')]"))
+            .withRequestBody(matchingJsonPath("$[?(@.draft == true)]"))
+            .withRequestBody(matchingJsonPath("$[?(@.prerelease == true)]"))
+            .willReturn(aResponse()
+              .withStatus(200)
+              .withBody("""{"id": 1}""")
+            )
+        )
+        val newRelease = client.createRelease(tagName, name=name,targetCommitish=targetCommitish, body=body,
+          draft=draft, prerelease = prerelease)
+        assertEquals(newRelease["id"], 1)
     }
 
     @Test

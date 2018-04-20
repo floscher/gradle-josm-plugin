@@ -170,7 +170,6 @@ class GithubReleasesClient(
             404 -> return null
             else -> throw GithubReleaseClientException("Unexpected response with code ${response.code()}. "
                 + "Response body: ${response.body()?.string()}")
-
           }
         } catch(e: GithubReleaseClientException) {
           throw e
@@ -179,16 +178,25 @@ class GithubReleasesClient(
         }
     }
 
-    fun createRelease(name: String, body: String): JsonObject {
-        //TODO use a more stable way to create the JSON body 
-        val jsonBody = """{
-                "name": "${name}",
-                "body": "${body}",
-                "tag_name": "v0.0.1",
-                "draft": true
-            }"""
+    /**
+     * Creates a github release with the tag `tagName`.
+     */
+    @Throws(GithubReleaseClientException::class)
+    fun createRelease(tagName: String, targetCommitish: String? = null, name: String? = null,
+                    body: String? = null, draft: Boolean = false, prerelease: Boolean = false
+        ): JsonObject {
+
+        val requestJson = JsonObject()
+        requestJson.put("tag_name", tagName)
+        targetCommitish?.let {requestJson.put("target_commitish", it)}
+        name?.let {requestJson.put("name", it)}
+        body?.let {requestJson.put("body", it)}
+        requestJson.put("draft", draft)
+        requestJson.put("prerelease", prerelease)
+
+
         val jsonMediaType = MediaType.parse("application/json; charset=utf-8")
-        val requestBody = RequestBody.create(jsonMediaType, jsonBody)
+        val requestBody = RequestBody.create(jsonMediaType, requestJson.toJsonString())
 
         val request = createBaseRequestBuilder()
             .post(requestBody)
@@ -196,19 +204,21 @@ class GithubReleasesClient(
             .build()
 
         try {
-            val response = client.newCall(request).execute()
-            if (!response.isSuccessful()) {
-                println(response.body()?.string() ?: "null")
-                //TODO more specific exception
-                throw  Exception("Unexpected response: " + response)
-            }
-            val parser = Parser()
-            return parser.parse(StringBuilder(
+          val response = client.newCall(request).execute()
+          when (response.code()) {
+            in 200..299 -> {
+              val parser = Parser()
+              return parser.parse(StringBuilder(
                 response.body()?.string() ?: "null"
-            )) as JsonObject
+              )) as JsonObject
+            }
+            else -> throw GithubReleaseClientException("Unexpected response with code ${response.code()}. "
+              + "Response body: ${response.body()?.string()}")
+          }
+        } catch(e: GithubReleaseClientException) {
+            throw e
         } catch(e: Exception) {
-            // TODO wrap exception?
-            throw e;
+            throw GithubReleaseClientException(e.message ?: "", e)
         }
     }
 
