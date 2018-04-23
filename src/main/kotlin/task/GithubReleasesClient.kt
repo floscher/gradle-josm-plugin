@@ -191,8 +191,12 @@ class GithubReleasesClient(
         targetCommitish?.let {requestJson.put("target_commitish", it)}
         name?.let {requestJson.put("name", it)}
         body?.let {requestJson.put("body", it)}
-        requestJson.put("draft", draft)
-        requestJson.put("prerelease", prerelease)
+        if (!draft) {
+          requestJson.put("draft", draft)
+        }
+        if (!prerelease) {
+          requestJson.put("prerelease", prerelease)
+        }
 
 
         val jsonMediaType = MediaType.parse("application/json; charset=utf-8")
