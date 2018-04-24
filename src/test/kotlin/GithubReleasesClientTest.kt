@@ -165,7 +165,8 @@ class GithubReleasesClientTest {
 
     @Test
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `createRelease should acept optional parameters`(@Wiremock server: WireMockServer,
+    @Disabled
+    fun `createRelease should accept optional parameters`(@Wiremock server: WireMockServer,
                                                          @WiremockUri uri: String) {
         val client = buildClient(uri)
         val path = "/repos/${client.user}/${client.repository}/releases"
@@ -196,10 +197,7 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(
-        WiremockResolver::class,
-        WiremockUriResolver::class
-    )
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
     @Disabled
     fun `if a few relases are present, getReleases should work`(@Wiremock server: WireMockServer, @WiremockUri uri: String) {
         val client = buildClient(uri)
@@ -234,13 +232,64 @@ class GithubReleasesClientTest {
         assertEquals(releases.size, 4)
     }
 
+    @Test
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+    @Disabled
+    fun `uploading a simple text file as release asset should work`(
+        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
+        val client = buildClient(uri)
+        val releaseId = 12345
+        val path = "/repos/${client.user}/${client.repository}/releases/${releaseId}/assets"
+        val asset = createTempFile(suffix="txt")
+        val content = "Hello World!"
+        asset.writeText(content)
+
+        // replies two release in the first page
+        server.stubFor(post(urlPathEqualTo(path))
+            .withRequestBody(equalTo(content))
+            .withHeader("Content-Type", equalTo("text/plain"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withBody("""{"id": 1}""")
+            )
+        )
+
+        val assets = client.uploadReleaseAsset(releaseId=releaseId, contentType = "text/plain", file = asset)
+        assertEquals(assets.size, 1)
+    }
+
+    @Test
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+    fun `uploading a simple text file as release asset with a new name and a label should work`(
+        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
+        val client = buildClient(uri)
+        val releaseId = 12345
+        val asset = createTempFile(suffix="txt")
+        val content = "Hello World!"
+        asset.writeText(content)
+        val newName = "asset.txt"
+        val label = "This is a label"
+        val path = "/repos/${client.user}/${client.repository}/releases/${releaseId}/assets"
+
+        server.stubFor(post(urlPathMatching("${path}.*"))
+            .withRequestBody(equalTo(content))
+            .withHeader("Content-Type", equalTo("text/plain"))
+            .withQueryParam("name", equalTo(newName))
+            .withQueryParam("label", equalTo(label))
+            .willReturn(aResponse()
+                .withStatus(201)
+                .withBody("""{"id": 1}""")
+            )
+        )
+
+        val assets = client.uploadReleaseAsset(releaseId=releaseId, contentType = "text/plain", file = asset,
+            name = newName, label = label)
+        assertEquals(assets.size, 1)
+    }
 
     @Test
     @Disabled
-    @ExtendWith(
-        WiremockResolver::class,
-        WiremockUriResolver::class
-    ) 
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
     fun testGetReleases(@Wiremock server: WireMockServer, @WiremockUri uri: String) {
         val client = buildClient(uri)
         val url = "/repos/${client.user}/${client.repository}/releases"

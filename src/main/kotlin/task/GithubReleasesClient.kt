@@ -1,7 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.ghreleases
 
 import java.io.File
-
+import java.net.URLEncoder
 
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -23,18 +23,8 @@ const val DEFAULT_GITHUB_API_URL = "https://api.github.com"
 // and/or gradle properties
 
 
-data class Release (
-    @Json(name = "id")
-    val id: Int,
-    
-    @Json(name = "url")
-    val url: String,
-
-    @Json(name = "assets_url")
-    val assetsUrl: String
-)
-
-class GithubReleaseClientException(override var message: String, override var cause: Throwable?) : Exception(message, cause) {
+class GithubReleaseClientException(override var message: String, override var cause: Throwable?)
+    : Exception(message, cause) {
   constructor(message: String) : this(message, null) {
   }
 }
@@ -198,7 +188,6 @@ class GithubReleasesClient(
           requestJson.put("prerelease", prerelease)
         }
 
-
         val jsonMediaType = MediaType.parse("application/json; charset=utf-8")
         val requestBody = RequestBody.create(jsonMediaType, requestJson.toJsonString())
 
@@ -226,29 +215,43 @@ class GithubReleasesClient(
         }
     }
 
-    fun uploadAsset(releaseId: Int, jar: File) : JsonObject {
-        val fileName = jar.getName()
-        val mediaType =  MediaType.parse("application/java-archive")
-        val requestBody = RequestBody.create(mediaType, jar)
+    /**
+     * Upload a release asset `file` to the release `releaseId`. `name` is the (optional) new name
+     * of the uploaded file. `label` is an (optional) short description for the asset.
+     */
+    fun uploadReleaseAsset(releaseId: Int, file: File, contentType: String,  name: String? = null,
+                           label: String? = null) :JsonObject {
+
+        val name = (name ?: file.name)
+        val mediaType =  MediaType.parse(contentType)
+        val requestBody = RequestBody.create(mediaType, file)
+        var url = "${apiUrl}/repos/${user}/${repository}/releases/${releaseId}/assets?"
+        var queryParams = listOf<String>()
+        name?.let {queryParams += "name=${URLEncoder.encode(it, "utf-8")}"}
+        label?.let {queryParams += "label=${URLEncoder.encode(it, "utf-8")}"}
+        url += queryParams.joinToString(separator = "&")
+
         val request = createBaseRequestBuilder()
             .post(requestBody)
-            .url("${apiUrl}/repos/${user}/${repository}/releases/${releaseId}/assets?${fileName}")
+            .url(url)
             .build()
 
         try {
             val response = client.newCall(request).execute()
-            if (!response.isSuccessful()) {
-                println(response.body()?.string() ?: "null")
-                //TODO more specific exception
-                throw  Exception("Unexpected response: " + response)
+            when (response.code()) {
+                201 -> {
+                  val parser = Parser()
+                  return parser.parse(StringBuilder(
+                    response.body()?.string() ?: "null"
+                  )) as JsonObject
+                }
+                else -> throw GithubReleaseClientException("Unexpected response with code ${response.code()}. "
+                  + "Response body: ${response.body()?.string()}")
             }
-            val parser = Parser()
-            return parser.parse(StringBuilder(
-                response.body()?.string() ?: "null"
-            )) as JsonObject
+        } catch(e: GithubReleaseClientException) {
+            throw e
         } catch(e: Exception) {
-            // TODO wrap exception?
-            throw e;
+            throw GithubReleaseClientException(e.message ?: "", e)
         }
     }
 }
