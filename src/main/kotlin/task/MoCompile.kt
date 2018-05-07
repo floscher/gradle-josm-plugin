@@ -57,15 +57,6 @@ open class MoCompile : DefaultTask() {
             })
             langMap[it.nameWithoutExtension] = MoReader(it.toURI().toURL()).readFile()
           }
-          val projectDescription = project.extensions.josm.manifest.description
-          if (projectDescription != null) {
-            langMap.forEach { lang, map ->
-              val translation = map.get(MsgId(MsgStr(projectDescription)))
-              if (translation != null) {
-                project.extensions.josm.manifest.translatedDescription(lang, translation.strings.first());
-              }
-            }
-          }
 
           logger.lifecycle("Writing the *.lang files into ${outDir.absolutePath} …")
           LangWriter().writeLangFile(outDir, langMap, project.extensions.josm.i18n.mainLanguage)

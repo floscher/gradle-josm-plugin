@@ -94,8 +94,7 @@ public class JosmPlugin implements Plugin<Project> {
             t.setMoCompile(moCompileTask);
           });
 
-          s.getOutput().dir(langCompileTask);
-
+          s.getResources().srcDir(langCompileTask);
         }
       });
     }
