@@ -49,7 +49,7 @@ class MoReader(val moFileURL: URL) {
       stream2.use { s2 ->
         var stream2Pos: Long = 0
 
-        stream1Pos += safeSkip(s1, offsetOrigStrings - stream1Pos)
+        stream1Pos += s1.skipAllOrException(offsetOrigStrings - stream1Pos)
 
         // Read msgid strings
         var stringBytes: ByteArray
@@ -57,31 +57,31 @@ class MoReader(val moFileURL: URL) {
         var stringDescriptor: List<Long>
         val msgIds: MutableList<MsgId> = mutableListOf()
         for (i in 0 until numStrings) {
-          stream1Pos += safeRead(s1, stringLengthOffset)
+          stream1Pos += s1.readAllOrException(stringLengthOffset)
           stringDescriptor = stringLengthOffset.toList().toLongList(bigEndian)
           if (stringDescriptor[0] > Int.MAX_VALUE) {
             throw NotImplementedError("Strings longer than ${Int.MAX_VALUE} can not be read! You are trying to read one of length ${stringDescriptor[0]}")
           }
 
-          stream2Pos += safeSkip(s2, stringDescriptor[1] - stream2Pos)
+          stream2Pos += s2.skipAllOrException(stringDescriptor[1] - stream2Pos)
           stringBytes = ByteArray(stringDescriptor[0].toInt(), {0})
-          stream2Pos += safeRead(s2, stringBytes)
+          stream2Pos += s2.readAllOrException(stringBytes)
 
           msgIds.add(stringBytes.toMsgId())
         }
 
-        stream1Pos += safeSkip(s1, offsetTranslatedStrings - stream1Pos)
+        stream1Pos += s1.skipAllOrException(offsetTranslatedStrings - stream1Pos)
 
         // Read msgstr strings
         for (i in 0 until numStrings) {
-          stream1Pos += safeRead(s1, stringLengthOffset)
+          stream1Pos += s1.readAllOrException(stringLengthOffset)
           stringDescriptor = stringLengthOffset.toList().toLongList(bigEndian)
 
-          stream2Pos += safeSkip(s2, stringDescriptor[1] - stream2Pos)
+          stream2Pos += s2.skipAllOrException(stringDescriptor[1] - stream2Pos)
           stringBytes = ByteArray(stringDescriptor[0].toInt(), {0})
-          stream2Pos += safeRead(s2, stringBytes)
+          stream2Pos += s2.readAllOrException(stringBytes)
 
-          stringMap[msgIds.get(i)] = MsgStr(String(stringBytes, StandardCharsets.UTF_8).split('\u0000'))
+          stringMap[msgIds[i]] = MsgStr(String(stringBytes, StandardCharsets.UTF_8).split('\u0000'))
         }
       }
     }
@@ -115,31 +115,6 @@ class MoReader(val moFileURL: URL) {
 
     return header.size.toLong()
   }
-}
-
-/**
- * Read bytes from the input stream into the array. If there are not enough
- * bytes to fill the array, an exception is thrown.
- * @throws IOException if reading from the [InputStream] fails (see [InputStream.read]) or if the number of bytes that
- *   can be read is below the parameter [b].
- */
-private fun safeRead(stream: InputStream, b: ByteArray): Int {
-  val readBytes = stream.read(b)
-  if (readBytes < b.size) {
-    throw IOException("File ended unexpectedly")
-  }
-  return readBytes
-}
-
-/**
- * Skips over `n` bytes, if there are only less than `n` bytes, an exception is thrown.
- */
-private fun safeSkip(stream: InputStream, n: Long): Long {
-  val skippedBytes = stream.skip(n)
-  if (skippedBytes < n) {
-    throw IOException("Could not skip over $n bytes (maybe the file ended unexpectedly)")
-  }
-  return skippedBytes
 }
 
 /**
