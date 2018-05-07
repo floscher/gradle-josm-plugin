@@ -28,14 +28,14 @@ open class RunJosmTask : JavaExec() {
 
 
   init {
-    val arguments: MutableList<String> = if (project.hasProperty("josmArgs")) project.property("josmArgs").toString().split("\\\\").toMutableList() else ArrayList()
-    arguments.add("--load-preferences=" + File(project.buildDir, "/josm-custom-config/requiredPlugins.xml").toURI().toURL().toString());
+    val arguments: MutableList<String> = if (project.hasProperty("josmArgs")) project.property("josmArgs").toString().split("\\\\").toMutableList() else mutableListOf()
+    arguments.add("--load-preferences=" + File(project.buildDir, "/josm-custom-config/requiredPlugins.xml").toURI().toURL().toString())
 
     group = "JOSM"
     main = "org.openstreetmap.josm.gui.MainApplication"
     args = arguments
-    super.mustRunAfter(project.tasks.getByName("cleanJosm"));
-    super.dependsOn(project.tasks.getByName("updateJosmPlugins"));
+    super.mustRunAfter(project.tasks.getByName("cleanJosm"))
+    super.dependsOn(project.tasks.getByName("updateJosmPlugins"))
 
     project.afterEvaluate{
       description = "Runs an independent clean JOSM instance (v${project.extensions.josm.josmCompileVersion}) with temporary JOSM home directories (by default inside `build/.josm/`) and the freshly compiled plugin active."
@@ -50,25 +50,26 @@ open class RunJosmTask : JavaExec() {
         }
         classpath = project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.getByName("main").runtimeClasspath
 
-        logger.lifecycle("Running version {} of {}", project.version, project.name);
-        logger.lifecycle("\nUsing JOSM version {}", project.extensions.josm.josmCompileVersion);
+        logger.lifecycle("Running version {} of {}", project.version, project.name)
+        logger.lifecycle("\nUsing JOSM version {}", project.extensions.josm.josmCompileVersion)
 
-        logger.lifecycle("\nThese system properties are set:");
+        logger.lifecycle("\nThese system properties are set:")
         for ((key, value) in systemProperties) {
-          logger.lifecycle("  {} = {}", key, value);
+          logger.lifecycle("  {} = {}", key, value)
         }
 
+        val args = args ?: listOf() // make field args final and non-null
         if (args.isEmpty()) {
-          logger.lifecycle("\nNo command line arguments are passed to JOSM.");
+          logger.lifecycle("\nNo command line arguments are passed to JOSM.")
         } else {
-          logger.lifecycle("\nPassing these arguments to JOSM:\n  {}", args.joinToString("\n  "));
+          logger.lifecycle("\nPassing these arguments to JOSM:\n  {}", args.joinToString("\n  "))
         }
         if (!project.hasProperty("josmArgs")) {
           logger.lifecycle("\nIf you want to pass additional arguments to JOSM add '-PjosmArgs=\"arg0\\\\arg1\\\\arg2\\\\...\"' when starting Gradle from the commandline (separate the arguments with double-backslashes).")
         }
 
-        logger.lifecycle(extraInformation);
-        logger.lifecycle("\nOutput of JOSM starts with the line after the three equality signs\n===");
+        logger.lifecycle(extraInformation)
+        logger.lifecycle("\nOutput of JOSM starts with the line after the three equality signs\n===")
       }
     }
   }
