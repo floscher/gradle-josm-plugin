@@ -5,8 +5,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.Dependency;
-import org.gradle.api.artifacts.ExternalModuleDependency;
 import org.gradle.api.internal.file.SourceDirectorySetFactory;
 import org.gradle.api.internal.plugins.DslObject;
 import org.gradle.api.plugins.JavaPlugin;
@@ -48,10 +46,6 @@ public class JosmPlugin implements Plugin<Project> {
     // Define 'josm' extension
     project.getExtensions().create("josm", JosmPluginExtension.class, project);
 
-    // Configuration for JOSM plugins that are required for this plugin. Normally there's no need to set these manually, these are set based on the manifest configuration
-    project.getConfigurations().getByName("implementation").extendsFrom(project.getConfigurations().create("requiredPlugin"));
-    // Configuration for libraries on which the project depends and which should be packed into the built *.jar file.
-    project.getConfigurations().getByName("implementation").extendsFrom(project.getConfigurations().create("packIntoJar"));
 
     final Jar jarTask = project.getTasks().withType(Jar.class).getByName("jar");
     jarTask.doFirst(task -> {
@@ -69,17 +63,9 @@ public class JosmPlugin implements Plugin<Project> {
     project.afterEvaluate(p -> {
       // Add the repositories defined in the JOSM configuration
       JosmPluginExtension.forProject(project).getRepositories().invoke(project.getRepositories());
-
-      // Adding dependencies for JOSM and the required plugins
-      final Dependency dep = p.getDependencies().add("implementation", "org.openstreetmap.josm:josm:" + JosmPluginExtension.forProject(p).getJosmCompileVersion());
-      if ("latest".equals(JosmPluginExtension.forProject(p).getJosmCompileVersion()) || "tested".equals(JosmPluginExtension.forProject(p).getJosmCompileVersion())) {
-        p.getLogger().info("Compile against the variable JOSM version " + JosmPluginExtension.forProject(p).getJosmCompileVersion());
-        ((ExternalModuleDependency) dep).setChanging(true);
-      } else {
-        p.getLogger().info("Compile against the JOSM version " + JosmPluginExtension.forProject(p).getJosmCompileVersion());
-      }
-      ProjectKt.getAllRequiredJosmPlugins(p, JosmPluginExtension.forProject(p).getManifest().getPluginDependencies()).forEach(it -> p.getDependencies().add("requiredPlugin", it));
     });
+
+    ConfigurationsSetupKt.setupAsMainConfiguration(project.getConfigurations().getByName("implementation"), project);
 
     TaskSetupKt.setupJosmTasks(project);
     new PluginTaskSetup(project).setup();
