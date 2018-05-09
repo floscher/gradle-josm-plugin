@@ -12,7 +12,7 @@ class LangReader {
       .partition { it.name == "$baseLang.lang" }
 
     require(langFiles.first.isNotEmpty()) {
-      "The original language '$baseLang' is not present among the language files in '${langFileDir.absolutePath}'!"
+      "The base language '$baseLang' is not present among the language files in '${langFileDir.absolutePath}'!"
     }
 
     return readLangStreams(
@@ -69,7 +69,7 @@ class LangReader {
             finishedPluralStrings = true
           }
           0 -> if (baseStrings == null) {
-            throw IOException("The file indicates this string is not translated. This is not allowed for the original language!")
+            throw IOException("The file indicates this string is not translated. This is not allowed for the base language!")
           } else {
             result.add(null)
           }

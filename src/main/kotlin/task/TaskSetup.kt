@@ -12,6 +12,9 @@ import java.io.File
  * This method sets up all the [Task]s (and [Configuration]s) for a given project that should be there by default.
  */
 fun Project.setupJosmTasks() {
+
+  tasks.create("listJosmVersions", ListJosmVersions::class.java)
+
   tasks.create("cleanJosm", CleanJosm::class.java)
 
   // Init JOSM preferences.xml file
