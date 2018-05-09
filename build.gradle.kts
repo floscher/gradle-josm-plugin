@@ -76,6 +76,8 @@ dependencies {
   implementation(kotlin("stdlib-jdk8", kotlinVersion))
   implementation("com.squareup.okhttp3", "okhttp", "3.10.0")
   implementation("com.beust","klaxon", "2.1.14")
+  implementation("com.fasterxml.jackson.module", "jackson-module-kotlin", "2.9.5")
+  implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", "2.9.5")
   implementation("com.vladsch.flexmark:flexmark-all:0.34.46")
   testImplementation("org.junit.jupiter", "junit-jupiter-api", junitVersion)
   testImplementation("com.github.tomakehurst","wiremock","2.16.0")
