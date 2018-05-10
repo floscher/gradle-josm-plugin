@@ -6,7 +6,9 @@ import org.gradle.api.artifacts.ExternalModuleDependency
 
 fun Configuration.setupAsMainConfiguration(project: Project) {
   // Configuration for JOSM plugins that are required for this plugin. Normally there's no need to set these manually, these are set based on the manifest configuration
-  val requiredPluginConfiguration = extendsFrom(project.configurations.create("requiredPlugin"))
+  val requiredPluginConfiguration = project.configurations.create("requiredPlugin") {
+    this.extendsFrom(it)
+  }
   // Configuration for libraries on which the project depends and which should be packed into the built *.jar file.
   extendsFrom(project.configurations.create("packIntoJar"))
 
