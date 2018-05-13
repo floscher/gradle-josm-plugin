@@ -30,19 +30,20 @@ open class LangCompile : Sync() {
   val subdirectory = "data"
 
   init {
-    project.afterEvaluate {
-      destinationDir = File(project.buildDir, "i18n/lang/")
+    includeEmptyDirs = false
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
+    eachFile {
+      /* Flatten directory tree, the other compile tasks do the same. Put everything in `data/`,
+         because JOSM expects the files there. */
+      it.path = "$subdirectory/${it.sourceName}"
+    }
+
+    destinationDir = File(project.buildDir, "i18n/lang/")
+
+    project.afterEvaluate {
       from(moCompile)
       from(sourceSet.lang)
-
-      includeEmptyDirs = false
-      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-      eachFile {
-        /* Flatten directory tree, the other compile tasks do the same. Put everything in `data/`,
-           because JOSM expects the files there. */
-        it.path = "$subdirectory/${it.sourceName}"
-      }
 
       doFirst {
         logger.lifecycle("Copy *.lang files to ${destinationDir.absolutePath}/$subdirectory …")

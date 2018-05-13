@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.internal.file.SourceDirectorySetFactory
 import org.gradle.api.internal.plugins.DslObject
 import org.gradle.api.tasks.SourceSet
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.openstreetmap.josm.gradle.plugin.i18n.DefaultI18nSourceSet
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangReader
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
@@ -39,17 +40,19 @@ fun SourceSet.setup(project: Project, sdsf: SourceDirectorySetFactory) {
       it.moCompile = moCompileTask
     })
 
-    project.tasks.getByName(processResourcesTaskName).also {
-      it.inputs.files(langCompileTask)
+    project.tasks.withType(ProcessResources::class.java).getByName(processResourcesTaskName).also {
+      it.from(langCompileTask)
       if (this.name == "main") {
-        it.doFirst {
-          val translations = LangReader().readLangFiles(File(langCompileTask.destinationDir, langCompileTask.subdirectory), project.extensions.josm.i18n.mainLanguage)
-          val baseDescription = project.extensions.josm.manifest.description
-          if (baseDescription != null) {
-            translations.forEach {
-              val translatedDescription = it.value[MsgId(MsgStr(baseDescription))]
-              if (translatedDescription != null && translatedDescription.strings.isNotEmpty()) {
-                project.extensions.josm.manifest.translatedDescription(it.key, translatedDescription.strings.first())
+        it.doLast {
+          if (langCompileTask.didWork) {
+            val translations = LangReader().readLangFiles(File(langCompileTask.destinationDir, langCompileTask.subdirectory), project.extensions.josm.i18n.mainLanguage)
+            val baseDescription = project.extensions.josm.manifest.description
+            if (baseDescription != null) {
+              translations.forEach {
+                val translatedDescription = it.value[MsgId(MsgStr(baseDescription))]
+                if (translatedDescription != null && translatedDescription.strings.isNotEmpty()) {
+                  project.extensions.josm.manifest.translatedDescription(it.key, translatedDescription.strings.first())
+                }
               }
             }
           }
