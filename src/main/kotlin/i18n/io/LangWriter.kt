@@ -24,7 +24,7 @@ class LangWriter {
     // If the original language is present in the languageMaps, then use the msgids from that file.
     // Otherwise collect all the msgids from all the files.
     val originalMsgIds = (languageMaps[originLang]?.keys
-      ?: languageMaps.flatMap { it.value.keys }).filter { it.id.strings.first() != "" }
+      ?: languageMaps.flatMap { it.value.keys }).toSet().filter { it.id.strings.first() != "" }
     langFileDir.mkdirs()
     languageMaps
       // Adds a *.lang file for the original language even if no *.mo or *.po file is available
