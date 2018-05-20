@@ -28,6 +28,7 @@ import org.gradle.api.tasks.bundling.Jar;
 import org.openstreetmap.josm.gradle.plugin.ProjectKt;
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
 import org.openstreetmap.josm.gradle.plugin.task.GeneratePluginList;
+import org.openstreetmap.josm.gradle.plugin.task.LangCompile;
 
 public class PluginTaskSetup extends AbstractSetup {
 
@@ -70,6 +71,12 @@ public class PluginTaskSetup extends AbstractSetup {
 
     final Task generatePluginList = pro.getTasks().create("generatePluginList", GeneratePluginList.class, task -> {
       pro.afterEvaluate(p -> {
+        final LangCompile langCompile = JosmPluginExtension.forProject(pro).getManifest().getLangCompileTask();
+        if (langCompile != null) {
+          task.dependsOn(langCompile);
+        }
+      });
+      task.doFirst(t -> {
         try {
           task.addPlugin(
             getLocalDistFileName(pro),

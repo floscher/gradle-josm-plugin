@@ -231,13 +231,16 @@ class JosmManifest(private val project: Project) {
     // Add translated versions of the project description
     val langCompileTask = langCompileTask
     if (langCompileTask != null) {
-      val translations = LangReader().readLangFiles(File(langCompileTask.destinationDir, langCompileTask.subdirectory), project.extensions.josm.i18n.mainLanguage)
-      val baseDescription = project.extensions.josm.manifest.description
-      if (baseDescription != null) {
-        translations.forEach {
-          val translatedDescription = it.value[MsgId(MsgStr(baseDescription))]
-          if (translatedDescription != null && translatedDescription.strings.isNotEmpty()) {
-            manifestAtts["${it.key}_Plugin-Description"] = translatedDescription.strings.first()
+      val langDir = File(langCompileTask.destinationDir, langCompileTask.subdirectory)
+      if (langDir.exists() && langDir.canRead()) {
+        val translations = LangReader().readLangFiles(langDir, project.extensions.josm.i18n.mainLanguage)
+        val baseDescription = project.extensions.josm.manifest.description
+        if (baseDescription != null) {
+          translations.forEach {
+            val translatedDescription = it.value[MsgId(MsgStr(baseDescription))]
+            if (translatedDescription != null && translatedDescription.strings.isNotEmpty()) {
+              manifestAtts["${it.key}_Plugin-Description"] = translatedDescription.strings.first()
+            }
           }
         }
       }
