@@ -6,14 +6,10 @@ import org.gradle.api.internal.plugins.DslObject
 import org.gradle.api.tasks.SourceSet
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.openstreetmap.josm.gradle.plugin.i18n.DefaultI18nSourceSet
-import org.openstreetmap.josm.gradle.plugin.i18n.io.LangReader
-import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
-import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
 import org.openstreetmap.josm.gradle.plugin.task.LangCompile
 import org.openstreetmap.josm.gradle.plugin.task.MoCompile
 import org.openstreetmap.josm.gradle.plugin.task.PoCompile
 import org.openstreetmap.josm.gradle.plugin.task.ShortenPoFiles
-import java.io.File
 
 fun SourceSet.setup(project: Project, sdsf: SourceDirectorySetFactory) {
   if (name != "minJosmVersion" && name.isNotEmpty()) {
@@ -39,25 +35,12 @@ fun SourceSet.setup(project: Project, sdsf: SourceDirectorySetFactory) {
       it.sourceSet = i18nSourceSet
       it.moCompile = moCompileTask
     })
+    if ("main" == name) {
+      project.extensions.josm.manifest.langCompileTask = langCompileTask
+    }
 
     project.tasks.withType(ProcessResources::class.java).getByName(processResourcesTaskName).also {
       it.from(langCompileTask)
-      if (this.name == "main") {
-        it.doLast {
-          if (langCompileTask.didWork) {
-            val translations = LangReader().readLangFiles(File(langCompileTask.destinationDir, langCompileTask.subdirectory), project.extensions.josm.i18n.mainLanguage)
-            val baseDescription = project.extensions.josm.manifest.description
-            if (baseDescription != null) {
-              translations.forEach {
-                val translatedDescription = it.value[MsgId(MsgStr(baseDescription))]
-                if (translatedDescription != null && translatedDescription.strings.isNotEmpty()) {
-                  project.extensions.josm.manifest.translatedDescription(it.key, translatedDescription.strings.first())
-                }
-              }
-            }
-          }
-        }
-      }
     }
   }
 }

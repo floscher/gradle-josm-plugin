@@ -3,6 +3,12 @@ package org.openstreetmap.josm.gradle.plugin.config
 import groovy.lang.GroovySystem
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.openstreetmap.josm.gradle.plugin.i18n.io.LangReader
+import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
+import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
+import org.openstreetmap.josm.gradle.plugin.josm
+import org.openstreetmap.josm.gradle.plugin.task.LangCompile
+import java.io.File
 import java.net.URL
 import java.util.GregorianCalendar
 
@@ -65,6 +71,12 @@ class JosmManifest(private val project: Project) {
    * **Influenced MANIFEST.MF attribute:** `Plugin-Icon`
    */
   var iconPath: String? = project.findProperty("plugin.icon")?.toString()
+
+  /**
+   * The task that processes the *.lang files for translations. This is set automatically and you normally don't have
+   * to change it.
+   */
+  var langCompileTask: LangCompile? = null
 
   /**
    * This can be set to `true`, when the plugin should load before the GUI classes of JOSM.
@@ -178,6 +190,8 @@ class JosmManifest(private val project: Project) {
   /**
    * Returns a map containing all manifest attributes, which are set.
    * This map can then be fed into [org.gradle.api.java.archives.Manifest.attributes()]. That's already done automatically by the gradle-josm-plugin, so you normally don't need to call this yourself.
+   *
+   * Make sure the [langCompileTask] already ran before this method is called, otherwise not all translated descriptions are included in the Manifest.
    */
   public fun createJosmPluginJarManifest(): Map<String,String> {
     isRequiredFieldMissing(minJosmVersion == null, "the minimum JOSM version your plugin is compatible with", "josm.manifest.minJosmVersion = ‹a JOSM version›")
@@ -215,8 +229,21 @@ class JosmManifest(private val project: Project) {
     }
 
     // Add translated versions of the project description
+    val langCompileTask = langCompileTask
+    if (langCompileTask != null) {
+      val translations = LangReader().readLangFiles(File(langCompileTask.destinationDir, langCompileTask.subdirectory), project.extensions.josm.i18n.mainLanguage)
+      val baseDescription = project.extensions.josm.manifest.description
+      if (baseDescription != null) {
+        translations.forEach {
+          val translatedDescription = it.value[MsgId(MsgStr(baseDescription))]
+          if (translatedDescription != null && translatedDescription.strings.isNotEmpty()) {
+            manifestAtts["${it.key}_Plugin-Description"] = translatedDescription.strings.first()
+          }
+        }
+      }
+    }
     for(entry in translatedDescriptions) {
-      manifestAtts.put(entry.key+"_Plugin-Description", entry.value)
+      manifestAtts["${entry.key}_Plugin-Description"] = entry.value
     }
 
     // Optional attributes
