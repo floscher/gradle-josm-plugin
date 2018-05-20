@@ -1,12 +1,12 @@
 package org.openstreetmap.josm.gradle.plugin.setup;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
@@ -15,19 +15,19 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
-import java.util.GregorianCalendar;
-import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.Dependency;
-import org.gradle.api.file.DirectoryTree;
 import org.gradle.api.plugins.BasePluginConvention;
-import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.Sync;
 import org.gradle.api.tasks.TaskExecutionException;
+import org.gradle.api.tasks.TaskInstantiationException;
 import org.gradle.api.tasks.bundling.Jar;
+import org.openstreetmap.josm.gradle.plugin.ProjectKt;
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
+import org.openstreetmap.josm.gradle.plugin.task.GeneratePluginList;
 
 public class PluginTaskSetup extends AbstractSetup {
 
@@ -68,51 +68,36 @@ public class PluginTaskSetup extends AbstractSetup {
     final File localDistPath = new File(pro.getBuildDir(), "localDist");
     final File localDistListFile = new File(localDistPath, "list");
 
-    final Task generatePluginList = pro.task("generatePluginList");
-    generatePluginList.doFirst(task -> {
-      localDistListFile.getParentFile().mkdirs();
-      if (localDistListFile.exists()) {
-        localDistListFile.delete();
-      }
-
-      try {
-      StringBuilder localDistListBuilder = new StringBuilder();
-      // First line containing the name of the plugin and the URL to the *.jar file
-      localDistListBuilder
-        .append(getLocalDistFileName(pro))
-        .append(';')
-        .append(new File(localDistPath, getLocalDistFileName(pro)).toURI().toURL())
-        .append('\n');
-      // Manifest indented by one tab character
-      for (Entry<String, String> att : JosmPluginExtension.forProject(pro).getManifest().createJosmPluginJarManifest().entrySet()) {
-        // Base64-encode the icon
-        if ("Plugin-Icon".equals(att.getKey())) {
-          for (final DirectoryTree tree : task.getProject().getConvention().getPlugin(JavaPluginConvention.class).getSourceSets().getByName("main").getResources().getSrcDirTrees()) {
-            final File iconFile = new File(tree.getDir(), att.getValue());
-            if (iconFile.exists()) {
-              String contentType = Files.probeContentType(Paths.get(iconFile.getAbsolutePath()));
-              if (contentType == null) {
-                final BufferedInputStream bis = new BufferedInputStream(new FileInputStream(iconFile));
-                contentType = URLConnection.guessContentTypeFromStream(bis);
-                bis.close();
-              }
-              att.setValue("data:" + contentType + ";base64," + Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(iconFile.toURI()))));
+    final Task generatePluginList = pro.getTasks().create("generatePluginList", GeneratePluginList.class, task -> {
+      pro.afterEvaluate(p -> {
+        try {
+          task.addPlugin(
+            getLocalDistFileName(pro),
+            JosmPluginExtension.forProject(pro).getManifest().createJosmPluginJarManifest(),
+            new File(localDistPath, getLocalDistFileName(pro)).toURI().toURL()
+          );
+        } catch (MalformedURLException e) {
+          throw new TaskInstantiationException("The URL to the local distribution is malformed!", e);
+        }
+      });
+      task.setOutputFile(localDistListFile);
+      task.setIconBase64Provider(iconPath -> {
+        try {
+          final Optional<File> iconFile = ProjectKt.getJava(pro.getConvention()).getSourceSets().getByName("main").getResources().getSrcDirs().stream().map(srcDir -> new File(srcDir, iconPath)).filter(File::exists).findAny();
+          if (iconFile.isPresent()) {
+            String contentType = Files.probeContentType(Paths.get(iconFile.get().toURI()));
+            if (contentType == null) {
+              final InputStream is = new FileInputStream(iconFile.get());
+              contentType = URLConnection.guessContentTypeFromStream(is);
+              is.close();
             }
+            return "data:" + contentType + ";base64," + Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(iconFile.get().toURI())));
           }
+        } catch (IOException e) {
+          task.getLogger().lifecycle("Error reading icon file!", e);
         }
-        // Append date to the plugin version
-        if ("Plugin-Version".equals(att.getKey())) {
-          att.setValue(att.getValue() + String.format("#%1$tY-%1$tm-%1$tdT%1$tH:%1$tM:%1$tS%1$tz", new GregorianCalendar()));
-        }
-        localDistListBuilder.append('\t').append(att.getKey()).append(": ").append(att.getValue()).append('\n');
-      }
-
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(localDistListFile), StandardCharsets.UTF_8))) {
-          writer.write(localDistListBuilder.toString());
-        }
-      } catch(IOException e) {
-        throw new TaskExecutionException(task, e);
-      }
+        return null;
+      });
     });
 
     final Sync localDist = pro.getTasks().create("localDist", Sync.class);
