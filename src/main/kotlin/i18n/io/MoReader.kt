@@ -123,12 +123,14 @@ class MoReader(val moFileURL: URL) {
 private fun ByteArray.toMsgId(contextSeparator: Char = '\u0004', pluralSeparator: Char = '\u0000'): MsgId {
   val string = this.toString(StandardCharsets.UTF_8)
   val csIndex = string.indexOf(contextSeparator)
-  val parts = if (csIndex >= 0) {
-    Pair(string.substring(csIndex + 1), string.substring(0, csIndex))
+  return if (csIndex >= 0) {
+    MsgId(
+      MsgStr(string.substring(csIndex + 1).split(pluralSeparator)),
+      string.substring(0, csIndex)
+    )
   } else {
-    Pair(string, null)
+    MsgId(MsgStr(string.split(pluralSeparator)))
   }
-  return MsgId(MsgStr(parts.first.split(pluralSeparator)), parts.second)
 }
 
 /**
