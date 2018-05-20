@@ -1,0 +1,17 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>JosmManifest.createJosmPluginJarManifest - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.config</a>&nbsp;/&nbsp;<a href="index.html">JosmManifest</a>&nbsp;/&nbsp;<a href="./create-josm-plugin-jar-manifest.html">createJosmPluginJarManifest</a><br/>
+<br/>
+<h1>createJosmPluginJarManifest</h1>
+<a name="org.openstreetmap.josm.gradle.plugin.config.JosmManifest$createJosmPluginJarManifest()"></a>
+<code><span class="keyword">fun </span><span class="identifier">createJosmPluginJarManifest</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><span class="identifier">Map</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">,</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span></code>
+<p>Returns a map containing all manifest attributes, which are set.
+This map can then be fed into <a href="https://docs.gradle.org/4.7/javadoc/org/gradle/api/java/archives/Manifest.html#attributes(java.util.Map<java.lang.String,?>)">org.gradle.api.java.archives.Manifest.attributes</a>. That's already done automatically by the gradle-josm-plugin, so you normally don't need to call this yourself.</p>
+<p>Make sure the <a href="lang-compile-task.html">langCompileTask</a> already ran before this method is called, otherwise not all translated descriptions are included in the Manifest.</p>
+</BODY>
+</HTML>
