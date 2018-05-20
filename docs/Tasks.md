@@ -24,9 +24,10 @@ Also all plugins that your plugin requires are automatically activated in that J
 
 ## cleanJosm
 ```bash
-./gradlew runJosm
+./gradlew cleanJosm
 ```
-Deletes the `JOSM_HOME` directory located at `$projectDir/build/.josm/`, which is used for the task `runJosm`.
+Deletes the `JOSM_HOME` directories located at `$projectDir/build/.josm/cache`, `$projectDir/build/.josm/pref` and `$projectDir/build/.josm/userdata`
+that are used for the task `runJosm`.
 
 ## debugJosm
 ```bash
