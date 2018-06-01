@@ -27,7 +27,7 @@ fun Project.setupJosmTasks() {
     it.description = "Put all needed plugin *.jar files into the plugins directory. This task copies files into the temporary JOSM home directory."
     it.dependsOn(initJosmPrefs)
     it.dependsOn(writePluginConfig)
-    it.rename("(.*)-\\.jar", "$1.jar")
+    it.rename("(.*)-(SNAPSHOT)?\\.jar", "$1.jar")
   })
   afterEvaluate {
     updateJosmPlugins.from(it.tasks.getByName("dist"))
