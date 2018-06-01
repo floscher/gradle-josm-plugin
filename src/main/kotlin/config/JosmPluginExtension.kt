@@ -109,8 +109,8 @@ open class JosmPluginExtension(private val project: Project) {
    * **Default value (in this order):**
    * 1. Nexus repo for JOSM releases: [https://josm.openstreetmap.de/nexus/content/repositories/releases/](https://josm.openstreetmap.de/nexus/content/repositories/releases/) (as Maven repo)
    * 2. Download page for JOSM releases and snapshots: [https://josm.openstreetmap.de/download/](https://josm.openstreetmap.de/download/) (as custom Ivy repo, the `Archiv` subdirectory is also included)
-   * 3. Directory in SVN repo where JOSM plugins are published: [https://svn.openstreetmap.org/applications/editors/josm/dist/](https://svn.openstreetmap.org/applications/editors/josm/dist/) (as custom Ivy repo)
-   * 4. Nexus repo for JOSM snapshots: [https://josm.openstreetmap.de/nexus/content/repositories/snapshots/](https://josm.openstreetmap.de/nexus/content/repositories/snapshots/) (as Maven repo)
+   * 3. Nexus repo for JOSM snapshots: [https://josm.openstreetmap.de/nexus/content/repositories/snapshots/](https://josm.openstreetmap.de/nexus/content/repositories/snapshots/) (as Maven repo)
+   * 4. Directory in SVN repo where JOSM plugins are published: [https://svn.openstreetmap.org/applications/editors/josm/dist/](https://svn.openstreetmap.org/applications/editors/josm/dist/) (as custom Ivy repo)
    *
    * @see RepositoryHandler
    */
@@ -127,14 +127,14 @@ open class JosmPluginExtension(private val project: Project) {
         it.artifact("Archiv/[artifact]-snapshot-[revision].jar")
       })
     }
+    rh.maven {
+      it.url = URI("https://josm.openstreetmap.de/nexus/content/repositories/snapshots/")
+    }
     rh.ivy {
       it.url = URI("https://svn.openstreetmap.org/applications/editors/josm/dist/")
       it.layout("pattern", Action<IvyPatternRepositoryLayout> {
         it.artifact("[artifact].jar")
       })
-    }
-    rh.maven {
-      it.url = URI("https://josm.openstreetmap.de/nexus/content/repositories/snapshots/")
     }
   }
 

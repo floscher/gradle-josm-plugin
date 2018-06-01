@@ -95,7 +95,7 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
     if (alreadyResolvedPlugins.contains(pluginName)) {
       logger.info("{}* {} (see above for dependencies)", indentation, pluginName)
     } else {
-      val dep = dependencies.create("org.openstreetmap.josm.plugins:$pluginName:") as ExternalModuleDependency
+      val dep = dependencies.create("org.openstreetmap.josm.plugins:$pluginName:SNAPSHOT") as ExternalModuleDependency
       dep.setChanging(true)
       conf.dependencies.add(dep)
       val resolvedFiles = conf.fileCollection(dep).files
