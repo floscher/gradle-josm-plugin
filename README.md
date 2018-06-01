@@ -31,10 +31,12 @@ Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://floscher.github.io
 * [fieldpapers/josm-**fieldpapers**](https://github.com/fieldpapers/josm-fieldpapers)
 * [JOSM/**geojson**](https://github.com/JOSM/geojson)
 * [osmlab/**josm-atlas**](https://github.com/osmlab/josm-atlas)
+* [qeef/**mapathoner**](https://github.com/qeef/mapathoner)
 * [JOSM/**Mapillary**](https://github.com/JOSM/Mapillary)
 * [matsim-org/josm-**matsim**-plugin](https://github.com/matsim-org/josm-matsim-plugin)
 * [iandees/josm-**mbtiles**](https://github.com/iandees/josm-mbtiles)
 * [Gubaer/josm-**scripting**-plugin](https://github.com/Gubaer/josm-scripting-plugin)
+* [JOSM/**wikipedia**](https://github.com/JOSM/wikipedia)
 
 ## Deprecated links
 Alternatively to the default Gradle plugin repository, you can download this plugin from a Maven repository at `https://floscher.github.io/gradle-josm-plugin/maven`.
