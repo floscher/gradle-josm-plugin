@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>AddMinJosmVersionDependency - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.task</a>&nbsp;/&nbsp;<a href="./index.html">AddMinJosmVersionDependency</a><br/>
+<br/>
+<h1>AddMinJosmVersionDependency</h1>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">AddMinJosmVersionDependency</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/4.7/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a></code>
+<p>Add the dependencies of the implementation configuration of one source set (mainSourceSet) to the
+implementation configuration of another source set (minJosmVersionSourceSet).</p>
+<p>The version of the JOSM dependency is set to <a href="../../org.openstreetmap.josm.gradle.plugin.config/-josm-manifest/min-josm-version.html">JosmManifest.minJosmVersion</a>. When this task runs, it is checked,
+if that version is available, if not a later version is chosen according to <a href="../../org.openstreetmap.josm.gradle.plugin/org.gradle.api.-project/get-next-josm-version.html">getNextJosmVersion</a>.</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">AddMinJosmVersionDependency</span><span class="symbol">(</span><span class="symbol">)</span></code>
+<p>Add the dependencies of the implementation configuration of one source set (mainSourceSet) to the
+implementation configuration of another source set (minJosmVersionSourceSet).</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="init.html">init</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">init</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.task.AddMinJosmVersionDependency$init(org.gradle.api.tasks.SourceSet, kotlin.String)/mainSourceSet">mainSourceSet</span><span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/4.7/javadoc/org/gradle/api/tasks/SourceSet.html"><span class="identifier">SourceSet</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.task.AddMinJosmVersionDependency$init(org.gradle.api.tasks.SourceSet, kotlin.String)/newSourceSetName">newSourceSetName</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Initialize the task with the two source sets on which it should operate.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
