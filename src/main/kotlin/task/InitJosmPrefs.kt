@@ -23,14 +23,16 @@ open class InitJosmPrefs: Copy() {
       if (source.isEmpty) {
         logger.debug("No default JOSM preference file found in ${project.extensions.josm.josmConfigDir}/preferences.xml.")
       }
-    }
-
-    doFirst {
-      if (File(destinationDir, PREF_FILE_NAME).exists()) {
-        logger.lifecycle("JOSM preferences not copied, file is already present.\nIf you want to replace it, run the task 'cleanJosm' additionally.")
-      } else {
-        logger.lifecycle("Copy [{}] to {}…", source.files.map { it.absolutePath }.joinToString(", "), destinationDir.absolutePath)
+      doFirst {
+        if (File(destinationDir, PREF_FILE_NAME).exists()) {
+          exclude("*")
+          logger.lifecycle("Default JOSM preferences not copied, file is already present. If you want to replace it, run the task 'cleanJosm' additionally.")
+        } else {
+          logger.lifecycle("Copy [{}] to {}…", source.files.map { it.absolutePath }.joinToString(", "), destinationDir.absolutePath)
+        }
       }
     }
+
+
   }
 }
