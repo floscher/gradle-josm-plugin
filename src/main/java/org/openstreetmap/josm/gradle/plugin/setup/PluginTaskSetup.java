@@ -27,6 +27,7 @@ import org.gradle.api.tasks.TaskInstantiationException;
 import org.gradle.api.tasks.bundling.Jar;
 import org.openstreetmap.josm.gradle.plugin.ProjectKt;
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
+import org.openstreetmap.josm.gradle.plugin.task.WriteRequiredPluginConfig;
 import org.openstreetmap.josm.gradle.plugin.task.GeneratePluginList;
 import org.openstreetmap.josm.gradle.plugin.task.LangCompile;
 
@@ -37,35 +38,6 @@ public class PluginTaskSetup extends AbstractSetup {
   }
 
   public void setup() {
-    final Task writePluginConfig = pro.task("writePluginConfig");
-    writePluginConfig.setDescription("Creates the configuration that tells JOSM which plugins to load (which is later automatically loaded by e.g. `runJosm`)");
-    writePluginConfig.doFirst(task -> {
-      final File customConfig = new File(pro.getBuildDir(), "josm-custom-config/requiredPlugins.xml");
-      customConfig.getParentFile().mkdirs();
-      task.getLogger().lifecycle("Write required plugins to {}…", customConfig.getAbsolutePath());
-
-      final StringBuilder pluginListEntries = new StringBuilder();
-      for (Dependency requiredPlugin : pro.getConfigurations().getByName("requiredPlugin").getDependencies()) {
-        pluginListEntries.append("      <entry value=\"").append(requiredPlugin.getName()).append("\"/>\n");
-      }
-      pluginListEntries.append("      <entry value=\"").append(pro.getConvention().getPlugin(BasePluginConvention.class).getArchivesBaseName()).append("\"/>");
-
-      final String xmlTemplate = new BufferedReader(new InputStreamReader(PluginTaskSetup.class.getResourceAsStream("/requiredPluginConfigTemplate.xml"), StandardCharsets.UTF_8)).lines().collect(Collectors.joining("\n"));
-      try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(customConfig), StandardCharsets.UTF_8))) {
-        writer.write(xmlTemplate.replace("{{{PLUGIN_LIST_ENTRIES}}}", pluginListEntries.toString()).replace("{{{tmpJosmPrefDir}}}", JosmPluginExtension.forProject(pro).getTmpJosmPrefDir().getAbsolutePath()));
-      } catch (IOException e) {
-        throw new TaskExecutionException(task, e);
-      }
-    });
-
-    final Sync updateJosmPlugins = pro.getTasks().withType(Sync.class).getByName("updateJosmPlugins");
-    updateJosmPlugins.dependsOn(writePluginConfig);
-    updateJosmPlugins.rename("(.*)-\\.jar", "$1.jar");
-    pro.afterEvaluate(p -> {
-      updateJosmPlugins.from(pro.getTasks().getByName("dist").getOutputs());
-      updateJosmPlugins.from(pro.getConfigurations().getByName("requiredPlugin"));
-    });
-
     final File localDistPath = new File(pro.getBuildDir(), "localDist");
     final File localDistListFile = new File(localDistPath, "list");
 
