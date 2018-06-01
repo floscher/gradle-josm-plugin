@@ -1,5 +1,5 @@
 plugins {
-  id 'org.openstreetmap.josm' version '0.4.0'
+  id 'org.openstreetmap.josm' version '0.4.5'
 }
 
 repositories {
@@ -8,7 +8,7 @@ repositories {
 
 version = 'git describe --always --dirty'.execute().in.text.trim()
 josm {
-  josmCompileVersion = '13576'
+  josmCompileVersion = '13878'
   manifest {
     description = 'The description of my awesome plugin'
     mainClass = 'org.openstreetmap.josm.plugins.myawesomeplugin.MyAwesomePlugin'
