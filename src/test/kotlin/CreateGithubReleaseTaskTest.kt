@@ -49,7 +49,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
             import org.openstreetmap.josm.gradle.plugin.task.CreateGithubReleaseTask
 
-            task createGithubRelease(type: CreateGithubReleaseTask){
+            task myCreateGithubRelease(type: CreateGithubReleaseTask){
               releaseLabel = "$releaseLabel"
               githubUser = "$githubUser"
               githubAccessToken = "$githubAccessToken"
@@ -82,9 +82,9 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("createGithubRelease")
+            .withArguments("myCreateGithubRelease")
             .build()
-        assertEquals(SUCCESS, result.task(":createGithubRelease")?.outcome)
+        assertEquals(SUCCESS, result.task(":myCreateGithubRelease")?.outcome)
         println(result.output)
     }
 
@@ -120,7 +120,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
             import org.openstreetmap.josm.gradle.plugin.task.CreateGithubReleaseTask
 
-            task createGithubRelease(type: CreateGithubReleaseTask){
+            task myCreateGithubRelease(type: CreateGithubReleaseTask){
             }
             """.trimIndent()
         buildFile?.printWriter()?.use {it.println(buildFileContent)}
@@ -148,7 +148,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("createGithubRelease",
+            .withArguments("myCreateGithubRelease",
                 "--release-label", releaseLabel,
                 "--github-api-url", apiUri,
                 "--github-repository", githubRepo,
@@ -156,7 +156,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 "--github-access-token", githubAccessToken
             )
             .build()
-        assertEquals(SUCCESS, result.task(":createGithubRelease")?.outcome)
+        assertEquals(SUCCESS, result.task(":myCreateGithubRelease")?.outcome)
         println(result.output)
     }
 
@@ -202,7 +202,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
             import org.openstreetmap.josm.gradle.plugin.task.CreateGithubReleaseTask
 
-            task createGithubRelease(type: CreateGithubReleaseTask){
+            task myCreateGithubRelease(type: CreateGithubReleaseTask){
               releaseLabel = "$releaseLabel"
             }
             """.trimIndent()
@@ -229,6 +229,145 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             .withStatus(200)
             .withBody("""{"id": 1}""")
         ))
+
+        val result = GradleRunner.create()
+          .withProjectDir(buildDir)
+          .withArguments("myCreateGithubRelease")
+          .build()
+        assertEquals(SUCCESS, result.task(":myCreateGithubRelease")?.outcome)
+        println(result.output)
+    }
+
+    @Test
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+    fun `can create a release using pre-configured task and cmd line args`(
+        @WiremockResolver.Wiremock server: WireMockServer,
+        @WiremockUriResolver.WiremockUri apiUri: String) {
+
+        val releaseName = "a test release"
+        val releaseLabel = "v0.0.2"
+
+        val releaseFileContent = """
+          releases:
+            - label: "$releaseLabel"
+              name: "$releaseName"
+              numeric_plugin_version: 1234
+              numeric_josm_version: 5678
+              description: a test description
+          """.trimIndent()
+        File(buildDir, "releases.yml").printWriter().use {
+            it.println(releaseFileContent)
+        }
+
+        val githubUser = "github_user"
+        val githubAccessToken = "aaaabbbb"
+        val githubRepo = "repo"
+
+        val buildFileContent = """
+            plugins {
+                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
+            }
+
+            // The task 'createGithubRelease' is predefined
+            """.trimIndent()
+        buildFile?.printWriter()?.use {it.println(buildFileContent)}
+
+        val path = "/repos/$githubUser/$githubRepo/releases"
+
+        server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
+            .withBasicAuth(githubUser, githubAccessToken)
+            .willReturn(WireMock.aResponse()
+                .withStatus(200)
+                // assume we already have one release with label 'v0.0.1'
+                // on the github server
+                .withBody("""[{"id": 1, "label": "v0.0.1"}]""")
+            ))
+
+        server.stubFor(WireMock.post(WireMock.urlPathEqualTo(path))
+            .withRequestBody(WireMock.matchingJsonPath(
+                "$[?(@.tag_name == '$releaseLabel')]"))
+            .withRequestBody(WireMock.matchingJsonPath(
+                "$[?(@.name == '$releaseName')]"))
+            .withBasicAuth(githubUser, githubAccessToken)
+            .willReturn(WireMock.aResponse()
+                .withStatus(200)
+                .withBody("""{"id": 1}""")
+            ))
+
+        val result = GradleRunner.create()
+            .withProjectDir(buildDir)
+            .withArguments("createGithubRelease",
+                "--release-label", releaseLabel,
+                "--github-api-url", apiUri,
+                "--github-repository", githubRepo,
+                "--github-user", githubUser,
+                "--github-access-token", githubAccessToken
+            )
+            .build()
+        assertEquals(SUCCESS, result.task(":createGithubRelease")?.outcome)
+        println(result.output)
+    }
+
+    @Test
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+    fun `can create a release using pre-configured task with parameters`(
+        @WiremockResolver.Wiremock server: WireMockServer,
+        @WiremockUriResolver.WiremockUri apiUri: String) {
+
+        val releaseName = "a test release"
+        val releaseLabel = "v0.0.2"
+
+        val releaseFileContent = """
+          releases:
+            - label: "$releaseLabel"
+              name: "$releaseName"
+              numeric_plugin_version: 1234
+              numeric_josm_version: 5678
+              description: a test description
+          """.trimIndent()
+        File(buildDir, "releases.yml").printWriter().use {
+            it.println(releaseFileContent)
+        }
+
+        val githubUser = "github_user"
+        val githubAccessToken = "aaaabbbb"
+        val githubRepo = "repo"
+
+        val buildFileContent = """
+            plugins {
+                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
+            }
+            createGithubRelease {
+              releaseLabel = "$releaseLabel"
+              githubUser = "$githubUser"
+              githubAccessToken = "$githubAccessToken"
+              githubRepository = "$githubRepo"
+              githubApiUrl = "$apiUri"
+            }
+            """.trimIndent()
+        buildFile?.printWriter()?.use {it.println(buildFileContent)}
+
+        val path = "/repos/$githubUser/$githubRepo/releases"
+
+        server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
+            .withBasicAuth(githubUser, githubAccessToken)
+            .willReturn(WireMock.aResponse()
+                .withStatus(200)
+                // assume we already have one release with label 'v0.0.1'
+                // on the github server
+                .withBody("""[{"id": 1, "label": "v0.0.1"}]""")
+            ))
+
+        server.stubFor(WireMock.post(WireMock.urlPathEqualTo(path))
+            .withRequestBody(WireMock.matchingJsonPath(
+                "$[?(@.tag_name == '$releaseLabel')]"))
+            .withRequestBody(WireMock.matchingJsonPath(
+                "$[?(@.name == '$releaseName')]"))
+            .withBasicAuth(githubUser, githubAccessToken)
+            .willReturn(WireMock.aResponse()
+                .withStatus(200)
+                .withBody("""{"id": 1}""")
+            ))
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
