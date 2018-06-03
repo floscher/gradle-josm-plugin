@@ -1,25 +1,18 @@
 package org.openstreetmap.josm.gradle.plugin.ghreleases
 
+import com.beust.klaxon.JsonArray
+import com.beust.klaxon.JsonObject
+import com.beust.klaxon.Parser
+import okhttp3.*
 import java.io.File
 import java.net.URLEncoder
-
-import com.beust.klaxon.Json
-import com.beust.klaxon.Parser
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.JsonArray
-import okhttp3.*
-import org.gradle.internal.impldep.com.google.gson.JsonNull
 
 // the default API URL for the Github API
 const val DEFAULT_GITHUB_API_URL = "https://api.github.com"
 
-//TODO: add a factory class to create a GithubReleaseClient for a given
-// gradle project or gradle task. It should initialize the parameters
-// for the repos, the user and the accessToken from environment variables
-// and/or gradle properties
 
-
-class GithubReleaseClientException(override var message: String, override var cause: Throwable?)
+class GithubReleaseClientException(override var message: String,
+                                   override var cause: Throwable?)
     : Exception(message, cause) {
     constructor(message: String) : this(message, null)
     constructor(response: Response) : this(
@@ -46,7 +39,7 @@ class Pagination(linkHeader: String?) {
     *  Parses the relation URLs in `linkHeader` (if not null). Pass in the
     *  header value only, without the header name `Link:`
     *
-    * Sample of a link header (including the Header name) replyed by the Github
+    * Sample of a link header (including the Header name) replied by the Github
     * API
     * ```
     * Link: <https://api.github.com/search/code?q=addClass+user%3Amozilla&page=15>; rel="next",
@@ -56,10 +49,10 @@ class Pagination(linkHeader: String?) {
     * ```
     */
    init {
-        linkHeader?.let {linkHeader ->
+        linkHeader?.let {header ->
             val relNextRegex = """rel=\"next\"""".toRegex()
             val urlPatternRegex = """<(.*)>""".toRegex()
-            _nextUrl = linkHeader.split(",")
+            _nextUrl = header.split(",")
                 .map(String::trim)
                 .filter {relNextRegex.containsMatchIn(it)}
                 .map {
@@ -131,7 +124,7 @@ class GithubReleasesClient(
                 ret.addAll(releases)
                 requestUrl = pagination.nextUrl
             } catch(e: GithubReleaseClientException) {
-                throw e;
+                throw e
             } catch(e: Throwable) {
                 throw GithubReleaseClientException(e)
             }
@@ -152,9 +145,10 @@ class GithubReleasesClient(
             val response = client.newCall(request).execute()
             return when (response.code()) {
                 in 200..299 -> {
-                    val body = response.body()?.string() ?: throw GithubReleaseClientException(
-                        "Unexpected response body from GitHub API"
-                    )
+                    val body = response.body()?.string() ?:
+                        throw GithubReleaseClientException(
+                            "Unexpected response body from GitHub API"
+                        )
                     Parser().parse(StringBuilder(body)) as JsonObject
                 }
                 404 -> null
@@ -171,8 +165,9 @@ class GithubReleasesClient(
      * Creates a github release with the tag `tagName`.
      */
     @Throws(GithubReleaseClientException::class)
-    fun createRelease(tagName: String, targetCommitish: String? = null, name: String? = null,
-                    body: String? = null, draft: Boolean = false, prerelease: Boolean = false
+    fun createRelease(tagName: String, targetCommitish: String? = null,
+            name: String? = null, body: String? = null,
+            draft: Boolean = false, prerelease: Boolean = false
         ): JsonObject {
 
         val requestJson = JsonObject()
@@ -205,7 +200,8 @@ class GithubReleasesClient(
             val response = client.newCall(request).execute()
             return when (response.code()) {
                 in 200..299 -> {
-                    val body = response.body()?.string() ?: throw GithubReleaseClientException(
+                    val body = response.body()?.string() ?:
+                    throw GithubReleaseClientException(
                         "Unexpected response body from GitHub API"
                     )
                     Parser().parse(StringBuilder(body)) as JsonObject
@@ -224,19 +220,22 @@ class GithubReleasesClient(
 
 
     /**
-     * Upload a release asset `file` to the release `releaseId`. `name` is the (optional) new name
-     * of the uploaded file. `label` is an (optional) short description for the asset.
+     * Upload a release asset `file` to the release `releaseId`. `name` is the
+     * (optional) new name of the uploaded file. `label` is an (optional) short
+     * description for the asset.
      */
     @Throws(GithubReleaseClientException::class)
-    fun uploadReleaseAsset(releaseId: Int, file: File, contentType: String,  name: String? = null,
-                           label: String? = null) :JsonObject {
+    fun uploadReleaseAsset(releaseId: Int, file: File, contentType: String,
+                           name: String? = null, label: String? = null)
+        :JsonObject {
 
         val name = name ?: file.name
         val mediaType =  MediaType.parse(contentType)
         val requestBody = RequestBody.create(mediaType, file)
 
 
-        val url = "$apiUrl/repos/$user/$repository/releases/$releaseId/assets?" +
+        val url = "$apiUrl/repos/$user/$repository/releases/$releaseId" +
+            "/assets?" +
             listOf(
                 kvpair("name", name),
                 kvpair("label", label)
@@ -253,9 +252,10 @@ class GithubReleasesClient(
             val response = client.newCall(request).execute()
             return when (response.code()) {
                 201 -> {
-                    val body = response.body()?.string() ?: throw GithubReleaseClientException(
-                        "Unexpected response body from GitHub API"
-                    )
+                    val body = response.body()?.string() ?:
+                        throw GithubReleaseClientException(
+                            "Unexpected response body from GitHub API"
+                        )
                     Parser().parse(StringBuilder(body)) as JsonObject
                 }
                 else -> throw GithubReleaseClientException(response)
