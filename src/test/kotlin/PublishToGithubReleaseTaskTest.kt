@@ -83,7 +83,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
             }
 
             import org.openstreetmap.josm.gradle.plugin.task.PublishToGithubReleaseTask
-            task publishToGithubRelease(type: PublishToGithubReleaseTask){
+            task myPublishToGithubRelease(type: PublishToGithubReleaseTask){
                 // no configuration. use standard values
             }
             """
@@ -132,7 +132,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("build", "publishToGithubRelease",
+            .withArguments("build", "myPublishToGithubRelease",
                 "--release-label", releaseLabel,
                 "--github-api-url", uri,
                 "--github-repository", githubRepo
@@ -140,7 +140,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
         .build()
         Assertions.assertEquals(
             TaskOutcome.SUCCESS,
-            result.task(":publishToGithubRelease")?.outcome
+            result.task(":myPublishToGithubRelease")?.outcome
         )
     }
 
@@ -179,7 +179,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
             }
 
             import org.openstreetmap.josm.gradle.plugin.task.PublishToGithubReleaseTask
-            task publishToGithubRelease(type: PublishToGithubReleaseTask){
+            task myPublishToGithubRelease(type: PublishToGithubReleaseTask){
                 githubApiUrl = "$uri"
                 githubRepository = "$githubRepo"
                 releaseLabel = "$releaseLabel"
@@ -230,11 +230,11 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("build", "publishToGithubRelease")
+            .withArguments("build", "myPublishToGithubRelease")
             .build()
         Assertions.assertEquals(
             TaskOutcome.SUCCESS,
-            result.task(":publishToGithubRelease")?.outcome
+            result.task(":myPublishToGithubRelease")?.outcome
         )
     }
 
@@ -275,7 +275,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
             }
 
             import org.openstreetmap.josm.gradle.plugin.task.PublishToGithubReleaseTask
-            task publishToGithubRelease(type: PublishToGithubReleaseTask){
+            task myPublishToGithubRelease(type: PublishToGithubReleaseTask){
                 githubApiUrl = "$uri"
                 githubRepository = "$githubRepo"
                 releaseLabel = "$releaseLabel"
@@ -349,11 +349,11 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("build", "publishToGithubRelease")
+            .withArguments("build", "myPublishToGithubRelease")
             .build()
         Assertions.assertEquals(
             TaskOutcome.SUCCESS,
-            result.task(":publishToGithubRelease")?.outcome
+            result.task(":myPublishToGithubRelease")?.outcome
         )
         println(result.output)
     }
