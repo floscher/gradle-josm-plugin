@@ -1,6 +1,5 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
@@ -11,10 +10,10 @@ import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
 
-class GithubReleaseTaskException(override var message: String, override var cause: Throwable?)
+class GithubReleaseTaskException(override var message: String,
+                                 override var cause: Throwable?)
     : Exception(message, cause) {
-    constructor(message: String) : this(message, null) {
-    }
+    constructor(message: String) : this(message, null)
 }
 
 const val DEFAULT_TARGET_COMMITISH = "master"
@@ -65,12 +64,14 @@ open class BaseGithubReleaseTask: DefaultTask() {
 
     @Option(
         option = "releases-config-file",
-        description = "the full path to the release configuration file. Default: \$PROJECT_DIR/releases.yml")
+        description = "the full path to the release configuration file. "
+            +"Default: \$PROJECT_DIR/releases.yml")
     lateinit var releasesConfigFile: String
 
     @Option(
         option = "releases-target-commitish",
-        description = "the target commitish for the release, i.e. 'master' or 'deploy'. Default: 'master'")
+        description = "the target commitish for the release, i.e. 'master' "
+            + "or 'deploy'. Default: 'master'")
     lateinit var targetCommitish: String
 
     private val defaultReleasesConfigFile: File by lazy {
@@ -82,8 +83,11 @@ open class BaseGithubReleaseTask: DefaultTask() {
      */
     val configuredReleasesConfigFile: File by lazy {
         fun ensureReleaseConfigFileReadable(configFile: File) {
-          if (! (configFile.isFile && configFile.exists() && configFile.canRead())) {
-            throw IOException("releases configuration file <${configFile.absolutePath}> doesn't exist or can't be read")
+          if (! (configFile.isFile && configFile.exists()
+                  && configFile.canRead())) {
+            throw IOException(
+                "releases configuration file <${configFile.absolutePath}> "
+              + "doesn't exist or can't be read")
           }
         }
 
@@ -116,7 +120,7 @@ open class BaseGithubReleaseTask: DefaultTask() {
         else throw notConfigured
     }
 
-    val configuredGithubUser: String? by lazy {
+    private val configuredGithubUser: String? by lazy {
         val notConfigured = GithubReleaseTaskException(
             """No github user name configured. Configure it in the task, i.e.
               |   task createRelease(type: CreateGithubReleaseTask) {
@@ -124,8 +128,9 @@ open class BaseGithubReleaseTask: DefaultTask() {
               |   }
               |with the command line option --github-user,
               |the project property $CONFIG_OPT_GITHUB_USER
-              |or the environment variable $ENV_VAR_GITHUB_USER""".trimMargin("|")
-        )
+              |or the environment variable $ENV_VAR_GITHUB_USER"""
+                .trimMargin("|")
+    )
 
         if (::githubUser.isInitialized) {
             githubUser.trim()
@@ -138,7 +143,7 @@ open class BaseGithubReleaseTask: DefaultTask() {
         }
     }
 
-    val configuredGithubAccessToken: String? by lazy {
+    private val configuredGithubAccessToken: String? by lazy {
         val notConfigured = GithubReleaseTaskException(
             """No github access token configured. Configure it in the task, i.e.
             |     task createRelease(type: CreateGithubReleaseTask) {
@@ -146,7 +151,8 @@ open class BaseGithubReleaseTask: DefaultTask() {
             |     }
             |with the command line option --github-access-token,
             |the project property $CONFIG_OPT_GITHUB_ACCESS_TOKEN
-            |or the environment variable $ENV_VAR_GITHUB_ACCESS_TOKEN""".trimMargin("|")
+            |or the environment variable $ENV_VAR_GITHUB_ACCESS_TOKEN"""
+                .trimMargin("|")
         )
 
         if (::githubAccessToken.isInitialized) {
@@ -160,7 +166,7 @@ open class BaseGithubReleaseTask: DefaultTask() {
         }
       }
 
-    val configuredGithubApiUrl: String by lazy {
+    private val configuredGithubApiUrl: String by lazy {
         if (::githubApiUrl.isInitialized) {
             githubApiUrl.trim()
         }
@@ -183,7 +189,7 @@ open class BaseGithubReleaseTask: DefaultTask() {
         }
     }
 
-    val configuredGithubRepository: String? by lazy {
+    private val configuredGithubRepository: String? by lazy {
 
         val notConfigured = GithubReleaseTaskException(
             """No github repository configured. Configure it in the task, i.e.
@@ -192,7 +198,8 @@ open class BaseGithubReleaseTask: DefaultTask() {
             |   }
             |with the command line option --github-repository,
             |the project property $CONFIG_OPT_GITHUB_REPOSITORY
-            |or the environment variable $ENV_VAR_GITHUB_REPOSITORY""".trimMargin("|")
+            |or the environment variable $ENV_VAR_GITHUB_REPOSITORY"""
+                .trimMargin("|")
         )
 
         if (::githubRepository.isInitialized) {
@@ -210,10 +217,10 @@ open class BaseGithubReleaseTask: DefaultTask() {
     protected fun ensureValidNumericPluginVersion(release: ReleaseSpec) {
         if (release.numericPluginVersion <= 0) {
             throw GithubReleaseTaskException(
-                """Illegal numeric plugin version '${release.numericPluginVersion}' for release
-                    |'${release.label}'.
-                    |Fix in '$configuredReleasesConfigFile'"""
-                  .trimMargin("|")
+            """Illegal numeric plugin version '${release.numericPluginVersion}'
+                |for release '${release.label}'.
+                |Fix it in '$configuredReleasesConfigFile'"""
+              .trimMargin("|")
             )
         }
     }
@@ -222,9 +229,9 @@ open class BaseGithubReleaseTask: DefaultTask() {
     protected fun ensureValidNumericJsomVersion(release: ReleaseSpec) {
         if (release.numericJosmVersion <= 0) {
             throw GithubReleaseTaskException(
-                """Illegal numeric josm version '${release.numericJosmVersion}' for release
-                    |'$releaseLabel'.
-                    |Fix in '$configuredReleasesConfigFile'"""
+                """Illegal numeric josm version '${release.numericJosmVersion}'
+                    | for release '$releaseLabel'.
+                    |Fix it in '$configuredReleasesConfigFile'"""
                   .trimMargin("|")
             )
         }
@@ -239,7 +246,8 @@ open class BaseGithubReleaseTask: DefaultTask() {
         )
     }
 
-    private fun lookupConfiguredProperty(propertyName: String, envName: String? = null): String? {
+    private fun lookupConfiguredProperty(propertyName: String,
+                                         envName: String? = null): String? {
         val prop = this.project.findProperty(propertyName)?.toString()?.trim()
 
         return if (!prop.isNullOrEmpty()) { prop }
@@ -265,31 +273,35 @@ open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
         val releaseLabel = configuredReleaseLabel
         val releaseConfig = ReleasesSpec.load(releaseConfigFile)
 
-        val release = (releaseConfig?.releases?.find {it.label == releaseLabel}) ?: throw GithubReleaseTaskException(
-            """The releases config file '$releaseConfigFile' doesn't include a release
-                |with release label '$releaseLabel yet.
-                |Add and configure a release with this label in '$releaseConfigFile' and rerun."""
+        val release = (releaseConfig?.releases?.find {it.label == releaseLabel})
+            ?: throw GithubReleaseTaskException(
+            """The releases config file '$releaseConfigFile' doesn't include a
+            |release with release label '$releaseLabel yet. Add and configure
+            |a release with this label in '$releaseConfigFile' and rerun."""
               .trimMargin("|")
         )
         ensureValidNumericPluginVersion(release)
         ensureValidNumericJsomVersion(release)
         val client = githubReleaseClient
 
-        val remoteRelease = client.getReleases()?.find {it["label"] == releaseLabel}
+        val remoteRelease = client.getReleases().find {
+            it["label"] == releaseLabel}
 
         remoteRelease?.let {
             throw GithubReleaseTaskException(
-                "Release with release label '${releaseLabel}' already exists on the github server"
+                "Release with release label '$releaseLabel' already exists "
+              + "on the github server"
             )
         }
 
         try {
-            val newRelease = client.createRelease(
+            client.createRelease(
                 tagName = releaseLabel,
                 targetCommitish = configuredTargetCommitish,
                 name = release.name ?: releaseLabel,
                 body = release.description)
-            println("Success: new release '${releaseLabel}' created in github repository")
+            println("Success: new release '$releaseLabel' created in "
+                + "github repository")
         } catch(e: Throwable) {
            throw GithubReleaseTaskException(e.message ?: "", e)
         }
@@ -317,24 +329,28 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
 
     @Option(
         option = CMDLINE_OPT_UPDATE_LATEST,
-        description = "indicates whether the asset is also updated to the latest release.\n"
-            + "The label of the latest release is configured in 'releases.yml' and defaults\n"
-            + "to 'latest'.\n"
-            + "Default: false, if missing or if illegal value"
+        description =
+        "indicates whether the asset is also updated to the latest release.\n"
+      + "The label of the latest release is configured in 'releases.yml' and "
+      + "defaults to 'latest'.\n"
+      + "Default: false, if missing or if illegal value"
     )
     lateinit var updateLatest: Any
 
     private val jarArchivePath: String?  by lazy {
-        project.tasks.withType(Jar::class.java).getByName("jar")?.archivePath?.absolutePath
+        project.tasks.withType(Jar::class.java).getByName("jar")
+            .archivePath?.absolutePath
     }
 
     private val jarArchiveName: String?  by lazy {
-        project.tasks.withType(Jar::class.java).getByName("jar")?.archivePath?.name
+        project.tasks.withType(Jar::class.java).getByName("jar")
+            .archivePath?.name
     }
 
-    val configuredLocalJarPath: String? by lazy {
+    private val configuredLocalJarPath: String? by lazy {
         val notConfigured = GithubReleaseTaskException(
-            """Missing configuration for local jar to publish as release asset. Configure it n the task, i.e.
+            """Missing configuration for local jar to publish as release asset.
+            |Configure it n the task, i.e.
             |   task publishRelease(type: PublishToGithubReleaseTask) {
             |       localJarPath = "/path/to/the/jar/to/publish.jar"
             |   }
@@ -346,9 +362,10 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         else jarArchivePath ?: throw notConfigured
     }
 
-    val configuredRemoteJarName: String? by lazy {
+    private val configuredRemoteJarName: String? by lazy {
         val notConfigured = GithubReleaseTaskException(
-            """Missing configuration for remote jar name. Configure it in the task, i.e.
+            """Missing configuration for remote jar name.
+           |Configure it in the task, i.e.
             |   task publishRelease(type: PublishToGithubReleaseTask) {
             |       remoteJarName = "my-josm-plugin.jar"
             |   }
@@ -356,12 +373,12 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
             """.trimMargin("|")
         )
 
-        if (::remoteJarName.isInitialized && ! remoteJarName.trim().isNullOrBlank())
+        if (::remoteJarName.isInitialized && ! remoteJarName.trim().isBlank())
           remoteJarName.trim()
         else jarArchiveName ?: throw notConfigured
     }
 
-    val configuredUpdateLatest: Boolean by lazy {
+    private val configuredUpdateLatest: Boolean by lazy {
         fun fromString(value: String): Boolean =
             when(value.toLowerCase().trim()) {
                 "true", "1", "yes", "y" -> true
@@ -380,7 +397,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
      * true, if this file can be uploaded to a github release, i.e. if it
      * is an existing, readable, locally available file
      */
-    internal val File.canUpload: Boolean
+    private val File.canUpload: Boolean
         get() = this.exists() && this.isFile && this.canRead()
 
     /**
@@ -395,17 +412,18 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         }
 
     /**
-     * throws an exception if this file isn't a valid jar file with a manifest including
+     * throws an exception if this file isn't a valid jar file with a manifest
+     * including
      *   * an attribute `Plugin-Version`
      *   * an attribute `Plugin-Mainversion`
      *
      * Both must match the respecitive attributes in [release].
      *
-     * @exception GithubReleaseTaskException thrown, if this file isn't consistent with
-     *   the release spec
+     * @exception GithubReleaseTaskException thrown, if this file isn't
+     * consistent with the release spec
      */
     @Throws(GithubReleaseTaskException::class)
-    internal fun File.ensureConsistentWithReleaseSpec(release: ReleaseSpec) {
+    private fun File.ensureConsistentWithReleaseSpec(release: ReleaseSpec) {
         val jarFile = try {
             JarFile(this)
         } catch (e: IOException) {
@@ -422,62 +440,70 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         } catch (e: Throwable) {
             null
         } ?: throw GithubReleaseTaskException(
-            """The jar file '${this.absolutePath}' does either not include an attribute
-                | 'Plugin-Version' or its value isn't a positive int"""".trimMargin("|")
+            """The jar file '${this.absolutePath}' does either not include an
+            | attribute 'Plugin-Version' or its value isn't a positive int""""
+                .trimMargin("|")
         )
         if (pluginVersion != release.numericPluginVersion) {
             throw GithubReleaseTaskException(
-                """The numeric plugin version in the in the MANIFEST of the jar file
-                  |'${this.absolutePath}' doesn't match with numeric plugin version of the release
-                  | Numeric plugin version for the release: ${release.numericPluginVersion}
-                  | Numeric plugin version in the MANIFEST: ${pluginVersion}
-                  """.trimMargin("|")
+            """The numeric plugin version in the in the MANIFEST of the jar file
+            |'${this.absolutePath}' doesn't match with numeric plugin version
+            | of the release.
+            | Numeric plugin version for the release: ${release.numericPluginVersion}
+            | Numeric plugin version in the MANIFEST: ${pluginVersion}
+            """.trimMargin("|")
             )
         }
 
         val josmVersion = try {
-            manifest.mainAttributes.getValue("Plugin-Mainversion")?.trim()?.toInt()
+            manifest.mainAttributes.getValue("Plugin-Mainversion")?.trim()
+                ?.toInt()
         } catch (e: Throwable) {
             null
         } ?: throw GithubReleaseTaskException(
-            """The jar file '${this.absolutePath}' does either not include an attribute
-                | 'Plugin-Main-Version' or its value isn't a positive int"""".trimMargin("|")
+            """The jar file '${this.absolutePath}' does either not include
+            |an attribute
+           | 'Plugin-Main-Version' or its value isn't a positive int""""
+                .trimMargin("|")
         )
         if (josmVersion != release.numericJosmVersion) {
             throw GithubReleaseTaskException(
-                """The numeric JOSM version in the in the MANIFEST of the jar file
-                  |'${this.absolutePath}' doesn't match with the numeric JOSM version of the release
-                  | Numeric JOSM version for the release: ${release.numericJosmVersion}
-                  | Numeric JOSM version in the MANIFEST: ${josmVersion}
-                  """.trimMargin("|")
+            """The numeric JOSM version in the in the MANIFEST of the jar file
+            |'${this.absolutePath}' doesn't match with the numeric JOSM version
+            | of the release.
+            | Numeric JOSM version for the release: ${release.numericJosmVersion}
+            | Numeric JOSM version in the MANIFEST: ${josmVersion}"""
+                .trimMargin("|")
             )
         }
     }
 
     @TaskAction
     fun publishToGithubRelease() {
-        val localJarPath = configuredLocalJarPath
-        val remoteJarName = configuredRemoteJarName
 
         val releaseLabel = configuredReleaseLabel
         val client = githubReleaseClient
 
         val releaseConfig = ReleasesSpec.load(configuredReleasesConfigFile)
 
-        val localRelease = (releaseConfig?.releases?.find {it.label == releaseLabel})
+        val localRelease = (releaseConfig?.releases?.find {
+            it.label == releaseLabel})
             ?: throw GithubReleaseTaskException(
-              """The releases config file '$configuredReleasesConfigFile' doesn't include a release
-                  |with release label '$releaseLabel yet.
-                  |Add and configure a release with this label in '$configuredReleasesConfigFile' and rerun."""
+            """The releases config file '$configuredReleasesConfigFile' doesn't
+            |include a release with release label '$releaseLabel yet.
+            |Add and configure a release with this label in '$configuredReleasesConfigFile'
+            |and rerun."""
                 .trimMargin("|")
             )
         ensureValidNumericPluginVersion(localRelease)
         ensureValidNumericJsomVersion(localRelease)
         val remoteReleases = client.getReleases()
 
-        val remoteRelease = remoteReleases?.find {it["tag_name"] == releaseLabel}
+        val remoteRelease = remoteReleases.find {
+            it["tag_name"] == releaseLabel}
         remoteRelease ?: throw GithubReleaseTaskException(
-            "Release with tag_name '${releaseLabel}' doesn't exist on the github server"
+            "Release with tag_name '$releaseLabel' doesn't exist on the "
+          + "github server"
         )
 
         val releaseId = remoteRelease["id"].toString().toInt()
@@ -485,12 +511,14 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         if (!localFile.canUpload) {
             throw GithubReleaseTaskException(
               """Local jar file '$configuredLocalJarPath' doesn't exist
-                |or isn't readable. Can't upload it as release artefact.""".trimMargin("|")
+                |or isn't readable. Can't upload it as release artefact."""
+                  .trimMargin("|")
             )
         }
         localFile.ensureConsistentWithReleaseSpec(localRelease)
 
-        println("Uploading '${localFile.name}' to release '$releaseLabel' at ${client.apiUrl}")
+        println("Uploading '${localFile.name}' to release '$releaseLabel' "
+           + "at ${client.apiUrl}")
         client.uploadReleaseAsset(
             releaseId = releaseId,
             name = configuredRemoteJarName,
@@ -503,12 +531,14 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
             val notFound = GithubReleaseTaskException(
                 """remote release with label '$latestReleaseLabel' not found"""
             )
-            val latestRelease = remoteReleases?.find {it["tag_name"] == latestReleaseLabel}
+            val latestRelease = remoteReleases.find {
+                it["tag_name"] == latestReleaseLabel}
                 ?: throw notFound
-            val releaseId = latestRelease["id"].toString().toInt()
-            println("Uploading '${localFile.name}' to release '$latestReleaseLabel' at ${client.apiUrl}")
+            val latestReleaseId = latestRelease["id"].toString().toInt()
+            println("Uploading '${localFile.name}' to release "
+                + "'$latestReleaseLabel' at ${client.apiUrl}")
             client.uploadReleaseAsset(
-                releaseId = releaseId,
+                releaseId = latestReleaseId,
                 name = configuredRemoteJarName,
                 contentType = MEDIA_TYPE_JAR,
                 file = localFile
