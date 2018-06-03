@@ -64,18 +64,25 @@ data class ReleasesSpec(val latest: String, val releases: List<ReleaseSpec>?) {
                             | specification with label '$label'
                              """.trimMargin("|"), e)
                     }
-                } ?: 0
+                } ?: throw ReleaseSpecException(
+                    """Missing numeric_josm_version for release
+                    | specification with label '$label'"""
+                        .trimMargin("|"))
 
                 val numericPluginVersion =
                     release.get("numeric_plugin_version")?.let {
                       try {
                         it.asText().toInt()
                       } catch(e: NumberFormatException) {
-                        throw ReleaseSpecException("""Illegal numeric_plugin_version for release
+                        throw ReleaseSpecException(
+                            """Illegal numeric_plugin_version for release
                             | specification with label '$label'
                              """.trimMargin("|"), e)
                       }
-                } ?: 0
+                } ?: throw ReleaseSpecException(
+                    """Missing numeric_plugin_version for release
+                    | specification with label '$label'"""
+                        .trimMargin("|"))
 
                 ReleaseSpec(
                     label = label,
@@ -95,16 +102,8 @@ data class ReleasesSpec(val latest: String, val releases: List<ReleaseSpec>?) {
     fun hasRelease(label: String) : Boolean = releases?.find {
         it.label == label } != null
 
-    fun hasRelease(numericPluginVersion: Int) : Boolean = releases?.find {
+    fun hasRelease(numericPluginVersion: Int) : Boolean =  releases?.find {
         it.numericPluginVersion == numericPluginVersion} != null
-}
-
-
-/**
- * A list of release specifications
- */
-private data class Releases(val releases: List<ReleaseSpec>?) {
-
 }
 
 
