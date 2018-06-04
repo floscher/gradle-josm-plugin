@@ -14,7 +14,7 @@ plugins {
   id 'org.openstreetmap.josm' version '‹insertCurrentVersionNumber›'
 }
 ```
-Replace `‹insertCurrentVersionNumber›` with [![the latest available version number](https://img.shields.io/github/tag/floscher/gradle-josm-plugin.svg?style=flat-square&label=%20)](https://plugins.gradle.org/plugin/org.openstreetmap.josm.gradle.plugin), but do not include the leading `v` character.
+Replace `‹insertCurrentVersionNumber›` with the [latest available version](https://plugins.gradle.org/plugin/org.openstreetmap.josm).
 
 ## Option 1: My project does not have a `build.xml` file in the project root
 
@@ -48,9 +48,9 @@ josm {
 Some of these options are commented out, that means that they are optional, the others have to be set.
 
 For documentation on what each of these means, see the documentation for
-[`josm{ }`](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/config/JosmPluginExtension.html),
-[`manifest{ }`](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/config/JosmManifest.html) and for
-[`i18n{ }`](https://floscher.github.io/gradle-josm-plugin/groovydoc/current/org/openstreetmap/josm/gradle/plugin/config/I18nConfig.html).
+[`josm{ }`](https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/),
+[`manifest{ }`](https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/-josm-manifest/) and for
+[`i18n{ }`](https://floscher.gitlab.io/gradle-josm-plugin/kdoc/v0.4.6/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/-i18n-config/).
 
 
 

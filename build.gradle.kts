@@ -98,8 +98,8 @@ version = if (tmpVersion[0] == 'v') tmpVersion.substring(1) else tmpVersion
 
 // for the plugin-publish (publish to plugins.gradle.org)
 pluginBundle {
-  website = "https://github.com/floscher/gradle-josm-plugin#readme"
-  vcsUrl = "https://github.com/floscher/gradle-josm-plugin.git"
+  website = "https://gitlab.com/floscher/gradle-josm-plugin#readme"
+  vcsUrl = "https://gitlab.com/floscher/gradle-josm-plugin.git"
   description = "This plugin helps with developing for the JOSM project."
   tags = listOf("josm", "openstreetmap", "osm")
 

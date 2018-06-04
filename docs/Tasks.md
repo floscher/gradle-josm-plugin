@@ -6,7 +6,7 @@ If you want to do a full build (including unit tests and other tools you set up,
 
 To see a list of available tasks, run `./gradlew tasks` in your project root and take special note of the part titled `JOSM tasks`.
 
-> **Note:** Did you know? You can [abbreviate Gradle tasks](https://docs.gradle.org/4.1/userguide/tutorial_gradle_command_line.html#sec:task_name_abbreviation). E.g. for `runJosm` you could write `runJ` or even `rJ` as long as your abbreviation is not ambiguous.
+> **Note:** Did you know? You can [abbreviate Gradle tasks](https://docs.gradle.org/4.8/userguide/command_line_interface.html#_task_name_abbreviation). E.g. for `runJosm` you could write `runJ` or even `rJ` as long as your abbreviation is not ambiguous.
 
 ## runJosm
 ```bash
