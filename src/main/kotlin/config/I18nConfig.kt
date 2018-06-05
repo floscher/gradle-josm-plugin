@@ -1,8 +1,8 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
 import groovy.lang.Closure
-import org.gradle.api.GradleException
 import org.gradle.api.Project
+import java.io.IOException
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -10,6 +10,8 @@ import java.util.regex.Pattern
  * Holds configuration options regarding internationalization.
  */
 class I18nConfig(private val project: Project) {
+  private val LINE_NUMBER_PATTERN = Pattern.compile(".*:([1-9][0-9]*)")
+
   /**
    * E-Mail address to which bugs regarding i18n should be reported.
    * This will be put into the *.pot files that are forwarded to the translators.
@@ -68,27 +70,42 @@ class I18nConfig(private val project: Project) {
    * Supply a repo slug (`username/repo`) and this method will return a function,
    * which you can use as value for the field [pathTransformer].
    */
-  fun getGithubPathTransformer(repoSlug: String): (String) -> String {
-    return fun(path: String): String {
-        val lineNumberMatcher: Matcher = Pattern.compile(".*:([1-9][0-9]*)").matcher(path)
-        var lineNumber: String? = null
-        var filePath: String = path
-        if (lineNumberMatcher.matches()) {
-          lineNumber = lineNumberMatcher.group(1)
-          filePath = path.substring(0, path.length - lineNumber.length - 1)
-        }
-        val gitProcess: Process = ProcessBuilder("git", "rev-parse", "--short", "HEAD").start()
-        gitProcess.waitFor()
-        if (gitProcess.exitValue() == 0) {
-          val projectPath: String = project.projectDir.absolutePath
-          if (filePath.startsWith(projectPath)) {
-            return "github.com/$repoSlug/blob/${gitProcess.inputStream.bufferedReader().readText().trim()}" +
-              filePath.substring(projectPath.length) +
-              (if (lineNumber == null ) "" else "#L" + lineNumber + ':' + lineNumber)
-          }
-          return path
-        }
-        throw GradleException("Failed to determine current commit hash!\n" + gitProcess.errorStream.bufferedReader().readText())
-    };
+  @Deprecated("Use the more generic getPathTransformer() instead", ReplaceWith("getPathTransformer(\"github.com/\" + repoSlug + \"/blob\")"))
+  fun getGithubPathTransformer(repoSlug: String) = getPathTransformer("github.com/$repoSlug/blob")
+
+  /**
+   * Creates a path transformer that replaces an absolute file path of the *.pot file with a URL
+   * to a hosted instance of the project.
+   * Supply a base URL to a source code browser on the web, it will be transformed to the full URL as follows:
+   *
+   * `$repoUrl/$gitCommitHash/$filePathRelativeToProjectRoot#L$lineNumber`
+   *
+   * Good values would be e.g. `gitlab.com/myself/MyAwesomeProject/blob` or `github.com/myself/MyAwesomeProject/blob`
+   *
+   * @param repoUrl the supplied base URL
+   */
+  fun getPathTransformer(repoUrl: String) = { path: String ->
+    val sourceFileMatcher = LINE_NUMBER_PATTERN.matcher(path)
+    val (sourceFilePath, lineNumber) = if (sourceFileMatcher.matches()) {
+      val lineNumber = sourceFileMatcher.group(1)
+      path.substring(0, path.length - lineNumber.length - 1) to lineNumber
+    } else {
+      path to null
+    }
+    if (sourceFilePath.startsWith(project.projectDir.absolutePath)) {
+      val relativePath = sourceFilePath.substring(project.projectDir.absolutePath.length).trim('/')
+      "$repoUrl/${getGitCommitHash()}/$relativePath" + if (lineNumber == null) { "" } else { "#L$lineNumber"}
+    } else {
+      path
+    }
+  }
+
+  fun getGitCommitHash(): String {
+    val gitProcess: Process = ProcessBuilder("git", "rev-parse", "--short", "HEAD").start()
+    gitProcess.waitFor()
+    if (gitProcess.exitValue() == 0) {
+      return gitProcess.inputStream.bufferedReader().readText().trim()
+    }
+    throw IOException("Failed to determine current commit hash!\n" + gitProcess.errorStream.bufferedReader().readText())
   }
 }
