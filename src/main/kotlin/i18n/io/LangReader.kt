@@ -4,8 +4,17 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 
+/**
+ * A reader class for reading the custom *.lang file format of JOSM.
+ */
 class LangReader {
 
+  /**
+   * Reads all *.lang files in a directory into a map from the name of each language
+   * to a map that associates the string in the base language with the string translated to the current language.
+   * @param langFileDir the directory containing the *.lang files
+   * @param baseLang the base language from which the translators will translate to other languages
+   */
   fun readLangFiles(langFileDir: File, baseLang: String): Map<String, Map<MsgId, MsgStr>> {
     val langFiles = langFileDir
       .listFiles { file -> file.isFile && file.extension == "lang" }
@@ -24,6 +33,13 @@ class LangReader {
     )
   }
 
+  /**
+   * Read translations from *.lang files available as [InputStream]s
+   * @param baseLang the base language, from where the translatable strings originate
+   * @param baseStream the [InputStream] for the *.lang file of the base language
+   * @param langStreams a [Map] containing the [InputStream]s for the other languages
+   *   (the keys of this map are the names of the *.lang files without extension)
+   */
   fun readLangStreams(baseLang: String, baseStream: InputStream, langStreams: Map<String, InputStream>): Map<String, Map<MsgId, MsgStr>> {
     val baseStrings = readBaseLangStream(baseStream)
     return langStreams.map { (lang, stream) ->

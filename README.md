@@ -10,7 +10,9 @@ Things like test driving your JOSM plugins before releasing them becomes as easy
 
 See the docs below for many more things you can do. And you don't even need to abandon the Ant build, which is used for most of the JOSM plugins. Option 2 in [the guide for setting up the `gradle-josm-plugin`](docs/Setup.md) explains how a JOSM plugin can support building with either build system (many configuration options can be shared between both).
 
-If you miss something here, found something that's broken, or need more info about this project: Feel free to open issues on this project!
+If you miss something here, found something that's broken, or need more info about this project:
+Feel free to open issues on this project!
+Or you can reach out via email: incoming+floscher/gradle-josm-plugin@incoming.gitlab.com (e-mails to this address will end up published online)
 
 ## Getting started
 

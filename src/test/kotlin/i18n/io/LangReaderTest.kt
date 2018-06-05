@@ -138,8 +138,6 @@ class LangReaderTest {
 
   @Test
   fun testWriteReadLang() {
-    val bytes = mutableListOf<Byte>()
-
     val msgids = mutableListOf<MsgId>()
     msgids.add(MsgId(MsgStr("ASCII")))
     msgids.add(MsgId(MsgStr("Umlaut: ÄÖÜäöüß")))
@@ -171,7 +169,6 @@ class LangReaderTest {
     val translationsByLang = getDummyTranslations(baseLang)
     val langStreams = translationsByLang.keys.associate { it to ByteArrayOutputStream() }
     val writer = LangWriter()
-    val reader = LangReader()
     langStreams.forEach {
       println("Writing language ${it.key}…")
       println("Translatable: " + translatableStrings.joinToString("\n"))
