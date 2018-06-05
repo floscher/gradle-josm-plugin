@@ -13,7 +13,7 @@ plugins {
   id("com.gradle.plugin-publish").version("0.9.10")
   id("com.github.ben-manes.versions").version("0.17.0")
   kotlin("jvm").version("1.2.41")
-  id("org.jetbrains.dokka").version("0.9.16")
+  id("org.jetbrains.dokka").version("0.9.17")
 
   jacoco
   maven
@@ -59,6 +59,7 @@ dependencies {
   val kotlinVersion: String by project.extra
   implementation(localGroovy())
   implementation("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", kotlinVersion)
+  implementation("org.eclipse.jgit", "org.eclipse.jgit", "5.0.0.201805301535-rc2")
   testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.2.0")
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.2.0")
 }

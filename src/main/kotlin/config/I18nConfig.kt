@@ -1,9 +1,10 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
 import groovy.lang.Closure
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.gradle.api.Project
-import java.io.IOException
-import java.util.regex.Matcher
+import java.io.File
 import java.util.regex.Pattern
 
 /**
@@ -100,12 +101,8 @@ class I18nConfig(private val project: Project) {
     }
   }
 
-  fun getGitCommitHash(): String {
-    val gitProcess: Process = ProcessBuilder("git", "rev-parse", "--short", "HEAD").start()
-    gitProcess.waitFor()
-    if (gitProcess.exitValue() == 0) {
-      return gitProcess.inputStream.bufferedReader().readText().trim()
-    }
-    throw IOException("Failed to determine current commit hash!\n" + gitProcess.errorStream.bufferedReader().readText())
+  private fun getGitCommitHash(): String {
+    val git = Git(FileRepository(File(project.projectDir, ".git")))
+    return git.repository.newObjectReader().abbreviate(git.log().setMaxCount(1).call().first().tree.id).name()
   }
 }
