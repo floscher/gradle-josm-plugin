@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>RunJosmTask - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.task</a>&nbsp;/&nbsp;<a href="./index.html">RunJosmTask</a><br/>
+<br/>
+<h1>RunJosmTask</h1>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">RunJosmTask</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/4.7/javadoc/org/gradle/api/tasks/JavaExec.html"><span class="identifier">JavaExec</span></a></code>
+<p>A task that can execute a JOSM instance. There's also the class <a href="../-debug-josm/index.html">DebugJosm</a>, which extends this class and allows to
+remote debug via JDWP (Java debug wire protocol).</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">RunJosmTask</span><span class="symbol">(</span><span class="symbol">)</span></code>
+<p>A task that can execute a JOSM instance. There's also the class <a href="../-debug-josm/index.html">DebugJosm</a>, which extends this class and allows to
+remote debug via JDWP (Java debug wire protocol).</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="extra-information.html">extraInformation</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">extraInformation</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Text that should be displayed in the console output right before JOSM is started up. Defaults to the empty string.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-debug-josm/index.html">DebugJosm</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">DebugJosm</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">RunJosmTask</span></a></code>
+<p>The same as <a href="./index.html">RunJosmTask</a>, but the JOSM instance is debuggable via JDWP (Java debug wire protocol) on the port
+configured at <a href="../../org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/debug-port.html">JosmPluginExtension.debugPort</a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
