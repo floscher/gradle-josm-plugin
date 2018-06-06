@@ -37,7 +37,7 @@ class GitDescriber(val workTree: File) {
    */
   fun commitHash(): String {
     return git.repository.newObjectReader().abbreviate(
-      git.log().setMaxCount(1).call().first().tree.id
+      git.log().setMaxCount(1).call().first().toObjectId()
     ).name()
   }
 }
