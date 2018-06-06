@@ -3,7 +3,6 @@ package org.openstreetmap.josm.gradle.plugin.config
 import groovy.lang.Closure
 import org.gradle.api.Project
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
-import java.io.File
 import java.util.regex.Pattern
 
 /**
@@ -54,7 +53,7 @@ class I18nConfig(private val project: Project) {
    * `#: `).
    *
    * **Default value:** `{a -> a}` (identity)
-   * @see getGithubPathTransformer
+   * @see getPathTransformer
    */
   var pathTransformer: (String) -> String = {a -> a};
 
@@ -70,7 +69,7 @@ class I18nConfig(private val project: Project) {
    * Supply a repo slug (`username/repo`) and this method will return a function,
    * which you can use as value for the field [pathTransformer].
    */
-  @Deprecated("Use the more generic getPathTransformer() instead", ReplaceWith("getPathTransformer(\"github.com/\" + repoSlug + \"/blob\")"))
+  @Deprecated("Use the more generic getPathTransformer() instead", ReplaceWith("getPathTransformer(\"github.com/\$repoSlug/blob\")"))
   fun getGithubPathTransformer(repoSlug: String) = getPathTransformer("github.com/$repoSlug/blob")
 
   /**

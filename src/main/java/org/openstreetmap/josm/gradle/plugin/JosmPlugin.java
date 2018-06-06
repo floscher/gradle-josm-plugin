@@ -11,7 +11,6 @@ import org.gradle.api.tasks.bundling.Jar;
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
 import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.task.TaskSetupKt;
-import org.openstreetmap.josm.gradle.plugin.GitDescriber;
 
 /**
  * Main class of the plugin, sets up the custom configurations <code>requiredPlugin</code> and <code>packIntoJar</code>,

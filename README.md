@@ -1,8 +1,7 @@
 # Gradle plugin for developing JOSM plugins
 
 [![build status](https://gitlab.com/floscher/gradle-josm-plugin/badges/master/build.svg)](https://gitlab.com/floscher/gradle-josm-plugin/pipelines?scope=branches)
-[![latest release](https://img.shields.io/github/tag/floscher/gradle-josm-plugin.svg?style=flat-square)](https://plugins.gradle.org/plugin/org.openstreetmap.josm)
-[![license](https://img.shields.io/github/license/floscher/gradle-josm-plugin.svg?style=flat-square)](https://github.com/floscher/gradle-josm-plugin/blob/master/LICENSE)
+[![License is GPLv3](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://gitlab.com/floscher/gradle-josm-plugin/blob/master/LICENSE)
 
 This Gradle plugin is designed to make development of JOSM plugins easier.
 
@@ -11,8 +10,8 @@ Things like test driving your JOSM plugins before releasing them becomes as easy
 See the docs below for many more things you can do. And you don't even need to abandon the Ant build, which is used for most of the JOSM plugins. Option 2 in [the guide for setting up the `gradle-josm-plugin`](docs/Setup.md) explains how a JOSM plugin can support building with either build system (many configuration options can be shared between both).
 
 If you miss something here, found something that's broken, or need more info about this project:
-Feel free to open issues on this project!
-Or you can reach out via email: incoming+floscher/gradle-josm-plugin@incoming.gitlab.com (e-mails to this address will end up published online)
+* Feel free to [open issues on this project](https://gitlab.com/floscher/gradle-josm-plugin/issues/new)!
+* Or you can reach out via email: [incoming+floscher/gradle-josm-plugin@incoming.gitlab.com](mailto:incoming+floscher/gradle-josm-plugin@incoming.gitlab.com) (e-mails to this address will be published online as issues)
 
 ## Getting started
 
@@ -33,12 +32,12 @@ Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://floscher.gitlab.io
 * [fieldpapers/josm-**fieldpapers**](https://github.com/fieldpapers/josm-fieldpapers)
 * [JOSM/**geojson**](https://github.com/JOSM/geojson)
 * [osmlab/**josm-atlas**](https://github.com/osmlab/josm-atlas)
-* [qeef/**mapathoner**](https://github.com/qeef/mapathoner)
+* [qeef/**mapathoner**](https://gitlab.com/qeef/mapathoner)
 * [JOSM/**Mapillary**](https://github.com/JOSM/Mapillary)
 * [matsim-org/josm-**matsim**-plugin](https://github.com/matsim-org/josm-matsim-plugin)
 * [iandees/josm-**mbtiles**](https://github.com/iandees/josm-mbtiles)
 * [Gubaer/josm-**scripting**-plugin](https://github.com/Gubaer/josm-scripting-plugin)
-* [JOSM/**wikipedia**](https://github.com/JOSM/wikipedia)
+* [JOSM/**wikipedia**](https://gitlab.com/floscher/JOSM-wikipedia)
 
 ## Deprecated links
 Alternatively to the default Gradle plugin repository, you can download this plugin from a Maven repository at `https://floscher.gitlab.io/gradle-josm-plugin/maven`.
