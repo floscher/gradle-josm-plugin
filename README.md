@@ -33,7 +33,7 @@ Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://floscher.gitlab.io
 * [fieldpapers/josm-**fieldpapers**](https://github.com/fieldpapers/josm-fieldpapers)
 * [JOSM/**geojson**](https://github.com/JOSM/geojson)
 * [osmlab/**josm-atlas**](https://github.com/osmlab/josm-atlas)
-* [qeef/**mapathoner**](https://github.com/qeef/mapathoner)
+* [qeef/**mapathoner**](https://gitlab.com/qeef/mapathoner)
 * [JOSM/**Mapillary**](https://github.com/JOSM/Mapillary)
 * [matsim-org/josm-**matsim**-plugin](https://github.com/matsim-org/josm-matsim-plugin)
 * [iandees/josm-**mbtiles**](https://github.com/iandees/josm-mbtiles)
