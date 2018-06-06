@@ -1,9 +1,8 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
 import groovy.lang.Closure
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.gradle.api.Project
+import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import java.io.File
 import java.util.regex.Pattern
 
@@ -95,14 +94,9 @@ class I18nConfig(private val project: Project) {
     }
     if (sourceFilePath.startsWith(project.projectDir.absolutePath)) {
       val relativePath = sourceFilePath.substring(project.projectDir.absolutePath.length).trim('/')
-      "$repoUrl/${getGitCommitHash()}/$relativePath" + if (lineNumber == null) { "" } else { "#L$lineNumber"}
+      "$repoUrl/${GitDescriber(project.projectDir).commitHash()}/$relativePath" + if (lineNumber == null) { "" } else { "#L$lineNumber"}
     } else {
       path
     }
-  }
-
-  private fun getGitCommitHash(): String {
-    val git = Git(FileRepository(File(project.projectDir, ".git")))
-    return git.repository.newObjectReader().abbreviate(git.log().setMaxCount(1).call().first().tree.id).name()
   }
 }

@@ -11,6 +11,7 @@ import org.gradle.api.tasks.bundling.Jar;
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
 import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.task.TaskSetupKt;
+import org.openstreetmap.josm.gradle.plugin.GitDescriber;
 
 /**
  * Main class of the plugin, sets up the custom configurations <code>requiredPlugin</code> and <code>packIntoJar</code>,
@@ -31,6 +32,12 @@ public class JosmPlugin implements Plugin<Project> {
    * Overrides <a href="https://docs.gradle.org/current/javadoc/org/gradle/api/Plugin.html#apply-T-">Plugin.apply()</a>.
    */
   public void apply(@Nonnull final Project project) {
+    try {
+      project.setVersion(new GitDescriber(project.getProjectDir()).describe(true));
+    } catch (Exception e) {
+      project.setVersion("‹unknown›");
+    }
+
     // Apply the Java plugin if not available, because we rely on the `jar` task
     if (project.getPlugins().findPlugin(JavaPlugin.class) == null) {
       project.apply(conf -> conf.plugin(JavaPlugin.class));

@@ -1,18 +1,39 @@
 import groovy.lang.GroovySystem
 import org.codehaus.groovy.runtime.DefaultGroovyMethods.printf
+import org.eclipse.jgit.internal.storage.file.FileRepository
+import org.eclipse.jgit.lib.Repository
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.gradle.api.internal.artifacts.repositories.layout.MavenRepositoryLayout
+import org.eclipse.jgit.api.Git
+import org.gradle.api.internal.HasConvention
+import org.gradle.kotlin.dsl.resolver.SourcePathProvider
+import org.gradle.kotlin.dsl.resolver.buildSrcSourceRootsFilePath
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.ExternalDocumentationLinkImpl
 import org.jetbrains.dokka.gradle.DokkaPlugin
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.SourceRoot
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.openstreetmap.josm.gradle.plugin.GitDescriber
+
 import java.time.Duration
 import java.time.Instant
 import java.net.URL
 
+buildscript {
+  val kotlinVersion: String by project.extra { "1.2.41" }
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath(kotlin("gradle-plugin", kotlinVersion))
+  }
+}
+
 plugins {
   id("com.gradle.plugin-publish").version("0.9.10")
   id("com.github.ben-manes.versions").version("0.17.0")
-  kotlin("jvm").version("1.2.41")
   id("org.jetbrains.dokka").version("0.9.17")
 
   jacoco
@@ -20,6 +41,9 @@ plugins {
   eclipse
   `java-gradle-plugin`
   `maven-publish`
+}
+apply {
+  plugin("org.jetbrains.kotlin.jvm")
 }
 
 gradle.taskGraph.beforeTask {
@@ -55,11 +79,25 @@ repositories {
   jcenter()
 }
 
+// Reuse the kotlin sources from the "buildSrc" project
+gradle.projectsEvaluated {
+  java.sourceSets["main"].withConvention(KotlinSourceSet::class) {
+    project(":buildSrc").java.sourceSets["main"]
+      .withConvention(KotlinSourceSet::class) { kotlin.srcDirs }
+      .forEach {
+        this.kotlin.srcDir(it)
+      }
+  }
+  project(":buildSrc").configurations["implementation"].dependencies.forEach {
+    // Add all `implementation` dependencies of the `buildSrc` project
+    dependencies.implementation(it)
+  }
+}
+
 dependencies {
   val kotlinVersion: String by project.extra
   implementation(localGroovy())
   implementation("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", kotlinVersion)
-  implementation("org.eclipse.jgit", "org.eclipse.jgit", "5.0.0.201805301535-rc2")
   testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.2.0")
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.2.0")
 }
@@ -77,6 +115,13 @@ tasks {
   "dokka"(DokkaTask::class) {
     outputFormat = "html"
     outputDirectory = "$buildDir/docs/kdoc"
+    gradle.projectsEvaluated {
+      project(":buildSrc").java.sourceSets["main"].withConvention(KotlinSourceSet::class) {
+        kotlin.srcDirs.forEach {
+          sourceDirs = sourceDirs.toList().plus(it).asIterable()
+        }
+      }
+    }
   }
   withType(DokkaTask::class.java) {
     includes = listOf("src/main/kotlin/packages.md")
@@ -89,12 +134,9 @@ tasks {
 }
 
 group = "org.openstreetmap.josm"
-val versionProcess: Process = ProcessBuilder().command("git", "describe", "--dirty", "--always").start()
-versionProcess.waitFor()
-if (versionProcess.exitValue() != 0) {
-  throw GradleException("Failed to determine version!")
-}
-val tmpVersion = versionProcess.inputStream.bufferedReader().readText().trim()
+
+
+val tmpVersion = GitDescriber(projectDir).describe()
 version = if (tmpVersion[0] == 'v') tmpVersion.substring(1) else tmpVersion
 
 // for the plugin-publish (publish to plugins.gradle.org)
