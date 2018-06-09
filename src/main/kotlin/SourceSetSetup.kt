@@ -21,20 +21,26 @@ fun SourceSet.setup(project: Project, sdsf: SourceDirectorySetFactory) {
     project.tasks.create(
       if (name=="main") "shortenPoFiles" else "shorten${name.capitalize()}PoFiles",
       ShortenPoFiles::class.java,
-      { it.sourceSet = i18nSourceSet }
+      i18nSourceSet
     )
 
-    val poCompileTask = project.tasks.create(getCompileTaskName("po"), PoCompile::class.java, {
-      it.sourceSet = i18nSourceSet
-    })
-    val moCompileTask = project.tasks.create(getCompileTaskName("mo"), MoCompile::class.java, {
-      it.sourceSet = i18nSourceSet
-      it.poCompile = poCompileTask
-    })
-    val langCompileTask = project.tasks.create(getCompileTaskName("lang"), LangCompile::class.java, {
-      it.sourceSet = i18nSourceSet
-      it.moCompile = moCompileTask
-    })
+    val poCompileTask = project.tasks.create(
+      getCompileTaskName("po"),
+      PoCompile::class.java,
+      i18nSourceSet
+    )
+    val moCompileTask = project.tasks.create(
+      getCompileTaskName("mo"),
+      MoCompile::class.java,
+      poCompileTask,
+      i18nSourceSet
+    )
+    val langCompileTask = project.tasks.create(
+      getCompileTaskName("lang"),
+      LangCompile::class.java,
+      moCompileTask,
+      i18nSourceSet
+    )
     if ("main" == name) {
       project.extensions.josm.manifest.langCompileTask = langCompileTask
     }
