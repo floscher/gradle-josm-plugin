@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ExternalModuleDependency
@@ -13,18 +14,14 @@ fun Configuration.setupAsMainConfiguration(project: Project) {
   extendsFrom(project.configurations.create("packIntoJar"))
 
   project.afterEvaluate {
-    val josmCompileVersion = project.extensions.josm.josmCompileVersion
+    val josmCompileVersion = project.extensions.josm.josmCompileVersion ?: throw GradleException("JOSM compile version not set!")
 
     // Adding dependencies for JOSM and the required plugins
-    val josmDependency = project.dependencies.create("org.openstreetmap.josm:josm:${josmCompileVersion}")
-    when (josmCompileVersion) {
-      "latest", "tested" -> {
-        project.logger.info("Compile against the variable JOSM version ${josmCompileVersion}")
-        (josmDependency as ExternalModuleDependency).setChanging(true)
-      }
-      else -> {
-        project.logger.info("Compile against the JOSM version ${josmCompileVersion}")
-      }
+    val josmDependency = project.dependencies.createJosm(project, josmCompileVersion)
+    if (josmDependency is ExternalModuleDependency && josmDependency.isChanging) {
+      project.logger.info("Compile against the variable JOSM version ${josmCompileVersion}")
+    } else {
+      project.logger.info("Compile against the JOSM version ${josmCompileVersion.toInt()}")
     }
     dependencies.add(josmDependency)
 

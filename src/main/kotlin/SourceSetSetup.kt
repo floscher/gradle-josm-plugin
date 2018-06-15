@@ -12,7 +12,7 @@ import org.openstreetmap.josm.gradle.plugin.task.PoCompile
 import org.openstreetmap.josm.gradle.plugin.task.ShortenPoFiles
 
 fun SourceSet.setup(project: Project, sdsf: SourceDirectorySetFactory) {
-  if (name != "minJosmVersion" && name.isNotEmpty()) {
+  if (name.isNotEmpty()) {
     // Inspired by https://github.com/gradle/gradle/blob/9d86f98b01acb6496d05e05deddbc88c1e35d038/subprojects/plugins/src/main/java/org/gradle/api/plugins/GroovyBasePlugin.java#L88-L113
     val i18nSourceSet = DefaultI18nSourceSet(this, sdsf)
     DslObject(this).convention.plugins["i18n"] = i18nSourceSet

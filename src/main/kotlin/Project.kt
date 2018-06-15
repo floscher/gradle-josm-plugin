@@ -9,6 +9,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.plugins.JavaPluginConvention
@@ -126,6 +127,23 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
   }
   return result
 }
+
+fun DependencyHandler.createJosm(project: Project, version: String, findNextAvailable: Boolean = false): Dependency {
+  return if (findNextAvailable) {
+    project.getNextJosmVersion(version)
+  } else {
+    when (version) {
+      "latest", "tested" -> {
+        (create("org.openstreetmap.josm:josm:$version") as ExternalModuleDependency).setChanging(true)
+      }
+      else -> {
+        create("org.openstreetmap.josm:josm:${version.toInt()}")
+      }
+    }
+  }
+}
+
+fun DependencyHandler.isJosmDependency(dep: Dependency) = dep.group == "org.openstreetmap.josm" && dep.name == "josm"
 
 /**
  * @return true if a JOSM version of 7841 or later is used that can be configured to use separate directories for cache, preferences and userdata
