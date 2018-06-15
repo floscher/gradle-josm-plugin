@@ -70,6 +70,8 @@ repositories {
 
 // Reuse the kotlin sources from the "buildSrc" project
 gradle.projectsEvaluated {
+  // the following line is here so IntelliJ correctly picks up the dependency on project :buildSrc
+  java.sourceSets["main"].compileClasspath += project(":buildSrc").java.sourceSets["main"].output
   java.sourceSets["main"].withConvention(KotlinSourceSet::class) {
     project(":buildSrc").java.sourceSets["main"]
       .withConvention(KotlinSourceSet::class) { kotlin.srcDirs }
