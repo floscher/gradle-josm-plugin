@@ -1,19 +1,8 @@
 import groovy.lang.GroovySystem
-import org.codehaus.groovy.runtime.DefaultGroovyMethods.printf
-import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.eclipse.jgit.lib.Repository
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder
-import org.gradle.api.internal.artifacts.repositories.layout.MavenRepositoryLayout
 import org.eclipse.jgit.api.Git
-import org.gradle.api.internal.HasConvention
-import org.gradle.kotlin.dsl.resolver.SourcePathProvider
-import org.gradle.kotlin.dsl.resolver.buildSrcSourceRootsFilePath
 import org.jetbrains.dokka.DokkaConfiguration
-import org.jetbrains.dokka.ExternalDocumentationLinkImpl
-import org.jetbrains.dokka.gradle.DokkaPlugin
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.dokka.gradle.SourceRoot
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
 
@@ -22,18 +11,18 @@ import java.time.Instant
 import java.net.URL
 
 buildscript {
-  val kotlinVersion: String by project.extra { "1.2.41" }
   repositories {
     jcenter()
   }
   dependencies {
+    val kotlinVersion by project.extra { "1.2.50" }
     classpath(kotlin("gradle-plugin", kotlinVersion))
   }
 }
 
 plugins {
   id("com.gradle.plugin-publish").version("0.9.10")
-  id("com.github.ben-manes.versions").version("0.17.0")
+  id("com.github.ben-manes.versions").version("0.19.0")
   id("org.jetbrains.dokka").version("0.9.17")
 
   jacoco
@@ -124,7 +113,7 @@ tasks {
     }
   }
   withType(DokkaTask::class.java) {
-    includes = listOf("src/main/kotlin/packages.md")
+    includes = listOfNotNull("src/main/kotlin/packages.md")
     jdkVersion = 8
     skipEmptyPackages = false
 
@@ -134,7 +123,6 @@ tasks {
 }
 
 group = "org.openstreetmap.josm"
-
 
 val tmpVersion = GitDescriber(projectDir).describe()
 version = if (tmpVersion[0] == 'v') tmpVersion.substring(1) else tmpVersion
