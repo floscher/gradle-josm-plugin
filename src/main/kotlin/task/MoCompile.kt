@@ -31,7 +31,8 @@ open class MoCompile
     @Internal val sourceSet: I18nSourceSet
   ): DefaultTask() {
 
-  lateinit var outDir: File
+
+  private lateinit var outDir: File
 
   init {
     project.afterEvaluate {

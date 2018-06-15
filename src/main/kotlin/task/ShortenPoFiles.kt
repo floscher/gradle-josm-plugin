@@ -24,7 +24,7 @@ open class ShortenPoFiles
    * @property sourceSet The source set for which this task will shorten the *.po files
    */
   @Inject
-  constructor(@Internal val sourceSet: I18nSourceSet): DefaultTask() {
+  constructor(private val sourceSet: I18nSourceSet): DefaultTask() {
 
   init {
     group = "JOSM-i18n"

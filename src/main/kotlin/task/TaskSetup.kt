@@ -55,14 +55,18 @@ fun Project.setupJosmTasks() {
 private fun setupI18nTasks(project: Project, sourceSetJosmPlugin: SourceSet) {
 
   // Generate a list of all files in the main Java source set
-  val genSrcFileList = project.tasks.create("generateSrcFileList", GenerateFileList::class.java, {
-    it.outFile = File(project.buildDir, "srcFileList.txt")
-    it.srcSet = sourceSetJosmPlugin
-  })
+  val genSrcFileList = project.tasks.create(
+    "generateSrcFileList",
+    GenerateFileList::class.java,
+    File(project.buildDir, "srcFileList.txt"),
+    sourceSetJosmPlugin
+  )
 
-  project.tasks.create("generatePot", GeneratePot::class.java, {
-    it.fileListGenTask = genSrcFileList
-  })
+  project.tasks.create(
+    "generatePot",
+    GeneratePot::class.java,
+    genSrcFileList
+  )
 
   project.tasks.create("transifexDownload", TransifexDownload::class.java)
 }

@@ -2,7 +2,6 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.plugins.BasePluginConvention
 import org.gradle.api.tasks.Exec
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.josm
 import java.io.BufferedReader
@@ -15,6 +14,7 @@ import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 import java.time.Year
+import javax.inject.Inject
 
 /**
  * Create *.pot file (gettext file format), which contains all translatable strings.
@@ -22,13 +22,15 @@ import java.time.Year
  *
  * For this task to work the command line tool `xgettext` is required!
  */
-open class GeneratePot: Exec() {
-  private lateinit var outBaseName: String
+open class GeneratePot
   /**
+   * @property fileListGenTask
    * The task that generates a list of all source files. That file is needed to tell xgettext, which files it should examine.
    */
-  @Internal
-  lateinit var fileListGenTask: GenerateFileList
+  @Inject
+  constructor(private val fileListGenTask: GenerateFileList): Exec() {
+
+  private lateinit var outBaseName: String
 
   init {
     group = "JOSM-i18n"
