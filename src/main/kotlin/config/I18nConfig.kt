@@ -65,14 +65,6 @@ class I18nConfig(private val project: Project) {
   }
 
   /**
-   * Creates a path transformer for a project hosted on GitHub.
-   * Supply a repo slug (`username/repo`) and this method will return a function,
-   * which you can use as value for the field [pathTransformer].
-   */
-  @Deprecated("Use the more generic getPathTransformer() instead", ReplaceWith("getPathTransformer(\"github.com/\$repoSlug/blob\")"))
-  fun getGithubPathTransformer(repoSlug: String) = getPathTransformer("github.com/$repoSlug/blob")
-
-  /**
    * Creates a path transformer that replaces an absolute file path of the *.pot file with a URL
    * to a hosted instance of the project.
    * Supply a base URL to a source code browser on the web, it will be transformed to the full URL as follows:
@@ -82,6 +74,7 @@ class I18nConfig(private val project: Project) {
    * Good values would be e.g. `gitlab.com/myself/MyAwesomeProject/blob` or `github.com/myself/MyAwesomeProject/blob`
    *
    * @param repoUrl the supplied base URL
+   * @since v0.4.7
    */
   fun getPathTransformer(repoUrl: String) = { path: String ->
     val sourceFileMatcher = LINE_NUMBER_PATTERN.matcher(path)
