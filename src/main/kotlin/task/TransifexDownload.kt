@@ -12,7 +12,7 @@ open class TransifexDownload : Exec() {
   init {
     group = "JOSM-i18n"
     description = "Download the current state of translations from transifex.com . Requires the Transifex client to be installed."
-    commandLine = listOf("tx", "pull", "-f", "--mode", "onlytranslated")
+    commandLine = listOf("tx", "pull", "-a", "--mode", "onlytranslated")
     workingDir = project.projectDir
     project.afterEvaluate {
       doFirst {

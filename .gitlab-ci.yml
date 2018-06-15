@@ -1,7 +1,6 @@
-image: openjdk:8-jdk-alpine
+image: registry.gitlab.com/floscher/gradle-josm-plugin/java8:latest
 
 before_script:
-- apk add --update git openssh
 - export GRADLE_USER_HOME=`pwd`/.gradle
 
 cache:
