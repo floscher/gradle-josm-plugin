@@ -5,13 +5,13 @@
 
 This Gradle plugin is designed to make development of JOSM plugins easier.
 
-Things like test driving your JOSM plugins before releasing them becomes as easy as typing `./gradlew runJosm` into the command line and the `gradle-josm-plugin` automatically takes care of compiling the current state of your JOSM plugin, getting starting a clean (!) instance of JOSM with only your plugin loaded (and all required plugins, even transitive ones). You'll no longer need to keep a local copy of the JOSM source code in a compatible version and the other JOSM plugins!
+Things like test driving your JOSM plugins before releasing them becomes as easy as typing `./gradlew runJosm` into the command line and the `gradle-josm-plugin` automatically takes care of compiling the current state of your JOSM plugin, starting a clean (!) instance of JOSM with only your plugin loaded (and all required plugins, even transitive ones). You'll no longer need to keep a local copy of the JOSM source code in a compatible version and the other JOSM plugins!
 
 See the docs below for many more things you can do. And you don't even need to abandon the Ant build, which is used for most of the JOSM plugins. Option 2 in [the guide for setting up the `gradle-josm-plugin`](docs/Setup.md) explains how a JOSM plugin can support building with either build system (many configuration options can be shared between both).
 
 If you miss something here, found something that's broken, or need more info about this project:
 * Feel free to [open issues on this project](https://gitlab.com/floscher/gradle-josm-plugin/issues/new)!
-* Or you can reach out via email: [incoming+floscher/gradle-josm-plugin@incoming.gitlab.com](mailto:incoming+floscher/gradle-josm-plugin@incoming.gitlab.com) (e-mails to this address will be published online as issues)
+* Or you can reach out via email: `incoming+floscher/gradle-josm-plugin (at) incoming.gitlab.com`
 
 ## Getting started
 

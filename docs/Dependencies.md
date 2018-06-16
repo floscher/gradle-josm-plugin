@@ -14,9 +14,13 @@ Replace `plugin1` and `plugin2` with the JOSM plugins you depend on, how many pl
 If your plugin has dependencies to java libraries that are not available as JOSM plugin, but via Maven, then add the following to your `build.gradle`:
 
 ```gradle
+repositories {
+  // Define any additional repositories here (see https://docs.gradle.org/4.8/userguide/declaring_repositories.html)
+  // For the repositories that are automatically available with the gradle-josm-plugin, see https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/repositories.html
+}
 dependencies {
-  packIntoJar 'groupId:artifactId:1.2.3'
-  packIntoJar 'otherGroupId:otherArtifactId:42.0.0'
+  packIntoJar("groupId:artifactId:1.2.3")
+  packIntoJar("otherGroupId:otherArtifactId:42.0.0")
 }
 ```
 
