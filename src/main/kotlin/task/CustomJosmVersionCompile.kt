@@ -16,6 +16,8 @@ open class CustomJosmVersionCompile
   private lateinit var customJosm : Dependency
 
   init {
+    group = "JOSM"
+    description = "Compile the JOSM plugin against ${if (findNextVersion) { "the first available JOSM version since" } else { "JOSM version" }} $customVersion"
     classpath = additionalClasspath
     source.add(sourceSet.java)
     destinationDir =  File(project.buildDir, "classes/java/${sourceSet.name}_${customVersion}")

@@ -34,7 +34,7 @@ public class JosmPlugin implements Plugin<Project> {
     try {
       project.setVersion(new GitDescriber(project.getProjectDir()).describe(true));
     } catch (Exception e) {
-      project.setVersion("‹unknown›");
+      // Don't set the project version
     }
 
     // Apply the Java plugin if not available, because we rely on the `jar` task
