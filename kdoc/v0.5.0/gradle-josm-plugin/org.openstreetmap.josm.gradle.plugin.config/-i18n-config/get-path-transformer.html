@@ -1,0 +1,24 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>I18nConfig.getPathTransformer - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.config</a>&nbsp;/&nbsp;<a href="index.html">I18nConfig</a>&nbsp;/&nbsp;<a href="./get-path-transformer.html">getPathTransformer</a><br/>
+<br/>
+<h1>getPathTransformer</h1>
+<a name="org.openstreetmap.josm.gradle.plugin.config.I18nConfig$getPathTransformer(kotlin.String)"></a>
+<code><span class="keyword">fun </span><span class="identifier">getPathTransformer</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.I18nConfig$getPathTransformer(kotlin.String)/repoUrl">repoUrl</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Creates a path transformer that replaces an absolute file path of the *.pot file with a URL
+to a hosted instance of the project.
+Supply a base URL to a source code browser on the web, it will be transformed to the full URL as follows:</p>
+<p><code>$repoUrl/$gitCommitHash/$filePathRelativeToProjectRoot#L$lineNumber</code></p>
+<p>Good values would be e.g. <code>gitlab.com/myself/MyAwesomeProject/blob</code> or <code>github.com/myself/MyAwesomeProject/blob</code></p>
+<h3>Parameters</h3>
+<p><a name="repoUrl"></a>
+<code>repoUrl</code> - the supplied base URL</p>
+<p><strong>Since</strong><br/>
+v0.4.7</p>
+</BODY>
+</HTML>

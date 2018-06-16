@@ -1,0 +1,21 @@
+$dokka.format:html
+$dokka.linkExtension:html
+$dokka.location:org.openstreetmap.josm.gradle.plugin$createJosm(org.gradle.api.artifacts.dsl.DependencyHandler, org.gradle.api.Project, kotlin.String, kotlin.Boolean)org.openstreetmap.josm.gradle.plugin/org.gradle.api.artifacts.dsl.-dependency-handler/create-josm.html
+$dokka.location:org.openstreetmap.josm.gradle.plugin$getAllRequiredJosmPlugins(org.gradle.api.Project, kotlin.collections.Collection((kotlin.String)))org.openstreetmap.josm.gradle.plugin/org.gradle.api.-project/get-all-required-josm-plugins.html
+$dokka.location:org.openstreetmap.josm.gradle.plugin$getNextJosmVersion(org.gradle.api.Project, kotlin.String)org.openstreetmap.josm.gradle.plugin/org.gradle.api.-project/get-next-josm-version.html
+$dokka.location:org.openstreetmap.josm.gradle.plugin$isJosmDependency(org.gradle.api.artifacts.dsl.DependencyHandler, org.gradle.api.artifacts.Dependency)org.openstreetmap.josm.gradle.plugin/org.gradle.api.artifacts.dsl.-dependency-handler/is-josm-dependency.html
+$dokka.location:org.openstreetmap.josm.gradle.plugin$java#org.gradle.api.plugins.Conventionorg.openstreetmap.josm.gradle.plugin/org.gradle.api.plugins.-convention/java.html
+$dokka.location:org.openstreetmap.josm.gradle.plugin$josm#org.gradle.api.plugins.ExtensionContainerorg.openstreetmap.josm.gradle.plugin/org.gradle.api.plugins.-extension-container/josm.html
+$dokka.location:org.openstreetmap.josm.gradle.plugin$setup(org.gradle.api.tasks.SourceSet, org.gradle.api.Project, org.gradle.api.internal.file.SourceDirectorySetFactory)org.openstreetmap.josm.gradle.plugin/org.gradle.api.tasks.-source-set/setup.html
+$dokka.location:org.openstreetmap.josm.gradle.plugin$setupAsMainConfiguration(org.gradle.api.artifacts.Configuration, org.gradle.api.Project)org.openstreetmap.josm.gradle.plugin/org.gradle.api.artifacts.-configuration/setup-as-main-configuration.html
+$dokka.location:org.openstreetmap.josm.gradle.plugin$useSeparateTmpJosmDirs(org.gradle.api.Project)org.openstreetmap.josm.gradle.plugin/org.gradle.api.-project/use-separate-tmp-josm-dirs.html
+$dokka.location:org.openstreetmap.josm.gradle.plugin.i18n.io$readAllOrException(java.io.InputStream, kotlin.ByteArray)org.openstreetmap.josm.gradle.plugin.i18n.io/java.io.-input-stream/read-all-or-exception.html
+$dokka.location:org.openstreetmap.josm.gradle.plugin.i18n.io$readTwoBytesAsInt(java.io.InputStream)org.openstreetmap.josm.gradle.plugin.i18n.io/java.io.-input-stream/read-two-bytes-as-int.html
+$dokka.location:org.openstreetmap.josm.gradle.plugin.i18n.io$skipAllOrException(java.io.InputStream, kotlin.Long)org.openstreetmap.josm.gradle.plugin.i18n.io/java.io.-input-stream/skip-all-or-exception.html
+$dokka.location:org.openstreetmap.josm.gradle.plugin.task$setupJosmTasks(org.gradle.api.Project)org.openstreetmap.josm.gradle.plugin.task/org.gradle.api.-project/setup-josm-tasks.html
+org.openstreetmap.josm.gradle.plugin
+org.openstreetmap.josm.gradle.plugin.config
+org.openstreetmap.josm.gradle.plugin.i18n
+org.openstreetmap.josm.gradle.plugin.i18n.io
+org.openstreetmap.josm.gradle.plugin.setup
+org.openstreetmap.josm.gradle.plugin.task
