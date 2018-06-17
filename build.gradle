@@ -1,30 +1,30 @@
 plugins {
-  id 'org.openstreetmap.josm' version '0.4.5'
+  id "org.openstreetmap.josm" version "0.5.0"
 }
 
 repositories {
   jcenter()
 }
 
-version = 'git describe --always --dirty'.execute().in.text.trim()
 josm {
-  josmCompileVersion = '13878'
+  josmCompileVersion = "13878"
   manifest {
-    description = 'The description of my awesome plugin'
-    mainClass = 'org.openstreetmap.josm.plugins.myawesomeplugin.MyAwesomePlugin'
-    minJosmVersion = 1234
-    // author = 'John Doe'
+    description = "The description of my awesome plugin"
+    mainClass = "org.openstreetmap.josm.plugins.myawesomeplugin.MyAwesomePlugin"
+    minJosmVersion = 43
+    // author = "John Doe"
     // canLoadAtRuntime = true
-    // iconPath = 'path/to/my/icon.svg'
+    // iconPath = "path/to/my/icon.svg"
     // loadEarly = false
     // loadPriority = 50
-    // pluginDependencies << 'apache-commons' << 'apache-http'
-    // website = new URL('https://example.org')
-    // oldVersionDownloadLink 123, 'v1.2.0', new URL('https://example.org/download/v1.2.0/MyAwesomePlugin.jar')
-    // oldVersionDownloadLink  42, 'v1.0.0', new URL('https://example.org/download/v1.0.0/MyAwesomePlugin.jar')
+    // pluginDependencies << "apache-commons" << "apache-http"
+    // website = new URL("https://example.org")
+    // oldVersionDownloadLink 123, "v1.2.0", new URL("https://example.org/download/v1.2.0/MyAwesomePlugin.jar")
+    // oldVersionDownloadLink  42, "v1.0.0", new URL("https://example.org/download/v1.0.0/MyAwesomePlugin.jar")
   }
-  // i18n {
-  //   bugReportEmail = 'me@example.com'
-  //   copyrightHolder = 'John Doe'
-  // }
+  i18n {
+    // pathTransformer = getPathTransformer("gitlab.com/floscher/gradle-josm-plugin/blob/demo")
+    //   bugReportEmail = "me@example.com"
+    //   copyrightHolder = "John Doe"
+  }
 }
