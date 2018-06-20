@@ -13,17 +13,40 @@ assemble:
   script:
   - ./gradlew assemble
   artifacts:
-    untracked: true
+    paths:
+    - build/
+
+assemble on java10:
+  stage: build
+  script:
+  - ./gradlew assemble
+  artifacts:
+    paths:
+    - build/
 
 test:
   stage: test
   script:
   - ./gradlew build dokka
   artifacts:
-    untracked: true
+    paths:
+    - build/
+  dependencies:
+  - assemble
+
+test on java10:
+  stage: test
+  image:
+  script:
+  - ./gradlew build
+  dependencies:
+  - assemble on java10
 
 publishPlugin:
   stage: deploy
+  environment:
+    name: production
+    url: https://plugins.gradle.org/plugin/org.openstreetmap.josm
   script:
   - ./gradlew -Pgradle.publish.secret="$GRADLE_PUBLISH_SECRET" -Pgradle.publish.key="$GRADLE_PUBLISH_KEY" publishPlugins
   dependencies:
