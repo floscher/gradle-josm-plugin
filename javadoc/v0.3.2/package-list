@@ -1,7 +1,0 @@
-org.openstreetmap.josm.gradle.plugin
-org.openstreetmap.josm.gradle.plugin.config
-org.openstreetmap.josm.gradle.plugin.i18n
-org.openstreetmap.josm.gradle.plugin.i18n.io
-org.openstreetmap.josm.gradle.plugin.setup
-org.openstreetmap.josm.gradle.plugin.task
-task
