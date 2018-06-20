@@ -6,12 +6,16 @@ repositories {
   jcenter()
 }
 
+/**
+ * For documentation about the `josm{}` block see
+ * https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/
+ */
 josm {
   josmCompileVersion = "13878"
   manifest {
     description = "The description of my awesome plugin"
     mainClass = "org.openstreetmap.josm.plugins.myawesomeplugin.MyAwesomePlugin"
-    minJosmVersion = 43
+    minJosmVersion = 2830
     // author = "John Doe"
     // canLoadAtRuntime = true
     // iconPath = "path/to/my/icon.svg"
@@ -19,12 +23,12 @@ josm {
     // loadPriority = 50
     // pluginDependencies << "apache-commons" << "apache-http"
     // website = new URL("https://example.org")
-    // oldVersionDownloadLink 123, "v1.2.0", new URL("https://example.org/download/v1.2.0/MyAwesomePlugin.jar")
-    // oldVersionDownloadLink  42, "v1.0.0", new URL("https://example.org/download/v1.0.0/MyAwesomePlugin.jar")
+    // oldVersionDownloadLink(123, "v1.2.0", new URL("https://example.org/download/v1.2.0/MyAwesomePlugin.jar"))
+    // oldVersionDownloadLink( 42, "v1.0.0", new URL("https://example.org/download/v1.0.0/MyAwesomePlugin.jar"))
   }
   i18n {
     // pathTransformer = getPathTransformer("gitlab.com/floscher/gradle-josm-plugin/blob/demo")
-    //   bugReportEmail = "me@example.com"
-    //   copyrightHolder = "John Doe"
+    // bugReportEmail = "me@example.com"
+    // copyrightHolder = "John Doe"
   }
 }
