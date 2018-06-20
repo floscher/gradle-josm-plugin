@@ -9,6 +9,7 @@ import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import java.time.Duration
 import java.time.Instant
 import java.net.URL
+import java.util.Locale
 
 buildscript {
   repositories {
@@ -96,11 +97,45 @@ dependencies {
 jacoco {
   toolVersion = "0.8.1"
 }
+tasks.withType(JacocoReport::class.java) {
+  reports {
+    csv.isEnabled = true
+  }
+  val task = this
+  doLast {
+    val allLines = task.reports.csv.destination.readLines()
+    val headerLine = allLines[0].split(',')
+    var instructionsCovered = 0
+    var instructionsMissed = 0
+    var branchesCovered = 0
+    var branchesMissed = 0
+    var linesCovered = 0
+    var linesMissed = 0
+    allLines.subList(1, allLines.size)
+      .map{ it.split(',') }
+      .forEach {
+        require(it.size == headerLine.size)
+        instructionsCovered += it[headerLine.indexOf("INSTRUCTION_COVERED")].toInt()
+        instructionsMissed += it[headerLine.indexOf("INSTRUCTION_MISSED")].toInt()
+        branchesCovered += it[headerLine.indexOf("BRANCH_COVERED")].toInt()
+        branchesMissed += it[headerLine.indexOf("BRANCH_MISSED")].toInt()
+        linesCovered += it[headerLine.indexOf("LINE_COVERED")].toInt()
+        linesMissed += it[headerLine.indexOf("LINE_MISSED")].toInt()
+      }
+
+    fun coverageLogMessage(coveredCount: Int, missedCount: Int) = "${String.format(Locale.UK, "%.4f", 100 * coveredCount.toDouble() / (coveredCount + missedCount))} % ($coveredCount of ${coveredCount + missedCount})"
+
+    logger.lifecycle("Instruction coverage: ${coverageLogMessage(instructionsCovered, instructionsMissed)}")
+    logger.lifecycle("     Branch coverage: ${coverageLogMessage(branchesCovered, branchesMissed)}")
+    logger.lifecycle("       Line coverage: ${coverageLogMessage(linesCovered, linesMissed)}")
+  }
+}
+
 
 tasks.withType(Test::class.java) {
   useJUnitPlatform()
+  finalizedBy(tasks.getByName("jacocoTestReport"))
 }
-tasks.findByName("jacocoTestReport")?.dependsOn(tasks.findByName("test"))
 
 tasks {
   "dokka"(DokkaTask::class) {

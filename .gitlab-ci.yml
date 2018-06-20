@@ -56,6 +56,9 @@ publishPlugin:
 
 pages:
   stage: deploy
+  environment:
+    name: documentation
+    url: https://gitlab.com/floscher/gradle-josm-plugin/tree/pages
   script:
   - |
     mkdir -p ~/.ssh/
