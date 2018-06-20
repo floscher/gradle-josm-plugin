@@ -54,10 +54,10 @@ publishPlugin:
   only:
   - tags@floscher/gradle-josm-plugin
 
-pages:
+push pages branch:
   stage: deploy
   environment:
-    name: documentation
+    name: pages branch
     url: https://gitlab.com/floscher/gradle-josm-plugin/tree/pages
   script:
   - |
@@ -87,8 +87,5 @@ pages:
     git push origin pages
   dependencies:
   - test
-  artifacts:
-    paths:
-    - public
   only:
   - tags@floscher/gradle-josm-plugin
