@@ -1,0 +1,16 @@
+image: alpine:3.7
+
+pages:
+  stage: deploy
+  environment:
+    name: documentation
+    url: https://floscher.gitlab.io/gradle-josm-plugin
+  script:
+  - mkdir .public
+  - cp -r * .public
+  - mv .public public
+  artifacts:
+    paths:
+    - public
+  only:
+  - pages@floscher/gradle-josm-plugin
