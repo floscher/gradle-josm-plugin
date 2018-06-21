@@ -120,7 +120,7 @@ class MoReader(val moFileURL: URL) {
 /**
  * Returns a MsgId for a string as it is saved in a *.mo file (context and EOT byte, then the string)
  */
-private fun ByteArray.toMsgId(contextSeparator: Char = '\u0004', pluralSeparator: Char = '\u0000'): MsgId {
+internal fun ByteArray.toMsgId(contextSeparator: Char = '\u0004', pluralSeparator: Char = '\u0000'): MsgId {
   val string = this.toString(StandardCharsets.UTF_8)
   val csIndex = string.indexOf(contextSeparator)
   return if (csIndex >= 0) {
@@ -138,9 +138,9 @@ private fun ByteArray.toMsgId(contextSeparator: Char = '\u0004', pluralSeparator
  * Four [Byte] values are combined to form one [Long] value (either as little endian or as big endian).
  * See [FourBytes] for details on how the byte values are combined.
  */
-private fun List<Byte>.toLongList(bigEndian: Boolean): List<Long> {
+internal fun List<Byte>.toLongList(bigEndian: Boolean): List<Long> {
   val result = mutableListOf<Long>()
-  for (i in 0 until size step 4) {
+  for (i in 0 until size - 3 step 4) {
     result.add(FourBytes(get(i), get(i + 1), get(i + 2), get(i + 3)).getLongValue(bigEndian))
   }
   return result.toList()

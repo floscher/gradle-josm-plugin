@@ -1,7 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskAction
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.josm

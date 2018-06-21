@@ -21,7 +21,7 @@ class MsgTest {
 
   @Test
   fun testMsgStr() {
-    assertThrows(IllegalArgumentException::class.java, { MsgStr(listOf()) })
+    assertThrows(IllegalArgumentException::class.java) { MsgStr(listOf()) }
     val alphabetList = listOf("A", "B", "C", "D", "E")
     assertEquals(alphabetList, MsgStr("A", "B", "C", "D", "E").strings)
     assertEquals(alphabetList, MsgStr(alphabetList).strings)

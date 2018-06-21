@@ -59,9 +59,9 @@ class ProjectExtensionsTest {
 
   @Test
   fun testNextJosmFail() {
-    assertThrows(GradleException::class.java, {
+    assertThrows(GradleException::class.java) {
       createNextJosmTestRepo().getNextJosmVersion("50")
-    })
+    }
   }
 
   @Test
@@ -71,9 +71,9 @@ class ProjectExtensionsTest {
 
   @Test
   fun testNextJosmNull() {
-    assertThrows(GradleException::class.java, {
+    assertThrows(GradleException::class.java) {
       createNextJosmTestRepo().getNextJosmVersion(null)
-    })
+    }
   }
 
   @Test
@@ -83,9 +83,9 @@ class ProjectExtensionsTest {
 
   @Test
   fun testNextJosmStringFail() {
-    assertThrows(GradleException::class.java, {
+    assertThrows(GradleException::class.java) {
       createNextJosmTestRepo().getNextJosmVersion("ABC")
-    })
+    }
   }
 
   /**
