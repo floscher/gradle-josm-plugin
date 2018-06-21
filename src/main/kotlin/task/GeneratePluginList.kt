@@ -2,6 +2,7 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.config.JosmManifest
 import java.io.File
@@ -11,6 +12,9 @@ import java.util.GregorianCalendar
 
 open class GeneratePluginList : DefaultTask() {
 
+  /**
+   * Maps the plugin name to the manifest attributes and the download URL of the plugin
+   */
   @Internal
   private val plugins: MutableMap<String, Pair<Map<String, String>, URL>> = mutableMapOf()
 
@@ -39,47 +43,49 @@ open class GeneratePluginList : DefaultTask() {
     project.afterEvaluate {
       outputs.file(outputFile)
     }
-    doFirst {
-      val fileBuilder = StringBuilder()
+  }
 
-      plugins.forEach { name, (manifest, url) ->
+  @TaskAction
+  fun action() {
+    val fileBuilder = StringBuilder()
+
+    plugins.forEach { name, (manifest, url) ->
+      fileBuilder
+        .append(name)
+        .append(';')
+        .append(url)
+        .append('\n')
+      manifest.forEach { key, value ->
         fileBuilder
-          .append(name)
-          .append(';')
-          .append(url)
-          .append('\n')
-        manifest.forEach { key, value ->
-          fileBuilder
-            .append('\t')
-            .append(key)
-            .append(": ")
-            .append(when (key) {
-              "Plugin-Icon" -> {
-                val iconBase64 = iconBase64Provider.invoke(value)
-                if (iconBase64 != null) {
-                  iconBase64
-                } else {
-                  value
-                }
-              }
-              "Plugin-Version" -> {
-                value + versionSuffix.invoke(name)
-              }
-              else -> {
+          .append('\t')
+          .append(key)
+          .append(": ")
+          .append(when (key) {
+            "Plugin-Icon" -> {
+              val iconBase64 = iconBase64Provider.invoke(value)
+              if (iconBase64 != null) {
+                iconBase64
+              } else {
                 value
               }
-            })
-            .append('\n')
-        }
+            }
+            "Plugin-Version" -> {
+              value + versionSuffix.invoke(name)
+            }
+            else -> {
+              value
+            }
+          })
+          .append('\n')
       }
-
-      if (!outputFile.parentFile.exists()) {
-        if (!outputFile.parentFile.mkdirs()) {
-          throw TaskExecutionException(this, IOException("Can't create directory ${outputFile.parentFile.absolutePath}!"))
-        }
-      }
-      outputFile.writeText(fileBuilder.toString(), Charsets.UTF_8)
     }
+
+    if (!outputFile.parentFile.exists()) {
+      if (!outputFile.parentFile.mkdirs()) {
+        throw TaskExecutionException(this, IOException("Can't create directory ${outputFile.parentFile.absolutePath}!"))
+      }
+    }
+    outputFile.writeText(fileBuilder.toString(), Charsets.UTF_8)
   }
 
   /**
