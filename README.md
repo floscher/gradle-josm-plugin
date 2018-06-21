@@ -1,8 +1,5 @@
 # Gradle plugin for developing JOSM plugins
 
-[![build status](https://gitlab.com/floscher/gradle-josm-plugin/badges/master/build.svg)](https://gitlab.com/floscher/gradle-josm-plugin/pipelines?scope=branches)
-[![License is GPLv3](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://gitlab.com/floscher/gradle-josm-plugin/blob/master/LICENSE)
-
 This Gradle plugin is designed to make development of JOSM plugins easier.
 
 Things like test driving your JOSM plugins before releasing them becomes as easy as typing `./gradlew runJosm` into the command line and the `gradle-josm-plugin` automatically takes care of compiling the current state of your JOSM plugin, starting a clean (!) instance of JOSM with only your plugin loaded (and all required plugins, even transitive ones). You'll no longer need to keep a local copy of the JOSM source code in a compatible version and the other JOSM plugins!
