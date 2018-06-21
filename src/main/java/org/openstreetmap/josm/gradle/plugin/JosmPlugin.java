@@ -9,7 +9,6 @@ import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.bundling.Jar;
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension;
-import org.openstreetmap.josm.gradle.plugin.setup.PluginTaskSetup;
 import org.openstreetmap.josm.gradle.plugin.task.TaskSetupKt;
 
 /**
@@ -30,6 +29,7 @@ public class JosmPlugin implements Plugin<Project> {
    * Creates the tasks this plugin provides, defines the <code>josm</code> extension, adds the repositories where JOSM specific dependencies can be found.
    * Overrides <a href="https://docs.gradle.org/current/javadoc/org/gradle/api/Plugin.html#apply-T-">Plugin.apply()</a>.
    */
+  @Override
   public void apply(@Nonnull final Project project) {
     try {
       project.setVersion(new GitDescriber(project.getProjectDir()).describe(true));
@@ -66,7 +66,6 @@ public class JosmPlugin implements Plugin<Project> {
     ConfigurationsSetupKt.setupAsMainConfiguration(project.getConfigurations().getByName("implementation"), project);
 
     TaskSetupKt.setupJosmTasks(project);
-    new PluginTaskSetup(project).setup();
 
     if (sourceDirectorySetFactory == null) {
       project.getLogger().warn("No source directory set factory given! The i18n source sets are not configured.");
