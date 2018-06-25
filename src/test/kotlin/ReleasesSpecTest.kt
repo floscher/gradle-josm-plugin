@@ -13,13 +13,11 @@ class ReleasesSpecTest {
         releases:
           - label: v0.0.2
             name: a name 1
-            numeric_plugin_version: 1
             numeric_josm_version: 1234
             description: a description
 
           - label: v0.0.1
             name: a name 2
-            numeric_plugin_version: 1
             numeric_josm_version: 1234
             description: a description
      """.trimIndent()
@@ -31,7 +29,6 @@ class ReleasesSpecTest {
       assertEquals(releases.size, 2)
       assertEquals(releases[0].label, "v0.0.2")
       assertEquals(releases[0].numericJosmVersion, 1234)
-      assertEquals(releases[0].numericPluginVersion, 1)
       assertEquals(releases[0].description, "a description")
       assertEquals(releases[0].name, "a name 1")
     } finally {
@@ -45,7 +42,6 @@ class ReleasesSpecTest {
     val releases = """
         releases:
           - label: v0.0.1
-            numeric_plugin_version: 1
             numeric_josm_version: 1234
             name: a_name
             description: a_description
@@ -68,7 +64,6 @@ class ReleasesSpecTest {
     val releases = """
         releases:
           - label: v0.0.1
-            numeric_plugin_version: 1
             numeric_josm_version: 1234
      """.trimIndent()
     try {

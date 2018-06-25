@@ -16,20 +16,17 @@ const val DEFAULT_LATEST_NAME = "latest"
  * A release specification maintained in the local `releases.yml` file
  */
 data class ReleaseSpec(
-  /** the release label, i.e. v1.0.0 */
-  val label: String,
+    /** the release label, i.e. v1.0.0 */
+    val label: String,
 
-  /** the numeric plugin version, monotonically increasing positive integer */
-  val numericPluginVersion: Int,
+    /** the lowest numeric josm version this release is compatible with */
+    val numericJosmVersion: Int,
 
-  /** the lowest numeric josm version this release is compatible with */
-  val numericJosmVersion: Int,
+    /** a description for the plugin release */
+    val description: String? = null,
 
-  /** a description for the plugin release */
-  val description: String? = null,
-
-  /** an optional name for the release. Defaults to the label, if missing. */
-  val name: String? = null
+    /** an optional name for the release. Defaults to the label, if missing. */
+    val name: String? = null
 )
 
 data class ReleasesSpec(val latest: String, val releases: List<ReleaseSpec>?) {
@@ -69,25 +66,9 @@ data class ReleasesSpec(val latest: String, val releases: List<ReleaseSpec>?) {
                     | specification with label '$label'"""
                         .trimMargin("|"))
 
-                val numericPluginVersion =
-                    release.get("numeric_plugin_version")?.let {
-                      try {
-                        it.asText().toInt()
-                      } catch(e: NumberFormatException) {
-                        throw ReleaseSpecException(
-                            """Illegal numeric_plugin_version for release
-                            | specification with label '$label'
-                             """.trimMargin("|"), e)
-                      }
-                } ?: throw ReleaseSpecException(
-                    """Missing numeric_plugin_version for release
-                    | specification with label '$label'"""
-                        .trimMargin("|"))
-
                 ReleaseSpec(
                     label = label,
                     numericJosmVersion = numericJosmVersion,
-                    numericPluginVersion = numericPluginVersion,
                     description = release.get("description")?.asText(),
                     name = release.get("name")?.asText() ?: label
                 )
@@ -101,9 +82,6 @@ data class ReleasesSpec(val latest: String, val releases: List<ReleaseSpec>?) {
 
     fun hasRelease(label: String) : Boolean = releases?.find {
         it.label == label } != null
-
-    fun hasRelease(numericPluginVersion: Int) : Boolean =  releases?.find {
-        it.numericPluginVersion == numericPluginVersion} != null
 }
 
 

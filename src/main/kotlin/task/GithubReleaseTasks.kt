@@ -5,6 +5,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.options.Option
 import org.openstreetmap.josm.gradle.plugin.ghreleases.DEFAULT_GITHUB_API_URL
+import org.openstreetmap.josm.gradle.plugin.ghreleases.DEFAULT_GITHUB_UPLOAD_URL
 import org.openstreetmap.josm.gradle.plugin.ghreleases.GithubReleasesClient
 import java.io.File
 import java.io.IOException
@@ -23,6 +24,7 @@ const val MEDIA_TYPE_JAR = "application/java-archive"
 const val CONFIG_OPT_GITHUB_USER = "josm.github.user"
 const val CONFIG_OPT_GITHUB_ACCESS_TOKEN = "josm.github.access_token"
 const val CONFIG_OPT_GITHUB_API_URL = "josm.github.api_url"
+const val CONFIG_OPT_GITHUB_UPLOAD_URL = "josm.github.uplod_url"
 const val CONFIG_OPT_GITHUB_REPOSITORY = "josm.github.repository"
 const val CONFIG_OPT_RELEASES_CONFIG_FILE = "josm.releases_config_file"
 const val CONFIG_OPT_RELEASE_TARGET_COMMITISH = "josm.release_target_commitish"
@@ -31,6 +33,7 @@ const val CONFIG_OPT_RELEASE_TARGET_COMMITISH = "josm.release_target_commitish"
 const val ENV_VAR_GITHUB_USER = "GITHUB_USER"
 const val ENV_VAR_GITHUB_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN"
 const val ENV_VAR_GITHUB_API_URL = "GITHUB_API_URL"
+const val ENV_VAR_GITHUB_UPLOAD_URL = "GITHUB_UPLOAD_URL"
 const val ENV_VAR_GITHUB_REPOSITORY = "GITHUB_REPOSITORY"
 
 /**
@@ -61,6 +64,11 @@ open class BaseGithubReleaseTask: DefaultTask() {
         option = "github-api-url",
         description = "the github api url")
     lateinit var githubApiUrl: String
+
+    @Option(
+        option = "github-upload-url",
+        description = "the github upload url")
+    lateinit var githubUploadUrl: String
 
     @Option(
         option = "releases-config-file",
@@ -178,6 +186,18 @@ open class BaseGithubReleaseTask: DefaultTask() {
         }
       }
 
+     val configuredGithubUploadUrl: String by lazy {
+        if (::githubUploadUrl.isInitialized) {
+            githubUploadUrl.trim()
+        }
+        else {
+            lookupConfiguredProperty(
+                propertyName = CONFIG_OPT_GITHUB_UPLOAD_URL,
+                envName = ENV_VAR_GITHUB_UPLOAD_URL
+            ) ?: DEFAULT_GITHUB_UPLOAD_URL
+        }
+    }
+
     val configuredTargetCommitish: String by lazy {
         if (::targetCommitish.isInitialized) {
             targetCommitish.trim()
@@ -214,18 +234,6 @@ open class BaseGithubReleaseTask: DefaultTask() {
     }
 
     @Throws(GithubReleaseTaskException::class)
-    protected fun ensureValidNumericPluginVersion(release: ReleaseSpec) {
-        if (release.numericPluginVersion <= 0) {
-            throw GithubReleaseTaskException(
-            """Illegal numeric plugin version '${release.numericPluginVersion}'
-                |for release '${release.label}'.
-                |Fix it in '$configuredReleasesConfigFile'"""
-              .trimMargin("|")
-            )
-        }
-    }
-
-    @Throws(GithubReleaseTaskException::class)
     protected fun ensureValidNumericJsomVersion(release: ReleaseSpec) {
         if (release.numericJosmVersion <= 0) {
             throw GithubReleaseTaskException(
@@ -237,14 +245,15 @@ open class BaseGithubReleaseTask: DefaultTask() {
         }
       }
 
-    protected val githubReleaseClient: GithubReleasesClient by lazy {
+    protected fun githubReleaseClient(url: String = configuredGithubApiUrl)
+        : GithubReleasesClient =
         GithubReleasesClient(
             repository = configuredGithubRepository,
             user = configuredGithubUser,
             accessToken = configuredGithubAccessToken,
-            apiUrl = configuredGithubApiUrl
+            apiUrl = url
         )
-    }
+
 
     private fun lookupConfiguredProperty(propertyName: String,
                                          envName: String? = null): String? {
@@ -280,9 +289,8 @@ open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
             |a release with this label in '$releaseConfigFile' and rerun."""
               .trimMargin("|")
         )
-        ensureValidNumericPluginVersion(release)
         ensureValidNumericJsomVersion(release)
-        val client = githubReleaseClient
+        val client = githubReleaseClient()
 
         val remoteRelease = client.getReleases().find {
             it["label"] == releaseLabel}
@@ -435,22 +443,21 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         manifest ?: throw GithubReleaseTaskException(
           "The jar file ${this.absolutePath} doesn't include a MANIFEST file"
         )
-        val pluginVersion = try {
-            manifest.mainAttributes.getValue("Plugin-Version")?.trim()?.toInt()
-        } catch (e: Throwable) {
-            null
-        } ?: throw GithubReleaseTaskException(
-            """The jar file '${this.absolutePath}' does either not include an
-            | attribute 'Plugin-Version' or its value isn't a positive int""""
-                .trimMargin("|")
-        )
-        if (pluginVersion != release.numericPluginVersion) {
+        val pluginVersion = manifest.mainAttributes.getValue("Plugin-Version")
+            ?.trim()
+        if (pluginVersion.isNullOrEmpty()) {
+            throw GithubReleaseTaskException(
+                """The jar file '${this.absolutePath}' doesn't include an
+                | attribute 'Plugin-Version' """"
+                    .trimMargin("|")
+            )
+        } else if (pluginVersion != release.label) {
             throw GithubReleaseTaskException(
             """The numeric plugin version in the in the MANIFEST of the jar file
-            |'${this.absolutePath}' doesn't match with numeric plugin version
+            |'${this.absolutePath}' doesn't match with the release label
             | of the release.
-            | Numeric plugin version for the release: ${release.numericPluginVersion}
-            | Numeric plugin version in the MANIFEST: ${pluginVersion}
+            | Release label:                  ${release.label}
+            | Plugin-version in the MANIFEST: $pluginVersion
             """.trimMargin("|")
             )
         }
@@ -463,7 +470,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         } ?: throw GithubReleaseTaskException(
             """The jar file '${this.absolutePath}' does either not include
             |an attribute
-           | 'Plugin-Main-Version' or its value isn't a positive int""""
+            | 'Plugin-Main-Version' or its value isn't a positive int""""
                 .trimMargin("|")
         )
         if (josmVersion != release.numericJosmVersion) {
@@ -482,7 +489,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
     fun publishToGithubRelease() {
 
         val releaseLabel = configuredReleaseLabel
-        val client = githubReleaseClient
+        val client = githubReleaseClient()
 
         val releaseConfig = ReleasesSpec.load(configuredReleasesConfigFile)
 
@@ -495,7 +502,6 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
             |and rerun."""
                 .trimMargin("|")
             )
-        ensureValidNumericPluginVersion(localRelease)
         ensureValidNumericJsomVersion(localRelease)
         val remoteReleases = client.getReleases()
 
@@ -519,7 +525,8 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
 
         println("Uploading '${localFile.name}' to release '$releaseLabel' "
            + "at ${client.apiUrl}")
-        client.uploadReleaseAsset(
+        val uploadClient = githubReleaseClient(configuredGithubUploadUrl)
+        uploadClient.uploadReleaseAsset(
             releaseId = releaseId,
             name = configuredRemoteJarName,
             contentType = MEDIA_TYPE_JAR,
@@ -537,7 +544,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
             val latestReleaseId = latestRelease["id"].toString().toInt()
             println("Uploading '${localFile.name}' to release "
                 + "'$latestReleaseLabel' at ${client.apiUrl}")
-            client.uploadReleaseAsset(
+            uploadClient.uploadReleaseAsset(
                 releaseId = latestReleaseId,
                 name = configuredRemoteJarName,
                 contentType = MEDIA_TYPE_JAR,

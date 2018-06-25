@@ -30,7 +30,6 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           releases:
             - label: "$releaseLabel"
               name: "$releaseName"
-              numeric_plugin_version: 1234
               numeric_josm_version: 5678
               description: a test description
           """.trimIndent()
@@ -101,7 +100,6 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           releases:
             - label: "$releaseLabel"
               name: "$releaseName"
-              numeric_plugin_version: 1234
               numeric_josm_version: 5678
               description: a test description
           """.trimIndent()
@@ -173,7 +171,6 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           releases:
             - label: "$releaseLabel"
               name: "$releaseName"
-              numeric_plugin_version: 1234
               numeric_josm_version: 5678
               description: a test description
           """.trimIndent()
@@ -251,7 +248,6 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           releases:
             - label: "$releaseLabel"
               name: "$releaseName"
-              numeric_plugin_version: 1234
               numeric_josm_version: 5678
               description: a test description
           """.trimIndent()
@@ -321,7 +317,6 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           releases:
             - label: "$releaseLabel"
               name: "$releaseName"
-              numeric_plugin_version: 1234
               numeric_josm_version: 5678
               description: a test description
           """.trimIndent()

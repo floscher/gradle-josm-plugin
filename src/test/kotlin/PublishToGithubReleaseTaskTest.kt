@@ -57,21 +57,20 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
         @WiremockUriResolver.WiremockUri uri: String) {
 
         val minJosmVersion = 1111
-        val pluginVersion = 2222
         val releaseId = 12345678
         val releaseLabel = "v0.0.1"
         val githubRepo = "repo_xy"
 
         // the standard pattern for the jar name the gradle-josm-plugin sets
         // for the plugin jar
-        val localJarName = "${buildDir?.name}-$pluginVersion.jar"
+        val localJarName = "${buildDir?.name}-$releaseLabel.jar"
 
         val buildFileContent = """
             plugins {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
                 id 'java'
             }
-            version = $pluginVersion
+            version = "$releaseLabel"
             josm {
               josmCompileVersion = "latest"
               manifest {
@@ -90,7 +89,6 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
         val releasesContent = """
               releases:
                 - label: $releaseLabel
-                  numeric_plugin_version: $pluginVersion
                   numeric_josm_version: $minJosmVersion
             """.trimIndent()
 
@@ -134,6 +132,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
             .withArguments("build", "myPublishToGithubRelease",
                 "--release-label", releaseLabel,
                 "--github-api-url", uri,
+                "--github-upload-url", uri,
                 "--github-repository", githubRepo
             )
         .build()
@@ -151,12 +150,11 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
     ) {
 
         val minJosmVersion = 1111
-        val pluginVersion = 2222
         val releaseId = 12345678
         val releaseLabel = "v0.0.1"
         val githubRepo = "repo_xy"
 
-        val localJarName = "test-$pluginVersion.jar"
+        val localJarName = "test-$releaseLabel.jar"
         val remoteJarName = "test.jar"
 
         val buildFileContent = """
@@ -164,7 +162,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
                 id 'java'
             }
-            version = $pluginVersion
+            version = "$releaseLabel"
             jar.archiveName = "$localJarName"
             josm {
               josmCompileVersion = "latest"
@@ -178,6 +176,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
             import org.openstreetmap.josm.gradle.plugin.task.PublishToGithubReleaseTask
             task myPublishToGithubRelease(type: PublishToGithubReleaseTask){
                 githubApiUrl = "$uri"
+                githubUploadUrl = "$uri"
                 githubRepository = "$githubRepo"
                 releaseLabel = "$releaseLabel"
                 remoteJarName = "$remoteJarName"
@@ -187,7 +186,6 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
         val releasesContent = """
               releases:
                 - label: $releaseLabel
-                  numeric_plugin_version: $pluginVersion
                   numeric_josm_version: $minJosmVersion
             """.trimIndent()
 
@@ -244,7 +242,6 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
     ) {
 
         val minJosmVersion = 1111
-        val pluginVersion = 2222
         val releaseId = 12345678
         val releaseLabel = "v0.0.1"
         val githubRepo = "repo_xy"
@@ -252,7 +249,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
         val latestReleaseLabel = "most_recent"
         val latestReleaseId = "45681234"
 
-        val localJarName = "test-$pluginVersion.jar"
+        val localJarName = "test-$releaseLabel.jar"
         val remoteJarName = "test.jar"
 
         val buildFileContent = """
@@ -260,7 +257,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
                 id 'java'
             }
-            version = $pluginVersion
+            version = "$releaseLabel"
             jar.archiveName = "$localJarName"
             josm {
               josmCompileVersion = "latest"
@@ -274,6 +271,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
             import org.openstreetmap.josm.gradle.plugin.task.PublishToGithubReleaseTask
             task myPublishToGithubRelease(type: PublishToGithubReleaseTask){
                 githubApiUrl = "$uri"
+                githubUploadUrl = "$uri"
                 githubRepository = "$githubRepo"
                 releaseLabel = "$releaseLabel"
                 remoteJarName = "$remoteJarName"
@@ -287,7 +285,6 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
                 name: $latestReleaseLabel
               releases:
                 - label: $releaseLabel
-                  numeric_plugin_version: $pluginVersion
                   numeric_josm_version: $minJosmVersion
             """.trimIndent()
 
@@ -362,21 +359,20 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
         @WiremockUriResolver.WiremockUri uri: String) {
 
         val minJosmVersion = 1111
-        val pluginVersion = 2222
         val releaseId = 12345678
         val releaseLabel = "v0.0.1"
         val githubRepo = "repo_xy"
 
         // the standard pattern for the jar name the gradle-josm-plugin sets
         // for the plugin jar
-        val localJarName = "${buildDir?.name}-$pluginVersion.jar"
+        val localJarName = "${buildDir?.name}-$releaseLabel.jar"
 
         val buildFileContent = """
             plugins {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
                 id 'java'
             }
-            version = $pluginVersion
+            version = "$releaseLabel"
             josm {
               josmCompileVersion = "latest"
               manifest {
@@ -391,7 +387,6 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
         val releasesContent = """
               releases:
                 - label: $releaseLabel
-                  numeric_plugin_version: $pluginVersion
                   numeric_josm_version: $minJosmVersion
             """.trimIndent()
 
@@ -435,6 +430,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
             .withArguments("build", "publishToGithubRelease",
                 "--release-label", releaseLabel,
                 "--github-api-url", uri,
+                "--github-upload-url", uri,
                 "--github-repository", githubRepo
             )
             .build()
@@ -453,7 +449,6 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
     ) {
 
         val minJosmVersion = 1111
-        val pluginVersion = 2222
         val releaseId = 12345678
         val releaseLabel = "v0.0.1"
         val githubRepo = "repo_xy"
@@ -461,7 +456,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
         val latestReleaseLabel = "most_recent"
         val latestReleaseId = "45681234"
 
-        val localJarName = "test-$pluginVersion.jar"
+        val localJarName = "test-$releaseLabel.jar"
         val remoteJarName = "test.jar"
 
         val buildFileContent = """
@@ -469,7 +464,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
                 id 'java'
             }
-            version = $pluginVersion
+            version = "$releaseLabel"
             jar.archiveName = "$localJarName"
             josm {
               josmCompileVersion = "latest"
@@ -484,6 +479,7 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
                 // githubUser from env var GITHUB_USER
                 // githubAccessToken from env var GITHUB_ACCESS_TOKEN
                 githubApiUrl = "$uri"
+                githubUploadUrl = "$uri"
                 githubRepository = "$githubRepo"
                 releaseLabel = "$releaseLabel"
                 remoteJarName = "$remoteJarName"
@@ -497,7 +493,6 @@ class PublishToGithubReleaseTaskTest() : BaseGithubReleaseTaskTest() {
                 name: $latestReleaseLabel
               releases:
                 - label: $releaseLabel
-                  numeric_plugin_version: $pluginVersion
                   numeric_josm_version: $minJosmVersion
             """.trimIndent()
 

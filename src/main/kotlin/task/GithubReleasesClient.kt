@@ -9,6 +9,8 @@ import java.net.URLEncoder
 
 // the default API URL for the Github API
 const val DEFAULT_GITHUB_API_URL = "https://api.github.com"
+// the default upload URL to upload a release asset
+const val DEFAULT_GITHUB_UPLOAD_URL = "https://uploads.github.com"
 
 
 class GithubReleaseClientException(override var message: String,
@@ -242,6 +244,7 @@ class GithubReleasesClient(
             )
             .filterNotNull()
             .joinToString(separator = "&")
+        println("uploadReleaseAsset: url=$url")
 
         val request = createBaseRequestBuilder()
             .post(requestBody)
