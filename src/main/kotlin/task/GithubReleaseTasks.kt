@@ -10,6 +10,7 @@ import org.openstreetmap.josm.gradle.plugin.ghreleases.GithubReleasesClient
 import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
+import java.util.logging.Logger
 
 class GithubReleaseTaskException(override var message: String,
                                  override var cause: Throwable?)
@@ -38,7 +39,7 @@ const val ENV_VAR_GITHUB_REPOSITORY = "GITHUB_REPOSITORY"
 
 // command line options
 const val CMDLINE_OPT_RELEASE_LABEL = "release-label"
-const val CMDLINE_OPT_GITHUB_USER = "release-github-user"
+const val CMDLINE_OPT_GITHUB_USER = "github-user"
 const val CMDLINE_OPT_GITHUB_REPOSITORY = "github-repository"
 const val CMDLINE_OPT_GITHUB_ACCESS_TOKEN = "github-access-token"
 const val CMDLINE_OPT_GITHUB_API_URL = "github-api-url"
@@ -48,6 +49,8 @@ const val CMDLINE_OPT_TARGET_COMMITISH = "target-commitish"
 const val CMDLINE_OPT_LOCAL_JAR_PATH = "local-jar-path"
 const val CMDLINE_OPT_REMOTE_JAR_NAME = "remote-jar-name"
 const val CMDLINE_OPT_UPDATE_LATEST = "update-latest"
+
+private val logger = Logger.getLogger("GithubReleaseTasks")
 
 /**
  * Base class for tasks related to the management of github releases
@@ -234,29 +237,20 @@ open class BaseGithubReleaseTask: DefaultTask() {
         } ?: DEFAULT_TARGET_COMMITISH
     }
 
-    private val configuredGithubRepository: String? by lazy {
-
-        val notConfigured = GithubReleaseTaskException(
-            """No github repository configured.
-            |Configure it in the task, i.e.
-            |   createGithubRelease {
-            |       githubRepository = "my-github-repo"
-            |   }
-            |or with the command line option --$CMDLINE_OPT_GITHUB_REPOSITORY,
-            |or with the project property $CONFIG_OPT_GITHUB_REPOSITORY
-            |or with the environment variable $ENV_VAR_GITHUB_REPOSITORY"""
-                .trimMargin("|")
-        )
+    private val configuredGithubRepository: String by lazy {
 
         if (::githubRepository.isInitialized) {
-            githubRepository.trim()
+            if (githubRepository.isNullOrBlank()) {
+                logger.warn("'githubRepository' is null or blank. "
+                    + " Assuming default value '${project.name}'")
+                project.name
+            }
+            else githubRepository
         }
-        else {
-            lookupConfiguredProperty(
+        else lookupConfiguredProperty(
                 propertyName = CONFIG_OPT_GITHUB_REPOSITORY,
                 envName = ENV_VAR_GITHUB_REPOSITORY
-            ) ?: throw notConfigured
-        }
+            ) ?: project.name
     }
 
     @Throws(GithubReleaseTaskException::class)
@@ -272,13 +266,14 @@ open class BaseGithubReleaseTask: DefaultTask() {
       }
 
     protected fun githubReleaseClient(url: String = configuredGithubApiUrl)
-        : GithubReleasesClient =
-        GithubReleasesClient(
+        : GithubReleasesClient {
+        return GithubReleasesClient(
             repository = configuredGithubRepository,
             user = configuredGithubUser,
             accessToken = configuredGithubAccessToken,
             apiUrl = url
         )
+    }
 
 
     private fun lookupConfiguredProperty(propertyName: String,
@@ -333,7 +328,7 @@ open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
                 targetCommitish = configuredTargetCommitish,
                 name = release.name ?: releaseLabel,
                 body = release.description)
-            println("Success: new release '$releaseLabel' created in "
+            logger.info("Success: new release '$releaseLabel' created in "
                 + "github repository")
         } catch(e: Throwable) {
            throw GithubReleaseTaskException(e.message ?: "", e)
@@ -542,7 +537,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         }
         localFile.ensureConsistentWithReleaseSpec(localRelease)
 
-        println("Uploading '${localFile.name}' to release '$releaseLabel' "
+        logger.info("Uploading '${localFile.name}' to release '$releaseLabel' "
            + "at ${client.apiUrl} ...")
         val uploadClient = githubReleaseClient(configuredGithubUploadUrl)
         uploadClient.uploadReleaseAsset(
@@ -563,7 +558,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
                 it["tag_name"] == latestReleaseLabel}
                 ?: throw notFound
             val latestReleaseId = latestRelease["id"].toString().toInt()
-            println("Uploading '${localFile.name}' to release "
+            logger.info("Uploading '${localFile.name}' to release "
                 + "'$latestReleaseLabel' at ${client.apiUrl} ...")
             uploadClient.uploadReleaseAsset(
                 releaseId = latestReleaseId,
