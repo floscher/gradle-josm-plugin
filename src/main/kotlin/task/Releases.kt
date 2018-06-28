@@ -82,6 +82,25 @@ data class ReleasesSpec(val latest: String, val releases: List<ReleaseSpec>?) {
 
     fun hasRelease(label: String) : Boolean = releases?.find {
         it.label == label } != null
+
+    /**
+     * Replies the list of numeric JOSM versions for which
+     * releases are configured
+     */
+    fun josmVersions(): List<Int> =
+        releases?.map { it.numericJosmVersion }
+            ?.sorted()?.distinct()
+            ?: listOf()
+
+    /**
+     * Replies the list of relevant releases whose download URLs
+     * have to be included in  the `MANIFEST` file of a plugin
+     * jar.
+     */
+    fun relevantReleasesForDownloadUrls(): List<ReleaseSpec> =
+        josmVersions().map { v ->
+            releases?.first { it.numericJosmVersion == v }
+        }.filterNotNull()
 }
 
 
