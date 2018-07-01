@@ -46,4 +46,42 @@ open class BaseGithubReleaseTaskTest() {
             .readText().trim()
         return if (tmpVersion[0] == 'v') tmpVersion.substring(1) else tmpVersion
     }
+
+    protected fun prepareTestPluginSource() {
+        val testPluginContent = """
+                package test_plugin;
+                import org.openstreetmap.josm.plugins.Plugin;
+                import org.openstreetmap.josm.plugins.PluginInformation;
+                public class TestPlugin extends Plugin {
+                  public TestPlugin(PluginInformation info) {
+                      super(info);
+                  }
+                }
+            """.trimIndent()
+        val sourceDir = File(buildDir, "src/main/java/test_plugin")
+        sourceDir.mkdirs()
+
+        val sourceFile = File(sourceDir, "TestPlugin.java")
+        sourceFile.printWriter().use { out ->
+            out.println(testPluginContent)
+        }
+    }
+
+    protected fun prepareBuildFile(content: String) {
+        buildFile?.printWriter()?.use {
+            it.println(content)
+        }
+    }
+
+    protected fun prepareReleasesSpecs(content: String,
+                                       releasesFile: File? = null) {
+        (releasesFile ?: File(buildDir, "releases.yml"))
+            .printWriter().use { it.println(content) }
+    }
+
+    protected fun prepareGradleProperties(content: String,
+                                          propertiesFile: File? = null) {
+        (propertiesFile ?: File(buildDir, "gradle.properties"))
+            .printWriter().use { it.println(content) }
+    }
 }

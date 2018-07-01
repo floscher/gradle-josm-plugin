@@ -1,6 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.options.Option
@@ -33,24 +34,112 @@ const val CONFIG_OPT_TARGET_COMMITISH = "josm.target_commitish"
 // environment variables
 const val ENV_VAR_GITHUB_USER = "GITHUB_USER"
 const val ENV_VAR_GITHUB_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN"
+const val ENV_VAR_GITHUB_REPOSITORY = "GITHUB_REPOSITORY"
 const val ENV_VAR_GITHUB_API_URL = "GITHUB_API_URL"
 const val ENV_VAR_GITHUB_UPLOAD_URL = "GITHUB_UPLOAD_URL"
-const val ENV_VAR_GITHUB_REPOSITORY = "GITHUB_REPOSITORY"
 
 // command line options
 const val CMDLINE_OPT_RELEASE_LABEL = "release-label"
-const val CMDLINE_OPT_GITHUB_USER = "github-user"
-const val CMDLINE_OPT_GITHUB_REPOSITORY = "github-repository"
-const val CMDLINE_OPT_GITHUB_ACCESS_TOKEN = "github-access-token"
-const val CMDLINE_OPT_GITHUB_API_URL = "github-api-url"
-const val CMDLINE_OPT_GITHUB_UPLOAD_URL = "github-upload-url"
-const val CMDLINE_OPT_RELEASES_CONFIG_FILE = "releases-config-file"
 const val CMDLINE_OPT_TARGET_COMMITISH = "target-commitish"
 const val CMDLINE_OPT_LOCAL_JAR_PATH = "local-jar-path"
 const val CMDLINE_OPT_REMOTE_JAR_NAME = "remote-jar-name"
 const val CMDLINE_OPT_UPDATE_LATEST = "update-latest"
 
 private val logger = Logger.getLogger("GithubReleaseTasks")
+
+private fun Project.lookupConfiguredProperty(propertyName: String,
+                                     envName: String? = null): String? {
+    val prop = this.findProperty(propertyName)?.toString()?.trim()
+
+    return if (!prop.isNullOrEmpty()) { prop }
+    else {
+        envName?.let {
+            System.getenv(envName)?.trim().let {value->
+                if (value.isNullOrEmpty()) null else value
+            }
+        }
+    }
+}
+
+val Project.configuredGithubUser: String get() {
+    val notConfigured = GithubReleaseTaskException(
+        """No github user name configured.
+          |Configure it
+          |- with the project property $CONFIG_OPT_GITHUB_USER
+          |- or with the environment variable $ENV_VAR_GITHUB_USER"""
+            .trimMargin("|")
+    )
+
+    return this.lookupConfiguredProperty(
+        propertyName = CONFIG_OPT_GITHUB_USER,
+        envName = ENV_VAR_GITHUB_USER
+    ) ?: throw notConfigured
+}
+
+val Project.configuredGithubAccessToken: String get() {
+    val notConfigured = GithubReleaseTaskException(
+        """No github access token configured.
+            |Configure it
+            |- with the project property $CONFIG_OPT_GITHUB_ACCESS_TOKEN
+            |- or with the environment variable $ENV_VAR_GITHUB_ACCESS_TOKEN"""
+            .trimMargin("|")
+    )
+
+    return lookupConfiguredProperty(
+        propertyName =  CONFIG_OPT_GITHUB_ACCESS_TOKEN,
+        envName = ENV_VAR_GITHUB_ACCESS_TOKEN
+    ) ?: throw notConfigured
+}
+
+val Project.defaultReleasesConfigFile: File get() {
+    return File(this.project.projectDir, "releases.yml")
+}
+
+/**
+ * the configured release config file
+ */
+val Project.configuredReleasesConfigFile: File get() {
+    fun ensureReleaseConfigFileReadable(configFile: File) {
+        if (! (configFile.isFile && configFile.exists()
+                && configFile.canRead())) {
+            throw IOException(
+                "releases configuration file <${configFile.absolutePath}> "
+                    + "doesn't exist or can't be read")
+        }
+    }
+
+    val file =
+        lookupConfiguredProperty(
+            propertyName = CONFIG_OPT_RELEASES_CONFIG_FILE
+        )?.trim().let {name ->
+            if (name.isNullOrEmpty()) null else File(name)
+        } ?: defaultReleasesConfigFile
+
+    ensureReleaseConfigFileReadable(file)
+    return file
+}
+
+val Project.configuredGithubApiUrl: String get () {
+    return lookupConfiguredProperty(
+            propertyName = CONFIG_OPT_GITHUB_API_URL,
+            envName = ENV_VAR_GITHUB_API_URL
+    ) ?: DEFAULT_GITHUB_API_URL
+}
+
+val Project.configuredGithubUploadUrl: String get () {
+    return lookupConfiguredProperty(
+        propertyName = CONFIG_OPT_GITHUB_UPLOAD_URL,
+        envName = ENV_VAR_GITHUB_UPLOAD_URL
+    ) ?: DEFAULT_GITHUB_UPLOAD_URL
+}
+
+val Project.configuredGithubRepository: String get () {
+    return lookupConfiguredProperty(
+        propertyName = CONFIG_OPT_GITHUB_REPOSITORY,
+        envName = ENV_VAR_GITHUB_REPOSITORY
+    ) ?: project.name
+}
+
 
 /**
  * Base class for tasks related to the management of github releases
@@ -62,74 +151,10 @@ open class BaseGithubReleaseTask: DefaultTask() {
     lateinit var releaseLabel: String
 
     @Option(
-        option = CMDLINE_OPT_GITHUB_USER,
-        description = "the github user id")
-    lateinit var githubUser: String
-
-    @Option(
-        option = CMDLINE_OPT_GITHUB_REPOSITORY,
-        description = "the name of the github repository")
-    lateinit var githubRepository: String
-
-    @Option(
-        option = CMDLINE_OPT_GITHUB_ACCESS_TOKEN,
-        description = "the github access token")
-    lateinit var githubAccessToken: String
-
-    @Option(
-        option = CMDLINE_OPT_GITHUB_API_URL,
-        description = "the github api url")
-    lateinit var githubApiUrl: String
-
-    @Option(
-        option = CMDLINE_OPT_GITHUB_UPLOAD_URL,
-        description = "the github upload url")
-    lateinit var githubUploadUrl: String
-
-    @Option(
-        option = CMDLINE_OPT_RELEASES_CONFIG_FILE,
-        description = "the full path to the releases configuration file. "
-            +"Default: \$PROJECT_DIR/releases.yml")
-    lateinit var releasesConfigFile: String
-
-    @Option(
         option = CMDLINE_OPT_TARGET_COMMITISH,
         description = "the target commitish for the release, i.e. 'master' "
             + "or 'deploy'. Default: 'master'")
     lateinit var targetCommitish: String
-
-    private val defaultReleasesConfigFile: File by lazy {
-        File(this.project.projectDir, "releases.yml")
-    }
-
-    /**
-     * the configured release config file
-     */
-    val configuredReleasesConfigFile: File by lazy {
-        fun ensureReleaseConfigFileReadable(configFile: File) {
-          if (! (configFile.isFile && configFile.exists()
-                  && configFile.canRead())) {
-            throw IOException(
-                "releases configuration file <${configFile.absolutePath}> "
-              + "doesn't exist or can't be read")
-          }
-        }
-
-        val file =
-            if (::releasesConfigFile.isInitialized) {
-                File(releasesConfigFile.trim())
-            }
-            else {
-                lookupConfiguredProperty(
-                    propertyName = CONFIG_OPT_RELEASES_CONFIG_FILE
-                )?.trim().let {name ->
-                    if (name.isNullOrEmpty()) null else File(name)
-                } ?: defaultReleasesConfigFile
-            }
-
-        ensureReleaseConfigFileReadable(file)
-        file
-    }
 
     val configuredReleaseLabel: String by lazy {
         val notConfigured = GithubReleaseTaskException(
@@ -153,105 +178,18 @@ open class BaseGithubReleaseTask: DefaultTask() {
         label
     }
 
-    private val configuredGithubUser: String? by lazy {
-        val notConfigured = GithubReleaseTaskException(
-            """No github user name configured.
-              |Configure it in the task, i.e.
-              |   createGithubRelease {
-              |       githubUser = "my-user-name"
-              |   }
-              |or with the command line option --$CMDLINE_OPT_GITHUB_USER,
-              |or with the project property $CONFIG_OPT_GITHUB_USER
-              |or with the environment variable $ENV_VAR_GITHUB_USER"""
-                .trimMargin("|")
-    )
-
-        if (::githubUser.isInitialized) {
-            githubUser.trim()
-        }
-        else {
-            lookupConfiguredProperty(
-                propertyName = CONFIG_OPT_GITHUB_USER,
-                envName = ENV_VAR_GITHUB_USER
-            ) ?: throw notConfigured
-        }
-    }
-
-    private val configuredGithubAccessToken: String? by lazy {
-        val notConfigured = GithubReleaseTaskException(
-            """No github access token configured.
-            |Configure it in the task, i.e.
-            |     createGithubRelease {
-            |         githubAccessToken = "abcx23234..."
-            |     }
-            |or with the command line option --$CMDLINE_OPT_GITHUB_ACCESS_TOKEN,
-            |or with the project property $CONFIG_OPT_GITHUB_ACCESS_TOKEN
-            |or with the environment variable $ENV_VAR_GITHUB_ACCESS_TOKEN"""
-                .trimMargin("|")
-        )
-
-        if (::githubAccessToken.isInitialized) {
-            githubAccessToken.trim()
-        }
-        else {
-            lookupConfiguredProperty(
-                propertyName =  CONFIG_OPT_GITHUB_ACCESS_TOKEN,
-                envName = ENV_VAR_GITHUB_ACCESS_TOKEN
-            ) ?: throw notConfigured
-        }
-      }
-
-    private val configuredGithubApiUrl: String by lazy {
-        if (::githubApiUrl.isInitialized) {
-            githubApiUrl.trim()
-        }
-        else {
-            lookupConfiguredProperty(
-                propertyName = CONFIG_OPT_GITHUB_API_URL,
-                envName = ENV_VAR_GITHUB_API_URL
-              ) ?: DEFAULT_GITHUB_API_URL
-        }
-      }
-
-     val configuredGithubUploadUrl: String by lazy {
-        if (::githubUploadUrl.isInitialized) {
-            githubUploadUrl.trim()
-        }
-        else {
-            lookupConfiguredProperty(
-                propertyName = CONFIG_OPT_GITHUB_UPLOAD_URL,
-                envName = ENV_VAR_GITHUB_UPLOAD_URL
-            ) ?: DEFAULT_GITHUB_UPLOAD_URL
-        }
-    }
-
     val configuredTargetCommitish: String by lazy {
         if (::targetCommitish.isInitialized) {
             if (targetCommitish.isNullOrBlank()) null
             else targetCommitish
         }
         else {
-            lookupConfiguredProperty(
+            project.lookupConfiguredProperty(
                 propertyName = CONFIG_OPT_TARGET_COMMITISH
             )
         } ?: DEFAULT_TARGET_COMMITISH
     }
 
-    private val configuredGithubRepository: String by lazy {
-
-        if (::githubRepository.isInitialized) {
-            if (githubRepository.isNullOrBlank()) {
-                logger.warn("'githubRepository' is null or blank. "
-                    + " Assuming default value '${project.name}'")
-                project.name
-            }
-            else githubRepository
-        }
-        else lookupConfiguredProperty(
-                propertyName = CONFIG_OPT_GITHUB_REPOSITORY,
-                envName = ENV_VAR_GITHUB_REPOSITORY
-            ) ?: project.name
-    }
 
     @Throws(GithubReleaseTaskException::class)
     protected fun ensureValidNumericJsomVersion(release: ReleaseSpec) {
@@ -259,36 +197,20 @@ open class BaseGithubReleaseTask: DefaultTask() {
             throw GithubReleaseTaskException(
                 """Illegal numeric josm version '${release.numericJosmVersion}'
                 |for release '$releaseLabel'.
-                |Fix it in '$configuredReleasesConfigFile'"""
+                |Fix it in '${project.configuredReleasesConfigFile}'"""
                   .trimMargin("|")
             )
         }
       }
 
-    protected fun githubReleaseClient(url: String = configuredGithubApiUrl)
-        : GithubReleasesClient {
-        return GithubReleasesClient(
-            repository = configuredGithubRepository,
-            user = configuredGithubUser,
-            accessToken = configuredGithubAccessToken,
+    protected fun githubReleaseClient(
+            url: String = project.configuredGithubApiUrl) =
+        GithubReleasesClient(
+            repository = project.configuredGithubRepository,
+            user = this.project.configuredGithubUser,
+            accessToken = this.project.configuredGithubAccessToken,
             apiUrl = url
         )
-    }
-
-
-    private fun lookupConfiguredProperty(propertyName: String,
-                                         envName: String? = null): String? {
-        val prop = this.project.findProperty(propertyName)?.toString()?.trim()
-
-        return if (!prop.isNullOrEmpty()) { prop }
-        else {
-            envName?.let {
-                System.getenv(envName)?.trim().let {value->
-                  if (value.isNullOrEmpty()) null else value
-                }
-            }
-          }
-      }
 }
 
 /**
@@ -298,7 +220,7 @@ open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
 
     @TaskAction
     fun createGithubRelease() {
-        val releaseConfigFile = configuredReleasesConfigFile
+        val releaseConfigFile = project.configuredReleasesConfigFile
         val releaseLabel = configuredReleaseLabel
         val releaseConfig = ReleasesSpec.load(releaseConfigFile)
 
@@ -505,14 +427,14 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         val releaseLabel = configuredReleaseLabel
         val client = githubReleaseClient()
 
-        val releaseConfig = ReleasesSpec.load(configuredReleasesConfigFile)
+        val releaseConfig = ReleasesSpec.load(project.configuredReleasesConfigFile)
 
         val localRelease = (releaseConfig?.releases?.find {
             it.label == releaseLabel})
             ?: throw GithubReleaseTaskException(
-            """The releases config file '$configuredReleasesConfigFile' doesn't
+            """The releases config file '${project.configuredReleasesConfigFile}' doesn't
             |include a release with release label '$releaseLabel' yet.
-            |Add and configure a release with this label in '$configuredReleasesConfigFile'
+            |Add and configure a release with this label in '${project.configuredReleasesConfigFile}'
             |and rerun."""
                 .trimMargin("|")
             )
@@ -539,7 +461,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
 
         logger.info("Uploading '${localFile.name}' to release '$releaseLabel' "
            + "at ${client.apiUrl} ...")
-        val uploadClient = githubReleaseClient(configuredGithubUploadUrl)
+        val uploadClient = githubReleaseClient(project.configuredGithubUploadUrl)
         uploadClient.uploadReleaseAsset(
             releaseId = releaseId,
             name = configuredRemoteJarName,
