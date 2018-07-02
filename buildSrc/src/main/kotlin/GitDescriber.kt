@@ -11,7 +11,7 @@ import java.io.IOException
  * @param workTree the directory where the work tree of the git repository is
  *   (typically the parent directory of the `.git` directory)
  */
-class GitDescriber(val workTree: File) {
+class GitDescriber(val workTree: File) : Describer {
   private val git = Git(FileRepositoryBuilder().setWorkTree(workTree).readEnvironment().findGitDir().build())
 
   /**
@@ -20,7 +20,7 @@ class GitDescriber(val workTree: File) {
    * @return a string that describes the current HEAD of the git repository
    */
   @Throws(IOException::class, GitAPIException::class)
-  fun describe(dirty: Boolean = true): String {
+  override fun describe(dirty: Boolean): String {
     val description = git.describe().call()
     return if (description == null) {
       // return abbreviated hash

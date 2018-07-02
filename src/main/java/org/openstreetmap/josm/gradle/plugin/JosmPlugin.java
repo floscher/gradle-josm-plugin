@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin;
 
+import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.gradle.api.Plugin;
@@ -34,7 +35,12 @@ public class JosmPlugin implements Plugin<Project> {
     try {
       project.setVersion(new GitDescriber(project.getProjectDir()).describe(true));
     } catch (Exception e) {
-      // Don't set the project version
+      try {
+        // Fall back to SVN revision if `git describe` does nor work
+        project.setVersion(new SvnDescriber(project.getProjectDir()).describe(true));
+      } catch (IOException e2) {
+        // Don't set the project version
+      }
     }
 
     // Apply the Java plugin if not available, because we rely on the `jar` task
