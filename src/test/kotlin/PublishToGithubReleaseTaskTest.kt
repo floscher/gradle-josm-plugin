@@ -65,7 +65,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 - label: $releaseLabel
                   numeric_josm_version: $minJosmVersion
             """.trimIndent()
-
+        prepareReleasesSpecs(releasesContent)
 
         fun prepareAPIStub() {
             val githubUser = System.getenv(ENV_VAR_GITHUB_USER)
@@ -97,7 +97,6 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
         prepareBuildFile(buildFileContent)
         prepareTestPluginSource()
-        prepareReleasesSpecs(releasesContent)
         prepareAPIStub()
 
         val result = GradleRunner.create()
