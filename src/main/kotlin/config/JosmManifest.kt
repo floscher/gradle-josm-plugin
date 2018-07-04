@@ -1,13 +1,22 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
+import com.beust.klaxon.JsonArray
+import com.beust.klaxon.JsonObject
 import groovy.lang.GroovySystem
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.openstreetmap.josm.gradle.plugin.ghreleases.GithubReleasesClient
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangReader
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
 import org.openstreetmap.josm.gradle.plugin.josm
 import org.openstreetmap.josm.gradle.plugin.task.LangCompile
+import org.openstreetmap.josm.gradle.plugin.task.ReleasesSpec
+import org.openstreetmap.josm.gradle.plugin.task.configuredGithubAccessToken
+import org.openstreetmap.josm.gradle.plugin.task.configuredGithubApiUrl
+import org.openstreetmap.josm.gradle.plugin.task.configuredGithubRepository
+import org.openstreetmap.josm.gradle.plugin.task.configuredGithubUser
+import org.openstreetmap.josm.gradle.plugin.task.configuredReleasesConfigFile
 import java.io.File
 import java.net.URL
 import java.util.GregorianCalendar
@@ -114,6 +123,11 @@ class JosmManifest(private val project: Project) {
   var minJosmVersion: String? = project.findProperty("plugin.main.version")?.toString()
 
   /**
+   * If true, load the old version download links from GitHub releases.
+   */
+  var includeLinksToGithubReleases: Boolean = false
+
+  /**
    * A collection of the names of all JOSM plugins that must be installed for this JOSM plugin to work
    *
    * **Default:** the value of property `plugin.requires` split at every semicolon (do not rely on the order, as it is not necessarily maintained) or `null` if that property is not set.</dd>
@@ -188,6 +202,59 @@ class JosmManifest(private val project: Project) {
   }
 
   /**
+   * Builds the map of download URLs
+   */
+  private fun buildMapOfGitHubDownloadLinks() : Map<String,String> {
+
+    fun JsonArray<JsonObject>.releaseByLabel(label: String): JsonObject? =
+      this.find { it["tag_name"] == label }
+
+    fun JsonObject.downloadUrl() : String? {
+      val assets = this["assets"] as? JsonArray<JsonObject>
+      return assets?.mapNotNull {
+          it["browser_download_url"]?.toString()
+        }
+        ?.find { it.endsWith(".jar") }
+    }
+
+    val specs = ReleasesSpec.load(project.configuredReleasesConfigFile)
+    val client = GithubReleasesClient(
+      user = project.configuredGithubUser,
+      accessToken =  project.configuredGithubAccessToken,
+      repository = project.configuredGithubRepository,
+      apiUrl = project.configuredGithubApiUrl
+    )
+    val remoteReleases = client.getReleases()
+
+    return specs?.relevantReleasesForDownloadUrls()
+      ?.fold(initial=mutableMapOf()) fold@{links, release ->
+        val key = "${release.numericJosmVersion}_Plugin-Url"
+        val remoteRelease = remoteReleases?.releaseByLabel(release.label)
+          ?: run {
+            project.logger.warn(
+              "Could not find a remote release for the release label " +
+                "'${release.label}'. No download link included in the " +
+                "MANIFEST file for JOSM release ${release.numericJosmVersion}"
+            )
+            return@fold links
+          }
+        val downloadUrl = remoteRelease?.downloadUrl() ?: run {
+          project.logger.warn(
+            "Could not find a jar download url for the remote release with " +
+              "label '${release.label}'. No download link included in the " +
+              "MANIFEST file for JOSM release ${release.numericJosmVersion}"
+          )
+          return@fold links
+        }
+        val value = "${release.label};$downloadUrl"
+
+        links[key] = value
+        links
+      }
+      ?: emptyMap()
+  }
+
+  /**
    * Returns a map containing all manifest attributes, which are set.
    * This map can then be fed into [org.gradle.api.java.archives.Manifest.attributes()]. That's already done automatically by the gradle-josm-plugin, so you normally don't need to call this yourself.
    *
@@ -223,9 +290,14 @@ class JosmManifest(private val project: Project) {
       "Plugin-Canloadatruntime" to canLoadAtRuntime.toString()
     )
 
-    // Add links to older versions of the plugin
-    for(value in oldVersionDownloadLinks) {
-      manifestAtts.put(value.minJosmVersion.toString() + "_Plugin-Url",  value.pluginVersion + ';' + value.downloadURL.toString())
+    if (includeLinksToGithubReleases) {
+      // Add download links to github releases
+      manifestAtts.putAll(buildMapOfGitHubDownloadLinks())
+    } else {
+      // Add links to older versions of the plugin
+      for (value in oldVersionDownloadLinks) {
+        manifestAtts.put(value.minJosmVersion.toString() + "_Plugin-Url", value.pluginVersion + ';' + value.downloadURL.toString())
+      }
     }
 
     // Add translated versions of the project description
