@@ -19,7 +19,8 @@ open class BaseGithubReleaseTaskTest() {
                 pluginManagement {
                   repositories {
                       maven {
-                        url "${System.getenv("HOME")}/.m2/repository"
+                        //url "${System.getenv("HOME")}/.m2/repository"
+                        url "${File(".").absolutePath}/build/maven"
                       }
                       gradlePluginPortal()
                   }
