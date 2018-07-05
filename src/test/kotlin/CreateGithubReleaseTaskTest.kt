@@ -52,9 +52,14 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             plugins {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
             }
-
+            version="v0.0.1"
+            josm {
+                josmCompileVersion = 14002
+                manifest {
+                    minJosmVersion = 14002
+                }
+            }
             import org.openstreetmap.josm.gradle.plugin.task.CreateGithubReleaseTask
-
             task myCreateGithubRelease(type: CreateGithubReleaseTask){
               releaseLabel = "$releaseLabel"
             }
@@ -124,6 +129,14 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
         val buildFileContent = """
             plugins {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
+            }
+
+            version="v0.0.1"
+            josm {
+                josmCompileVersion = 14002
+                manifest {
+                    minJosmVersion = 14002
+                }
             }
 
             import org.openstreetmap.josm.gradle.plugin.task.CreateGithubReleaseTask
