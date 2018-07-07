@@ -1,6 +1,5 @@
 package org.openstreetmap.josm.gradle.plugin.ghreleases
 
-
 import com.beust.klaxon.JsonObject
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
@@ -18,17 +17,7 @@ const val GITHUB_ACCESS_TOKEN = "an-access-token"
 
 class GithubReleasesClientTest {
 
-    fun buildClient(apiUri: String) : GithubReleasesClient {
-//        val accessToken = System.getenv("GITHUB_ACCESS_TOKEN")
-//        val githubUser = System.getenv("GITHUB_USER")
-//        if (accessToken == null) {
-//            println("Warning: required environment variable "
-//                + "GITHUB_ACCESS_TOKEN not set")
-//        }
-//        if (githubUser == null) {
-//            println("Warning: required environment variable GITHUB_USER "
-//                + "not set")
-//        }
+    private fun buildClient(apiUri: String) : GithubReleasesClient {
         val client = GithubReleasesClient()
         client.user = GITHUB_USER
         client.repository = "josm-scripting-plugin"
@@ -36,7 +25,6 @@ class GithubReleasesClientTest {
         client.apiUrl = apiUri
         return client
     }
-
 
     @Test
     fun `pagination with an empty Link header should work`() {
@@ -112,9 +100,9 @@ class GithubReleasesClientTest {
                 .withBody("Server Error")
             )
         )
-        assertThrows(GithubReleaseClientException::class.java, {
+        assertThrows(GithubReleaseClientException::class.java) {
             client.getLatestRelease()
-        })
+        }
     }
 
     @Test
@@ -128,7 +116,7 @@ class GithubReleasesClientTest {
 
         // replies two release in the first page
         server.stubFor(post(urlPathEqualTo(path))
-          .withRequestBody(matchingJsonPath("$[?(@.tag_name == '${tagName}')]"))
+          .withRequestBody(matchingJsonPath("$[?(@.tag_name == '$tagName')]"))
             .willReturn(aResponse()
               .withStatus(200)
               .withBody("""{"id": 1}""")
@@ -193,7 +181,7 @@ class GithubReleasesClientTest {
                 .withStatus(200)
                 // link to the next page of releases
                 .withHeader("Link",
-                    "<${client.apiUrl}${path}?page=2>; rel=\"next\"")
+                    "<${client.apiUrl}$path?page=2>; rel=\"next\"")
                 .withBody("""[
                     {"id": 1},
                     {"id": 2}
@@ -223,7 +211,7 @@ class GithubReleasesClientTest {
         val client = buildClient(uri)
         val releaseId = 12345
         val path = "/repos/${client.user}/${client.repository}" +
-                    "/releases/${releaseId}/assets"
+                    "/releases/$releaseId/assets"
         val asset = createTempFile(suffix="txt")
         val content = "Hello World!"
         asset.writeText(content)
@@ -255,9 +243,9 @@ class GithubReleasesClientTest {
         val newName = "asset.txt"
         val label = "This is a label"
         val path = "/repos/${client.user}/${client.repository}" +
-                    "/releases/${releaseId}/assets"
+                    "/releases/$releaseId/assets"
 
-        server.stubFor(post(urlPathMatching("${path}.*"))
+        server.stubFor(post(urlPathMatching("$path.*"))
             .withRequestBody(equalTo(content))
             .withHeader("Content-Type", equalTo("text/plain"))
             .withQueryParam("name", equalTo(newName))
@@ -272,7 +260,6 @@ class GithubReleasesClientTest {
             contentType = "text/plain", file = asset, name = newName,
             label = label)
         assertEquals(assets.size, 1)
-
     }
 
     @Test
