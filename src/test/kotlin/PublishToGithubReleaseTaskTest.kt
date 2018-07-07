@@ -14,8 +14,6 @@ import org.openstreetmap.josm.gradle.plugin.task.*
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver
 
-const val GITHUB_USER = "a-github-user"
-
 class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
     @Test

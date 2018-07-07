@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import java.io.File
 
+const val GITHUB_USER = "a-github-user"
+
 open class BaseGithubReleaseTaskTest() {
     protected var buildFile: File? = null
     protected var buildDir: File? = null

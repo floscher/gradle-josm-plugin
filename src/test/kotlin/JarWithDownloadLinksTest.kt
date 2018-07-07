@@ -19,6 +19,17 @@ import java.util.jar.Attributes
 import java.util.jar.JarInputStream
 
 class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
+    val GITHUB_REPO = "repo_xy"
+
+    private fun prepareTestGradleProperties(apiUri: String) {
+        val gradlePropertiesContent = """
+            $CONFIG_OPT_GITHUB_REPOSITORY = $GITHUB_REPO
+            $CONFIG_OPT_GITHUB_API_URL = $apiUri
+            $CONFIG_OPT_GITHUB_USER = $GITHUB_USER
+            $CONFIG_OPT_GITHUB_ACCESS_TOKEN = alsdkjfoiauosf
+            """.trimIndent()
+        prepareGradleProperties(gradlePropertiesContent)
+    }
 
     @Test
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
@@ -28,17 +39,12 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
         val currentMinJosmVersion = 2222
         val currentRelease = "v0.0.2"
-        val githubRepo = "repo_xy"
 
         // prepare test plugin source
         prepareTestPluginSource()
 
         // prepare gradle properties
-        val gradlePropertiesContent = """
-            $CONFIG_OPT_GITHUB_REPOSITORY = $githubRepo
-            $CONFIG_OPT_GITHUB_API_URL = $apiUri
-            """.trimIndent()
-        prepareGradleProperties(gradlePropertiesContent)
+        prepareTestGradleProperties(apiUri)
 
         // prepare releases file
         val releasesContent = """
@@ -75,13 +81,9 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         prepareBuildFile(buildFileContent)
 
         // prepare API stub
-        val githubUser = System.getenv(ENV_VAR_GITHUB_USER)
-            ?: throw Exception(
-                "env variable $ENV_VAR_GITHUB_USER not set"
-            )
 
-        val path1 = "/repos/$githubUser/$githubRepo/releases"
-        val assetUrl = "http://a.b.c/$githubUser/$githubRepo/download/v0.0.1/test.jar"
+        val path1 = "/repos/$GITHUB_USER/$GITHUB_REPO/releases"
+        val assetUrl = "http://a.b.c/$GITHUB_USER/$GITHUB_REPO/download/v0.0.1/test.jar"
         server.stubFor(WireMock.get(WireMock.urlPathMatching("$path1.*"))
             .willReturn(WireMock.aResponse()
                 .withStatus(200)
@@ -142,17 +144,12 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
         val currentMinJosmVersion = 2222
         val currentRelease = "v0.1.0"
-        val githubRepo = "repo_xy"
 
         // prepare test plugin source
         prepareTestPluginSource()
 
         // prepare gradle properties
-        val gradlePropertiesContent = """
-            $CONFIG_OPT_GITHUB_REPOSITORY = $githubRepo
-            $CONFIG_OPT_GITHUB_API_URL = $apiUri
-            """.trimIndent()
-        prepareGradleProperties(gradlePropertiesContent)
+        prepareTestGradleProperties(apiUri)
 
         // prepare releases file
         val releasesContent = """
@@ -194,14 +191,10 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         prepareBuildFile(buildFileContent)
 
         // prepare API stub
-        val githubUser = System.getenv(ENV_VAR_GITHUB_USER)
-            ?: throw Exception(
-                "env variable $ENV_VAR_GITHUB_USER not set"
-            )
 
-        val path1 = "/repos/$githubUser/$githubRepo/releases"
+        val path1 = "/repos/$GITHUB_USER/$GITHUB_REPO/releases"
         fun assetUrl(label: String) =
-            "http://a.b.c/$githubUser/$githubRepo/download/$label/test.jar"
+            "http://a.b.c/$GITHUB_USER/$GITHUB_REPO/download/$label/test.jar"
         server.stubFor(WireMock.get(WireMock.urlPathMatching("$path1.*"))
             .willReturn(WireMock.aResponse()
                 .withStatus(200)
@@ -274,17 +267,12 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
         val currentMinJosmVersion = 3000
         val currentRelease = "v0.2.0"
-        val githubRepo = "repo_xy"
 
         // prepare test plugin source
         prepareTestPluginSource()
 
         // prepare gradle properties
-        val gradlePropertiesContent = """
-            $CONFIG_OPT_GITHUB_REPOSITORY = $githubRepo
-            $CONFIG_OPT_GITHUB_API_URL = $apiUri
-            """.trimIndent()
-        prepareGradleProperties(gradlePropertiesContent)
+        prepareTestGradleProperties(apiUri)
 
         // prepare releases file
         val releasesContent = """
@@ -326,14 +314,9 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         prepareBuildFile(buildFileContent)
 
         // prepare API stub
-        val githubUser = System.getenv(ENV_VAR_GITHUB_USER)
-            ?: throw Exception(
-                "env variable $ENV_VAR_GITHUB_USER not set"
-            )
-
-        val path1 = "/repos/$githubUser/$githubRepo/releases"
+        val path1 = "/repos/$GITHUB_USER/$GITHUB_REPO/releases"
         fun assetUrl(label: String) =
-            "http://a.b.c/$githubUser/$githubRepo/download/$label/test.jar"
+            "http://a.b.c/$GITHUB_USER/$GITHUB_REPO/download/$label/test.jar"
         server.stubFor(WireMock.get(WireMock.urlPathMatching("$path1.*"))
             .willReturn(WireMock.aResponse()
                 .withStatus(200)
