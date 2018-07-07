@@ -190,19 +190,6 @@ open class BaseGithubReleaseTask: DefaultTask() {
         } ?: DEFAULT_TARGET_COMMITISH
     }
 
-
-    @Throws(GithubReleaseTaskException::class)
-    protected fun ensureValidNumericJsomVersion(release: ReleaseSpec) {
-        if (release.numericJosmVersion <= 0) {
-            throw GithubReleaseTaskException(
-                """Illegal numeric josm version '${release.numericJosmVersion}'
-                |for release '$releaseLabel'.
-                |Fix it in '${project.configuredReleasesConfigFile}'"""
-                  .trimMargin("|")
-            )
-        }
-      }
-
     protected fun githubReleaseClient(
             url: String = project.configuredGithubApiUrl) =
         GithubReleasesClient(
@@ -224,23 +211,24 @@ open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
         val releaseLabel = configuredReleaseLabel
         val releaseConfig = ReleasesSpec.load(releaseConfigFile)
 
-        val release = (releaseConfig?.releases?.find {it.label == releaseLabel})
-            ?: throw GithubReleaseTaskException(
-            """The releases config file '$releaseConfigFile' doesn't include a
+        val notFound = GithubReleaseTaskException(
+        """The releases config file '$releaseConfigFile' doesn't include a
             |release with release label '$releaseLabel yet. Add and configure
             |a release with this label in '$releaseConfigFile' and rerun."""
-              .trimMargin("|")
-            )
-        ensureValidNumericJsomVersion(release)
+            .trimMargin("|")
+        )
+        val release =
+            if (releaseLabel == releaseConfig.latestLabel)
+                releaseConfig.latestRelease
+            else
+                releaseConfig[releaseLabel] ?: throw notFound
+
         val client = githubReleaseClient()
 
-        val remoteRelease = client.getReleases().find {
-            it["label"] == releaseLabel}
-
-        if (remoteRelease != null) {
+        client.getReleases().find {it["tag_name"] == releaseLabel}?.let {
             throw GithubReleaseTaskException(
                 "Release with release label '$releaseLabel' already exists "
-              + "on the github server."
+                    + "on the github server."
             )
         }
 
@@ -248,9 +236,9 @@ open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
             client.createRelease(
                 tagName = releaseLabel,
                 targetCommitish = configuredTargetCommitish,
-                name = release.name ?: releaseLabel,
+                name = release.name,
                 body = release.description)
-            logger.info("Success: new release '$releaseLabel' created in "
+            logger.info("New release '$releaseLabel' created in "
                 + "github repository")
         } catch(e: Throwable) {
            throw GithubReleaseTaskException(e.message ?: "", e)
@@ -429,16 +417,20 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
 
         val releaseConfig = ReleasesSpec.load(project.configuredReleasesConfigFile)
 
-        val localRelease = (releaseConfig?.releases?.find {
-            it.label == releaseLabel})
-            ?: throw GithubReleaseTaskException(
-            """The releases config file '${project.configuredReleasesConfigFile}' doesn't
-            |include a release with release label '$releaseLabel' yet.
-            |Add and configure a release with this label in '${project.configuredReleasesConfigFile}'
+        val notFound = GithubReleaseTaskException(
+        """The releases config file '${project.configuredReleasesConfigFile}'
+            | doesn't include a release with release label '$releaseLabel' yet.
+            |Add and configure a release with this label in
+            |  '${project.configuredReleasesConfigFile}'
             |and rerun."""
-                .trimMargin("|")
-            )
-        ensureValidNumericJsomVersion(localRelease)
+            .trimMargin("|")
+        )
+        val localRelease =
+            if (releaseLabel == releaseConfig?.latestLabel)
+                releaseConfig.latestRelease
+            else
+                releaseConfig[releaseLabel] ?: throw notFound
+
         val remoteReleases = client.getReleases()
 
         val remoteRelease = remoteReleases.find {
@@ -470,7 +462,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         )
 
         if (configuredUpdateLatest) {
-            val latestReleaseLabel = releaseConfig.latest
+            val latestReleaseLabel = releaseConfig.latestLabel
             val notFound = GithubReleaseTaskException(
                 """Remote release with label '$latestReleaseLabel' doesn't
                 |exist on the Github server.

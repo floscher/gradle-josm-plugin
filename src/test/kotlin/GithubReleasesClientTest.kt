@@ -13,24 +13,26 @@ import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock
 import ru.lanwen.wiremock.ext.WiremockUriResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver.WiremockUri
 
+const val GITHUB_USER = "a-user"
+const val GITHUB_ACCESS_TOKEN = "an-access-token"
 
 class GithubReleasesClientTest {
 
     fun buildClient(apiUri: String) : GithubReleasesClient {
-        val accessToken = System.getenv("GITHUB_ACCESS_TOKEN")
-        val githubUser = System.getenv("GITHUB_USER")
-        if (accessToken == null) {
-            println("Warning: required environment variable "
-                + "GITHUB_ACCESS_TOKEN not set")
-        }
-        if (githubUser == null) {
-            println("Warning: required environment variable GITHUB_USER "
-                + "not set")
-        }
+//        val accessToken = System.getenv("GITHUB_ACCESS_TOKEN")
+//        val githubUser = System.getenv("GITHUB_USER")
+//        if (accessToken == null) {
+//            println("Warning: required environment variable "
+//                + "GITHUB_ACCESS_TOKEN not set")
+//        }
+//        if (githubUser == null) {
+//            println("Warning: required environment variable GITHUB_USER "
+//                + "not set")
+//        }
         val client = GithubReleasesClient()
-        client.user = githubUser
+        client.user = GITHUB_USER
         client.repository = "josm-scripting-plugin"
-        client.accessToken = accessToken
+        client.accessToken = GITHUB_ACCESS_TOKEN
         client.apiUrl = apiUri
         return client
     }
