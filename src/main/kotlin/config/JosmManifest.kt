@@ -251,7 +251,6 @@ class JosmManifest(private val project: Project) {
         links[key] = value
         links
       }
-      ?: emptyMap()
   }
 
   /**

@@ -10,7 +10,7 @@ class ReleaseSpecException(override var message: String,
   constructor(message: String) : this(message, null)
 }
 
-const val DEFAULT_LATEST_NAME = "latest"
+const val DEFAULT_LATEST_LABEL = "latest"
 
 /**
  * A release specification maintained in the local `releases.yml` file
@@ -26,22 +26,30 @@ data class ReleaseSpec(
     val description: String? = null,
 
     /** an optional name for the release. Defaults to the label, if missing. */
-    val name: String? = null
-)
+    val name: String = label
+) {
+    init {
+        assert(numericJosmVersion >= 0)
+    }
+}
 
-data class ReleasesSpec(val latest: String, val releases: List<ReleaseSpec>?) {
+data class ReleasesSpec(val latestLabel: String, val releases: List<ReleaseSpec>?) {
     companion object {
+        val empty = ReleasesSpec(
+            latestLabel = DEFAULT_LATEST_LABEL,
+            releases = listOf()
+        )
         /**
          * Reads the release specifications from the YAML `file`.
          */
-        fun load(file: File): ReleasesSpec? {
+        fun load(file: File): ReleasesSpec {
             val mapper = ObjectMapper(YAMLFactory())
             val root = mapper.readTree(file)
-            if (root.isNull) return null
-            val latest = root.get("latest_release")?.get("name")?.asText()
-                ?: DEFAULT_LATEST_NAME
-            val releases = root.get("releases")?.mapIndexed {i, release ->
-                if (release.isNull) return null
+            if (root.isNull) return empty
+            val latestLabel = root.get("latest_release")?.get("label")?.asText()
+                ?: DEFAULT_LATEST_LABEL
+            val releases = root.get("releases")
+                ?.mapIndexedNotNull {i, release ->
                 val label = release.get("label")?.asText() ?:
                     throw ReleaseSpecException(
                       """Missing label for release with index $i
@@ -74,14 +82,24 @@ data class ReleasesSpec(val latest: String, val releases: List<ReleaseSpec>?) {
                 )
              }
             return ReleasesSpec(
-                latest = latest,
+                latestLabel = latestLabel,
                 releases =  releases
             )
         }
     }
 
-    fun hasRelease(label: String) : Boolean = releases?.find {
-        it.label == label } != null
+    fun hasRelease(label: String) : Boolean =
+        this[label] != null
+
+    operator fun get(label: String): ReleaseSpec? =
+        releases?.first {it.label == label}
+
+    val latestRelease: ReleaseSpec by lazy {
+        ReleaseSpec(
+            label = this.latestLabel,
+            numericJosmVersion = 0
+        )
+    }
 
     /**
      * Replies the list of numeric JOSM versions for which

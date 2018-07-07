@@ -2,6 +2,7 @@
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import org.openstreetmap.josm.gradle.plugin.task.DEFAULT_LATEST_LABEL
 import org.openstreetmap.josm.gradle.plugin.task.ReleasesSpec
 
 class ReleasesSpecTest {
@@ -149,6 +150,42 @@ class ReleasesSpecTest {
             releasesFile.delete()
         }
     }
+
+    @Test
+    fun `default latest release, if not specified in file`() {
+        val releasesFile = createTempFile(suffix="yml")
+        val releases = """
+        releases:
+     """.trimIndent()
+        try {
+            releasesFile.writeText(releases)
+            val releases = ReleasesSpec.load(releasesFile)
+            assertEquals(DEFAULT_LATEST_LABEL, releases?.latestLabel)
+            assertEquals(DEFAULT_LATEST_LABEL, releases?.latestRelease?.label)
+        } finally {
+            releasesFile.delete()
+        }
+    }
+
+    @Test
+    fun `should accept customized latest release label`() {
+        val releasesFile = createTempFile(suffix="yml")
+        val releases = """
+        latest_release:
+          label: current
+
+        releases:
+     """.trimIndent()
+        try {
+            releasesFile.writeText(releases)
+            val releases = ReleasesSpec.load(releasesFile)
+            assertEquals("current", releases?.latestLabel)
+            assertEquals("current", releases?.latestRelease?.label)
+        } finally {
+            releasesFile.delete()
+        }
+    }
+
 
     @Test
     fun `relevant releases - exactly one release`() {
