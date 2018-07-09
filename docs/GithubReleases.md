@@ -4,33 +4,35 @@
 
 ### What are GitHub releases?
 
-[GitHub releases][github-releases] are a way of packaging and providing software to users. GitHub provides
-a [REST API][github-rest-api] to manage GitHub releases.
+[GitHub releases][github-releases] are a way of packaging and providing software to users. GitHub provides a [REST API][github-rest-api] to manage GitHub releases.
 
 ### How does JOSM pickup a plugin from a GitHub release?
-The JOSM maintainer maintain a public directory with metadata about the available
-plugins. It's a simple concatenation of the `MANIFEST`-files included in the available plugin `jar`-files. It is available [here][josm-plugin-list]. A JOSM instance on a client computer reads this list. If a user decides to [install a plugin][josm-plugin-preferences], JOSM downloads the plugin `jar` from the appropriate download URL included in the metadata.
+The JOSM team maintains a public directory with metadata about the available plugins. It's a simple concatenation of the `MANIFEST`-files included in the available plugin `jar`-files. It is available [here][josm-plugin-list]. A JOSM instance on a client computer reads this list. If a user decides to [install a plugin][josm-plugin-preferences], JOSM downloads the plugin `jar` from the appropriate download URL included in the metadata from this list.
 
-A plugin `MANIFEST` includes two kind of download URLs:
+A plugin `MANIFEST` includes two kinds of download URLs:
 
 1. the default download URL
+
    This is the download URL of the latest plugin release. Usually, it doesn't include a version numer or release label. 
-   For the `scripting` plugin, the default download URL is (you can look it up [here][josm-plugin-list])
+   For instance, the default download URL for the `scripting` plugin is 
    ```
    https://raw.githubusercontent.com/Gubaer/josm-scripting-plugin/deploy/dist/scripting.jar
    ```
+   (you can look it up [here][josm-plugin-list])
 
 2. download URLs for plugins releases compatible with JOSM releases newer than a specific reference JOSM release
-   The `scripting` plugin, for instance, is available as specific releases for the JOSM versions 5315, 8024, 12875, 13007, etc.
-   (you can look it up [here][josm-plugin-list]) and the `MANIFEST` includes specific download URLs for them.
+
+   The `scripting` plugin, for instance, is available for the JOSM versions 5315, 8024, 12875, 13007, etc.
+   and the `MANIFEST` includes specific download URLs for these JOSM versions
    ```
    5315_Plugin-Url: 30000;https://raw.github.com/Gubaer/josm-scripting-plugin/for-josm-5315/dist/scripting.jar
    8024_Plugin-Url: 30710;https://raw.github.com/Gubaer/josm-scripting-plugin/for-josm-8024/dist/scripting.jar
    12875_Plugin-Url: 30772;https://raw.github.com/Gubaer/josm-scripting-plugin/for-josm-12875/dist/scripting.jar
    13007_Plugin-Url: 30775;https://raw.github.com/Gubaer/josm-scripting-plugin/for-josm-13007/dist/scripting.jar
    ```
+   (you can look it up [here][josm-plugin-list]) 
 
-### How to add a new JOSM plugin to plugin directory?
+### How to add a new JOSM plugin to the plugin directory?
 
 Add a stable, release indepdent download URL for the latest release of the new plugin to [this page][josm-plugin-sources] in the JOSM wiki.
 
@@ -38,20 +40,21 @@ Every 10 minutes, a script in the backend infrastructure of the JOSM development
 
 ## Managing GitHub releases for your plugin
 
+The `gradle-josm-plugin` includes tasks to create GitHub releases and to upload a plugin jar as GitHub release asset.
+
 ### `releases.yml` - configuration file for releases
 You have to maintain a configuration file for the plugin releases.
 
 Its default name is `releases.yml` and its default location is the project root. To configure another location
 
-1. set the gradle property `josm.releases_config_file`
-   either in `gradle.properties` or directly in `build.gradle`.
+1. set the gradle property `josm.releases_config_file` either in `gradle.properties` or directly in `build.gradle`.
    ```properties
-   # gradle.properties
+   # in gradle.properties
    josm.releases_config_file=/full/path/to/my_releases.yml
    ```
    or
    ```groovy
-    // build.gradle
+    //in build.gradle
     ext {
         josm {
             releases_config_file="/full/path/to/my_releases.yml"
@@ -64,22 +67,24 @@ Here is annotated example `releases.yml`:
 # OPTIONAL: declare the name of the latest release. If missing, the default value is
 # 'latest'.
 latest_release:
-  name: my_latest
+  label: my_latest
 
 # MANDATORY: a list of releases
+#
+# Entries should be ordered by label (most recent label at the top of the list) and the by
+# nummeric_josm_version (highest nummeric_josm_version at the top). 
+#
 releases:
   # the first entry in the releases list
-  - label: v0.0.2  # MANDATORY: the release label
-    # MANDATORY: the minimal numeric josm version this release is 
-    # compatible with
-    numeric_josm_version: 5678
+  - label: v0.0.2                     # MANDATORY: the release label
+    numeric_josm_version: 5678        # MANDATORY: the minimal numeric josm version 
+                                      # this release is  compatible with
 
   # the second entry in the releases list
-  - label: v0.0.1
-    numeric_josm_version: 1234
-    # OPTIONAL: 
-    description: a description
-    name: a name for the release
+  - label: v0.0.1                     # MANDATORY:
+    numeric_josm_version: 1234        # MANDATORY:
+    description: a description        # OPTIONAL
+    name: a name for the release      # OPTIONAL
 
   # ... more entries in the releases list 
 ```
@@ -198,8 +203,7 @@ $ ./gradlew publishToGithubRelease --release-label v0.0.1
 ```
 #### Publish to a GitHub release with a specific label, configure in `build.gradle`
 
-Publishes the current plugin jar as release asset to the GitHub release with the 
-label `v0.0.1`.
+Publishes the current plugin jar as release asset to the GitHub release with the label `v0.0.1`.
 The local name and path of the plugin jar is derived from the name and location of the jar built by the gradle `jar` task. The name of the published jar is the same as the name  of the local jar.
 
 ```groovy
@@ -225,27 +229,28 @@ $ ./gradlew publishMyRelease
 
 #### Configure the asset to be published
 
-You can configure the local path of the published `jar` and/or the remote name of the `jar`-asset
-in the GitHub release.
+You can configure the local path of the published `jar` and/or the remote name of the `jar`-asset in the GitHub release.
 
 In `build.gradle`:
 
 ```groovy
 // build.gradle
 publishToGithubRelease {
-    localAssetPath="/path/to/my/asset/plugin.jar"
-    remoteAssetName="my_other_name.jar"
+    localJarPath="/path/to/my/asset/plugin.jar"
+    remoteJarName="my_other_name.jar"
 }
 ```
 
-TODO: check
+
 On the command line: 
 ```bash
 $ ./gradlew publishToGithubRelease \
-    --local-asset-path /path/to/my/asset/plugin.jar \
-    --remote-asset-name my_other_name.jar
+    --local-jar-path /path/to/my/asset/plugin.jar \
+    --remote-jar-name my_other_name.jar
 ```
-### Configuration options
+
+
+## Configuration options
 
 A configuration option is derived from command line arguments, properties, and environment variables in the following order:
 
@@ -255,7 +260,7 @@ A configuration option is derived from command line arguments, properties, and e
 4. environment variable
 5. hard coded default value
 
-#### common environement variables
+### common environement variables
 | environment variable | description |
 | --------------------- | ----------- |
 | `GITHUB_USER`       | the name of the github user |
@@ -264,7 +269,7 @@ A configuration option is derived from command line arguments, properties, and e
 | `GITHUB_API_URL` | the base API URL for the Github releases API. Defaults to `https://api.github.com` |
 | `GITHUB_UPLOAD_URL` | the base API URL to upload release assets. Defaults to `https://uploads.github.com` |
 
-#### common gradle properties
+### common gradle properties
 | gradle property | description |
 | --------------------- | ----------- |
 | `josm.github.user`       | the name of the github user |
@@ -274,6 +279,173 @@ A configuration option is derived from command line arguments, properties, and e
 | `josm.github.upload_url` | the base API URL to upload release assets. Defaults to `https://uploads.github.com` |
 | `josm.releases_config_file` | the full path to the local releases file. Defaults to `releases.yml` in the base project directory | 
 | `josm.target_commitish` | Specifies the commitish value that determines where the Git tag is created from. Can be any branch or commit SHA. Defaults to `master`. |
+
+
+## Sample and template configuration files
+
+### template for a script to set environment variables
+```bash
+#!/bin/bash
+#
+# save as 'github.env' and load using 'source github.env'
+#
+
+# the GitHub user name
+#export GITHUB_USER=a-user-name
+
+# the GitHub access token
+#export GITHUB_ACCESS_TOKEN=asldiu0w98357oasjf
+
+# the GitHub repository
+#export GITHUB_REPOSITORY=my-repo
+
+# the GitHub upload URL if different from https://uploads.github.com
+#export GITHUB_API_URL=https://api.my-github-host.test
+
+#  the GitHub upload URL if different from https://uploads.github.com
+# export GITHUB_UPLOAD_URL=https://uploads.my-github-host.test
+```
+
+### template for `gradle.properties`
+```properties
+# the GitHub user name
+#josm.github.user=a-user-name
+
+# the GitHub access token
+#josm.github.access_token=asldiu0w98357oasjf
+
+# the GitHub repository
+#josm.github.repository=my-repo
+
+# the GitHub API URL if different from https://api.github.com
+#josm.github.api_url=https://api.my-github-host.test
+
+# the GitHub upload URL if different from https://uploads.github.com
+#josm.github.upload_url=https://uploads.my-github-host.test
+
+# the full path to the local releases config file
+#josm.releases_config_file=/full/path/to/my_releases.yml
+
+# the target commitish, if different from 'master'
+#josm.target_commitish=deploy
+```
+
+### template for `build.gradle`
+```groovy
+plugins {
+    id 'org.openstreetmap.josm'  
+    id 'java'
+    id 'groovy'
+    id 'eclipse'
+}
+
+// optional inline configuration block, or configure these properteis in
+// 'gradle.properties'
+//ext {
+//   josm {
+//        github {
+//            user="a-user-name"
+//            access_token="asldiu0w98357oasjf"
+//            repository="my-repo"
+//            api_url="https://api.my-github-host.test"
+//            upload_url="https://uploads.my-github-host.test"            
+//        }
+//        releases_config_file="/full/path/to/my_releases.yml"
+//        target_commitish="deploy"
+//    }
+//}
+
+version="v0.0.5"      //  the current release label
+
+josm {
+    josmCompileVersion = "latest"
+    manifest {
+        // if true, the plugin will include download URLs for GitHub
+        // release assets in the MANIFEST file
+        includeLinksToGithubReleases = true
+        //  minimal required JOSM version for the current build
+        minJosmVersion = 13893
+        description = 'you plugin description'
+        mainClass = 'the.fully.qualified.name.of.YourPlugin'
+        //iconPath = 'images/your-plugin-icon.png'
+        //website = new URL("https://your.plugin.host/info-page.html")
+        canLoadAtRuntime = true
+    }
+}
+
+// uncomment to configure the provided task 'createGithubRelease'
+/*
+createGithubRelease {
+    // optional. if different from the project 'version'
+    //releaseLabel = "v0.0.5-GA"
+    // optional. if different from 'master'
+    //targetCommitish="deploy"
+}
+*/
+
+// uncomment to create your own task for creating GitHub releases
+/* 
+import org.openstreetmap.josm.gradle.plugin.task.CreateGithubReleaseTask
+task myCreateGithubReleas(task: CreateGithubReleaseTask) {
+    // optional. if different from the project 'version'
+    //releaseLabel = "v0.0.5-GA"
+    // optional. if different from 'master'
+    //targetCommitish="deploy"
+}
+*/
+
+
+// uncomment to configure the provided task 'publishToGithubRelease'
+/*
+publishToGithubRelease {
+    // optional. if different from the project 'version'
+    //releaseLabel = "v0.0.5-GA"
+
+    // optional. if different from 'master'
+    //targetCommitish="deploy"
+    
+    // optional. if different from the standard path where gradle build
+    // the jar
+    //localJarPath="/full/path/to/the/local/my-plugin.jar"
+    
+    // optional. if different from the name of the jar file built locally
+    //remoteJarName="my-plugin.jar"
+    
+    // optional. Set to true, if the jar should be published to two
+    // releases: the release with the current release label and the
+    // release with the release label for the latest release (usually
+    // the relaese with label 'latest')
+    //updateLatest=true
+}
+*/
+
+// uncomment to create your own task for uploading to GitHub releases
+/* 
+import org.openstreetmap.josm.gradle.plugin.task.PublishToGithubReleaseTask
+task myPublishToGithubRelease(task: PublishToGithubReleaseTask) {
+    // optional. if different from the project 'version'
+    //releaseLabel = "v0.0.5-GA"
+    
+    // optional. if different from 'master'
+    //targetCommitish="deploy"
+
+    // optional. if different from the standard path where gradle build
+    // the jar
+    //localJarPath="/full/path/to/the/local/my-plugin.jar"
+
+    // optional. if different from the name of the jar file built locally
+    //remoteJarName="my-plugin.jar"
+    
+    // optional. Set to true, if the jar should be published to two
+    // releases: the release with the current release label and the
+    // release with the release label for the latest release (usually
+    // the relaese with label 'latest')
+    //updateLatest=true
+}
+*/
+```
+
+
 
 
 [github-releases]: https://help.github.com/articles/about-releases/
