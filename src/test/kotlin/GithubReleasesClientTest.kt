@@ -281,4 +281,149 @@ class GithubReleasesClientTest {
 
         client.getReleases()
     }
+
+    @Test
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+    fun `getReleaseAssets() with one page should work`(
+                        @Wiremock server: WireMockServer,
+                        @WiremockUri uri: String) {
+        val client = buildClient(uri)
+        val releaseId = 123456
+        val url = "/repos/${client.user}/${client.repository}/releases" +
+            "/$releaseId/assets"
+
+        server.stubFor(get(urlEqualTo(url))
+            .willReturn(aResponse()
+                .withStatus(200)
+                // no link header
+                .withBody("""[
+                    {"id": 1},
+                    {"id": 2}
+                    ]""")
+
+            )
+        )
+
+        val assets = client.getReleaseAssets(releaseId = releaseId)
+        assertEquals(2, assets.size)
+        assertEquals(IntRange(1,2).toList(),
+            assets.map {it["id"].toString().toInt()}.sorted()
+        )
+    }
+
+    @Test
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+    fun `getReleaseAssets() with two pages should work`(
+        @Wiremock server: WireMockServer,
+        @WiremockUri uri: String) {
+        val client = buildClient(uri)
+        val releaseId = 123456
+        val path = "/repos/${client.user}/${client.repository}/releases" +
+            "/$releaseId/assets"
+
+        // replies two assets for the first page
+        server.stubFor(get(urlPathEqualTo(path))
+            .inScenario("paging")
+            .willReturn(aResponse()
+                .withStatus(200)
+                // link to the next page of releases
+                .withHeader("Link",
+                    "<${client.apiUrl}$path?page=2>; rel=\"next\"")
+                .withBody("""[
+                    {"id": 1},
+                    {"id": 2}
+                    ]""")
+            )
+        )
+
+        // replies two more assets in the second page
+        server.stubFor(get(urlPathEqualTo(path))
+            .withQueryParam("page", equalTo("2"))
+            .inScenario("paging")
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withBody("""[
+                    {"id": 3},
+                    {"id": 4}
+                    ]""")
+            )
+        )
+
+        val assets = client.getReleaseAssets(releaseId = releaseId)
+        assertEquals(4, assets.size)
+        assertEquals(IntRange(1,4).toList(),
+            assets.map {it["id"].toString().toInt()}.sorted()
+        )
+    }
+
+    @Test
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+    fun `getReleaseAssets() with no assets should work`(
+        @Wiremock server: WireMockServer,
+        @WiremockUri uri: String) {
+        val client = buildClient(uri)
+        val releaseId = 123456
+        val path = "/repos/${client.user}/${client.repository}/releases" +
+            "/$releaseId/assets"
+
+        // replies two assets for the first page
+        server.stubFor(get(urlPathEqualTo(path))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withBody("[]")
+            )
+        )
+
+        val assets = client.getReleaseAssets(releaseId = releaseId)
+        assertEquals(0, assets.size)
+    }
+
+
+    @Test
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+    fun `deleteReleaseAsset() for existing asset should work`(
+        @Wiremock server: WireMockServer,
+        @WiremockUri uri: String) {
+        val client = buildClient(uri)
+        val assetId = 123456
+        val path = "/repos/${client.user}/${client.repository}/releases" +
+            "/assets/$assetId"
+
+        // replies two assets for the first page
+        server.stubFor(delete(urlPathEqualTo(path))
+            .willReturn(aResponse()
+                .withStatus(204)
+                .withBody("")
+            )
+        )
+        client.deleteReleaseAsset(assetId = assetId)
+    }
+
+    @Test
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+    fun `deleteReleaseAsset() for non existing asset should work`(
+        @Wiremock server: WireMockServer,
+        @WiremockUri uri: String) {
+        val client = buildClient(uri)
+        // assumption: there's no asset with this id
+        val assetId = 123456
+        val path = "/repos/${client.user}/${client.repository}/releases" +
+            "/assets/$assetId"
+
+        // replies two assets for the first page
+        server.stubFor(delete(urlPathEqualTo(path))
+            .willReturn(aResponse()
+                .withStatus(404)
+                .withBody("""
+                    {
+                        "message": "Not Found",
+                        "documentation_url": "https://an-url/"
+                    }
+                """.trimIndent())
+            )
+        )
+        assertThrows(GithubReleaseClientException::class.java) {
+            client.deleteReleaseAsset(assetId = assetId)
+        }
+    }
 }

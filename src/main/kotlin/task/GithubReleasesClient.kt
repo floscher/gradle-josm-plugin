@@ -244,7 +244,6 @@ class GithubReleasesClient(
             )
             .filterNotNull()
             .joinToString(separator = "&")
-        println("uploadReleaseAsset: url=$url")
 
         val request = createBaseRequestBuilder()
             .post(requestBody)
