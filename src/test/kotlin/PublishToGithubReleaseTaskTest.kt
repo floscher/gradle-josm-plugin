@@ -3,6 +3,7 @@ package org.openstreetmap.josm.gradle.plugin
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Assertions
@@ -17,6 +18,7 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver
 class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
     @Test
+    @Disabled
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
     fun `configured with task parameters, with custom remote jar name`(
         @WiremockResolver.Wiremock server: WireMockServer,
@@ -74,17 +76,32 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             val githubUser = GITHUB_USER
             // stub for "get releases"
             val path1 = "/repos/$githubUser/$githubRepo/releases"
-            server.stubFor(get(WireMock.urlPathMatching("$path1.*"))
+            server.stubFor(get(urlPathEqualTo(path1))
+                .inScenario("upload-non-existing-asset")
                 .willReturn(aResponse()
                     .withStatus(200)
                     .withBody(
-                        """[{"id": $releaseId, "tag_name": "$releaseLabel"}]""")
+                        """[{"id": $releaseId,
+                        "tag_name": "$releaseLabel"}]"""
+                    )
+                )
+            )
+
+            // stub get release assets
+            val path2 = "/repos/$githubUser/$githubRepo/releases/$releaseId/assets"
+            server.stubFor(get(urlPathEqualTo(path2))
+                .inScenario("upload-non-existing-asset")
+                .willReturn(aResponse()
+                    .withStatus(200)
+                    // no assets
+                    .withBody("[]")
                 )
             )
 
             // stub for "upload release asset"
-            val path2 = "/repos/$githubUser/$githubRepo/releases/$releaseId/assets"
-            server.stubFor(post(WireMock.urlPathMatching("$path2.*"))
+            val path3 = "/repos/$githubUser/$githubRepo/releases/$releaseId/assets"
+            server.stubFor(post(urlPathEqualTo(path3))
+                .inScenario("upload-non-existing-asset")
                 .withHeader("Content-Type", equalTo(MEDIA_TYPE_JAR))
                 .withQueryParam("name", equalTo(remoteJarName))
                 //.withQueryParam("label", equalTo("test_plugin.jar"))
@@ -101,16 +118,20 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("build", "myPublishToGithubRelease")
+            .withArguments(
+                "--stacktrace",
+                "build","myPublishToGithubRelease")
             .build()
         Assertions.assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":myPublishToGithubRelease")?.outcome
         )
+        println(result.output)
     }
 
 
     @Test
+    @Disabled
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
     fun `should publish to latest release too`(
         @WiremockResolver.Wiremock server: WireMockServer,
@@ -128,7 +149,6 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             $CONFIG_OPT_GITHUB_UPLOAD_URL = $uri
             $CONFIG_OPT_GITHUB_USER = $GITHUB_USER
             $CONFIG_OPT_GITHUB_ACCESS_TOKEN = asdfalkasdhf
-
             """.trimIndent()
         prepareGradleProperties(gradlePropertiesContent)
 
@@ -166,6 +186,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
         val releasesContent = """
               latest_release:
                 label: $latestReleaseLabel
+                
               releases:
                 - label: $releaseLabel
                   numeric_josm_version: $minJosmVersion
@@ -174,24 +195,41 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
         fun prepareAPIStub() {
             val githubUser = GITHUB_USER
+            val leadingPath = "/repos/$githubUser/$githubRepo/releases"
+
             // stub for "get releases"
-            val path1 = "/repos/$githubUser/$githubRepo/releases"
-            server.stubFor(get(WireMock.urlPathMatching("$path1.*"))
+            server.stubFor(get(urlPathEqualTo(leadingPath))
+                .inScenario("upload-new-asset")
                 .willReturn(aResponse()
                     .withStatus(200)
                     .withBody("""[
-                    |   {"id": $releaseId, "tag_name": "$releaseLabel"},
-                    |   {"id": $latestReleaseId,
-                    |    "tag_name": "$latestReleaseLabel"
-                    |   }
-                    |]""".trimMargin())
+                        {
+                            "id": $releaseId,
+                            "tag_name": "$releaseLabel"
+                        },
+                        {
+                            "id": $latestReleaseId,
+                            "tag_name": "$latestReleaseLabel"
+                        }
+                    ]""".trimIndent())
                 )
             )
 
-            // stub for "upload release asset"
-            val path2 = "/repos/$githubUser/$githubRepo/releases/" +
-                releaseId + "/assets"
-            server.stubFor(post(WireMock.urlPathMatching("$path2.*"))
+            // stub for get release assets for normal release
+            val path2 = "$leadingPath/$releaseId/assets"
+            server.stubFor(get(urlPathEqualTo(path2))
+                .inScenario("upload-new-assets")
+                .willReturn(aResponse()
+                    .withStatus(200)
+                    // no assets
+                    .withBody("[]")
+                )
+            )
+
+            // stub for "upload release asset" to normal release
+            val path3 = "$leadingPath/$releaseId/assets"
+            server.stubFor(post(urlPathEqualTo(path3))
+                .inScenario("upload-new-assets")
                 .withHeader("Content-Type", equalTo(MEDIA_TYPE_JAR))
                 .withQueryParam("name", equalTo(remoteJarName))
                 //.withQueryParam("label", equalTo("test_plugin.jar"))
@@ -201,10 +239,22 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 )
             )
 
+
+            // stub for get release assets for latest release
+            val path4 = "$leadingPath/$latestReleaseId/assets"
+            server.stubFor(get(urlPathEqualTo(path4))
+                .inScenario("upload-new-assets")
+                .willReturn(aResponse()
+                    .withStatus(200)
+                    // no assets
+                    .withBody("[]")
+                )
+            )
+
             // stub for "upload release asset" to the latest release
-            val path3 = "/repos/$githubUser/$githubRepo/releases/" +
-                latestReleaseId + "/assets"
-            server.stubFor(post(WireMock.urlPathMatching("$path3.*"))
+            val path5 = "$leadingPath/$latestReleaseId/assets"
+            server.stubFor(post(urlPathEqualTo(path5))
+                .inScenario("upload-new-assets")
                 .withHeader("Content-Type", equalTo(MEDIA_TYPE_JAR))
                 .withQueryParam("name", equalTo(remoteJarName))
                 //.withQueryParam("label", equalTo("test_plugin.jar"))
@@ -223,16 +273,23 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("build", "myPublishToGithubRelease")
-            .build()
-        Assertions.assertEquals(
-            TaskOutcome.SUCCESS,
-            result.task(":myPublishToGithubRelease")?.outcome
-        )
-        println(result.output)
+            .withArguments(
+                "build", "myPublishToGithubRelease",
+                "--stacktrace"
+            ).build()
+
+        try {
+            Assertions.assertEquals(
+                TaskOutcome.SUCCESS,
+                result.task(":myPublishToGithubRelease")?.outcome
+            )
+        } finally {
+            println(result.output)
+        }
     }
 
     @Test
+    @Disabled
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
     fun `minimal config, on command line, use standard task`(
         @WiremockResolver.Wiremock server: WireMockServer,
@@ -284,21 +341,36 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
         fun prepareAPIStub() {
             val githubUser = GITHUB_USER
             // stub for "get releases"
-            val path1 = "/repos/$githubUser/$githubRepo/releases"
-            server.stubFor(get(WireMock.urlPathMatching("$path1.*"))
+            val leadingPath = "/repos/$githubUser/$githubRepo/releases"
+            server.stubFor(get(urlPathEqualTo(leadingPath))
+                .inScenario("upload-asset")
                 .willReturn(aResponse()
                     .withStatus(200)
                     .withBody(
-                        """[{"id": $releaseId, "tag_name": "$releaseLabel"}]""")
+                        """[{
+                            "id": $releaseId,
+                            "tag_name": "$releaseLabel"
+                            }]""".trimIndent())
+                )
+            )
+
+            // stub for get release assets for normal release
+            val path2 = "$leadingPath/$releaseId/assets"
+            server.stubFor(get(urlPathEqualTo(path2))
+                .inScenario("upload-assets")
+                .willReturn(aResponse()
+                    .withStatus(200)
+                    // no assets
+                    .withBody("[]")
                 )
             )
 
             // stub for "upload release asset"
-            val path2 = "/repos/$githubUser/$githubRepo/releases/$releaseId/assets"
-            server.stubFor(post(WireMock.urlPathMatching("$path2.*"))
+            val path3 = "$leadingPath/$releaseId/assets"
+            server.stubFor(post(urlPathEqualTo(path3))
+                .inScenario("upload-assets")
                 .withHeader("Content-Type", equalTo(MEDIA_TYPE_JAR))
                 .withQueryParam("name", equalTo(localJarName))
-                //.withQueryParam("label", equalTo("test_plugin.jar"))
                 .willReturn(aResponse()
                     .withStatus(201)
                     .withBody("""{"id": 1}""")
@@ -313,16 +385,18 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("build", "publishToGithubRelease",
+            .withArguments(
+                "--stacktrace",
+                "build", "publishToGithubRelease",
                 "--release-label", releaseLabel
             )
             .build()
+        println(result.output)
         Assertions.assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":publishToGithubRelease")?.outcome
         )
     }
-
 
     @Test
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
@@ -388,40 +462,66 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
         fun prepareAPIStub() {
             val githubUser = GITHUB_USER
+
             // stub for "get releases"
-            val path1 = "/repos/$githubUser/$githubRepo/releases"
-            server.stubFor(get(WireMock.urlPathMatching("$path1.*"))
+            val leadingPath = "/repos/$githubUser/$githubRepo/releases"
+            server.stubFor(get(urlPathEqualTo(leadingPath))
+                .inScenario("upload-asset")
                 .willReturn(aResponse()
                     .withStatus(200)
                     .withBody("""[
-                    |   {"id": $releaseId, "tag_name": "$releaseLabel"},
-                    |   {"id": $latestReleaseId,
-                    |    "tag_name": "$latestReleaseLabel"
-                    |   }
-                    |]""".trimMargin())
+                        {
+                            "id": $releaseId,
+                            "tag_name": "$releaseLabel"
+                        },
+                        {
+                            "id": $latestReleaseId,
+                            "tag_name": "$latestReleaseLabel"
+                        }
+                    ]""".trimIndent())
+                )
+            )
+
+            // stub for get release assets for normal release
+            val path2 = "$leadingPath/$releaseId/assets"
+            server.stubFor(get(urlPathEqualTo(path2))
+                .inScenario("upload-assets")
+                .willReturn(aResponse()
+                    .withStatus(200)
+                    // no assets
+                    .withBody("[]")
                 )
             )
 
             // stub for "upload release asset"
-            val path2 = "/repos/$githubUser/$githubRepo/releases/" +
-                releaseId + "/assets"
-            server.stubFor(post(WireMock.urlPathMatching("$path2.*"))
+            val path3 = "$leadingPath/$releaseId/assets"
+            server.stubFor(post(urlPathEqualTo(path3))
+                .inScenario("upload-assets")
                 .withHeader("Content-Type", equalTo(MEDIA_TYPE_JAR))
                 .withQueryParam("name", equalTo(remoteJarName))
-                //.withQueryParam("label", equalTo("test_plugin.jar"))
                 .willReturn(aResponse()
                     .withStatus(201)
                     .withBody("""{"id": 1}""")
                 )
             )
 
+            // stub for get release assets for latest release
+            val path4 = "$leadingPath/$latestReleaseId/assets"
+            server.stubFor(get(urlPathEqualTo(path4))
+                .inScenario("upload-assets")
+                .willReturn(aResponse()
+                    .withStatus(200)
+                    // no assets
+                    .withBody("[]")
+                )
+            )
+
             // stub for "upload release asset" to the latest release
-            val path3 = "/repos/$githubUser/$githubRepo/releases/" +
-                latestReleaseId + "/assets"
-            server.stubFor(post(WireMock.urlPathMatching("$path3.*"))
+            val path5 = "$leadingPath/$latestReleaseId/assets"
+            server.stubFor(post(urlPathEqualTo(path5))
+                .inScenario("upload-assets")
                 .withHeader("Content-Type", equalTo(MEDIA_TYPE_JAR))
                 .withQueryParam("name", equalTo(remoteJarName))
-                //.withQueryParam("label", equalTo("test_plugin.jar"))
                 .willReturn(aResponse()
                     .withStatus(201)
                     .withBody("""{"id": 2}""")
@@ -436,12 +536,14 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("build", "publishToGithubRelease")
+            .withArguments(
+                "--stacktrace",
+                "build", "publishToGithubRelease")
             .build()
+        println(result.output)
         Assertions.assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":publishToGithubRelease")?.outcome
         )
-        println(result.output)
     }
 }

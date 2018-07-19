@@ -11,7 +11,6 @@ import org.openstreetmap.josm.gradle.plugin.ghreleases.GithubReleasesClient
 import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
-import java.util.logging.Logger
 
 class GithubReleaseTaskException(override var message: String,
                                  override var cause: Throwable?)
@@ -44,8 +43,6 @@ const val CMDLINE_OPT_TARGET_COMMITISH = "target-commitish"
 const val CMDLINE_OPT_LOCAL_JAR_PATH = "local-jar-path"
 const val CMDLINE_OPT_REMOTE_JAR_NAME = "remote-jar-name"
 const val CMDLINE_OPT_UPDATE_LATEST = "update-latest"
-
-private val logger = Logger.getLogger("GithubReleaseTasks")
 
 private fun Project.lookupConfiguredProperty(propertyName: String,
                                      envName: String? = null): String? {
@@ -148,13 +145,13 @@ open class BaseGithubReleaseTask: DefaultTask() {
     @Option(
         option = CMDLINE_OPT_RELEASE_LABEL,
         description = "the release label. Example: v0.0.1")
-    lateinit var releaseLabel: String
+    var releaseLabel: String? = null
 
     @Option(
         option = CMDLINE_OPT_TARGET_COMMITISH,
         description = "the target commitish for the release, i.e. 'master' "
             + "or 'deploy'. Default: 'master'")
-    lateinit var targetCommitish: String
+    var targetCommitish: String? = null
 
     val configuredReleaseLabel: String by lazy {
         val notConfigured = GithubReleaseTaskException(
@@ -169,25 +166,24 @@ open class BaseGithubReleaseTask: DefaultTask() {
                   .trimMargin("|")
         )
 
-        val label = if (::releaseLabel.isInitialized) {
-            if (releaseLabel.isNullOrBlank()) null else releaseLabel
-        } else {
+        fun labelFromVersion() : String? {
             val version = project.findProperty("version")?.toString()
-            if (version.isNullOrBlank()) null else version
-        } ?: throw notConfigured
-        label
+            return if (version.isNullOrBlank()) null else version
+        }
+
+        (if (releaseLabel.isNullOrBlank()) null else releaseLabel)
+        ?: labelFromVersion()
+        ?: throw notConfigured
     }
 
     val configuredTargetCommitish: String by lazy {
-        if (::targetCommitish.isInitialized) {
-            if (targetCommitish.isNullOrBlank()) null
-            else targetCommitish
-        }
-        else {
-            project.lookupConfiguredProperty(
-                propertyName = CONFIG_OPT_TARGET_COMMITISH
-            )
-        } ?: DEFAULT_TARGET_COMMITISH
+        (if (targetCommitish.isNullOrBlank()) null
+         else targetCommitish
+        )
+        ?:project.lookupConfiguredProperty(
+             propertyName = CONFIG_OPT_TARGET_COMMITISH
+          )
+        ?: DEFAULT_TARGET_COMMITISH
     }
 
     protected fun githubReleaseClient(
@@ -238,7 +234,7 @@ open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
                 targetCommitish = configuredTargetCommitish,
                 name = release.name,
                 body = release.description)
-            logger.info("New release '$releaseLabel' created in "
+            logger.lifecycle("New release '$releaseLabel' created in "
                 + "github repository")
         } catch(e: Throwable) {
            throw GithubReleaseTaskException(e.message ?: "", e)
@@ -251,13 +247,13 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         option = CMDLINE_OPT_LOCAL_JAR_PATH,
         description = "the local path to the jar which should bei uploaded.\n"
           + "Default: the path of the jar built in the project")
-    lateinit var localJarPath: String
+    var localJarPath: String? = null
 
     @Option(
         option = CMDLINE_OPT_REMOTE_JAR_NAME,
         description = "the name of the jar after uploading.\n"
           + "Default: the name of the local jar")
-    lateinit var remoteJarName: String
+    var remoteJarName: String? = null
 
     @Option(
         option = CMDLINE_OPT_UPDATE_LATEST,
@@ -267,16 +263,16 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
       + "defaults to 'latest'.\n"
       + "Default: false, if missing or if illegal value"
     )
-    lateinit var updateLatest: Any
+    var updateLatest: Any? = null
 
     private val jarArchivePath: String?  by lazy {
         project.tasks.withType(Jar::class.java).getByName("jar")
-            .archivePath?.absolutePath
+            .archivePath.absolutePath
     }
 
     private val jarArchiveName: String?  by lazy {
         project.tasks.withType(Jar::class.java).getByName("jar")
-            .archivePath?.name
+            .archivePath.name
     }
 
     private val configuredLocalJarPath: String? by lazy {
@@ -290,24 +286,23 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
             """.trimMargin("|")
         )
 
-        if (::localJarPath.isInitialized) localJarPath
-        else jarArchivePath ?: throw notConfigured
+        (if (localJarPath.isNullOrBlank()) jarArchivePath
+        else localJarPath) ?: throw notConfigured
     }
 
-    private val configuredRemoteJarName: String? by lazy {
+    private val configuredRemoteJarName: String by lazy {
         val notConfigured = GithubReleaseTaskException(
             """Missing configuration for remote jar name.
-           |Configure it in the task, i.e.
+            |Configure it in the task, i.e.
             |   publishToGithubRelease {
             |       remoteJarName = "my-josm-plugin.jar"
             |   }
             |or with the command line option --$CMDLINE_OPT_REMOTE_JAR_NAME
             """.trimMargin("|")
         )
-
-        if (::remoteJarName.isInitialized && ! remoteJarName.trim().isBlank())
-          remoteJarName.trim()
-        else jarArchiveName ?: throw notConfigured
+        (if (remoteJarName.isNullOrBlank()) null else remoteJarName)
+        ?: jarArchiveName
+        ?: throw notConfigured
     }
 
     private val configuredUpdateLatest: Boolean by lazy {
@@ -317,7 +312,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
                 else -> false
             }
 
-        if (!::updateLatest.isInitialized) false
+        if (updateLatest == null) false
         else
             when(::updateLatest.get()) {
                 is Boolean -> ::updateLatest.get() as Boolean
@@ -361,18 +356,17 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         } catch (e: IOException) {
             null
         } ?: throw GithubReleaseTaskException(
-            """The file ${this.absolutePath} isn't a valid jar file."""
+            "The file ${this.absolutePath} isn't a valid jar file."
         )
-        val manifest = jarFile.manifest
-        manifest ?: throw GithubReleaseTaskException(
-          "The jar file ${this.absolutePath} doesn't include a MANIFEST file"
-        )
+        val manifest = jarFile.manifest ?: throw GithubReleaseTaskException(
+            "The jar file ${this.absolutePath} doesn't include a MANIFEST file"
+            )
         val pluginVersion = manifest.mainAttributes.getValue("Plugin-Version")
             ?.trim()
         if (pluginVersion.isNullOrEmpty()) {
             throw GithubReleaseTaskException(
                 """The jar file '${this.absolutePath}' doesn't include an
-                | attribute 'Plugin-Version' """"
+                |attribute 'Plugin-Version'""""
                     .trimMargin("|")
             )
         } else if (pluginVersion != release.label) {
@@ -409,77 +403,100 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         }
     }
 
+    private fun deleteExistingReleaseAssetForName(releaseId: Int, name: String) {
+        val apiClient = githubReleaseClient()
+        val assets = apiClient.getReleaseAssets(releaseId)
+        // not sure whether we can have multiple assets with the same 'name'.
+        // Just in case: use 'filter' and 'forEach' instead of
+        // 'first' and 'let'
+        assets.filter {  it["name"] == name}.forEach {asset ->
+            val assetId = asset["id"].toString().toInt()
+            apiClient.deleteReleaseAsset(assetId)
+            logger.lifecycle("Deleted already existing release asset " +
+                "'$name' with id '$assetId'")
+        }
+    }
+
     @TaskAction
     fun publishToGithubRelease() {
 
         val releaseLabel = configuredReleaseLabel
         val client = githubReleaseClient()
 
-        val releaseConfig = ReleasesSpec.load(project.configuredReleasesConfigFile)
+        val releaseConfig = ReleasesSpec.load(
+            project.configuredReleasesConfigFile)
 
         val notFound = GithubReleaseTaskException(
         """The releases config file '${project.configuredReleasesConfigFile}'
-            | doesn't include a release with release label '$releaseLabel' yet.
+            |doesn't include a release with release label '$releaseLabel' yet.
             |Add and configure a release with this label in
             |  '${project.configuredReleasesConfigFile}'
             |and rerun."""
             .trimMargin("|")
         )
         val localRelease =
-            if (releaseLabel == releaseConfig?.latestLabel)
+            if (releaseLabel == releaseConfig.latestLabel)
                 releaseConfig.latestRelease
             else
                 releaseConfig[releaseLabel] ?: throw notFound
 
         val remoteReleases = client.getReleases()
 
-        val remoteRelease = remoteReleases.find {
-            it["tag_name"] == releaseLabel}
-        remoteRelease ?: throw GithubReleaseTaskException(
-            "Release with tag_name '$releaseLabel' doesn't exist on the "
-          + "github server. Create it first, then publish a release asset."
-        )
+        val remoteRelease = remoteReleases
+            .find {it["tag_name"] == releaseLabel}
+            ?: throw GithubReleaseTaskException(
+                "Release with 'tag_name' '$releaseLabel' doesn't exist on the "
+              + "GitHub server. Create it first, then publish a release asset."
+            )
 
         val releaseId = remoteRelease["id"].toString().toInt()
         val localFile = File(configuredLocalJarPath)
         if (!localFile.canUpload) {
             throw GithubReleaseTaskException(
-              """Local jar file '$configuredLocalJarPath' doesn't exist
-                |or isn't readable. Can't upload it as release asset."""
-                  .trimMargin("|")
+              "Local jar file '$configuredLocalJarPath' doesn't exist " +
+              "or isn't readable. Can't upload it as release asset."
             )
         }
         localFile.ensureConsistentWithReleaseSpec(localRelease)
 
-        logger.info("Uploading '${localFile.name}' to release '$releaseLabel' "
-           + "at ${client.apiUrl} ...")
+        deleteExistingReleaseAssetForName(releaseId, configuredRemoteJarName)
+
         val uploadClient = githubReleaseClient(project.configuredGithubUploadUrl)
-        uploadClient.uploadReleaseAsset(
+        val asset = uploadClient.uploadReleaseAsset(
             releaseId = releaseId,
             name = configuredRemoteJarName,
             contentType = MEDIA_TYPE_JAR,
             file = localFile
         )
 
+        logger.lifecycle("Uploaded '${localFile.name}' to release '$releaseLabel' " +
+            "with asset name '$configuredRemoteJarName'. " +
+            "Asset id is '${asset["id"]}'.")
+
         if (configuredUpdateLatest) {
             val latestReleaseLabel = releaseConfig.latestLabel
-            val notFound = GithubReleaseTaskException(
+            val latestReleaseNotFound = GithubReleaseTaskException(
                 """Remote release with label '$latestReleaseLabel' doesn't
-                |exist on the Github server.
-                """.trimMargin()
+                |exist on the GitHub server.
+                |Can't upload release jar to the release '$latestReleaseLabel',
+                |create release '$latestReleaseLabel' first."""
+                .trimMargin("|")
             )
-            val latestRelease = remoteReleases.find {
-                it["tag_name"] == latestReleaseLabel}
-                ?: throw notFound
+            val latestRelease = remoteReleases
+                .find {it["tag_name"] == latestReleaseLabel}
+                ?: throw latestReleaseNotFound
             val latestReleaseId = latestRelease["id"].toString().toInt()
-            logger.info("Uploading '${localFile.name}' to release "
-                + "'$latestReleaseLabel' at ${client.apiUrl} ...")
-            uploadClient.uploadReleaseAsset(
+            deleteExistingReleaseAssetForName(latestReleaseId, configuredRemoteJarName)
+            val latestReleaseAsset = uploadClient.uploadReleaseAsset(
                 releaseId = latestReleaseId,
                 name = configuredRemoteJarName,
                 contentType = MEDIA_TYPE_JAR,
                 file = localFile
             )
+            logger.lifecycle(
+                "Uploaded '${localFile.name}' to release '$latestReleaseLabel' " +
+                "with asset name '$configuredRemoteJarName'. " +
+                "Asset id is '${latestReleaseAsset["id"]}'.")
         }
     }
 }
