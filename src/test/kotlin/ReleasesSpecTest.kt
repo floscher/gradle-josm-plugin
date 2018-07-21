@@ -2,7 +2,8 @@
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
-import org.openstreetmap.josm.gradle.plugin.task.DEFAULT_LATEST_LABEL
+import org.openstreetmap.josm.gradle.plugin.task.DEFAULT_PICKUP_RELEASE_DESCRIPTION
+import org.openstreetmap.josm.gradle.plugin.task.DEFAULT_PICKUP_RELEASE_LABEL
 import org.openstreetmap.josm.gradle.plugin.task.ReleasesSpec
 
 class ReleasesSpecTest {
@@ -10,7 +11,7 @@ class ReleasesSpecTest {
     @Test
     fun `should read a yaml file with local releases`() {
         val releasesFile = createTempFile(suffix="yml")
-        val releases = """
+        val releasesDesc = """
             releases:
               - label: v0.0.2
                 name: a name 1
@@ -23,8 +24,8 @@ class ReleasesSpecTest {
                 description: a description
          """.trimIndent()
         try {
-            releasesFile.writeText(releases)
-            val releases = ReleasesSpec.load(releasesFile)?.releases
+            releasesFile.writeText(releasesDesc)
+            val releases = ReleasesSpec.load(releasesFile).releases
             ?: throw Exception("no releases")
 
             assertEquals(releases.size, 2)
@@ -40,7 +41,7 @@ class ReleasesSpecTest {
     @Test
     fun `a release with a description and a name should be accepted`() {
         val releasesFile = createTempFile(suffix="yml")
-        val releases = """
+        val releasesDesc = """
             releases:
               - label: v0.0.1
                 numeric_josm_version: 1234
@@ -48,8 +49,8 @@ class ReleasesSpecTest {
                 description: a_description
             """.trimIndent()
         try {
-            releasesFile.writeText(releases)
-            val releases = ReleasesSpec.load(releasesFile)?.releases
+            releasesFile.writeText(releasesDesc)
+            val releases = ReleasesSpec.load(releasesFile).releases
             ?: throw Exception("no releases")
             assertEquals(releases.size, 1)
             assertEquals(releases[0].description, "a_description")
@@ -62,14 +63,14 @@ class ReleasesSpecTest {
     @Test
     fun `a release with a missing description and a missing name should be accepted`() {
         val releasesFile = createTempFile(suffix="yml")
-        val releases = """
+        val releasesDesc = """
             releases:
               - label: v0.0.1
                 numeric_josm_version: 1234
          """.trimIndent()
         try {
-            releasesFile.writeText(releases)
-            val releases = ReleasesSpec.load(releasesFile)?.releases
+            releasesFile.writeText(releasesDesc)
+            val releases = ReleasesSpec.load(releasesFile).releases
             ?: throw Exception("no releases")
             assertEquals(releases.size, 1)
             assertNull(releases[0].description)
@@ -82,12 +83,12 @@ class ReleasesSpecTest {
     @Test
     fun `should read a yaml file with an empty list of releases`() {
         val releasesFile = createTempFile(suffix="yml")
-        val releases = """
+        val releasesDesc = """
             releases:
          """.trimIndent()
         try {
-            releasesFile.writeText(releases)
-            val releases = ReleasesSpec.load(releasesFile)?.releases
+            releasesFile.writeText(releasesDesc)
+            val releases = ReleasesSpec.load(releasesFile).releases
             ?: throw Exception("no releases")
             assertEquals(releases.size, 0)
         } finally {
@@ -98,15 +99,15 @@ class ReleasesSpecTest {
     @Test
     fun `one josm version in the releases yml`() {
         val releasesFile = createTempFile(suffix="yml")
-        val releases = """
+        val releasesDesc = """
         releases:
           - label: v0.0.1
             numeric_josm_version: 1234
      """.trimIndent()
         try {
-            releasesFile.writeText(releases)
+            releasesFile.writeText(releasesDesc)
             val releases = ReleasesSpec.load(releasesFile)
-            val josmVersions = releases?.josmVersions()?.sorted()
+            val josmVersions = releases.josmVersions().sorted()
             assertEquals(josmVersions, listOf(1234))
         } finally {
             releasesFile.delete()
@@ -116,7 +117,7 @@ class ReleasesSpecTest {
     @Test
     fun `multiple josm versions in the releases yml`() {
         val releasesFile = createTempFile(suffix="yml")
-        val releases = """
+        val releasesDesc = """
         releases:
           - label: v0.0.3
             numeric_josm_version: 3
@@ -126,9 +127,9 @@ class ReleasesSpecTest {
             numeric_josm_version: 1
      """.trimIndent()
         try {
-            releasesFile.writeText(releases)
+            releasesFile.writeText(releasesDesc)
             val releases = ReleasesSpec.load(releasesFile)
-            val josmVersions = releases?.josmVersions()?.sorted()
+            val josmVersions = releases.josmVersions().sorted()
             assertEquals(josmVersions, listOf(1,2,3))
         } finally {
             releasesFile.delete()
@@ -138,13 +139,13 @@ class ReleasesSpecTest {
     @Test
     fun `no josm versions in the releases file`() {
         val releasesFile = createTempFile(suffix="yml")
-        val releases = """
+        val releasesDesc = """
         releases:
      """.trimIndent()
         try {
-            releasesFile.writeText(releases)
+            releasesFile.writeText(releasesDesc)
             val releases = ReleasesSpec.load(releasesFile)
-            val josmVersions = releases?.josmVersions()?.sorted()
+            val josmVersions = releases.josmVersions().sorted()
             assertEquals(josmVersions, emptyList<Int>())
         } finally {
             releasesFile.delete()
@@ -154,53 +155,59 @@ class ReleasesSpecTest {
     @Test
     fun `default latest release, if not specified in file`() {
         val releasesFile = createTempFile(suffix="yml")
-        val releases = """
+        val releasesDesc = """
         releases:
      """.trimIndent()
         try {
-            releasesFile.writeText(releases)
+            releasesFile.writeText(releasesDesc)
             val releases = ReleasesSpec.load(releasesFile)
-            assertEquals(DEFAULT_LATEST_LABEL, releases?.latestLabel)
-            assertEquals(DEFAULT_LATEST_LABEL, releases?.latestRelease?.label)
+            assertEquals(DEFAULT_PICKUP_RELEASE_LABEL,
+                releases.pickupRelease.label)
+            assertEquals(DEFAULT_PICKUP_RELEASE_DESCRIPTION,
+                releases.pickupRelease.description)
         } finally {
             releasesFile.delete()
         }
     }
 
     @Test
-    fun `should accept customized latest release label`() {
+    fun `should accept customized pickup release label and description`() {
         val releasesFile = createTempFile(suffix="yml")
-        val releases = """
-        latest_release:
-          label: current
+        val customLabel = "josm-entry-point"
+        val customDescription = "my description"
+        val releasesDesc = """
+        pickup_release_for_josm:
+          label: $customLabel
+          description: $customDescription
 
         releases:
      """.trimIndent()
         try {
-            releasesFile.writeText(releases)
+            releasesFile.writeText(releasesDesc)
             val releases = ReleasesSpec.load(releasesFile)
-            assertEquals("current", releases?.latestLabel)
-            assertEquals("current", releases?.latestRelease?.label)
+            assertEquals(customLabel,
+                releases.pickupRelease.label)
+            assertEquals(customDescription,
+                releases.pickupRelease.description)
         } finally {
             releasesFile.delete()
         }
     }
-
 
     @Test
     fun `relevant releases - exactly one release`() {
         val releasesFile = createTempFile(suffix="yml")
-        val releases = """
+        val releasesDesc = """
         releases:
           - label: v0.0.1
             numeric_josm_version: 1234
      """.trimIndent()
         try {
-            releasesFile.writeText(releases)
-            val releases = ReleasesSpec.load(releasesFile)!!
+            releasesFile.writeText(releasesDesc)
+            val releases = ReleasesSpec.load(releasesFile)
             val relevant = releases.relevantReleasesForDownloadUrls()
             assertEquals(relevant.size,1)
-            assertEquals(relevant.first()!!.label, "v0.0.1")
+            assertEquals(relevant.first().label, "v0.0.1")
         } finally {
             releasesFile.delete()
         }
@@ -209,7 +216,7 @@ class ReleasesSpecTest {
     @Test
     fun `relevant releases - multiple releases, same josm version`() {
         val releasesFile = createTempFile(suffix="yml")
-        val releases = """
+        val releasesDesc = """
         releases:
           - label: v0.0.3
             numeric_josm_version: 1234
@@ -219,8 +226,8 @@ class ReleasesSpecTest {
             numeric_josm_version: 1234
      """.trimIndent()
         try {
-            releasesFile.writeText(releases)
-            val releases = ReleasesSpec.load(releasesFile)!!
+            releasesFile.writeText(releasesDesc)
+            val releases = ReleasesSpec.load(releasesFile)
             val relevant = releases.relevantReleasesForDownloadUrls()
             assertEquals(relevant.size,1)
             assertEquals(relevant[0].label, "v0.0.3")
@@ -233,7 +240,7 @@ class ReleasesSpecTest {
     @Test
     fun `relevant releases - multiple releases, multiple josm version`() {
         val releasesFile = createTempFile(suffix="yml")
-        val releases = """
+        val releasesDesc = """
         releases:
           - label: v0.0.4
             numeric_josm_version: 2
@@ -245,8 +252,8 @@ class ReleasesSpecTest {
             numeric_josm_version: 1
      """.trimIndent()
         try {
-            releasesFile.writeText(releases)
-            val releases = ReleasesSpec.load(releasesFile)!!
+            releasesFile.writeText(releasesDesc)
+            val releases = ReleasesSpec.load(releasesFile)
             val relevant = releases.relevantReleasesForDownloadUrls()
             assertEquals(relevant.size,2)
             assertEquals(relevant[0].label, "v0.0.2")

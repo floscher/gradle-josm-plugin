@@ -214,8 +214,8 @@ open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
             .trimMargin("|")
         )
         val release =
-            if (releaseLabel == releaseConfig.latestLabel)
-                releaseConfig.latestRelease
+            if (releaseLabel == releaseConfig.pickupRelease.label)
+                releaseConfig.pickupRelease
             else
                 releaseConfig[releaseLabel] ?: throw notFound
 
@@ -434,9 +434,11 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
             |and rerun."""
             .trimMargin("|")
         )
+
+        //TODO: don't use pickup release here
         val localRelease =
-            if (releaseLabel == releaseConfig.latestLabel)
-                releaseConfig.latestRelease
+            if (releaseLabel == releaseConfig.pickupRelease.label)
+                releaseConfig.pickupRelease
             else
                 releaseConfig[releaseLabel] ?: throw notFound
 
@@ -473,8 +475,10 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
             "with asset name '$configuredRemoteJarName'. " +
             "Asset id is '${asset["id"]}'.")
 
+        // TODO: rename this flag
         if (configuredUpdateLatest) {
-            val latestReleaseLabel = releaseConfig.latestLabel
+
+            val latestReleaseLabel = releaseConfig.pickupRelease.label
             val latestReleaseNotFound = GithubReleaseTaskException(
                 """Remote release with label '$latestReleaseLabel' doesn't
                 |exist on the GitHub server.
@@ -493,6 +497,8 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
                 contentType = MEDIA_TYPE_JAR,
                 file = localFile
             )
+
+            //TODO: also update the release description
             logger.lifecycle(
                 "Uploaded '${localFile.name}' to release '$latestReleaseLabel' " +
                 "with asset name '$configuredRemoteJarName'. " +

@@ -3,6 +3,9 @@ package org.openstreetmap.josm.gradle.plugin.task
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import java.io.File
+import com.github.mustachejava.DefaultMustacheFactory
+import java.io.StringReader
+import java.io.StringWriter
 
 class ReleaseSpecException(override var message: String,
                            override var cause: Throwable?)
@@ -12,18 +15,31 @@ class ReleaseSpecException(override var message: String,
 
 const val DEFAULT_LATEST_LABEL = "latest"
 
+const val DEFAULT_PICKUP_RELEASE_LABEL = "pickup-release"
+const val DEFAULT_PICKUP_RELEASE_DESCRIPTION = """
+This is the pickup release for the JOSM plugin system. It
+* downloads the plugin jar in this release every 10 minutes
+* extracts the metadata from `META-INF/MANIFEST.INF`
+* updates the metadata in the
+  [JOSM plugin directory](https://josm.openstreetmap.de/plugin)
+---
+This release currently provides the plugin release
+{{ labelForPickedUpRelease }} with the following description:
+{{ descriptionForPickedUpRelease }}"""
+
 /**
  * A release specification maintained in the local `releases.yml` file
  */
-data class ReleaseSpec(
+
+open class ReleaseSpec(
     /** the release label, i.e. v1.0.0 */
-    val label: String,
+    open val label: String,
 
     /** the lowest numeric josm version this release is compatible with */
-    val numericJosmVersion: Int,
+    val numericJosmVersion: Int = 0,
 
     /** a description for the plugin release */
-    val description: String? = null,
+    open val description: String? = null,
 
     /** an optional name for the release. Defaults to the label, if missing. */
     val name: String = label
@@ -33,10 +49,37 @@ data class ReleaseSpec(
     }
 }
 
-data class ReleasesSpec(val latestLabel: String, val releases: List<ReleaseSpec>?) {
+class PickupRelaseSpec(
+    override val label: String = DEFAULT_PICKUP_RELEASE_LABEL,
+    override val description: String = DEFAULT_PICKUP_RELEASE_DESCRIPTION) :
+        ReleaseSpec(label=label, description = description){
+
+    fun descriptionForPickedUpRelease(
+        pickedUpReleaseLabel: String,
+        pickedUpReleaseDescription: String): String {
+        val factory = DefaultMustacheFactory()
+        val template = factory.compile(StringReader(description), "description")
+        val scope = mapOf(
+            "pickedUpReleaseLabel" to pickedUpReleaseLabel,
+            "pickedUpReleaseDescription" to pickedUpReleaseDescription
+        )
+        val writer = StringWriter()
+        template.execute(writer, scope)
+        return writer.toString()
+    }
+
+    fun descriptionForPickedUpRelease(pickedUpRelase: ReleaseSpec): String {
+        return descriptionForPickedUpRelease(
+            pickedUpRelase.label,
+            pickedUpRelase.description ?: "")
+    }
+}
+
+data class ReleasesSpec(val pickupRelease: PickupRelaseSpec,
+                        val releases: List<ReleaseSpec>?) {
     companion object {
         val empty = ReleasesSpec(
-            latestLabel = DEFAULT_LATEST_LABEL,
+            pickupRelease = PickupRelaseSpec(),
             releases = listOf()
         )
         /**
@@ -46,8 +89,17 @@ data class ReleasesSpec(val latestLabel: String, val releases: List<ReleaseSpec>
             val mapper = ObjectMapper(YAMLFactory())
             val root = mapper.readTree(file)
             if (root.isNull) return empty
-            val latestLabel = root.get("latest_release")?.get("label")?.asText()
-                ?: DEFAULT_LATEST_LABEL
+            val pickupReleaseLabel = root.get("pickup_release_for_josm")
+                ?.get("label")?.asText()
+                ?: DEFAULT_PICKUP_RELEASE_LABEL
+
+            val pickupReleaseDescription = root.get("pickup_release_for_josm")
+                    ?.get("description")?.asText()
+                ?: DEFAULT_PICKUP_RELEASE_DESCRIPTION
+
+            val pickupRelase =
+                PickupRelaseSpec(pickupReleaseLabel, pickupReleaseDescription)
+
             val releases = root.get("releases")
                 ?.mapIndexedNotNull {i, release ->
                 val label = release.get("label")?.asText() ?:
@@ -82,7 +134,7 @@ data class ReleasesSpec(val latestLabel: String, val releases: List<ReleaseSpec>
                 )
              }
             return ReleasesSpec(
-                latestLabel = latestLabel,
+                pickupRelease = pickupRelase,
                 releases =  releases
             )
         }
@@ -93,13 +145,6 @@ data class ReleasesSpec(val latestLabel: String, val releases: List<ReleaseSpec>
 
     operator fun get(label: String): ReleaseSpec? =
         releases?.first {it.label == label}
-
-    val latestRelease: ReleaseSpec by lazy {
-        ReleaseSpec(
-            label = this.latestLabel,
-            numericJosmVersion = 0
-        )
-    }
 
     /**
      * Replies the list of numeric JOSM versions for which
