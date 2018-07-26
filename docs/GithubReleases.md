@@ -1,4 +1,4 @@
-# GitHub Releases
+# GitHub Releases for JOSM plugins
 
 ## Intro
 
@@ -7,13 +7,13 @@
 [GitHub releases][github-releases] are a way of packaging and providing software to users. GitHub provides a [REST API][github-rest-api] to manage GitHub releases.
 
 ### How does JOSM pickup a plugin from a GitHub release?
-The JOSM team maintains a public directory with metadata about the available plugins. It's a simple concatenation of the `MANIFEST`-files included in the available plugin `jar`-files. It is available [here][josm-plugin-list]. A JOSM instance on a client computer reads this list. If a user decides to [install a plugin][josm-plugin-preferences], JOSM downloads the plugin `jar` from the appropriate download URL included in the metadata from this list.
+The JOSM team maintains a public directory with metadata about available plugins. It consists of a simple concatenation of the `MANIFEST`-files included in the plugin `jar`-files. You can look it up [here][josm-plugin-list]. A JOSM instance on a client computer reads downloads and parses this list. If a user decides to [install a plugin][josm-plugin-preferences], JOSM downloads the plugin `jar` from the appropriate download URL included in the plugin metadata in this list.
 
 A plugin `MANIFEST` includes two kinds of download URLs:
 
 1. the default download URL
 
-   This is the download URL of the latest plugin release. Usually, it doesn't include a version numer or release label. 
+   This is the download URL of the latest plugin release. Usually, it doesn't include neither a version numer nor a release label. 
    For instance, the default download URL for the `scripting` plugin is 
    ```
    https://raw.githubusercontent.com/Gubaer/josm-scripting-plugin/deploy/dist/scripting.jar
@@ -32,7 +32,7 @@ A plugin `MANIFEST` includes two kinds of download URLs:
    ```
    (you can look it up [here][josm-plugin-list]) 
 
-### How to add a new JOSM plugin to the plugin directory?
+### How to add a new JOSM plugin to the plugin directory? <a id="how-to-add-plugin-to-directory"></a>
 
 Add a stable, release indepdent download URL for the latest release of the new plugin to [this page][josm-plugin-sources] in the JOSM wiki.
 
@@ -41,6 +41,15 @@ Every 10 minutes, a script in the backend infrastructure of the JOSM development
 ## Managing GitHub releases for your plugin
 
 The `gradle-josm-plugin` includes tasks to create GitHub releases and to upload a plugin jar as GitHub release asset.
+
+### Two kinds of releases
+
+The gradle plugin manages to kinds of GitHub releases:
+
+1. a so called _pickup release_: a release with a stable, version indepenent name. The download URL for this release [can
+   be registered with the JOSM backend infrastructure](#how-to-add-plugin-to-directory)
+
+2. a list of _versioned releases_ with a release label, usually following the the conentions of [semantic versioning](https://semver.org/)
 
 ### `releases.yml` - configuration file for releases
 You have to maintain a configuration file for the plugin releases.
@@ -66,8 +75,18 @@ Here is annotated example `releases.yml`:
 ```yml
 # OPTIONAL: declare the name of the latest release. If missing, the default value is
 # 'latest'.
-latest_release:
-  label: my_latest
+pickup_release_for_josm:
+  label: pickup-release
+  description: |
+    This is the pickup release for the JOSM plugin system. It
+    * downloads the plugin jar in this release every 10 minutes
+    * extracts the metadata from `META-INF/MANIFEST.INF`
+    * updates the metadata in the
+      [JOSM plugin directory](https://josm.openstreetmap.de/plugin)
+    ---
+    This release currently provides the plugin release
+    {{ labelForPickedUpRelease }} with the following description:
+    {{ descriptionForPickedUpRelease }}
 
 # MANDATORY: a list of releases
 #
@@ -89,10 +108,11 @@ releases:
   # ... more entries in the releases list 
 ```
 
-A minimal `releases.yml` which includes two releases `v0.0.1`and `v0.0.2` looks as follows:
+A minimal `releases.yml` which includes two releases `v0.0.1`and `v0.0.2` looks as follows
+(note that the section for `pickup_release_for_josm` is optional):
 ```yml
 releases:
-    label: v0.0.2
+  - label: v0.0.2
     numeric_josm_version: 5678
 
   - label: v0.0.1
@@ -339,7 +359,7 @@ plugins {
     id 'eclipse'
 }
 
-// optional inline configuration block, or configure these properteis in
+// optional inline configuration block, or configure these properties in
 // 'gradle.properties'
 //ext {
 //   josm {
