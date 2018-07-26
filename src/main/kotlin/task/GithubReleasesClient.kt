@@ -134,9 +134,17 @@ class GithubReleasesClient(
         return ret
     }
 
-  /**
-   * Replies the latest release or null, if no such release exists.
-   */
+    fun Response.asJsonObject() : JsonObject {
+        val body = this.body()?.string() ?:
+        throw GithubReleaseClientException(
+            "Unexpected response body from GitHub API"
+        )
+        return Parser().parse(StringBuilder(body)) as JsonObject
+    }
+
+    /**
+     * Replies the latest release or null, if no such release exists.
+     */
     @Throws(GithubReleaseClientException::class)
     fun getLatestRelease(): JsonObject? {
         val request =  createBaseRequestBuilder()
@@ -146,13 +154,7 @@ class GithubReleasesClient(
         try {
             val response = client.newCall(request).execute()
             return when (response.code()) {
-                in 200..299 -> {
-                    val body = response.body()?.string() ?:
-                        throw GithubReleaseClientException(
-                            "Unexpected response body from GitHub API"
-                        )
-                    Parser().parse(StringBuilder(body)) as JsonObject
-                }
+                200 -> response.asJsonObject()
                 404 -> null
                 else -> throw GithubReleaseClientException(response)
             }
@@ -201,15 +203,53 @@ class GithubReleasesClient(
         try {
             val response = client.newCall(request).execute()
             return when (response.code()) {
-                in 200..299 -> {
-                    val body = response.body()?.string() ?:
-                    throw GithubReleaseClientException(
-                        "Unexpected response body from GitHub API"
-                    )
-                    Parser().parse(StringBuilder(body)) as JsonObject
-                }
+                200 -> response.asJsonObject()
                 else -> throw GithubReleaseClientException(response)
           }
+        } catch(e: GithubReleaseClientException) {
+            throw e
+        } catch(e: Throwable) {
+            throw GithubReleaseClientException(e)
+        }
+    }
+
+
+    /**
+     * Creates a github release with the tag `tagName`.
+     */
+    @Throws(GithubReleaseClientException::class)
+    fun updateRelease(releaseId: Int,
+                      tagName: String? = null, targetCommitish: String? = null,
+                      name: String? = null, body: String? = null,
+                      draft: Boolean? = null, prerelease: Boolean? = null
+    ): JsonObject {
+
+        val requestJson = JsonObject()
+        // copy the attribute values to update to the request JSON
+        // object
+        tagName?.let {requestJson["tag_name"] = tagName}
+        targetCommitish?.let {requestJson["target_commitish"] = it}
+        name?.let {requestJson["name"] = it}
+        body?.let {requestJson["body"] = it}
+        draft?.let {requestJson["draft"] = it}
+        prerelease?.let {requestJson["prerelease"] = it}
+
+        val requestBody = RequestBody.create(
+            MediaType.parse("application/json; charset=utf-8"),
+            requestJson.toJsonString()
+        )
+
+        val request = createBaseRequestBuilder()
+            .patch(requestBody)
+            .url("$apiUrl/repos/$user/$repository/releases/$releaseId")
+            .build()
+
+        try {
+            val response = client.newCall(request).execute()
+            return when (response.code()) {
+                200 -> response.asJsonObject()
+                else -> throw GithubReleaseClientException(response)
+            }
         } catch(e: GithubReleaseClientException) {
             throw e
         } catch(e: Throwable) {

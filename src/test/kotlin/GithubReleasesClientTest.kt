@@ -164,7 +164,68 @@ class GithubReleasesClientTest {
             targetCommitish = targetCommitish, body = body, draft = draft,
             prerelease = prerelease)
         assertEquals(newRelease["id"], 1)
+    }
 
+    @Test
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+    fun `updateRelease updating all attributes should work`(
+        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
+        val client = buildClient(uri)
+        val releaseId = 123456
+
+        val tagName = "new-tag"
+        val targetCommitish = "new-target-commitish"
+        val name = "new-name"
+        val body = "new-body"
+        val draft = true
+        val prerelease = true
+
+        val path = "/repos/${client.user}/${client.repository}/releases" +
+            "/$releaseId"
+
+        server.stubFor(patch(urlPathEqualTo(path))
+            .withRequestBody(matchingJsonPath(
+                "$[?(@.tag_name == '$tagName')]"))
+            .withRequestBody(matchingJsonPath("$[?(@.name == '$name')]"))
+            .withRequestBody(matchingJsonPath(
+                "$[?(@.target_commitish == '$targetCommitish')]"))
+            .withRequestBody(matchingJsonPath("$[?(@.body == '$body')]"))
+            .withRequestBody(matchingJsonPath("$[?(@.draft == $draft)]"))
+            .withRequestBody(matchingJsonPath(
+                "$[?(@.prerelease == $prerelease)]"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withBody("""{"id": $releaseId}""")
+            )
+        )
+        val updatedRelease = client.updateRelease(
+            releaseId,
+            tagName = tagName, name = name, targetCommitish = targetCommitish,
+            body = body, draft = draft, prerelease = prerelease)
+        assertEquals(releaseId, updatedRelease["id"])
+    }
+
+    @Test
+    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+    fun `updateRelease updating body only should work`(
+        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
+        val client = buildClient(uri)
+        val releaseId = 123456
+        val body = "new-body"
+
+        val path = "/repos/${client.user}/${client.repository}/releases" +
+            "/$releaseId"
+
+        server.stubFor(patch(urlPathEqualTo(path))
+            .withRequestBody(matchingJsonPath("$[?(@.body == '$body')]"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withBody("""{"id": $releaseId}""")
+            )
+        )
+        val updatedRelease = client.updateRelease(
+            releaseId, body = body)
+        assertEquals(releaseId, updatedRelease["id"])
     }
 
     @Test
