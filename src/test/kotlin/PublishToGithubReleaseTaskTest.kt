@@ -1,26 +1,33 @@
 package org.openstreetmap.josm.gradle.plugin
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.openstreetmap.josm.gradle.plugin.ghreleases.GITHUB_ACCESS_TOKEN
 import org.openstreetmap.josm.gradle.plugin.task.*
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver
 
 class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
+    fun BuildResult.assertMessageInOutput(message: String) {
+        val pattern = Regex(message, setOf(RegexOption.MULTILINE))
+        assertTrue(pattern.containsMatchIn(this.output))
+    }
+
+    /**
+     * runs a build with custom PublishToGithubReleaseTask
+     *  - with parameters supplied as task configuration
+     *  - for a custom remote jar name
+     */
     @Test
-    @Disabled
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `configured with task parameters, with custom remote jar name`(
+    fun test_01(
         @WiremockResolver.Wiremock server: WireMockServer,
         @WiremockUriResolver.WiremockUri uri: String
     ) {
@@ -122,21 +129,29 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 "--stacktrace",
                 "build","myPublishToGithubRelease")
             .build()
-        Assertions.assertEquals(
+        println(result.output)
+
+        assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":myPublishToGithubRelease")?.outcome
         )
-        println(result.output)
+        result.assertMessageInOutput(
+            "Uploaded '$localJarName' to release " +
+                "'$releaseLabel' with asset name '$remoteJarName'.")
     }
 
 
+    /**
+     * Publishes a plugin jar to a normal release first, and then
+     * to the pickup release; should also update the pickup release
+     * description.
+     */
     @Test
     @Disabled
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `should publish to latest release too`(
+    fun test_02(
         @WiremockResolver.Wiremock server: WireMockServer,
-        @WiremockUriResolver.WiremockUri uri: String
-    ) {
+        @WiremockUriResolver.WiremockUri uri: String) {
 
         val minJosmVersion = 1111
         val releaseId = 12345678
@@ -152,9 +167,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             """.trimIndent()
         prepareGradleProperties(gradlePropertiesContent)
 
-        val latestReleaseLabel = "most_recent"
-        val latestReleaseId = "45681234"
-
+        val pickupReleaseLabel = "most_recent"
+        val pickupReleaseId = "45681234"
         val localJarName = "test-$releaseLabel.jar"
         val remoteJarName = "test.jar"
 
@@ -178,18 +192,23 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             task myPublishToGithubRelease(type: PublishToGithubReleaseTask){
                 releaseLabel = "$releaseLabel"
                 remoteJarName = "$remoteJarName"
-                // upload to latest release to
-                updateLatest = true
+                // publish to the pickup release task too
+                publishToPickupRelease = true
             }
             """
 
         val releasesContent = """
-              latest_release:
-                label: $latestReleaseLabel
+              pickup_release_for_josm:
+                label: $pickupReleaseLabel
+                description: |
+                  pickup-release-description
+                  {{ labelForPickedUpRelease }}
+                  {{ descriptionForPickedUpRelease }}
                 
               releases:
                 - label: $releaseLabel
                   numeric_josm_version: $minJosmVersion
+                  description: $releaseLabel-description
             """.trimIndent()
 
 
@@ -208,8 +227,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                             "tag_name": "$releaseLabel"
                         },
                         {
-                            "id": $latestReleaseId,
-                            "tag_name": "$latestReleaseLabel"
+                            "id": $pickupReleaseId,
+                            "tag_name": "$pickupReleaseLabel"
                         }
                     ]""".trimIndent())
                 )
@@ -221,10 +240,13 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 .inScenario("upload-new-assets")
                 .willReturn(aResponse()
                     .withStatus(200)
-                    // no assets
+                    // no existing release asset
                     .withBody("[]")
                 )
             )
+
+            // don't expect a delete request for an already existing
+            // assets; there are none in this test case
 
             // stub for "upload release asset" to normal release
             val path3 = "$leadingPath/$releaseId/assets"
@@ -240,8 +262,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             )
 
 
-            // stub for get release assets for latest release
-            val path4 = "$leadingPath/$latestReleaseId/assets"
+            // stub for get release assets for the pickup release
+            val path4 = "$leadingPath/$pickupReleaseId/assets"
             server.stubFor(get(urlPathEqualTo(path4))
                 .inScenario("upload-new-assets")
                 .willReturn(aResponse()
@@ -251,19 +273,37 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 )
             )
 
-            // stub for "upload release asset" to the latest release
-            val path5 = "$leadingPath/$latestReleaseId/assets"
-            server.stubFor(post(urlPathEqualTo(path5))
+            // don't expect a delete request for an already existing
+            // assets in the pickup release; there are none in this test case
+
+            // stub for "update pickup release description"
+            val path5 = "$leadingPath/$pickupReleaseId"
+            server.stubFor(patch(urlPathEqualTo(path5))
+                .inScenario("upload-new-assets")
+                //TODO: the updated description in the body should match
+                // with the expected value
+                .willReturn(aResponse()
+                    .withStatus(200)
+                    .withBody("""
+                        {
+                            "id": $pickupReleaseId,
+                            "tag_name": "$pickupReleaseLabel"
+                        }
+                    """.trimIndent())
+                )
+            )
+
+            // stub for "upload release asset" to the pickup release
+            val path6 = "$leadingPath/$pickupReleaseId/assets"
+            server.stubFor(post(urlPathEqualTo(path6))
                 .inScenario("upload-new-assets")
                 .withHeader("Content-Type", equalTo(MEDIA_TYPE_JAR))
                 .withQueryParam("name", equalTo(remoteJarName))
-                //.withQueryParam("label", equalTo("test_plugin.jar"))
                 .willReturn(aResponse()
                     .withStatus(201)
                     .withBody("""{"id": 2}""")
                 )
             )
-
         }
 
         prepareBuildFile(buildFileContent)
@@ -278,20 +318,28 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 "--stacktrace"
             ).build()
 
-        try {
-            Assertions.assertEquals(
-                TaskOutcome.SUCCESS,
-                result.task(":myPublishToGithubRelease")?.outcome
-            )
-        } finally {
-            println(result.output)
-        }
+        println(result.output)
+        assertEquals(
+            TaskOutcome.SUCCESS,
+            result.task(":myPublishToGithubRelease")?.outcome
+        )
+        result.assertMessageInOutput(
+            "Uploaded '$localJarName' to release " +
+            "'$releaseLabel' with asset name '$remoteJarName'.")
+
+        result.assertMessageInOutput(
+            "Uploaded '$localJarName' to release " +
+            "'$pickupReleaseLabel' with asset name '$remoteJarName'.")
     }
 
+    /**
+     * Publish a plugin jar to a normal release using the standard task
+     * and standard task configuration. Supply the release label on the
+     * command line using '--release-label'.
+     */
     @Test
-    @Disabled
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `minimal config, on command line, use standard task`(
+    fun test_03(
         @WiremockResolver.Wiremock server: WireMockServer,
         @WiremockUriResolver.WiremockUri uri: String) {
 
@@ -391,20 +439,29 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 "--release-label", releaseLabel
             )
             .build()
+
         println(result.output)
-        Assertions.assertEquals(
+        assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":publishToGithubRelease")?.outcome
         )
+        result.assertMessageInOutput(
+            "Uploaded '$localJarName' to release " +
+            "'$releaseLabel' with asset name '$localJarName'.")
     }
 
+    /**
+     * Publish a plugin jar to a normal release and to the pickup
+     * release.
+     * The release label is specified on the command line with
+     * --release-label.
+     * Uses --publish-to-pickup-release on the command line
+     */
     @Test
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `use standard task, full config in the task`(
+    fun test_04(
         @WiremockResolver.Wiremock server: WireMockServer,
-        @WiremockUriResolver.WiremockUri uri: String
-    ) {
-
+        @WiremockUriResolver.WiremockUri uri: String){
 
         val minJosmVersion = 1111
         val releaseId = 12345678
@@ -420,8 +477,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             """.trimIndent()
         prepareGradleProperties(gradlePropertiesContent)
 
-        val latestReleaseLabel = "most_recent"
-        val latestReleaseId = "45681234"
+        val pickupReleaseLabel = "most_recent"
+        val pickupReleaseId = "45681234"
 
         val localJarName = "test-$releaseLabel.jar"
         val remoteJarName = "test.jar"
@@ -443,20 +500,21 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             }
 
             publishToGithubRelease {
-                releaseLabel = "$releaseLabel"
                 remoteJarName = "$remoteJarName"
-                // upload to latest release to
-                updateLatest = true
             }
             """
 
         val releasesContent = """
-              latest_release:
-                label: $latestReleaseLabel
+            pickup_release_for_josm:
+              label: $pickupReleaseLabel
+              description: |
+                pickup-release-description
+                {{ labelForPickedUpRelease }}
+                {{ descriptionForPickedUpRelease }}
 
-              releases:
-                - label: $releaseLabel
-                  numeric_josm_version: $minJosmVersion
+            releases:
+              - label: $releaseLabel
+                numeric_josm_version: $minJosmVersion
             """.trimIndent()
 
 
@@ -475,8 +533,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                             "tag_name": "$releaseLabel"
                         },
                         {
-                            "id": $latestReleaseId,
-                            "tag_name": "$latestReleaseLabel"
+                            "id": $pickupReleaseId,
+                            "tag_name": "$pickupReleaseLabel"
                         }
                     ]""".trimIndent())
                 )
@@ -505,8 +563,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 )
             )
 
-            // stub for get release assets for latest release
-            val path4 = "$leadingPath/$latestReleaseId/assets"
+            // stub for get release assets for pickup release
+            val path4 = "$leadingPath/$pickupReleaseId/assets"
             server.stubFor(get(urlPathEqualTo(path4))
                 .inScenario("upload-assets")
                 .willReturn(aResponse()
@@ -516,9 +574,26 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 )
             )
 
-            // stub for "upload release asset" to the latest release
-            val path5 = "$leadingPath/$latestReleaseId/assets"
-            server.stubFor(post(urlPathEqualTo(path5))
+            // stub for "update pickup release description"
+            val path5 = "$leadingPath/$pickupReleaseId"
+            server.stubFor(patch(urlPathEqualTo(path5))
+                .inScenario("upload-assets")
+                //TODO: the updated description in the body should match
+                // with the expected value
+                .willReturn(aResponse()
+                    .withStatus(200)
+                    .withBody("""
+                        {
+                            "id": $pickupReleaseId,
+                            "tag_name": "$pickupReleaseLabel"
+                        }
+                    """.trimIndent())
+                )
+            )
+
+            // stub for "upload release asset" to the pickup release
+            val path6 = "$leadingPath/$pickupReleaseId/assets"
+            server.stubFor(post(urlPathEqualTo(path6))
                 .inScenario("upload-assets")
                 .withHeader("Content-Type", equalTo(MEDIA_TYPE_JAR))
                 .withQueryParam("name", equalTo(remoteJarName))
@@ -537,13 +612,24 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
             .withArguments(
-                "--stacktrace",
-                "build", "publishToGithubRelease")
+                "build", "publishToGithubRelease",
+                "--release-label", releaseLabel,
+                "--publish-to-pickup-release",
+                "--stacktrace"
+                )
             .build()
+
         println(result.output)
-        Assertions.assertEquals(
+        assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":publishToGithubRelease")?.outcome
         )
+        result.assertMessageInOutput(
+            "Uploaded '$localJarName' to release " +
+            "'$releaseLabel' with asset name '$remoteJarName'.")
+
+        result.assertMessageInOutput(
+            "Uploaded '$localJarName' to release " +
+                "'$pickupReleaseLabel' with asset name '$remoteJarName'.")
     }
 }

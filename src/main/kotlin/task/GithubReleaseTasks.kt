@@ -16,6 +16,18 @@ class GithubReleaseTaskException(override var message: String,
                                  override var cause: Throwable?)
     : Exception(message, cause) {
     constructor(message: String) : this(message, null)
+
+    companion object {
+        fun remoteReleaseDoesntExist(releaseLabel: String)
+                : GithubReleaseTaskException {
+            val msg = """Remote release with label '$releaseLabel' doesn't
+                |exist on the GitHub server.
+                |Can't upload release jar to the release '$releaseLabel',
+                |create release '$releaseLabel' first."""
+                .trimMargin("|")
+            return GithubReleaseTaskException(msg)
+        }
+    }
 }
 
 const val DEFAULT_TARGET_COMMITISH = "master"
@@ -42,7 +54,7 @@ const val CMDLINE_OPT_RELEASE_LABEL = "release-label"
 const val CMDLINE_OPT_TARGET_COMMITISH = "target-commitish"
 const val CMDLINE_OPT_LOCAL_JAR_PATH = "local-jar-path"
 const val CMDLINE_OPT_REMOTE_JAR_NAME = "remote-jar-name"
-const val CMDLINE_OPT_UPDATE_LATEST = "update-latest"
+const val CMDLINE_OPT_PUBLISH_TO_PICKUP_RELEASE = "publish-to-pickup-release"
 
 private fun Project.lookupConfiguredProperty(propertyName: String,
                                      envName: String? = null): String? {
@@ -256,14 +268,14 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
     var remoteJarName: String? = null
 
     @Option(
-        option = CMDLINE_OPT_UPDATE_LATEST,
+        option = CMDLINE_OPT_PUBLISH_TO_PICKUP_RELEASE,
         description =
-        "indicates whether the asset is also updated to the latest release.\n"
+        "indicates whether the asset is also updated to the pickup release.\n"
       + "The label of the latest release is configured in 'releases.yml' and "
-      + "defaults to 'latest'.\n"
+      + "defaults to '$DEFAULT_PICKUP_RELEASE_LABEL'.\n"
       + "Default: false, if missing or if illegal value"
     )
-    var updateLatest: Any? = null
+    var publishToPickupRelease: Boolean? = null
 
     private val jarArchivePath: String?  by lazy {
         project.tasks.withType(Jar::class.java).getByName("jar")
@@ -305,19 +317,8 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         ?: throw notConfigured
     }
 
-    private val configuredUpdateLatest: Boolean by lazy {
-        fun fromString(value: String): Boolean =
-            when(value.toLowerCase().trim()) {
-                "true", "1", "yes", "y" -> true
-                else -> false
-            }
-
-        if (updateLatest == null) false
-        else
-            when(::updateLatest.get()) {
-                is Boolean -> ::updateLatest.get() as Boolean
-                else -> fromString(::updateLatest.get().toString())
-            }
+    private val configuredPublishToPickupRelease: Boolean by lazy {
+        publishToPickupRelease ?: false
     }
 
     /**
@@ -421,7 +422,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
     fun publishToGithubRelease() {
 
         val releaseLabel = configuredReleaseLabel
-        val client = githubReleaseClient()
+        val githubClient = githubReleaseClient()
 
         val releaseConfig = ReleasesSpec.load(
             project.configuredReleasesConfigFile)
@@ -435,21 +436,15 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
             .trimMargin("|")
         )
 
-        //TODO: don't use pickup release here
-        val localRelease =
-            if (releaseLabel == releaseConfig.pickupRelease.label)
-                releaseConfig.pickupRelease
-            else
-                releaseConfig[releaseLabel] ?: throw notFound
+        val localRelease = releaseConfig[releaseLabel] ?: throw notFound
 
-        val remoteReleases = client.getReleases()
+        val remoteReleases = githubClient.getReleases()
 
+        val remoteReleaseNotFound = GithubReleaseTaskException
+            .remoteReleaseDoesntExist(releaseLabel)
         val remoteRelease = remoteReleases
             .find {it["tag_name"] == releaseLabel}
-            ?: throw GithubReleaseTaskException(
-                "Release with 'tag_name' '$releaseLabel' doesn't exist on the "
-              + "GitHub server. Create it first, then publish a release asset."
-            )
+            ?: throw remoteReleaseNotFound
 
         val releaseId = remoteRelease["id"].toString().toInt()
         val localFile = File(configuredLocalJarPath)
@@ -463,44 +458,50 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
 
         deleteExistingReleaseAssetForName(releaseId, configuredRemoteJarName)
 
-        val uploadClient = githubReleaseClient(project.configuredGithubUploadUrl)
-        val asset = uploadClient.uploadReleaseAsset(
+        val githubUploadClient = githubReleaseClient(
+            project.configuredGithubUploadUrl)
+        val asset = githubUploadClient.uploadReleaseAsset(
             releaseId = releaseId,
             name = configuredRemoteJarName,
             contentType = MEDIA_TYPE_JAR,
             file = localFile
         )
-
-        logger.lifecycle("Uploaded '${localFile.name}' to release '$releaseLabel' " +
+        logger.lifecycle(
+            "Uploaded '${localFile.name}' to release '$releaseLabel' " +
             "with asset name '$configuredRemoteJarName'. " +
             "Asset id is '${asset["id"]}'.")
 
-        // TODO: rename this flag
-        if (configuredUpdateLatest) {
+        if (configuredPublishToPickupRelease) {
 
-            val latestReleaseLabel = releaseConfig.pickupRelease.label
-            val latestReleaseNotFound = GithubReleaseTaskException(
-                """Remote release with label '$latestReleaseLabel' doesn't
-                |exist on the GitHub server.
-                |Can't upload release jar to the release '$latestReleaseLabel',
-                |create release '$latestReleaseLabel' first."""
-                .trimMargin("|")
-            )
-            val latestRelease = remoteReleases
-                .find {it["tag_name"] == latestReleaseLabel}
-                ?: throw latestReleaseNotFound
-            val latestReleaseId = latestRelease["id"].toString().toInt()
-            deleteExistingReleaseAssetForName(latestReleaseId, configuredRemoteJarName)
-            val latestReleaseAsset = uploadClient.uploadReleaseAsset(
-                releaseId = latestReleaseId,
+            val pickupReleaseLabel = releaseConfig.pickupRelease.label
+            val pickupReleaseNotFound = GithubReleaseTaskException
+                .remoteReleaseDoesntExist(pickupReleaseLabel)
+
+            val remotePickupRelease = remoteReleases
+                .find {it["tag_name"] == pickupReleaseLabel}
+                ?: throw pickupReleaseNotFound
+            val pickupReleaseId = remotePickupRelease["id"].toString().toInt()
+            deleteExistingReleaseAssetForName(pickupReleaseId,
+                configuredRemoteJarName)
+
+            val pickupReleaseBody = releaseConfig.pickupRelease
+                .descriptionForPickedUpRelease(
+                    pickedUpRelase =  localRelease
+                )
+
+            githubClient.updateRelease(
+                releaseId = pickupReleaseId,
+                body = pickupReleaseBody)
+
+            val latestReleaseAsset = githubUploadClient.uploadReleaseAsset(
+                releaseId = pickupReleaseId,
                 name = configuredRemoteJarName,
                 contentType = MEDIA_TYPE_JAR,
                 file = localFile
             )
 
-            //TODO: also update the release description
             logger.lifecycle(
-                "Uploaded '${localFile.name}' to release '$latestReleaseLabel' " +
+                "Uploaded '${localFile.name}' to release '$pickupReleaseLabel' " +
                 "with asset name '$configuredRemoteJarName'. " +
                 "Asset id is '${latestReleaseAsset["id"]}'.")
         }
