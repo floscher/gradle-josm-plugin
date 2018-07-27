@@ -64,7 +64,7 @@ class Pagination(linkHeader: String?) {
     */
    init {
         linkHeader?.let {header ->
-            val relNextRegex = """rel=\"next\"""".toRegex()
+            val relNextRegex = """rel="next"""".toRegex()
             val urlPatternRegex = """<(.*)>""".toRegex()
             _nextUrl = header.split(",")
                 .map(String::trim)
@@ -146,12 +146,22 @@ class GithubReleasesClient(
         return ret
     }
 
-    fun Response.asJsonObject() : JsonObject {
+    private fun Response.asJsonObject() : JsonObject {
         val body = this.body()?.string() ?:
         throw GithubReleaseClientException(
             "Unexpected response body from GitHub API"
         )
         return Parser().parse(StringBuilder(body)) as JsonObject
+    }
+
+    private fun invokeWrapped(executor: () -> JsonObject?) : JsonObject? {
+        try {
+            return executor()
+        } catch(e: GithubReleaseClientException) {
+            throw e
+        } catch(e: Throwable) {
+            throw GithubReleaseClientException(e)
+        }
     }
 
     /**
@@ -163,17 +173,13 @@ class GithubReleasesClient(
             .url("$apiUrl/repos/$user/$repository/releases/latest")
             .build()
 
-        try {
+        return invokeWrapped {
             val response = client.newCall(request).execute()
-            return when (response.code()) {
+            when (response.code()) {
                 200 -> response.asJsonObject()
                 404 -> null
                 else -> throw GithubReleaseClientException(response)
             }
-        } catch(e: GithubReleaseClientException) {
-            throw e
-        } catch(e: Throwable) {
-            throw GithubReleaseClientException(e)
         }
     }
 
@@ -212,17 +218,13 @@ class GithubReleasesClient(
             .url("$apiUrl/repos/$user/$repository/releases")
             .build()
 
-        try {
+        return invokeWrapped {
             val response = client.newCall(request).execute()
-            return when (response.code()) {
+            when (response.code()) {
                 200 -> response.asJsonObject()
                 else -> throw GithubReleaseClientException(response)
-          }
-        } catch(e: GithubReleaseClientException) {
-            throw e
-        } catch(e: Throwable) {
-            throw GithubReleaseClientException(e)
-        }
+            }
+        }!!
     }
 
 
@@ -256,17 +258,13 @@ class GithubReleasesClient(
             .url("$apiUrl/repos/$user/$repository/releases/$releaseId")
             .build()
 
-        try {
+        return invokeWrapped {
             val response = client.newCall(request).execute()
-            return when (response.code()) {
+            when (response.code()) {
                 200 -> response.asJsonObject()
                 else -> throw GithubReleaseClientException(response)
             }
-        } catch(e: GithubReleaseClientException) {
-            throw e
-        } catch(e: Throwable) {
-            throw GithubReleaseClientException(e)
-        }
+        }!!
     }
 
     private fun kvpair(name: String, value: String?) =
@@ -316,6 +314,7 @@ class GithubReleasesClient(
                            name: String? = null, label: String? = null)
         :JsonObject {
 
+        @Suppress("NAME_SHADOWING")
         val name = name ?: file.name
         val mediaType =  MediaType.parse(contentType)
         val requestBody = RequestBody.create(mediaType, file)
@@ -338,13 +337,7 @@ class GithubReleasesClient(
         return invokeWrapped {
             val response = client.newCall(request).execute()
             when (response.code()) {
-                201 -> {
-                    val body = response.body()?.string()
-                        ?: throw GithubReleaseClientException(
-                            "Unexpected response body from GitHub API"
-                        )
-                    Parser().parse(StringBuilder(body)) as JsonObject
-                }
+                201 -> response.asJsonObject()
                 else -> {
                     val errorMessage = response.toFormattedErrorMessage()
                     throw GithubReleaseClientException(
