@@ -12,6 +12,18 @@ const val DEFAULT_GITHUB_API_URL = "https://api.github.com"
 // the default upload URL to upload a release asset
 const val DEFAULT_GITHUB_UPLOAD_URL = "https://uploads.github.com"
 
+@Throws(GithubReleaseClientException::class)
+private fun Response.toFormattedErrorMessage() : String {
+    val body = this.body()?.string()
+        ?: throw GithubReleaseClientException(
+            "Unexpected error response body from GitHub API"
+        )
+    return try {
+        Parser().parse(StringBuilder(body)) as JsonObject
+    } catch(t: Throwable) {
+        null
+    }?.toJsonString(prettyPrint = true) ?: body
+}
 
 class GithubReleaseClientException(override var message: String,
                                    override var cause: Throwable?)
@@ -260,6 +272,39 @@ class GithubReleasesClient(
     private fun kvpair(name: String, value: String?) =
         value?.let {"$name=${URLEncoder.encode(value, "utf-8")}"}
 
+    /**
+     * Fetch the list of release assets for the release `releaseId`.
+     */
+    @Throws(GithubReleaseClientException::class)
+    fun getReleaseAssets(releaseId: Int) : JsonArray<JsonObject> {
+        try {
+            var requestUrl: String? =
+                "$apiUrl/repos/$user/$repository/releases/$releaseId/assets"
+            val ret = JsonArray<JsonObject>()
+            while (requestUrl != null) {
+                val request = createBaseRequestBuilder()
+                    .url(requestUrl)
+                    .build()
+
+                val response = client.newCall(request).execute()
+                if (!response.isSuccessful) {
+                    throw GithubReleaseClientException(response)
+                }
+                val pagination = Pagination(response.header("Link"))
+
+                val releases = Parser().parse(StringBuilder(
+                        response.body()?.string() ?: "[]"
+                    )) as JsonArray<JsonObject>
+                ret.addAll(releases)
+                requestUrl = pagination.nextUrl
+            }
+            return ret
+        } catch (e: GithubReleaseClientException) {
+            throw e
+        } catch (e: Throwable) {
+            throw GithubReleaseClientException(e)
+        }
+    }
 
     /**
      * Upload a release asset `file` to the release `releaseId`. `name` is the
@@ -290,22 +335,51 @@ class GithubReleasesClient(
             .url(url)
             .build()
 
-        try {
+        return invokeWrapped {
             val response = client.newCall(request).execute()
-            return when (response.code()) {
+            when (response.code()) {
                 201 -> {
-                    val body = response.body()?.string() ?:
-                        throw GithubReleaseClientException(
+                    val body = response.body()?.string()
+                        ?: throw GithubReleaseClientException(
                             "Unexpected response body from GitHub API"
                         )
                     Parser().parse(StringBuilder(body)) as JsonObject
                 }
-                else -> throw GithubReleaseClientException(response)
+                else -> {
+                    val errorMessage = response.toFormattedErrorMessage()
+                    throw GithubReleaseClientException(
+                        "Failed to upload file '${file.absolutePath}' as " +
+                            "release asset '$name'. " +
+                            "Error message: \n" + errorMessage
+                    )
+                }
             }
-        } catch(e: GithubReleaseClientException) {
-            throw e
-        } catch(e: Throwable) {
-            throw GithubReleaseClientException(e)
+        }!!
+    }
+
+    /**
+     * Deletes the release asset `assetId`
+     */
+    @Throws(GithubReleaseClientException::class)
+    fun deleteReleaseAsset(assetId: Int) {
+        val url = "$apiUrl/repos/$user/$repository/releases/assets/$assetId"
+        val request = createBaseRequestBuilder()
+            .delete()
+            .url(url)
+            .build()
+
+        invokeWrapped {
+            val response = client.newCall(request).execute()
+            when (response.code()) {
+                204 -> null
+                else -> {
+                    val errorMessage = response.toFormattedErrorMessage()
+                    throw GithubReleaseClientException(
+                        "Failed to delete asset '$assetId'. " +
+                        "Error message: \n" + errorMessage
+                    )
+                }
+            }
         }
     }
 }
