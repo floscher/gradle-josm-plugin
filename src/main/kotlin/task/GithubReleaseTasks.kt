@@ -22,8 +22,21 @@ class GithubReleaseTaskException(override var message: String,
                 : GithubReleaseTaskException {
             val msg = """Remote release with label '$releaseLabel' doesn't
                 |exist on the GitHub server.
-                |Can't upload release jar to the release '$releaseLabel',
-                |create release '$releaseLabel' first."""
+                |Can't upload release jar to the release '$releaseLabel.
+                |Create release '$releaseLabel' first, i.e.
+                |  ./gradlew createGithubRelease --release-label $releaseLabel
+                """.trimMargin("|")
+            return GithubReleaseTaskException(msg)
+        }
+
+        fun remotePickupReleaseDoesntExit(releaseLabel: String)
+            : GithubReleaseTaskException {
+            val msg = """Remote pickup release with label '$releaseLabel'
+                |doesn't exist on the GitHub server.
+                |Can't upload release jar to the pickup release '$releaseLabel'.
+                |Create pickup release first, i.e.
+                |   ./gradlew createPickupRelease
+                |"""
                 .trimMargin("|")
             return GithubReleaseTaskException(msg)
         }
@@ -225,18 +238,14 @@ open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
             |a release with this label in '$releaseConfigFile' and rerun."""
             .trimMargin("|")
         )
-        val release =
-            if (releaseLabel == releaseConfig.pickupRelease.label)
-                releaseConfig.pickupRelease
-            else
-                releaseConfig[releaseLabel] ?: throw notFound
+        val release = releaseConfig[releaseLabel] ?: throw notFound
 
         val client = githubReleaseClient()
 
         client.getReleases().find {it["tag_name"] == releaseLabel}?.let {
             throw GithubReleaseTaskException(
                 "Release with release label '$releaseLabel' already exists "
-                    + "on the github server."
+                    + "on the GitHub server."
             )
         }
 
@@ -247,17 +256,48 @@ open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
                 name = release.name,
                 body = release.description)
             logger.lifecycle("New release '$releaseLabel' created in "
-                + "github repository")
+                + "GitHub repository")
         } catch(e: Throwable) {
            throw GithubReleaseTaskException(e.message ?: "", e)
         }
-      }
+    }
+}
+
+open class CreatePickupReleaseTask: BaseGithubReleaseTask() {
+
+    @TaskAction
+    fun createPickupRelease() {
+        val releaseConfigFile = project.configuredReleasesConfigFile
+        val releaseConfig = ReleasesSpec.load(releaseConfigFile)
+
+        val release = releaseConfig.pickupRelease
+        val client = githubReleaseClient()
+
+        client.getReleases().find {it["tag_name"] == release.label}?.let {
+            throw GithubReleaseTaskException(
+                "Pickup release with label '${release.label}' already exists "
+                    + "on the GitHub server."
+            )
+        }
+
+        try {
+            client.createRelease(
+                tagName = release.label,
+                targetCommitish = configuredTargetCommitish,
+                name = release.name,
+                body = release.defaultDescriptionForPickupRelease())
+            logger.lifecycle("Pickup release '$releaseLabel' created in "
+                + "GitHub repository")
+        } catch(e: Throwable) {
+            throw GithubReleaseTaskException(e.message ?: "", e)
+        }
+    }
 }
 
 open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
     @Option(
         option = CMDLINE_OPT_LOCAL_JAR_PATH,
-        description = "the local path to the jar which should bei uploaded.\n"
+        description = "the local path to the jar which should be uploaded.\n"
           + "Default: the path of the jar built in the project")
     var localJarPath: String? = null
 
@@ -271,9 +311,8 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
         option = CMDLINE_OPT_PUBLISH_TO_PICKUP_RELEASE,
         description =
         "indicates whether the asset is also updated to the pickup release.\n"
-      + "The label of the latest release is configured in 'releases.yml' and "
+      + "The label of the pickup release is configured in 'releases.yml' and "
       + "defaults to '$DEFAULT_PICKUP_RELEASE_LABEL'.\n"
-      + "Default: false, if missing or if illegal value"
     )
     var publishToPickupRelease: Boolean? = null
 
@@ -467,19 +506,24 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
             file = localFile
         )
         logger.lifecycle(
-            "Uploaded '${localFile.name}' to release '$releaseLabel' " +
-            "with asset name '$configuredRemoteJarName'. " +
-            "Asset id is '${asset["id"]}'.")
+            "Uploaded '{}' to release '{}' with asset name '{}'. " +
+            "Asset id is '{}'.",
+            localFile.name,
+            releaseLabel,
+            configuredRemoteJarName,
+            asset["id"]
+        )
 
         if (configuredPublishToPickupRelease) {
 
             val pickupReleaseLabel = releaseConfig.pickupRelease.label
             val pickupReleaseNotFound = GithubReleaseTaskException
-                .remoteReleaseDoesntExist(pickupReleaseLabel)
+                .remotePickupReleaseDoesntExit(pickupReleaseLabel)
 
             val remotePickupRelease = remoteReleases
                 .find {it["tag_name"] == pickupReleaseLabel}
                 ?: throw pickupReleaseNotFound
+
             val pickupReleaseId = remotePickupRelease["id"].toString().toInt()
             deleteExistingReleaseAssetForName(pickupReleaseId,
                 configuredRemoteJarName)
@@ -500,10 +544,13 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
                 file = localFile
             )
 
-            logger.lifecycle(
-                "Uploaded '${localFile.name}' to release '$pickupReleaseLabel' " +
-                "with asset name '$configuredRemoteJarName'. " +
-                "Asset id is '${latestReleaseAsset["id"]}'.")
+            logger.lifecycle("Uploaded '{}' to release '{}' with asset " +
+                "name '{}'. Asset id is '{}'.",
+                localFile.name,
+                pickupReleaseLabel,
+                configuredRemoteJarName,
+                latestReleaseAsset["id"]
+            )
         }
     }
 }

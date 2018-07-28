@@ -1,9 +1,11 @@
 package org.openstreetmap.josm.gradle.plugin
 
+import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import java.io.File
+import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 const val GITHUB_USER = "a-github-user"
 
@@ -86,5 +88,11 @@ open class BaseGithubReleaseTaskTest() {
                                           propertiesFile: File? = null) {
         (propertiesFile ?: File(buildDir, "gradle.properties"))
             .printWriter().use { it.println(content) }
+    }
+
+    protected fun BuildResult.dumpOutputOnError(taskName: String) {
+        if (this.task(":$taskName")?.outcome != SUCCESS) {
+            println(this.output)
+        }
     }
 }

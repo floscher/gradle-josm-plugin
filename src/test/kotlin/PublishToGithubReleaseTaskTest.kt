@@ -129,8 +129,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 "--stacktrace",
                 "build","myPublishToGithubRelease")
             .build()
-        println(result.output)
-
+        result.dumpOutputOnError("myPublishToGithubRelease")
         assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":myPublishToGithubRelease")?.outcome
@@ -318,7 +317,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 "--stacktrace"
             ).build()
 
-        println(result.output)
+        result.dumpOutputOnError("myPublishToGithubRelease")
+
         assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":myPublishToGithubRelease")?.outcome
@@ -440,7 +440,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             )
             .build()
 
-        println(result.output)
+        result.dumpOutputOnError("publishToGithubRelease")
         assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":publishToGithubRelease")?.outcome
@@ -619,7 +619,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 )
             .build()
 
-        println(result.output)
+        result.dumpOutputOnError("publishToGithubRelease")
         assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":publishToGithubRelease")?.outcome

@@ -171,17 +171,22 @@ private fun setupI18nTasks(project: Project, sourceSetJosmPlugin: SourceSet) {
   project.tasks.create("transifexDownload", TransifexDownload::class.java)
 }
 
-public fun setupGithubReleaseTasks(project: Project) {
+private fun setupGithubReleaseTasks(project: Project) {
 
-  project.tasks.create("createGithubRelease", CreateGithubReleaseTask::class.java) {
-    it.setDescription(
-        "Creates a new GitHub release using the GitHub API")
+  project.tasks.create("createGithubRelease",
+    CreateGithubReleaseTask::class.java) {
+      it.description =  "Creates a new GitHub release"
   }
 
-  project.tasks.create("publishToGithubRelease", PublishToGithubReleaseTask::class.java) {
-    it.setDescription(
-        "Publish a JOSM plugin jar as GitHub release asset to a " +
-            "GitHub release")
+  project.tasks.create("publishToGithubRelease",
+    PublishToGithubReleaseTask::class.java) {
+      it.description = "Publish a JOSM plugin jar as GitHub release asset " +
+        "to a GitHub release"
+  }
+
+  project.tasks.create("createPickupRelease",
+    CreatePickupReleaseTask::class.java) {
+      it.description = "Creates the pickup release for JOSM release using "
   }
 }
 
