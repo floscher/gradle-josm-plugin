@@ -15,6 +15,8 @@ import java.util.jar.JarFile
 class GithubReleaseTaskException(override var message: String,
                                  override var cause: Throwable?)
     : Exception(message, cause) {
+
+    constructor(cause: Throwable) : this(cause.message ?: "", cause)
     constructor(message: String) : this(message, null)
 
     companion object {
@@ -255,10 +257,10 @@ open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
                 targetCommitish = configuredTargetCommitish,
                 name = release.name,
                 body = release.description)
-            logger.lifecycle("New release '$releaseLabel' created in "
-                + "GitHub repository")
+            logger.lifecycle("New release '{}' created in GitHub repository",
+                releaseLabel)
         } catch(e: Throwable) {
-           throw GithubReleaseTaskException(e.message ?: "", e)
+           throw GithubReleaseTaskException(e)
         }
     }
 }
@@ -286,10 +288,10 @@ open class CreatePickupReleaseTask: BaseGithubReleaseTask() {
                 targetCommitish = configuredTargetCommitish,
                 name = release.name,
                 body = release.defaultDescriptionForPickupRelease())
-            logger.lifecycle("Pickup release '$releaseLabel' created in "
-                + "GitHub repository")
+            logger.lifecycle("Pickup release '{}' created in GitHub repository",
+                release.label)
         } catch(e: Throwable) {
-            throw GithubReleaseTaskException(e.message ?: "", e)
+            throw GithubReleaseTaskException(e)
         }
     }
 }
