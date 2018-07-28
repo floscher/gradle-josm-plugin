@@ -13,19 +13,26 @@ class ReleaseSpecException(override var message: String,
   constructor(message: String) : this(message, null)
 }
 
-const val DEFAULT_LATEST_LABEL = "latest"
-
 const val DEFAULT_PICKUP_RELEASE_LABEL = "pickup-release"
+const val DEFAULT_PICKUP_RELEASE_NAME = "Pickup Release"
+
 const val DEFAULT_PICKUP_RELEASE_DESCRIPTION = """
-This is the pickup release for the JOSM plugin system. It
-* downloads the plugin jar in this release every 10 minutes
-* extracts the metadata from `META-INF/MANIFEST.INF`
-* updates the metadata in the
-  [JOSM plugin directory](https://josm.openstreetmap.de/plugin)
----
-This release currently provides the plugin release
-{{ labelForPickedUpRelease }} with the following description:
-{{ descriptionForPickedUpRelease }}"""
+   This is the pickup release for the JOSM plugin system. The services
+    at [https://josm.openstreetmap.de]
+    * download the plugin jar in this release every 10 minutes
+    * extract the metadata from `META-INF/MANIFEST.INF`
+    * update the metadata in the
+      [JOSM plugin directory](https://josm.openstreetmap.de/plugin)
+    ---
+    {{#pickedUpReleaseLabel}}
+    This release currently provides the plugin release
+    {{pickedUpReleaseLabel}}.
+    {{/pickedUpReleaseLabel}}
+
+    {{#pickedUpReleaseDescription}}
+    __Description__:
+    {{pickedUpReleaseDescription}}
+    {{/pickedUpReleaseDescription}}"""
 
 /**
  * A release specification maintained in the local `releases.yml` file
@@ -42,7 +49,7 @@ open class ReleaseSpec(
     open val description: String? = null,
 
     /** an optional name for the release. Defaults to the label, if missing. */
-    val name: String = label
+    open val name: String = label
 ) {
     init {
         assert(numericJosmVersion >= 0)
@@ -51,6 +58,7 @@ open class ReleaseSpec(
 
 class PickupRelaseSpec(
     override val label: String = DEFAULT_PICKUP_RELEASE_LABEL,
+    override val name: String = DEFAULT_PICKUP_RELEASE_NAME,
     override val description: String = DEFAULT_PICKUP_RELEASE_DESCRIPTION) :
         ReleaseSpec(label=label, description = description){
 
@@ -73,6 +81,17 @@ class PickupRelaseSpec(
             pickedUpRelase.label,
             pickedUpRelase.description ?: "")
     }
+
+    /**
+     * Replies the default description for the pickup release.
+     */
+    fun defaultDescriptionForPickupRelease(): String {
+        val factory = DefaultMustacheFactory()
+        val template = factory.compile(StringReader(description), "description")
+        val writer = StringWriter()
+        template.execute(writer, emptyMap<String, Any>())
+        return writer.toString()
+    }
 }
 
 data class ReleasesSpec(val pickupRelease: PickupRelaseSpec,
@@ -93,12 +112,18 @@ data class ReleasesSpec(val pickupRelease: PickupRelaseSpec,
                 ?.get("label")?.asText()
                 ?: DEFAULT_PICKUP_RELEASE_LABEL
 
+            val pickupReleaseName = root.get("pickup_release_for_josm")
+                ?.get("name")?.asText()
+                ?: DEFAULT_PICKUP_RELEASE_NAME
+
             val pickupReleaseDescription = root.get("pickup_release_for_josm")
-                    ?.get("description")?.asText()
+                ?.get("description")?.asText()
                 ?: DEFAULT_PICKUP_RELEASE_DESCRIPTION
 
-            val pickupRelase =
-                PickupRelaseSpec(pickupReleaseLabel, pickupReleaseDescription)
+            val pickupRelase = PickupRelaseSpec(
+                label = pickupReleaseLabel,
+                name = pickupReleaseName,
+                description = pickupReleaseDescription)
 
             val releases = root.get("releases")
                 ?.mapIndexedNotNull {i, release ->

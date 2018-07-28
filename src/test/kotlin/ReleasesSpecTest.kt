@@ -1,9 +1,9 @@
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.openstreetmap.josm.gradle.plugin.task.DEFAULT_PICKUP_RELEASE_DESCRIPTION
 import org.openstreetmap.josm.gradle.plugin.task.DEFAULT_PICKUP_RELEASE_LABEL
+import org.openstreetmap.josm.gradle.plugin.task.DEFAULT_PICKUP_RELEASE_NAME
 import org.openstreetmap.josm.gradle.plugin.task.ReleasesSpec
 
 class ReleasesSpecTest {
@@ -153,7 +153,7 @@ class ReleasesSpecTest {
     }
 
     @Test
-    fun `default latest release, if not specified in file`() {
+    fun `default pickup release, if not specified in file`() {
         val releasesFile = createTempFile(suffix="yml")
         val releasesDesc = """
         releases:
@@ -165,6 +165,8 @@ class ReleasesSpecTest {
                 releases.pickupRelease.label)
             assertEquals(DEFAULT_PICKUP_RELEASE_DESCRIPTION,
                 releases.pickupRelease.description)
+            assertEquals(DEFAULT_PICKUP_RELEASE_NAME,
+                releases.pickupRelease.name)
         } finally {
             releasesFile.delete()
         }
@@ -174,10 +176,12 @@ class ReleasesSpecTest {
     fun `should accept customized pickup release label and description`() {
         val releasesFile = createTempFile(suffix="yml")
         val customLabel = "josm-entry-point"
+        val customName = "custom-name"
         val customDescription = "my description"
         val releasesDesc = """
         pickup_release_for_josm:
           label: $customLabel
+          name: $customName
           description: $customDescription
 
         releases:
@@ -189,6 +193,92 @@ class ReleasesSpecTest {
                 releases.pickupRelease.label)
             assertEquals(customDescription,
                 releases.pickupRelease.description)
+            assertEquals(customName,
+                releases.pickupRelease.name)
+        } finally {
+            releasesFile.delete()
+        }
+    }
+
+    @Test
+    fun `should ignore release specific infos for the default description`() {
+        val releasesFile = createTempFile(suffix="yml")
+        val releasesDesc = """
+        pickup_release_for_josm:
+          label: pickup-release
+          description: |
+            {{#pickedUpReleaseLabel}}
+                foo
+            {{/pickedUpReleaseLabel}}
+            {{#pickedUpReleaseDescription}}
+                bar
+            {{/pickedUpReleaseDescription}}
+
+        releases:
+     """.trimIndent()
+        try {
+            releasesFile.writeText(releasesDesc)
+            val releases = ReleasesSpec.load(releasesFile)
+            assertEquals("",
+                releases.pickupRelease
+                .defaultDescriptionForPickupRelease().trim())
+        } finally {
+            releasesFile.delete()
+        }
+    }
+
+    @Test
+    fun `should process the default description`() {
+        val releasesFile = createTempFile(suffix="yml")
+        val releasesDesc = """
+        pickup_release_for_josm:
+          # hardcoded default description will be used
+          label: pickup-release
+
+        releases:
+     """.trimIndent()
+        try {
+            releasesFile.writeText(releasesDesc)
+            val releases = ReleasesSpec.load(releasesFile)
+            releases.pickupRelease
+                    .defaultDescriptionForPickupRelease()
+        } finally {
+            releasesFile.delete()
+        }
+    }
+    @Test
+    fun `should consider variables in release specific description`() {
+        val releasesFile = createTempFile(suffix="yml")
+        val releaseLabel = "v0.0.1"
+        val releaseDescription = "my-description"
+        val releasesDesc = """
+        pickup_release_for_josm:
+          label: pickup-release
+          description: |
+            {{#pickedUpReleaseLabel}}
+                {{pickedUpReleaseLabel}}
+            {{/pickedUpReleaseLabel}}
+            {{#pickedUpReleaseDescription}}
+                {{pickedUpReleaseDescription}}
+            {{/pickedUpReleaseDescription}}
+
+        releases:
+          - label: $releaseLabel
+            description: $releaseDescription
+            numeric_josm_version: 1234
+     """.trimIndent()
+        try {
+            releasesFile.writeText(releasesDesc)
+            val releases = ReleasesSpec.load(releasesFile)
+            val release = releases["v0.0.1"]!!
+            assertTrue(releases.pickupRelease
+                    .descriptionForPickedUpRelease(release)
+                    .contains(releaseLabel)
+            )
+            assertTrue(releases.pickupRelease
+                .descriptionForPickedUpRelease(release)
+                .contains(releaseDescription)
+            )
         } finally {
             releasesFile.delete()
         }
