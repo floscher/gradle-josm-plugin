@@ -17,22 +17,23 @@ const val DEFAULT_PICKUP_RELEASE_LABEL = "pickup-release"
 const val DEFAULT_PICKUP_RELEASE_NAME = "Pickup Release"
 
 const val DEFAULT_PICKUP_RELEASE_DESCRIPTION = """
-   This is the pickup release for the JOSM plugin system. The services
-    provided by the [JOSM dev team](https://josm.openstreetmap.de)
-    * download the plugin jar in this release every 10 minutes
-    * extract the metadata from `META-INF/MANIFEST.INF`
-    * update the metadata in the
-      [JOSM plugin directory](https://josm.openstreetmap.de/plugin)
-    ---
-    {{#pickedUpReleaseLabel}}
-    This release currently provides the plugin release
-    {{pickedUpReleaseLabel}}.
-    {{/pickedUpReleaseLabel}}
+This is the pickup release for the JOSM plugin system. The services
+provided by the [JOSM dev team](https://josm.openstreetmap.de)
 
-    {{#pickedUpReleaseDescription}}
-    __Description__:
-    {{pickedUpReleaseDescription}}
-    {{/pickedUpReleaseDescription}}"""
+* download the plugin jar in this release every 10 minutes
+* extract the metadata from `META-INF/MANIFEST.INF`
+* update the metadata in the [JOSM plugin directory](https://josm.openstreetmap.de/plugin)
+
+---
+
+{{#pickedUpReleaseLabel}}
+This release currently provides the plugin release {{pickedUpReleaseLabel}}.
+{{/pickedUpReleaseLabel}}
+
+{{#pickedUpReleaseDescription}}
+__Description__:
+{{pickedUpReleaseDescription}}
+{{/pickedUpReleaseDescription}}"""
 
 /**
  * A release specification maintained in the local `releases.yml` file
@@ -77,7 +78,8 @@ class PickupRelaseSpec(
         val factory = DefaultMustacheFactory()
         val template = factory.compile(StringReader(description), "description")
         val scope = mapOf(
-            "pickedUpReleaseLabel" to pickedUpReleaseLink(pickedUpReleaseLabel),
+            "pickedUpReleaseLabel" to pickedUpReleaseLink(
+                pickedUpReleaseLabel, pickedUpReleaseUrl),
             "pickedUpReleaseDescription" to pickedUpReleaseDescription
         )
         val writer = StringWriter()

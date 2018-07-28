@@ -9,10 +9,13 @@ import java.net.HttpURLConnection.HTTP_CREATED
 import java.net.HttpURLConnection.HTTP_OK
 import java.net.URLEncoder
 
-// the default API URL for the Github API
+// the default API URL for the GitHub API
 const val DEFAULT_GITHUB_API_URL = "https://api.github.com"
 // the default upload URL to upload a release asset
 const val DEFAULT_GITHUB_UPLOAD_URL = "https://uploads.github.com"
+// the default base URL to access a release
+const val DEFAULT_GITHUB_URL = "http://github.com"
+
 
 @Throws(GithubReleaseClientException::class)
 private fun Response.toFormattedErrorMessage() : String {

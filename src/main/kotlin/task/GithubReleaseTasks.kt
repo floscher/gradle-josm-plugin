@@ -7,6 +7,7 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.options.Option
 import org.openstreetmap.josm.gradle.plugin.ghreleases.DEFAULT_GITHUB_API_URL
 import org.openstreetmap.josm.gradle.plugin.ghreleases.DEFAULT_GITHUB_UPLOAD_URL
+import org.openstreetmap.josm.gradle.plugin.ghreleases.DEFAULT_GITHUB_URL
 import org.openstreetmap.josm.gradle.plugin.ghreleases.GithubReleasesClient
 import java.io.File
 import java.io.IOException
@@ -53,6 +54,7 @@ const val CONFIG_OPT_GITHUB_USER = "josm.github.user"
 const val CONFIG_OPT_GITHUB_ACCESS_TOKEN = "josm.github.access_token"
 const val CONFIG_OPT_GITHUB_API_URL = "josm.github.api_url"
 const val CONFIG_OPT_GITHUB_UPLOAD_URL = "josm.github.upload_url"
+const val CONFIG_OPT_GITHUB_URL = "josm.github.url"
 const val CONFIG_OPT_GITHUB_REPOSITORY = "josm.github.repository"
 const val CONFIG_OPT_RELEASES_CONFIG_FILE = "josm.releases_config_file"
 const val CONFIG_OPT_TARGET_COMMITISH = "josm.target_commitish"
@@ -63,6 +65,7 @@ const val ENV_VAR_GITHUB_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN"
 const val ENV_VAR_GITHUB_REPOSITORY = "GITHUB_REPOSITORY"
 const val ENV_VAR_GITHUB_API_URL = "GITHUB_API_URL"
 const val ENV_VAR_GITHUB_UPLOAD_URL = "GITHUB_UPLOAD_URL"
+const val ENV_VAR_GITHUB_URL = "GITHUB_URL"
 
 // command line options
 const val CMDLINE_OPT_RELEASE_LABEL = "release-label"
@@ -120,7 +123,7 @@ val Project.defaultReleasesConfigFile: File get() {
 }
 
 fun Project.releaseUrl(label: String) =
-    "${this.configuredGithubApiUrl}/${this.configuredGithubUser}" +
+    "${this.configuredGithubUrl}/${this.configuredGithubUser}/" +
         "${this.configuredGithubRepository}/releases/tag/$label"
 
 /**
@@ -159,6 +162,13 @@ val Project.configuredGithubUploadUrl: String get () {
         propertyName = CONFIG_OPT_GITHUB_UPLOAD_URL,
         envName = ENV_VAR_GITHUB_UPLOAD_URL
     ) ?: DEFAULT_GITHUB_UPLOAD_URL
+}
+
+val Project.configuredGithubUrl: String get () {
+    return lookupConfiguredProperty(
+        propertyName = CONFIG_OPT_GITHUB_URL,
+        envName = ENV_VAR_GITHUB_URL
+    ) ?: DEFAULT_GITHUB_URL
 }
 
 val Project.configuredGithubRepository: String get () {
