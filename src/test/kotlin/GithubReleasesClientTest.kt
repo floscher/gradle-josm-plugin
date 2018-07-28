@@ -11,6 +11,7 @@ import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock
 import ru.lanwen.wiremock.ext.WiremockUriResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver.WiremockUri
+import java.net.HttpURLConnection.*
 
 const val GITHUB_USER = "a-user"
 const val GITHUB_ACCESS_TOKEN = "an-access-token"
@@ -54,7 +55,7 @@ class GithubReleasesClientTest {
         // replies two release in the first page
         server.stubFor(get(urlPathEqualTo(path))
             .willReturn(aResponse()
-            .withStatus(200)
+            .withStatus(HTTP_OK)
             // link to the next page of releases
             .withBody("""{"id": 1}""")
             )
@@ -76,7 +77,7 @@ class GithubReleasesClientTest {
         // replies two release in the first page
         server.stubFor(get(urlPathEqualTo(path))
             .willReturn(aResponse()
-                .withStatus(404)
+                .withStatus(HTTP_NOT_FOUND)
                 // link to the next page of releases
                 .withBody("""{"message": "not found"}""")
             )
@@ -95,7 +96,7 @@ class GithubReleasesClientTest {
         // replies two release in the first page
         server.stubFor(get(urlPathEqualTo(path))
             .willReturn(aResponse()
-                .withStatus(500)
+                .withStatus(HTTP_SERVER_ERROR)
                 // link to the next page of releases
                 .withBody("Server Error")
             )
@@ -118,7 +119,7 @@ class GithubReleasesClientTest {
         server.stubFor(post(urlPathEqualTo(path))
           .withRequestBody(matchingJsonPath("$[?(@.tag_name == '$tagName')]"))
             .willReturn(aResponse()
-              .withStatus(200)
+              .withStatus(HTTP_CREATED)
               .withBody("""{"id": 1}""")
             )
         )
@@ -156,7 +157,7 @@ class GithubReleasesClientTest {
             .withRequestBody(matchingJsonPath("$[?(@.draft == false)]"))
             .withRequestBody(matchingJsonPath("$[?(@.prerelease == false)]"))
             .willReturn(aResponse()
-              .withStatus(200)
+              .withStatus(HTTP_CREATED)
               .withBody("""{"id": 1}""")
             )
         )
@@ -194,7 +195,7 @@ class GithubReleasesClientTest {
             .withRequestBody(matchingJsonPath(
                 "$[?(@.prerelease == $prerelease)]"))
             .willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_OK)
                 .withBody("""{"id": $releaseId}""")
             )
         )
@@ -219,7 +220,7 @@ class GithubReleasesClientTest {
         server.stubFor(patch(urlPathEqualTo(path))
             .withRequestBody(matchingJsonPath("$[?(@.body == '$body')]"))
             .willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_OK)
                 .withBody("""{"id": $releaseId}""")
             )
         )
@@ -239,7 +240,7 @@ class GithubReleasesClientTest {
         server.stubFor(get(urlPathEqualTo(path))
             .inScenario("paging")
             .willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_OK)
                 // link to the next page of releases
                 .withHeader("Link",
                     "<${client.apiUrl}$path?page=2>; rel=\"next\"")
@@ -254,7 +255,7 @@ class GithubReleasesClientTest {
             .withQueryParam("page", equalTo("2"))
             .inScenario("paging")
             .willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_OK)
                 .withBody("""[
                     {"id": 3},
                     {"id": 4}
@@ -282,7 +283,7 @@ class GithubReleasesClientTest {
             .withRequestBody(equalTo(content))
             .withHeader("Content-Type", equalTo("text/plain"))
             .willReturn(aResponse()
-                .withStatus(201)
+                .withStatus(HTTP_CREATED)
                 .withBody("""{"id": 1}""")
             )
         )
@@ -312,7 +313,7 @@ class GithubReleasesClientTest {
             .withQueryParam("name", equalTo(newName))
             .withQueryParam("label", equalTo(label))
             .willReturn(aResponse()
-                .withStatus(201)
+                .withStatus(HTTP_CREATED)
                 .withBody("""{"id": 1}""")
             )
         )
@@ -332,7 +333,7 @@ class GithubReleasesClientTest {
 
         server.stubFor(get(urlEqualTo(url))
             .willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_OK)
                 .withBody("""[
                     {"id": 1},
                     {"id": 2}
@@ -355,7 +356,7 @@ class GithubReleasesClientTest {
 
         server.stubFor(get(urlEqualTo(url))
             .willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_OK)
                 // no link header
                 .withBody("""[
                     {"id": 1},
@@ -386,7 +387,7 @@ class GithubReleasesClientTest {
         server.stubFor(get(urlPathEqualTo(path))
             .inScenario("paging")
             .willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_OK)
                 // link to the next page of releases
                 .withHeader("Link",
                     "<${client.apiUrl}$path?page=2>; rel=\"next\"")
@@ -430,7 +431,7 @@ class GithubReleasesClientTest {
         // replies two assets for the first page
         server.stubFor(get(urlPathEqualTo(path))
             .willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_OK)
                 .withBody("[]")
             )
         )
@@ -453,7 +454,7 @@ class GithubReleasesClientTest {
         // replies two assets for the first page
         server.stubFor(delete(urlPathEqualTo(path))
             .willReturn(aResponse()
-                .withStatus(204)
+                .withStatus(HTTP_NO_CONTENT)
                 .withBody("")
             )
         )
@@ -474,7 +475,7 @@ class GithubReleasesClientTest {
         // replies two assets for the first page
         server.stubFor(delete(urlPathEqualTo(path))
             .willReturn(aResponse()
-                .withStatus(404)
+                .withStatus(HTTP_NOT_FOUND)
                 .withBody("""
                     {
                         "message": "Not Found",

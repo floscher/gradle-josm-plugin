@@ -11,6 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.openstreetmap.josm.gradle.plugin.task.*
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver
+import java.net.HttpURLConnection.HTTP_CREATED
+import java.net.HttpURLConnection.HTTP_OK
 
 class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
@@ -85,7 +87,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 "$[?(@.name == '$releaseName')]"))
             .withBasicAuth(githubUser, githubAccessToken)
             .willReturn(WireMock.aResponse()
-            .withStatus(200)
+            .withStatus(HTTP_CREATED)
             .withBody("""{"id": 1}""")
         ))
 
@@ -155,7 +157,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
         server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
             .withBasicAuth(githubUser, githubAccessToken)
             .willReturn(WireMock.aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_OK)
                 // assume we already have one release with label 'v0.0.1'
                 // on the github server
                 .withBody("""[{"id": 1, "label": "v0.0.1"}]""")
@@ -168,7 +170,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 "$[?(@.name == '$releaseName')]"))
             .withBasicAuth(githubUser, githubAccessToken)
             .willReturn(WireMock.aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_CREATED)
                 .withBody("""{"id": 1}""")
             ))
 
@@ -244,7 +246,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
         server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
             .withBasicAuth(githubUser, githubAccessToken)
             .willReturn(WireMock.aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_OK)
                 // assume we only have one release with label 'v0.0.1'
                 .withBody("""[{"id": 1, "label": "v0.0.1"}]""")
             ))
@@ -254,7 +256,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 "$[?(@.tag_name == '$releaseLabel')]"))
             .withBasicAuth(githubUser, githubAccessToken)
             .willReturn(WireMock.aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_CREATED)
                 .withBody("""{"id": 1}""")
             ))
 
@@ -322,7 +324,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
         server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
             .withBasicAuth(githubUser, githubAccessToken)
             .willReturn(WireMock.aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_OK)
                 // assume we already have one release with label 'v0.0.1'
                 // on the github server
                 .withBody("""[{"id": 1, "label": "v0.0.1"}]""")
@@ -335,7 +337,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 "$[?(@.name == '$releaseName')]"))
             .withBasicAuth(githubUser, githubAccessToken)
             .willReturn(WireMock.aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_CREATED)
                 .withBody("""{"id": 1}""")
             ))
 
@@ -404,7 +406,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
         server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
             .withBasicAuth(githubUser, githubAccessToken)
             .willReturn(WireMock.aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_OK)
                 // assume we already have one release with label 'v0.0.1'
                 // on the github server
                 .withBody("""[{"id": 1, "label": "v0.0.1"}]""")
@@ -417,7 +419,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 "$[?(@.name == '$releaseName')]"))
             .withBasicAuth(githubUser, githubAccessToken)
             .willReturn(WireMock.aResponse()
-                .withStatus(200)
+                .withStatus(HTTP_CREATED)
                 .withBody("""{"id": 1}""")
             ))
 

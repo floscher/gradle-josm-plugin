@@ -5,6 +5,8 @@ import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import okhttp3.*
 import java.io.File
+import java.net.HttpURLConnection.HTTP_CREATED
+import java.net.HttpURLConnection.HTTP_OK
 import java.net.URLEncoder
 
 // the default API URL for the Github API
@@ -176,7 +178,7 @@ class GithubReleasesClient(
         return invokeWrapped {
             val response = client.newCall(request).execute()
             when (response.code()) {
-                200 -> response.asJsonObject()
+                HTTP_OK -> response.asJsonObject()
                 404 -> null
                 else -> throw GithubReleaseClientException(response)
             }
@@ -221,7 +223,7 @@ class GithubReleasesClient(
         return invokeWrapped {
             val response = client.newCall(request).execute()
             when (response.code()) {
-                200 -> response.asJsonObject()
+                HTTP_CREATED -> response.asJsonObject()
                 else -> throw GithubReleaseClientException(response)
             }
         }!!
@@ -261,7 +263,7 @@ class GithubReleasesClient(
         return invokeWrapped {
             val response = client.newCall(request).execute()
             when (response.code()) {
-                200 -> response.asJsonObject()
+                HTTP_OK -> response.asJsonObject()
                 else -> throw GithubReleaseClientException(response)
             }
         }!!
@@ -337,7 +339,7 @@ class GithubReleasesClient(
         return invokeWrapped {
             val response = client.newCall(request).execute()
             when (response.code()) {
-                201 -> response.asJsonObject()
+                HTTP_CREATED -> response.asJsonObject()
                 else -> {
                     val errorMessage = response.toFormattedErrorMessage()
                     throw GithubReleaseClientException(
