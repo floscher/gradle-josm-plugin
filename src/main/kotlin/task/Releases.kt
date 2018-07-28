@@ -18,7 +18,7 @@ const val DEFAULT_PICKUP_RELEASE_NAME = "Pickup Release"
 
 const val DEFAULT_PICKUP_RELEASE_DESCRIPTION = """
    This is the pickup release for the JOSM plugin system. The services
-    at [https://josm.openstreetmap.de]
+    provided by the [JOSM dev team](https://josm.openstreetmap.de)
     * download the plugin jar in this release every 10 minutes
     * extract the metadata from `META-INF/MANIFEST.INF`
     * update the metadata in the
@@ -62,13 +62,22 @@ class PickupRelaseSpec(
     override val description: String = DEFAULT_PICKUP_RELEASE_DESCRIPTION) :
         ReleaseSpec(label=label, description = description){
 
+    private fun pickedUpReleaseLink(label: String, url: String?=null): String =
+        if (url == null) {
+            label
+        } else {
+            "[$label]($url)"
+        }
+
     fun descriptionForPickedUpRelease(
         pickedUpReleaseLabel: String,
-        pickedUpReleaseDescription: String): String {
+        pickedUpReleaseDescription: String,
+        pickedUpReleaseUrl: String? = null
+    ): String {
         val factory = DefaultMustacheFactory()
         val template = factory.compile(StringReader(description), "description")
         val scope = mapOf(
-            "pickedUpReleaseLabel" to pickedUpReleaseLabel,
+            "pickedUpReleaseLabel" to pickedUpReleaseLink(pickedUpReleaseLabel),
             "pickedUpReleaseDescription" to pickedUpReleaseDescription
         )
         val writer = StringWriter()
@@ -76,11 +85,12 @@ class PickupRelaseSpec(
         return writer.toString()
     }
 
-    fun descriptionForPickedUpRelease(pickedUpRelase: ReleaseSpec): String {
-        return descriptionForPickedUpRelease(
+    fun descriptionForPickedUpRelease(pickedUpRelase: ReleaseSpec,
+           pickedUpReleaseUrl: String?=null): String =
+        descriptionForPickedUpRelease(
             pickedUpRelase.label,
-            pickedUpRelase.description ?: "")
-    }
+            pickedUpRelase.description ?: "",
+            pickedUpReleaseUrl = pickedUpReleaseUrl)
 
     /**
      * Replies the default description for the pickup release.

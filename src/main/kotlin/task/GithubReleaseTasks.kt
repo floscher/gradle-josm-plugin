@@ -119,6 +119,10 @@ val Project.defaultReleasesConfigFile: File get() {
     return File(this.project.projectDir, "releases.yml")
 }
 
+fun Project.releaseUrl(label: String) =
+    "${this.configuredGithubApiUrl}/${this.configuredGithubUser}" +
+        "${this.configuredGithubRepository}/releases/tag/$label"
+
 /**
  * the configured release config file
  */
@@ -532,7 +536,8 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
 
             val pickupReleaseBody = releaseConfig.pickupRelease
                 .descriptionForPickedUpRelease(
-                    pickedUpRelase =  localRelease
+                    pickedUpRelase =  localRelease,
+                    pickedUpReleaseUrl = project.releaseUrl(localRelease.label)
                 )
 
             githubClient.updateRelease(
