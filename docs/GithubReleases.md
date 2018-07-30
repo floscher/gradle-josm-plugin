@@ -73,20 +73,29 @@ Its default name is `releases.yml` and its default location is the project root.
 
 Here is annotated example `releases.yml`:
 ```yml
-# OPTIONAL: declare the name of the latest release. If missing, the default value is
-# 'latest'.
+# OPTIONAL: declare the label, name, and description of the pickup release. If missing, hardcoded
+# default values are assumed
 pickup_release_for_josm:
   label: pickup-release
+  name: JOSM Pickup Release
   description: |
-    This is the pickup release for the JOSM plugin system. It
-    * downloads the plugin jar in this release every 10 minutes
-    * extracts the metadata from `META-INF/MANIFEST.INF`
-    * updates the metadata in the
-      [JOSM plugin directory](https://josm.openstreetmap.de/plugin)
+    This is the pickup release for the JOSM plugin system. The services
+    provided by the [JOSM dev team](https://josm.openstreetmap.de)
+
+    * download the plugin jar in this release every 10 minutes
+    * extract the metadata from `META-INF/MANIFEST.INF`
+    * update the metadata in the [JOSM plugin directory](https://josm.openstreetmap.de/plugin)
+
     ---
-    This release currently provides the plugin release
-    {{ labelForPickedUpRelease }} with the following description:
-    {{ descriptionForPickedUpRelease }}
+
+    {{#pickedUpReleaseLabel}}
+    This release currently provides the plugin release {{pickedUpReleaseLabel}}.
+    {{/pickedUpReleaseLabel}}
+
+    {{#pickedUpReleaseDescription}}
+    __Description__:
+    {{pickedUpReleaseDescription}}
+    {{/pickedUpReleaseDescription}}
 
 # MANDATORY: a list of releases
 #
@@ -192,6 +201,14 @@ task createMyRelease(type: CreateGithubReleaseTask){
 ```bash
 $ ./gradlew createMyRelease
 ```
+
+#### for the pickup release
+Use the dedicated task `creatPickupRelease` to create the pickup release.
+
+```bash
+$ ./gradlew createPickupRelease
+```
+
 ### Publish the plugin jar to a GitHub release
 
 #### Publish to the release with the current release label
@@ -269,6 +286,18 @@ $ ./gradlew publishToGithubRelease \
     --remote-jar-name my_other_name.jar
 ```
 
+#### Publish to the pickup release
+
+Use the command line option `--publish-to-pickup-release` to publish a plugin jar not only to a normal release, but also
+__to the pickup release__.
+
+```bash
+# publishes the plugin jar to the release with label 'v0.0.1' and
+# to pickup release
+$ ./gradlew publishToGithubRelease \
+    --release-label v0.0.1 \
+    --publish-to-pickup-release
+```
 
 ## Configuration options
 
@@ -288,6 +317,7 @@ A configuration option is derived from command line arguments, properties, and e
 | `GITHUB_REPOSITORY`       | the name of the github repositoy. Defaults  to the project name. |
 | `GITHUB_API_URL` | the base API URL for the Github releases API. Defaults to `https://api.github.com` |
 | `GITHUB_UPLOAD_URL` | the base API URL to upload release assets. Defaults to `https://uploads.github.com` |
+| `GITHUB_URL`| the base GitHub URL. Defaults to `http://github.com` |
 
 ### common gradle properties
 | gradle property | description |
@@ -297,6 +327,7 @@ A configuration option is derived from command line arguments, properties, and e
 | `josm.github.repository`       | the name of the github repositoy.  Defaults  to the project name. |
 | `josm.github.api_url`  | the base API URL for the Github releases API. Defaults to `https://api.github.com` |
 | `josm.github.upload_url` | the base API URL to upload release assets. Defaults to `https://uploads.github.com` |
+| `josm.github.url` | the base GitHub URL. Defaults to `http://github.com` |
 | `josm.releases_config_file` | the full path to the local releases file. Defaults to `releases.yml` in the base project directory | 
 | `josm.target_commitish` | Specifies the commitish value that determines where the Git tag is created from. Can be any branch or commit SHA. Defaults to `master`. |
 
@@ -324,6 +355,9 @@ A configuration option is derived from command line arguments, properties, and e
 
 #  the GitHub upload URL if different from https://uploads.github.com
 # export GITHUB_UPLOAD_URL=https://uploads.my-github-host.test
+
+# the base GitHub URL. Defaults to http://github.com 
+# export GITHUB_URL=http://my-github.test
 ```
 
 ### template for `gradle.properties`
@@ -343,6 +377,9 @@ A configuration option is derived from command line arguments, properties, and e
 # the GitHub upload URL if different from https://uploads.github.com
 #josm.github.upload_url=https://uploads.my-github-host.test
 
+# the base GitHub URL. Defaults to http://github.com
+#josm.github.url=http://my-github.test
+
 # the full path to the local releases config file
 #josm.releases_config_file=/full/path/to/my_releases.yml
 
@@ -353,7 +390,7 @@ A configuration option is derived from command line arguments, properties, and e
 ### template for `build.gradle`
 ```groovy
 plugins {
-    id 'org.openstreetmap.josm'  
+    id 'org.openstreetmap.josm'
     id 'java'
     id 'groovy'
     id 'eclipse'
@@ -368,7 +405,8 @@ plugins {
 //            access_token="asldiu0w98357oasjf"
 //            repository="my-repo"
 //            api_url="https://api.my-github-host.test"
-//            upload_url="https://uploads.my-github-host.test"            
+//            upload_url="https://uploads.my-github-host.test"
+//            url = "http://my-github.test"
 //        }
 //        releases_config_file="/full/path/to/my_releases.yml"
 //        target_commitish="deploy"
@@ -398,6 +436,7 @@ josm {
 createGithubRelease {
     // optional. if different from the project 'version'
     //releaseLabel = "v0.0.5-GA"
+
     // optional. if different from 'master'
     //targetCommitish="deploy"
 }
@@ -409,6 +448,7 @@ import org.openstreetmap.josm.gradle.plugin.task.CreateGithubReleaseTask
 task myCreateGithubReleas(task: CreateGithubReleaseTask) {
     // optional. if different from the project 'version'
     //releaseLabel = "v0.0.5-GA"
+
     // optional. if different from 'master'
     //targetCommitish="deploy"
 }
@@ -433,9 +473,8 @@ publishToGithubRelease {
     
     // optional. Set to true, if the jar should be published to two
     // releases: the release with the current release label and the
-    // release with the release label for the latest release (usually
-    // the relaese with label 'latest')
-    //updateLatest=true
+    // pickup release
+    //publishToPickupRelease=true
 }
 */
 
@@ -458,14 +497,10 @@ task myPublishToGithubRelease(task: PublishToGithubReleaseTask) {
     
     // optional. Set to true, if the jar should be published to two
     // releases: the release with the current release label and the
-    // release with the release label for the latest release (usually
-    // the relaese with label 'latest')
-    //updateLatest=true
-}
+    // pickup release
+    //publishToPickupRelease=true}
 */
 ```
-
-
 
 
 [github-releases]: https://help.github.com/articles/about-releases/
