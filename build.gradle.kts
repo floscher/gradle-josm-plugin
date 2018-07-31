@@ -151,8 +151,16 @@ publishing {
     maven {
       setUrl("$buildDir/maven")
     }
+    maven {
+      setUrl("s3://gradle-josm-plugin")
+      credentials(AwsCredentials::class.java) {
+        setAccessKey(System.getenv("AWS_ACCESS_KEY_ID"))
+        setSecretKey(System.getenv("AWS_SECRET_ACCESS_KEY"))
+      }
+    }
   }
 }
+
 tasks {
   "publish" {
     description = "Deploys the gradle-josm-plugin to a local Maven repository inside the $buildDir"
