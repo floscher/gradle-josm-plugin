@@ -1,25 +1,26 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 buildscript {
   repositories {
     jcenter()
   }
   dependencies {
-    val kotlinVersion: String by project.extra { "1.2.50" }
+    val kotlinVersion: String by project.extra
     classpath(kotlin("gradle-plugin", kotlinVersion))
   }
 }
 plugins {
   java
 }
-apply {
-  plugin("org.jetbrains.kotlin.jvm")
-}
+
+apply(plugin = "kotlin")
+
 repositories {
   jcenter()
 }
+
 dependencies {
-  val kotlinVersion: String by rootProject.extra
-  implementation("org.eclipse.jgit:org.eclipse.jgit:5.0.0.201805301535-rc2")
+  val kotlinVersion: String by project.extra
+
+  implementation(gradleApi())
+  implementation("org.eclipse.jgit:org.eclipse.jgit:5.1.1.201809181055-r")
   implementation(kotlin("stdlib-jdk8", kotlinVersion))
 }

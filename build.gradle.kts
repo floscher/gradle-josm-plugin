@@ -16,14 +16,14 @@ buildscript {
     jcenter()
   }
   dependencies {
-    val kotlinVersion by project.extra { "1.2.50" }
+    val kotlinVersion: String by project.project(":buildSrc").extra
     classpath(kotlin("gradle-plugin", kotlinVersion))
   }
 }
 
 plugins {
-  id("com.gradle.plugin-publish").version("0.9.10")
-  id("com.github.ben-manes.versions").version("0.19.0")
+  id("com.gradle.plugin-publish").version("0.10.0")
+  id("com.github.ben-manes.versions").version("0.20.0")
   id("org.jetbrains.dokka").version("0.9.17")
 
   jacoco
@@ -32,10 +32,8 @@ plugins {
   `java-gradle-plugin`
   `maven-publish`
 }
-apply {
-  plugin("org.jetbrains.kotlin.jvm")
-}
 
+apply(plugin = "kotlin")
 gradle.taskGraph.beforeTask {
   val startTime by this.extra { Instant.now() }
 }
@@ -72,9 +70,9 @@ repositories {
 // Reuse the kotlin sources from the "buildSrc" project
 gradle.projectsEvaluated {
   // the following line is here so IntelliJ correctly picks up the dependency on project :buildSrc
-  java.sourceSets["main"].compileClasspath += project(":buildSrc").java.sourceSets["main"].output
-  java.sourceSets["main"].withConvention(KotlinSourceSet::class) {
-    project(":buildSrc").java.sourceSets["main"]
+  sourceSets["main"].compileClasspath += project(":buildSrc").sourceSets["main"].output
+  sourceSets["main"].withConvention(KotlinSourceSet::class) {
+    project(":buildSrc").sourceSets["main"]
       .withConvention(KotlinSourceSet::class) { kotlin.srcDirs }
       .forEach {
         this.kotlin.srcDir(it)
@@ -87,11 +85,13 @@ gradle.projectsEvaluated {
 }
 
 dependencies {
-  val kotlinVersion: String by project.extra
+  val junitVersion = "5.3.1"
+  val kotlinVersion: String by project.project(":buildSrc").extra
+
   implementation(localGroovy())
-  implementation("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", kotlinVersion)
-  testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.2.0")
-  testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.2.0")
+  implementation(kotlin("stdlib-jdk8", kotlinVersion))
+  testImplementation("org.junit.jupiter", "junit-jupiter-api", junitVersion)
+  testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", junitVersion)
 }
 
 jacoco {
@@ -142,7 +142,7 @@ tasks {
     outputFormat = "html"
     outputDirectory = "$buildDir/docs/kdoc"
     gradle.projectsEvaluated {
-      project(":buildSrc").java.sourceSets["main"].withConvention(KotlinSourceSet::class) {
+      project(":buildSrc").sourceSets["main"].withConvention(KotlinSourceSet::class) {
         kotlin.srcDirs.forEach {
           sourceDirs = sourceDirs.toList().plus(it).asIterable()
         }
