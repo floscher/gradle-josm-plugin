@@ -39,6 +39,14 @@ open class JosmPluginExtension(private val project: Project) {
   var logSkippedTasks: Boolean = true
 
   /**
+   * Iff the JaCoCo Gradle plugin is applied, print the coverage numbers to the build log.
+   *
+   * **Default value:** `true`
+   * @since v0.5.1
+   */
+  var logJacocoCoverage: Boolean = true
+
+  /**
    * Logs the number of seconds each task needed for execution when execution of a task finishes
    *
    * **Default value:** `true`

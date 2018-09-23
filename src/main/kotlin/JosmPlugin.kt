@@ -5,6 +5,8 @@ import org.gradle.api.Project
 import org.gradle.api.internal.file.SourceDirectorySetFactory
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.jvm.tasks.Jar
+import org.gradle.testing.jacoco.plugins.JacocoPlugin
+import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.task.setupJosmTasks
 import javax.inject.Inject
@@ -66,6 +68,9 @@ class JosmPlugin @Inject constructor(val sourceDirectorySetFactory: SourceDirect
       }
       if (project.extensions.josm.logTaskDuration) {
         project.gradle.taskGraph.logTaskDuration()
+      }
+      if (project.plugins.hasPlugin(JacocoPlugin::class.java) && project.extensions.josm.logJacocoCoverage) {
+        project.tasks.withType(JacocoReport::class.java) { it.logCoverage() }
       }
     }
 
