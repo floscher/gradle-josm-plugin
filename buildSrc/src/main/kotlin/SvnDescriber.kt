@@ -4,8 +4,19 @@ import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
+/**
+ * Use the command `svn info` to determine the SVN revision.
+ * @param [workTree] the root directory of the SVN repository that you want to describe
+ */
 class SvnDescriber(val workTree: File): Describer {
 
+  /**
+   * @param [dirty] if this is true, the revision number is appended with "-dirty",
+   *   when there are uncommitted changes in the repository.
+   * @return the SVN revision in the format "r123"
+   * @throws [IOException] if the process of `svn info` is not executed successfully within 2 minutes,
+   *   or if the result does not contain a revision.
+   */
   @Throws(IOException::class)
   override fun describe(dirty: Boolean): String {
     val process = ProcessBuilder("svn", "info").directory(workTree).start()
@@ -27,6 +38,10 @@ class SvnDescriber(val workTree: File): Describer {
     throw IOException("Could not determine SVN revision of ${workTree.absolutePath}")
   }
 
+  /**
+   * @return `true` if there are uncommitted changes in the repository, `false` otherwise.
+   * @throws [IOException] if `svn status` does not execute successfully within 2 minutes
+   */
   @Throws(IOException::class)
   fun isDirty(): Boolean {
     val process = ProcessBuilder("svn", "status", "-q").directory(workTree).start()

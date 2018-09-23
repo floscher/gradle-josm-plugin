@@ -38,6 +38,13 @@ class LangWriter {
     }
   }
 
+  /**
+   * Write a *.lang file to an [OutputStream].
+   * @param [stream] the stream to write to
+   * @param [originalMsgIds] a list of the translatable strings in the base language
+   * @param [translations] a map from the strings in the base language to the translated strings
+   * @param [isOriginLanguage] `true` if the *.lang file is for the base language, `false` for all other languages
+   */
   fun writeLangStream(stream: OutputStream, originalMsgIds: List<MsgId>, translations: Map<MsgId, MsgStr>, isOriginLanguage: Boolean = false) {
     val originalMsgIdsPartitions = originalMsgIds.partition { it.id.strings.size <= 1 }
     // Iterate over the translatable messages in the original language without plural

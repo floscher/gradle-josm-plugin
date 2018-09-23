@@ -2,7 +2,6 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
 import java.io.BufferedReader
-import java.io.IOException
 import java.io.InputStreamReader
 import java.net.URL
 import java.nio.charset.StandardCharsets

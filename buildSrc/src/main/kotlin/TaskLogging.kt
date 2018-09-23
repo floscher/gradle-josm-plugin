@@ -7,6 +7,9 @@ import java.time.Duration
 import java.time.Instant
 import java.util.Locale
 
+/**
+ * Add logging of the task duration right after each task finishes.
+ */
 fun TaskExecutionGraph.logTaskDuration() {
   val startTimePropKey = "taskStartTime"
   beforeTask {
@@ -20,6 +23,9 @@ fun TaskExecutionGraph.logTaskDuration() {
   }
 }
 
+/**
+ * Add logging of all skipped tasks after the build of the project finishes.
+ */
 fun Project.logSkippedTasks() {
   gradle.buildFinished {
     var wereTasksSkipped = false

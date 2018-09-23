@@ -31,7 +31,14 @@ open class JosmPluginExtension(private val project: Project) {
   var debugPort: Int? = null
 
   /**
-   * Logs all tasks that were skipped when the build finishes
+   * Iff this is `true`, then after the build has finished, all skipped tasks are listed like this:
+   * ```
+   * Skipped tasks:
+   * ⏭️  :taskA (UP-TO-DATE)
+   * ⏭️  :taskB (NO-SOURCE)
+   * ⏭️  :taskC (FROM-CACHE)
+   * ```
+   * The message is printed via [Project.getLogger], logging level is [org.gradle.api.logging.Logger.lifecycle].
    *
    * **Default value:** `true`
    * @since v0.5.1
@@ -39,7 +46,16 @@ open class JosmPluginExtension(private val project: Project) {
   var logSkippedTasks: Boolean = true
 
   /**
-   * Iff the JaCoCo Gradle plugin is applied, print the coverage numbers to the build log.
+   * Iff this is `true`, the coverage numbers for instruction, branch and line coverage are logged for every tasks
+   * with type [org.gradle.testing.jacoco.tasks.JacocoReport].
+   *
+   * The format is as follows:
+   * ```
+   * Instruction coverage: 25.0000 % (25 of 100)
+   *      Branch coverage: 50.0000 % (5 of 10)
+   *        Line coverage: 75.0000 % (3 of 4)
+   * ```
+   * The message is printed via [Project.getLogger], logging level is [org.gradle.api.logging.Logger.lifecycle].
    *
    * **Default value:** `true`
    * @since v0.5.1
@@ -47,7 +63,14 @@ open class JosmPluginExtension(private val project: Project) {
   var logJacocoCoverage: Boolean = true
 
   /**
-   * Logs the number of seconds each task needed for execution when execution of a task finishes
+   * Iff this is `true`, the number of seconds each task needed for execution is logged,
+   * when execution of a task finishes.
+   *
+   * The line appended to the logging output of each task looks as follows:
+   * ```
+   *   🏁 Finished after 1.23 seconds.
+   * ```
+   * The message is printed via [Project.getLogger], logging level is [org.gradle.api.logging.Logger.lifecycle].
    *
    * **Default value:** `true`
    * @since v0.5.1

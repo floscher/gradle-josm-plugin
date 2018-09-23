@@ -1,8 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin.i18n.io
 
-import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class MoReaderTest {
