@@ -31,6 +31,22 @@ open class JosmPluginExtension(private val project: Project) {
   var debugPort: Int? = null
 
   /**
+   * Logs all tasks that were skipped when the build finishes
+   *
+   * **Default value:** `true`
+   * @since v0.5.1
+   */
+  var logSkippedTasks: Boolean = true
+
+  /**
+   * Logs the number of seconds each task needed for execution when execution of a task finishes
+   *
+   * **Default value:** `true`
+   * @since v0.5.1
+   */
+  var logTaskDuration: Boolean = true
+
+  /**
    * The directory in which the JOSM preferences for the JOSM instance used by `runJosm` and `debugJosm` are stored.
    *
    * **Default value:** `$buildDir/.josm/pref`

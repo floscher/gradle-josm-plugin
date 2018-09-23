@@ -60,6 +60,13 @@ class JosmPlugin @Inject constructor(val sourceDirectorySetFactory: SourceDirect
     project.afterEvaluate {
       // Add the repositories defined in the JOSM configuration
       project.extensions.josm.repositories.invoke(project.repositories)
+
+      if (project.extensions.josm.logSkippedTasks) {
+        project.logSkippedTasks()
+      }
+      if (project.extensions.josm.logTaskDuration) {
+        project.gradle.taskGraph.logTaskDuration()
+      }
     }
 
     project.configurations.getByName("implementation").setupAsMainConfiguration(project)
