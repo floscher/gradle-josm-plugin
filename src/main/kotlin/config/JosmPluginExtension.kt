@@ -215,12 +215,13 @@ open class JosmPluginExtension(private val project: Project) {
   public fun manifest(c: Closure<JosmManifest>) {
     project.configure(manifest, c)
   }
-
   /** @suppress */
+  @Deprecated(message = "Will soon be removed")
   companion object {
     /**
      * Returns the [JosmPluginExtension] for a particular [Project].
      */
+    @Deprecated("Will soon be removed", ReplaceWith("project.extensions.josm"))
     @JvmStatic
     fun forProject(project: Project): JosmPluginExtension {
       return project.getExtensions().getByType(JosmPluginExtension::class.java)
