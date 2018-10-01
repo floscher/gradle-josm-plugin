@@ -16,15 +16,17 @@ fun TaskExecutionGraph.logTaskDuration() {
     it.extensions.extraProperties.set(startTimePropKey, Instant.now())
   }
   afterTask {
-    it.logger.lifecycle(String.format(
-      "  🏁 Finished after %.2f seconds.",
-      Duration.between(it.extensions.extraProperties.get(startTimePropKey) as Instant, Instant.now()).toMillis() / 1e3
-    ))
+    if (!it.state.skipped) {
+      it.logger.lifecycle(String.format(
+        "  🏁 Finished after %.2f seconds.",
+        Duration.between(it.extensions.extraProperties.get(startTimePropKey) as Instant, Instant.now()).toMillis() / 1e3
+      ))
+    }
   }
 }
 
 /**
- * Add logging of all skipped tasks after the build of the project finishes.
+ * Enable logging of all skipped tasks after the build of the project finishes.
  */
 fun Project.logSkippedTasks() {
   gradle.buildFinished {
@@ -42,9 +44,10 @@ fun Project.logSkippedTasks() {
 }
 
 /**
- * Add logging of coverage for instructions, branches and lines to this task.
+ * Enable logging of coverage for instructions, branches and lines to this task.
  * As a side effect, csv reporting is enabled for this task.
- * For better machine-readability, the coverage numbers are always printed with decimal point and four decimal places.
+ * For better machine-readability, the coverage numbers are always printed with
+ * decimal point (never decimal comma) and four decimal places.
  */
 fun JacocoReport.logCoverage() {
   reports {
