@@ -52,7 +52,11 @@ class JosmPlugin @Inject constructor(val sourceDirectorySetFactory: SourceDirect
     project.afterEvaluate {
       if (project.extensions.josm.versionFromVcs) {
         val version = try {
-          GitDescriber(project.projectDir).describe(dirty = true)
+          val v = project.version.toString()
+          if (v == "unspecified") {
+              GitDescriber(project.projectDir).describe(dirty = true)
+          }
+          else v
         } catch (e: Exception) {
           project.logger.info("Error getting project version for ${project.projectDir} using git!", e)
           try {
