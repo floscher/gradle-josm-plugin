@@ -24,16 +24,6 @@ class JosmPlugin @Inject constructor(val sourceDirectorySetFactory: SourceDirect
    * Overrides <a href="https://docs.gradle.org/current/javadoc/org/gradle/api/Plugin.html#apply-T-">Plugin.apply()</a>.
    */
   override fun apply(project: Project) {
-    try {
-      project.version = GitDescriber(project.projectDir).describe(dirty = true)
-    } catch (e: Exception) {
-      try {
-        // Fall back to SVN revision if `git describe` does nor work
-        project.version = SvnDescriber(project.projectDir).describe(dirty = true)
-      } catch (e: Exception) {
-        // Don't set the project version
-      }
-    }
 
     // Apply the Java plugin if not available, because we rely on the `jar` task
     if (project.plugins.findPlugin(JavaPlugin::class.java) == null) {
@@ -60,6 +50,29 @@ class JosmPlugin @Inject constructor(val sourceDirectorySetFactory: SourceDirect
     }
 
     project.afterEvaluate {
+      if (project.extensions.josm.versionFromVcs) {
+        val version = try {
+          GitDescriber(project.projectDir).describe(dirty = true)
+        } catch (e: Exception) {
+          project.logger.info("Error getting project version for ${project.projectDir} using git!", e)
+          try {
+            // Fall back to SVN revision if `git describe` does nor work
+            SvnDescriber(project.projectDir).describe(dirty = true)
+          } catch (e: Exception) {
+            project.logger.info("Error getting project version for ${project.projectDir} using SVN!", e)
+            // Don't set the project version
+          }
+        }
+        if (version is String) {
+          project.version =
+            if (project.extensions.josm.versionWithoutLeadingV && version.length >= 2 && version[0] == 'v') {
+              version.substring(1)
+            } else {
+              version
+            }
+        }
+      }
+
       // Add the repositories defined in the JOSM configuration
       project.extensions.josm.repositories.invoke(project.repositories)
 

@@ -215,13 +215,32 @@ open class JosmPluginExtension(private val project: Project) {
   public fun manifest(c: Closure<JosmManifest>) {
     project.configure(manifest, c)
   }
-  /** @suppress */
-  @Deprecated(message = "Will soon be removed")
+
+  /**
+   * Determines if the version number of the project should be derived from the
+   * version control system (git, or SVN if git is not present).
+   *
+   * In case neither git nor SVN is present, the project version will not be modified regardless of this setting.
+   *
+   * **Default value:** `true`
+   * @since 0.5.2
+   */
+  var versionFromVcs = true
+
+  /**
+   * Determines if the leading 'v' character is trimmed from the beginning of [Project.getVersion]
+   *
+   * **Default value:** `false` (will be changed to `true` as soon as `0.6.0` is released)
+   * @since 0.5.2
+   */
+  var versionWithoutLeadingV = false // TODO: Switch to true with the release of 0.6.0
+
+  @Deprecated(message = "Will soon be removed with release 0.6.0") // TODO: Remove with the release of 0.6.0
   companion object {
     /**
      * Returns the [JosmPluginExtension] for a particular [Project].
      */
-    @Deprecated("Will soon be removed", ReplaceWith("project.extensions.josm"))
+    @Deprecated("Will soon be removed with release 0.6.0", ReplaceWith("project.extensions.josm"))
     @JvmStatic
     fun forProject(project: Project): JosmPluginExtension {
       return project.getExtensions().getByType(JosmPluginExtension::class.java)
