@@ -36,7 +36,7 @@ class DefaultI18nSourceSet(sourceSet: SourceSet, sourceDirectorySetFactory: Sour
     sourceSet.allSource.source(lang)
   }
 
-  override val name = sourceSet.name
+  override val name: String = sourceSet.name
 
   override fun lang(configureClosure: Closure<in SourceDirectorySet>): I18nSourceSet {
     ConfigureUtil.configure(configureClosure, lang)

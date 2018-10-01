@@ -61,20 +61,9 @@ open class GeneratePluginList : DefaultTask() {
           .append(key)
           .append(": ")
           .append(when (key) {
-            "Plugin-Icon" -> {
-              val iconBase64 = iconBase64Provider.invoke(value)
-              if (iconBase64 != null) {
-                iconBase64
-              } else {
-                value
-              }
-            }
-            "Plugin-Version" -> {
-              value + versionSuffix.invoke(name)
-            }
-            else -> {
-              value
-            }
+            "Plugin-Icon" -> iconBase64Provider.invoke(value) ?: value
+            "Plugin-Version" -> value + versionSuffix.invoke(name)
+            else -> value
           })
           .append('\n')
       }

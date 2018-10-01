@@ -53,10 +53,10 @@ open class LangCompile
       if (!langPaths.containsKey(it.nameWithoutExtension)) {
         langPaths.put(it.nameWithoutExtension, mutableListOf())
       }
-      langPaths.get(it.nameWithoutExtension)?.add(it.parentFile.absolutePath)
+      langPaths[it.nameWithoutExtension]?.add(it.parentFile.absolutePath)
     }
     langPaths.flatMap { it.value }.distinct().forEach { path ->
-      logger.lifecycle("  from $path: ${langPaths.filter { it.value.contains(path) }.keys.sorted().joinToString(", ")}")
+      logger.lifecycle("  from $path : ${langPaths.filter { it.value.contains(path) }.keys.sorted().joinToString(", ")}")
     }
     logger.lifecycle("  into ${destinationDir.absolutePath}/$subdirectory")
     langPaths.filter { it.value.size >= 2 }.forEach { lang, paths ->

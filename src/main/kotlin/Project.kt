@@ -47,7 +47,7 @@ fun Project.getNextJosmVersion(startVersion: String?): Dependency {
       }
     }
   }
-  throw GradleException("Could not determine the minimum required JOSM version from the given version number '$startVersion'", if (cause != null) cause else Exception())
+  throw GradleException("Could not determine the minimum required JOSM version from the given version number '$startVersion'", cause ?: Exception())
 }
 
 private fun Project.resolveJosm(version: String): Dependency {
@@ -157,12 +157,12 @@ fun Project.useSeparateTmpJosmDirs(): Boolean {
  * Access method for the `project.josm{}` extension.
  * @return the [JosmPluginExtension] for this project.
  */
-val ExtensionContainer.josm
+val ExtensionContainer.josm : JosmPluginExtension
   get() = getByType(JosmPluginExtension::class.java)
 
 /**
  * Convenience method to access the Java plugin convention.
  * @return the [JavaPluginConvention] of the project
  */
-val Convention.java
+val Convention.java : JavaPluginConvention
   get() = getPlugin(JavaPluginConvention::class.java)

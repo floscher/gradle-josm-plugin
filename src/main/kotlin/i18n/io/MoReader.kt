@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets
  * Reads the strings contained inside a *.mo file.
  * @param moFileURL the URL of the *.mo file that you want to read
  */
-class MoReader(val moFileURL: URL) {
+class MoReader(private val moFileURL: URL) {
   companion object {
     /**
      * The big-endian magic bytes of *.mo files (little-endian would be reversed)
@@ -53,7 +53,7 @@ class MoReader(val moFileURL: URL) {
 
         // Read msgid strings
         var stringBytes: ByteArray
-        val stringLengthOffset = ByteArray(8, { 0 })
+        val stringLengthOffset = ByteArray(8) { 0 }
         var stringDescriptor: List<Long>
         val msgIds: MutableList<MsgId> = mutableListOf()
         for (i in 0 until numStrings) {
@@ -64,7 +64,7 @@ class MoReader(val moFileURL: URL) {
           }
 
           stream2Pos += s2.skipAllOrException(stringDescriptor[1] - stream2Pos)
-          stringBytes = ByteArray(stringDescriptor[0].toInt(), {0})
+          stringBytes = ByteArray(stringDescriptor[0].toInt()) {0}
           stream2Pos += s2.readAllOrException(stringBytes)
 
           msgIds.add(stringBytes.toMsgId())
@@ -78,7 +78,7 @@ class MoReader(val moFileURL: URL) {
           stringDescriptor = stringLengthOffset.toList().toLongList(bigEndian)
 
           stream2Pos += s2.skipAllOrException(stringDescriptor[1] - stream2Pos)
-          stringBytes = ByteArray(stringDescriptor[0].toInt(), {0})
+          stringBytes = ByteArray(stringDescriptor[0].toInt()) {0}
           stream2Pos += s2.readAllOrException(stringBytes)
 
           stringMap[msgIds[i]] = MsgStr(String(stringBytes, StandardCharsets.UTF_8).split('\u0000'))
@@ -92,7 +92,7 @@ class MoReader(val moFileURL: URL) {
    * Read the file header from the given input stream
    */
   private fun readHeader(stream: InputStream): Long {
-    val header = ByteArray(28, { 0.toByte() })
+    val header = ByteArray(28) { 0.toByte() }
     if (stream.read(header) < 28) {
       throw IOException("Can't read header of MO file, input stream ends before header is complete!")
     }

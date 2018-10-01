@@ -77,7 +77,7 @@ open class GeneratePot
 
 
     doLast {
-      val destFile = File(outDir, outBaseName + ".pot")
+      val destFile = File(outDir, "$outBaseName.pot")
       val replacements = mutableMapOf<String, String>()
       replacements.put("(C) YEAR", "(C) " + Year.now().getValue())
       replacements.put("charset=CHARSET", "charset=UTF-8")

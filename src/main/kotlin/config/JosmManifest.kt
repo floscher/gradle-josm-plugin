@@ -127,7 +127,7 @@ class JosmManifest(private val project: Project) {
     if (requirements != null) {
       val dependencyArray: List<String> = requirements.split(';')
       for (dependency in dependencyArray) {
-        if (dependency.trim().length >= 1) {
+        if (dependency.isNotBlank()) {
           pluginDependencies.add(dependency.trim())
         }
       }
@@ -276,7 +276,7 @@ class JosmManifest(private val project: Project) {
     if (!language.matches(Regex("[a-z]{2,3}(_[A-Z]{2})?"))) {
       throw IllegalArgumentException("The given language string '$language' is not a valid abbreviation for a language.")
     }
-    if (translatedDescription.length <= 0) {
+    if (translatedDescription.isEmpty()) {
       throw IllegalArgumentException("The translated description must not be empty")
     }
     translatedDescriptions.put(language, translatedDescription)

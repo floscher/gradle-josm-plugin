@@ -38,7 +38,7 @@ open class ShortenPoFiles
   fun action() {
     // Go through all *.po files in the "po source sets"
     sourceSet.po.files.filter { it.extension == "po" }.forEach { file ->
-      logger.lifecycle("Shorten " + file)
+      logger.lifecycle("Shorten $file")
       // Create a temporary file for the current *.po file
       val tmpFile = Files.createTempFile(null, null).toFile()
       tmpFile.bufferedWriter(StandardCharsets.UTF_8).use { out ->

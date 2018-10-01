@@ -12,6 +12,6 @@ data class MsgStr(val strings: List<String>) {
    */
   constructor(singularString: String, vararg pluralStrings: String): this(listOf(singularString, *pluralStrings))
   init {
-    require(strings.size >= 1){"A MsgStr has to consist of at least one string!"}
+    require(strings.isNotEmpty()){"A MsgStr has to consist of at least one string!"}
   }
 }

@@ -78,12 +78,12 @@ class LangReaderTest {
     }
 
     // 0xFFFF
-    testLangStreams(baseLang, emptyResult.keys.toList(), { ByteArray(2, { 0xFF.toSignedByte() }) }) {
+    testLangStreams(baseLang, emptyResult.keys.toList(), { ByteArray(2) { 0xFF.toSignedByte() } }) {
       assertEquals(emptyResult, it.invoke())
     }
 
     // 0xFFFFFF
-    testLangStreams(baseLang, emptyResult.keys.toList(), { ByteArray(3, { 0xFF.toSignedByte() }) }) {
+    testLangStreams(baseLang, emptyResult.keys.toList(), { ByteArray(3) { 0xFF.toSignedByte() } }) {
       assertEquals(emptyResult, it.invoke())
     }
   }
@@ -94,7 +94,7 @@ class LangReaderTest {
       "en",
       listOf("en"),
       { byteArrayOf(0xFF.toSignedByte()) },
-      { assertThrows(IOException::class.java, { it.invoke() }) }
+      { assertThrows(IOException::class.java) { it.invoke() } }
     )
   }
 
@@ -131,7 +131,7 @@ class LangReaderTest {
           }
         }
       },
-      { assertThrows(IOException::class.java, { it.invoke() }) }
+      { assertThrows(IOException::class.java) { it.invoke() } }
     )
   }
 
@@ -206,7 +206,7 @@ class LangReaderTest {
   }
 
   private fun getDummyLangStreamsWithInts(baseLang: String, languages: List<String>, langToInts: (String) -> List<Int>): Pair<InputStream, Map<String, InputStream>> {
-    return getDummyLangStreamsWithBytes(baseLang, languages, { langToInts.invoke(it).map { it.toSignedByte() }.toByteArray() })
+    return getDummyLangStreamsWithBytes(baseLang, languages) { langToInts.invoke(it).map { it.toSignedByte() }.toByteArray() }
   }
 
   private fun getDummyLangStreamsWithBytes(baseLang: String, languages: List<String>, langToBytes: (String) -> ByteArray): Pair<InputStream, Map<String, InputStream>> {
