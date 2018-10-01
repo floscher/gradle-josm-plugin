@@ -47,17 +47,20 @@ open class LangCompile
 
   @TaskAction
   fun action() {
-    logger.lifecycle("Copy *.lang files to ${destinationDir.absolutePath}/$subdirectory …")
-    val langs = HashSet<String>()
+    logger.lifecycle("Copy *.lang files …")
+    val langPaths = mutableMapOf<String, MutableList<String>>()
     source.files.forEach {
-      logger.lifecycle(
-        "  ${it.path} …" +
-          if (langs.add(it.nameWithoutExtension)) {
-            ""
-          } else {
-            " (will overwrite existing file!)"
-          }
-      )
+      if (!langPaths.containsKey(it.nameWithoutExtension)) {
+        langPaths.put(it.nameWithoutExtension, mutableListOf())
+      }
+      langPaths.get(it.nameWithoutExtension)?.add(it.parentFile.absolutePath)
+    }
+    langPaths.flatMap { it.value }.distinct().forEach { path ->
+      logger.lifecycle("  from $path: ${langPaths.filter { it.value.contains(path) }.keys.sorted().joinToString(", ")}")
+    }
+    logger.lifecycle("  into ${destinationDir.absolutePath}/$subdirectory")
+    langPaths.filter { it.value.size >= 2 }.forEach { lang, paths ->
+      logger.warn("\nWARNING: For language $lang there are multiple *.lang files, of which only the last one in the following list is used:\n  * ${paths.joinToString("\n  * ")}\n")
     }
   }
 }
