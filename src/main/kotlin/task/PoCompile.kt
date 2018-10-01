@@ -1,12 +1,13 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 import java.io.File
 import java.io.IOException
-import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -45,35 +46,47 @@ open class PoCompile
       this.logger.lifecycle("No *.po files found for this source set '{}'.", sourceSet.name)
     } else {
       project.fileTree(outDir)
-        .filter { it.isFile && it.name.endsWith(".mo") }
+        .filter { it.isFile && it.extension == "mo" }
         .forEach { it.delete() }
+
+
+      logger.lifecycle("Converting *.po files to *.mo files using the program `msgfmt` (part of xgettext)…")
+      val convertedFiles = mutableListOf<File>()
       sourceSet.po.asFileTree.forEach {
         val commandLine = listOf(
           "msgfmt",
           "--output-file=" + File(outDir, it.nameWithoutExtension + ".mo").absolutePath,
-          "--statistics",
           it.absolutePath
         )
-        this.logger.lifecycle(commandLine.joinToString("  "))
+        this.logger.info("Executing command: " + commandLine.joinToString("  "))
         try {
           val process: Process = ProcessBuilder(commandLine).redirectErrorStream(true).start()
           if (process.waitFor(2, TimeUnit.MINUTES)) {
-            this.logger.lifecycle(" > " + process.inputStream.bufferedReader(StandardCharsets.UTF_8).readText())
+            convertedFiles.add(it)
           } else {
             val sourceFilePath = it.absolutePath
-            logger.warn("WARNING: msgfmt takes longer than 2 minutes to convert $sourceFilePath . Aborting now!")
+            logger.warn("WARNING: msgfmt could not convert $sourceFilePath within 2 minutes. Aborting now!")
             project.gradle.buildFinished {
-              logger.warn("WARNING: Gradle wasn't able to convert $sourceFilePath to a *.mo file in less than two minutes! I18n is incomplete!")
+              logger.error("WARNING: Gradle wasn't able to convert $sourceFilePath to a *.mo file in less than two minutes! I18n is incomplete!")
             }
           }
         } catch (e: IOException) {
-          logger.warn("Failed to convert *.po file to *.mo file. Probably xgettext is not installed on your machine!")
+          logger.warn("WARNING: Failed to convert *.po file to *.mo file. Probably xgettext is not installed on your machine!")
           project.gradle.buildFinished {
             project.logger.error(
               "WARNING: Not all i18n files have been built! Some *.po files could not be converted to *.mo files!\nWARNING: Maybe the program xgettext is not installed on your machine! It is required for processing *.po files."
             )
           }
         }
+      }
+      convertedFiles.groupBy { it.parentFile.absolutePath }.forEach { dir, files ->
+        logger.lifecycle("  from $dir :\n    ${files.map { it.nameWithoutExtension }.sorted().joinToString(", ")}")
+      }
+      logger.lifecycle("  into $outDir")
+
+      val duplicateFiles = convertedFiles.groupBy { it.nameWithoutExtension }.filter { it.value.size > 1 }
+      if (duplicateFiles.isNotEmpty()) {
+        throw TaskExecutionException(this, GradleException("There are multiple *.po files with the same name:\n" + duplicateFiles.map { "* ${it.key}: ${it.value.joinToString(", ")}" }.joinToString("\n")))
       }
     }
   }
