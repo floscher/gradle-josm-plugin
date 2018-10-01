@@ -16,7 +16,7 @@ class I18nConfig(private val project: Project) {
    * This will be put into the *.pot files that are forwarded to the translators.
    *
    * **Default value:** `null`
-   * @since v0.2.0
+   * @since 0.2.0
    */
   var bugReportEmail: String? = null
 
@@ -28,7 +28,7 @@ class I18nConfig(private val project: Project) {
    * ```
    *
    * **Default value:** `null`
-   * @since v0.2.0
+   * @since 0.2.0
    */
   var copyrightHolder: String? = null
 
@@ -39,7 +39,7 @@ class I18nConfig(private val project: Project) {
    * Use the language codes, which you also use to name the *.po, *.mo or *.lang files.
    *
    * **Default value:** `en`
-   * @since v0.3.1
+   * @since 0.3.1
    */
   var mainLanguage: String = "en"
 
@@ -74,7 +74,7 @@ class I18nConfig(private val project: Project) {
    * Good values would be e.g. `gitlab.com/myself/MyAwesomeProject/blob` or `github.com/myself/MyAwesomeProject/blob`
    *
    * @param repoUrl the supplied base URL
-   * @since v0.4.7
+   * @since 0.4.7
    */
   fun getPathTransformer(repoUrl: String) = { path: String ->
     val sourceFileMatcher = LINE_NUMBER_PATTERN.matcher(path)

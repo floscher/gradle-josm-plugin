@@ -41,7 +41,7 @@ open class JosmPluginExtension(private val project: Project) {
    * The message is printed via [Project.getLogger], logging level is [org.gradle.api.logging.Logger.lifecycle].
    *
    * **Default value:** `true`
-   * @since v0.5.1
+   * @since 0.5.1
    */
   var logSkippedTasks: Boolean = true
 
@@ -58,7 +58,7 @@ open class JosmPluginExtension(private val project: Project) {
    * The message is printed via [Project.getLogger], logging level is [org.gradle.api.logging.Logger.lifecycle].
    *
    * **Default value:** `true`
-   * @since v0.5.1
+   * @since 0.5.1
    */
   var logJacocoCoverage: Boolean = true
 
@@ -73,7 +73,7 @@ open class JosmPluginExtension(private val project: Project) {
    * The message is printed via [Project.getLogger], logging level is [org.gradle.api.logging.Logger.lifecycle].
    *
    * **Default value:** `true`
-   * @since v0.5.1
+   * @since 0.5.1
    */
   var logTaskDuration: Boolean = true
 
@@ -81,7 +81,7 @@ open class JosmPluginExtension(private val project: Project) {
    * The directory in which the JOSM preferences for the JOSM instance used by `runJosm` and `debugJosm` are stored.
    *
    * **Default value:** `$buildDir/.josm/pref`
-   * @since v0.4.0
+   * @since 0.4.0
    */
   var tmpJosmPrefDir = File(project.buildDir, ".josm/pref")
 
@@ -89,7 +89,7 @@ open class JosmPluginExtension(private val project: Project) {
    * The directory in which the JOSM cache for the JOSM instance used by `runJosm` and `debugJosm` is stored.
    *
    * **Default value:** `$buildDir/.josm/cache` (for JOSM versions < 7841, `${josm.tmpJosmPrefDir}/cache` is used)
-   * @since v0.4.0
+   * @since 0.4.0
    */
   var tmpJosmCacheDir = File(project.buildDir, ".josm/cache")
 
@@ -97,7 +97,7 @@ open class JosmPluginExtension(private val project: Project) {
    * The directory in which the JOSM user data for the JOSM instance used by `runJosm` and `debugJosm` is stored.
    *
    * **Default value:** `$buildDir/.josm/userdata` (for JOSM versions < 7841,  `${josm.tmpJosmPrefDir}` is used)
-   * @since v0.4.0
+   * @since 0.4.0
    */
   var tmpJosmUserdataDir = File(project.buildDir, ".josm/userdata")
 
