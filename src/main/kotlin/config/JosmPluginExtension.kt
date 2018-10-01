@@ -198,10 +198,17 @@ open class JosmPluginExtension(private val project: Project) {
   val i18n: I18nConfig = I18nConfig(project)
 
   /**
-   * Set the field [JosmPluginExtension.i18n] using a Groovy [Closure]
+   * Configure the field [JosmPluginExtension.i18n] using a Groovy [Closure]
    */
   public fun i18n(c: Closure<I18nConfig>) {
     project.configure(i18n, c)
+  }
+
+  /**
+   * Configure the field [JosmPluginExtension.i18n] using an [Action].
+   */
+  public fun i18n(a: Action<I18nConfig>) {
+    a.execute(i18n)
   }
 
   /**
@@ -210,10 +217,17 @@ open class JosmPluginExtension(private val project: Project) {
   val manifest: JosmManifest = JosmManifest(project)
 
   /**
-   * Set the field [manifest] using a Groovy [Closure].
+   * Configure the field [manifest] using a Groovy [Closure].
    */
   public fun manifest(c: Closure<JosmManifest>) {
     project.configure(manifest, c)
+  }
+
+  /**
+   * Configure the field [manifest] using an [Action].
+   */
+  public fun manifest(a: Action<JosmManifest>) {
+    a.execute(manifest)
   }
 
   /**
