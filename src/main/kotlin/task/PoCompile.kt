@@ -80,7 +80,7 @@ open class PoCompile
         }
       }
       convertedFiles.groupBy { it.parentFile.absolutePath }.forEach { dir, files ->
-        logger.lifecycle("  from $dir :\n    ${files.map { it.nameWithoutExtension }.sorted().joinToString(", ")}")
+        logger.lifecycle("  from $dir : ${files.map { it.nameWithoutExtension }.sorted().joinToString(", ")}")
       }
       logger.lifecycle("  into $outDir")
 

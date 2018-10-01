@@ -60,7 +60,9 @@ open class LangCompile
     }
     logger.lifecycle("  into ${destinationDir.absolutePath}/$subdirectory")
     langPaths.filter { it.value.size >= 2 }.forEach { lang, paths ->
-      logger.warn("\nWARNING: For language $lang there are multiple *.lang files, of which only the last one in the following list is used:\n  * ${paths.joinToString("\n  * ")}\n")
+      val warnMsg = "\nWARNING: For language $lang there are multiple *.lang files, of which only the last one in the following list is used:\n  * ${paths.joinToString("\n  * ")}\n"
+      logger.warn(warnMsg)
+      project.gradle.buildFinished { logger.warn(warnMsg) }
     }
   }
 }

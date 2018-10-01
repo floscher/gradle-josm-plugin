@@ -58,18 +58,24 @@ open class MoCompile
       project.fileTree(outDir)
         .filter { it.isFile && it.name.endsWith(".lang") }
         .forEach { it.delete() }
+
+      inputFiles.groupBy { it.parentFile.absolutePath }.forEach { dir, files ->
+        logger.lifecycle("  from $dir : ${files.map { it.nameWithoutExtension }.sorted().joinToString(", ")}")
+      }
+
       val langMap = mutableMapOf<String, Map<MsgId, MsgStr>>()
       inputFiles.forEach {
-        logger.lifecycle("  ${it.absolutePath} …" + if (langMap.containsKey(it.nameWithoutExtension)) {
-          " (will overwrite existing file!)"
-        } else {
-          ""
-        })
         langMap[it.nameWithoutExtension] = MoReader(it.toURI().toURL()).readFile()
       }
 
       logger.lifecycle("Writing the *.lang files into ${outDir.absolutePath} …")
       LangWriter().writeLangFile(outDir, langMap, project.extensions.josm.i18n.mainLanguage)
+
+      inputFiles.groupBy { it.nameWithoutExtension }.filter { it.value.size >= 2 }.forEach { lang, paths ->
+        val warnMsg = "\nWARNING: For language $lang there are multiple *.mo files, of which only the last one in the following list is used:\n  * ${paths.joinToString("\n  * ")}\n"
+        logger.warn(warnMsg)
+        project.gradle.buildFinished { logger.warn(warnMsg) }
+      }
     }
   }
 }
