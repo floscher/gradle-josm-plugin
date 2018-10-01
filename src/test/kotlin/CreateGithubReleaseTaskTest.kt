@@ -55,11 +55,12 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             plugins {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
             }
-            version="v0.0.1"
+            project.version="v0.0.1"
             josm {
                 josmCompileVersion = 14002
                 manifest {
                     minJosmVersion = 14002
+                    mainClass = "test_plugin.TestPlugin"
                 }
             }
             import org.openstreetmap.josm.gradle.plugin.task.CreateGithubReleaseTask
@@ -139,11 +140,12 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             plugins {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
             }
-            version="v0.0.1"
+            project.version="v0.0.1"
             josm {
                 josmCompileVersion = 14002
                 manifest {
                     minJosmVersion = 14002
+                    mainClass = "test_plugin.TestPlugin"
                 }
             }
             createGithubRelease {
@@ -225,11 +227,12 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
             }
 
-            version="v0.0.1"
+            project.version="v0.0.1"
             josm {
                 josmCompileVersion = 14002
                 manifest {
                     minJosmVersion = 14002
+                    mainClass = "test_plugin.TestPlugin"
                 }
             }
 
@@ -309,11 +312,12 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             plugins {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
             }
-            version="v0.0.1"
+            project.version="v0.0.1"
             josm {
                 josmCompileVersion = 14002
                 manifest {
                     minJosmVersion = 14002
+                    mainClass = "test_plugin.TestPlugin"
                 }
             }
             """.trimIndent()
@@ -396,6 +400,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 josmCompileVersion = 14002
                 manifest {
                     minJosmVersion = 14002
+                    mainClass = "test_plugin.TestPlugin"
                 }
             }
             """.trimIndent()

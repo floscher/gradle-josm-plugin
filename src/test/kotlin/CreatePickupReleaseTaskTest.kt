@@ -51,6 +51,7 @@ class CreatePickupReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 josmCompileVersion = 14002
                 manifest {
                     minJosmVersion = 14002
+                    mainClass = "test_plugin.TestPlugin"
                 }
             }
             """.trimIndent()
@@ -132,6 +133,7 @@ class CreatePickupReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 josmCompileVersion = 14002
                 manifest {
                     minJosmVersion = 14002
+                    mainClass = "test_plugin.TestPlugin"
                 }
             }
             """.trimIndent()

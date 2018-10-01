@@ -54,7 +54,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
                 id 'java'
             }
-            version = "$releaseLabel"
+            project.version = "$releaseLabel"
             jar.archiveName = "$localJarName"
             josm {
               josmCompileVersion = "latest"
@@ -176,7 +176,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
                 id 'java'
             }
-            version = "$releaseLabel"
+            project.version = "$releaseLabel"
             jar.archiveName = "$localJarName"
             josm {
               josmCompileVersion = "latest"
@@ -366,7 +366,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
                 id 'java'
             }
-            version = "$releaseLabel"
+            project.version = "$releaseLabel"
             josm {
               josmCompileVersion = "latest"
               manifest {
@@ -488,7 +488,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
                 id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
                 id 'java'
             }
-            version = "$releaseLabel"
+            project.version = "$releaseLabel"
             jar.archiveName = "$localJarName"
             josm {
               josmCompileVersion = "latest"
