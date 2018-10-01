@@ -149,15 +149,27 @@ gradlePlugin {
 publishing {
   repositories {
     maven {
-      setUrl("$buildDir/maven")
+        setUrl("$buildDir/maven")
     }
-    maven {
-      setUrl("s3://gradle-josm-plugin")
-      credentials(AwsCredentials::class.java) {
-        setAccessKey(System.getenv("AWS_ACCESS_KEY_ID"))
-        setSecretKey(System.getenv("AWS_SECRET_ACCESS_KEY"))
-      }
+    if (System.getenv("AWS_ACCESS_KEY_ID") == null) {
+        logger.lifecycle("warning: environment variable AWS_ACCESS_KEY_ID "
+            + "not set, can't publish to s3://gradle-josm-plugin")
     }
+    if (System.getenv("AWS_SECRET_ACCESS_KEY") == null) {
+        logger.lifecycle("warning: environment variable AWS_SECRET_ACCESS_KEY "
+            + "not set, can't publish to s3://gradle-josm-plugin")
+    }
+    if(System.getenv("AWS_ACCESS_KEY_ID") != null
+        && System.getenv("AWS_SECRET_ACCESS_KEY") != null) {
+        maven {
+            setUrl("s3://gradle-josm-plugin")
+            credentials(AwsCredentials::class.java) {
+                setAccessKey(System.getenv("AWS_ACCESS_KEY_ID"))
+                setSecretKey(System.getenv("AWS_SECRET_ACCESS_KEY"))
+           }
+        }
+    }
+
   }
 }
 
