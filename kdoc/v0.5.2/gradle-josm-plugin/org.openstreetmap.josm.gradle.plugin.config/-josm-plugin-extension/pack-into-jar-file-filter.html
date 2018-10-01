@@ -1,0 +1,26 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>JosmPluginExtension.packIntoJarFileFilter - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.config</a>&nbsp;/&nbsp;<a href="index.html">JosmPluginExtension</a>&nbsp;/&nbsp;<a href="./pack-into-jar-file-filter.html">packIntoJarFileFilter</a><br/>
+<br/>
+<h1>packIntoJarFileFilter</h1>
+<a name="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$packIntoJarFileFilter"></a>
+<code><span class="keyword">var </span><span class="identifier">packIntoJarFileFilter</span><span class="symbol">: </span><span class="symbol">(</span><a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/tasks/util/PatternFilterable.html"><span class="identifier">PatternFilterable</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/tasks/util/PatternFilterable.html"><span class="identifier">PatternFilterable</span></a></code>
+<p>When packing the dependencies of the <code>packIntoJar</code> configuration into the distribution *.jar,
+this closure is applied to the file tree. If you want to exclude certain files in your dependencies into
+your release, you can modify this.
+By default the <code>/META-INF/</code> directory of dependencies is discarded.</p>
+<p><strong>Default value:</strong> <code>{ it.exclude("META-INF/&amp;#42;&amp;#42;/&amp;#42;") }</code></p>
+<p><strong>See Also</strong><br/>
+<p><a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/file/FileTree.html#matching(groovy.lang.Closure)">org.gradle.api.file.FileTree.matching</a></p>
+<p><a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/tasks/util/PatternFilterable.html">PatternFilterable</a></p>
+</p>
+<a name="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$packIntoJarFileFilter(groovy.lang.Closure((org.gradle.api.tasks.util.PatternFilterable)))"></a>
+<code><span class="keyword">fun </span><span class="identifier">packIntoJarFileFilter</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$packIntoJarFileFilter(groovy.lang.Closure((org.gradle.api.tasks.util.PatternFilterable)))/closure">closure</span><span class="symbol">:</span>&nbsp;<a href="http://docs.groovy-lang.org/2.4.15/html/api/groovy/lang/Closure.html"><span class="identifier">Closure</span></a><span class="symbol">&lt;</span><a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/tasks/util/PatternFilterable.html"><span class="identifier">PatternFilterable</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set the <a href="./pack-into-jar-file-filter.html">packIntoJarFileFilter</a> with a Groovy <a href="http://docs.groovy-lang.org/2.4.15/html/api/groovy/lang/Closure.html">Closure</a></p>
+</BODY>
+</HTML>
