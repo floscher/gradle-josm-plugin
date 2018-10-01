@@ -74,6 +74,7 @@ dependencies {
 
   implementation(localGroovy())
   implementation(kotlin("stdlib-jdk8", kotlinVersion))
+  implementation("com.vladsch.flexmark:flexmark-all:0.34.46")
   testImplementation("org.junit.jupiter", "junit-jupiter-api", junitVersion)
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", junitVersion)
 }
