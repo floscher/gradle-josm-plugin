@@ -239,6 +239,7 @@ open class JosmPluginExtension(private val project: Project) {
    * **Default value:** `true`
    * @since 0.5.2
    */
+  @Deprecated(message = "Will soon be removed with release 0.6.0")
   var versionFromVcs = true
 
   /**
