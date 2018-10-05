@@ -14,7 +14,7 @@ open class BaseGithubReleaseTaskTest() {
 
     @BeforeEach
     fun setup() {
-        buildDir = createTempDir(prefix = "/tmp")
+        buildDir = createTempDir(prefix = "gradle-josm-plugin_unit-test")
         println("build dir: $buildDir")
         buildFile = File(buildDir, "build.gradle")
         File(buildDir, "settings.gradle").printWriter().use {
@@ -40,14 +40,7 @@ open class BaseGithubReleaseTaskTest() {
     // copy/paste of the code in build.gradle.kts which assembles the plugin
     // version
     fun  pluginUnderTestVersion(): String {
-        val versionProcess = ProcessBuilder().command("git", "describe",
-            "--dirty", "--always").start()
-        versionProcess.waitFor()
-        if (versionProcess.exitValue() != 0) {
-            throw Exception("Failed to determine version!")
-        }
-        val tmpVersion = versionProcess.inputStream.bufferedReader()
-            .readText().trim()
+        val tmpVersion = GitDescriber(File(".")).describe()
         return if (tmpVersion[0] == 'v') tmpVersion.substring(1) else tmpVersion
     }
 
@@ -71,11 +64,7 @@ open class BaseGithubReleaseTaskTest() {
         }
     }
 
-    protected fun prepareBuildFile(content: String) {
-        buildFile?.printWriter()?.use {
-            it.println(content)
-        }
-    }
+    protected fun prepareBuildFile(content: String) = buildFile!!.writeText(content)
 
     protected fun prepareReleasesSpecs(content: String,
                                        releasesFile: File? = null) {
