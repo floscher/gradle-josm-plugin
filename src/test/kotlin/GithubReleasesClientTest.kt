@@ -2,16 +2,32 @@ package org.openstreetmap.josm.gradle.plugin.ghreleases
 
 import com.beust.klaxon.JsonObject
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock.*
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Disabled
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.delete
+import com.github.tomakehurst.wiremock.client.WireMock.equalTo
+import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath
+import com.github.tomakehurst.wiremock.client.WireMock.patch
+import com.github.tomakehurst.wiremock.client.WireMock.post
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
+import com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock
 import ru.lanwen.wiremock.ext.WiremockUriResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver.WiremockUri
-import java.net.HttpURLConnection.*
+import java.net.HttpURLConnection.HTTP_CREATED
+import java.net.HttpURLConnection.HTTP_NOT_FOUND
+import java.net.HttpURLConnection.HTTP_NO_CONTENT
+import java.net.HttpURLConnection.HTTP_OK
+import java.net.HttpURLConnection.HTTP_SERVER_ERROR
 
 const val GITHUB_USER = "a-user"
 const val GITHUB_ACCESS_TOKEN = "an-access-token"

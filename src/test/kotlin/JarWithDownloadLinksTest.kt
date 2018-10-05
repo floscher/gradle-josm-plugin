@@ -7,8 +7,10 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.openstreetmap.josm.gradle.plugin.task.CONFIG_OPT_GITHUB_ACCESS_TOKEN
 import org.openstreetmap.josm.gradle.plugin.task.CONFIG_OPT_GITHUB_API_URL
 import org.openstreetmap.josm.gradle.plugin.task.CONFIG_OPT_GITHUB_REPOSITORY
+import org.openstreetmap.josm.gradle.plugin.task.CONFIG_OPT_GITHUB_USER
 import org.openstreetmap.josm.gradle.plugin.task.ENV_VAR_GITHUB_USER
 import org.openstreetmap.josm.gradle.plugin.task.MEDIA_TYPE_JAR
 import org.openstreetmap.josm.gradle.plugin.task.ReleasesSpec

@@ -174,6 +174,7 @@ project.afterEvaluate {
   tasks.withType(PublishToMavenRepository::class).configureEach {
     if (repository == buildDirRepo) {
       description = "Deploys the gradle-josm-plugin to a local Maven repository at ${repository.url}"
+      tasks.withType(Test::class).forEach { it.dependsOn(this) }
     } else if (repository == s3Repo) {
       description = "Deploys the gradle-josm-plugin to a Maven repository on AWS S3: ${repository.url}"
     }

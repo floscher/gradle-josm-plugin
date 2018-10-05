@@ -1,5 +1,7 @@
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.openstreetmap.josm.gradle.plugin.task.DEFAULT_PICKUP_RELEASE_DESCRIPTION
 import org.openstreetmap.josm.gradle.plugin.task.DEFAULT_PICKUP_RELEASE_LABEL

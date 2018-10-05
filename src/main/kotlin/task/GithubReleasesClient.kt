@@ -3,7 +3,12 @@ package org.openstreetmap.josm.gradle.plugin.ghreleases
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
-import okhttp3.*
+import okhttp3.Credentials
+import okhttp3.MediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.Response
 import java.io.File
 import java.net.HttpURLConnection.HTTP_CREATED
 import java.net.HttpURLConnection.HTTP_OK
@@ -14,7 +19,7 @@ const val DEFAULT_GITHUB_API_URL = "https://api.github.com"
 // the default upload URL to upload a release asset
 const val DEFAULT_GITHUB_UPLOAD_URL = "https://uploads.github.com"
 // the default base URL to access a release
-const val DEFAULT_GITHUB_URL = "http://github.com"
+const val DEFAULT_GITHUB_URL = "https://github.com"
 
 
 @Throws(GithubReleaseClientException::class)

@@ -1,11 +1,10 @@
 package org.openstreetmap.josm.gradle.plugin
 
 import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import java.io.File
-import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 const val GITHUB_USER = "a-github-user"
 
