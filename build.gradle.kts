@@ -85,6 +85,7 @@ dependencies {
   testImplementation("com.github.tomakehurst","wiremock","2.16.0")
   testImplementation("ru.lanwen.wiremock", "wiremock-junit5", "1.1.1")
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", junitVersion)
+  testImplementation(kotlin("reflect", kotlinVersion))
 }
 
 jacoco {
