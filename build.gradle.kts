@@ -146,38 +146,39 @@ gradlePlugin {
   }
 }
 
-publishing {
-  repositories {
-    maven {
-        setUrl("$buildDir/maven")
-    }
-    if (System.getenv("AWS_ACCESS_KEY_ID") == null) {
-        logger.lifecycle("warning: environment variable AWS_ACCESS_KEY_ID "
-            + "not set, can't publish to s3://gradle-josm-plugin")
-    }
-    if (System.getenv("AWS_SECRET_ACCESS_KEY") == null) {
-        logger.lifecycle("warning: environment variable AWS_SECRET_ACCESS_KEY "
-            + "not set, can't publish to s3://gradle-josm-plugin")
-    }
-    if(System.getenv("AWS_ACCESS_KEY_ID") != null
-        && System.getenv("AWS_SECRET_ACCESS_KEY") != null) {
-        maven {
-            setUrl("s3://gradle-josm-plugin")
-            credentials(AwsCredentials::class.java) {
-                setAccessKey(System.getenv("AWS_ACCESS_KEY_ID"))
-                setSecretKey(System.getenv("AWS_SECRET_ACCESS_KEY"))
-           }
-        }
-    }
+val buildDirRepo = publishing.repositories.maven("$buildDir/maven") {
+  name = "buildDir"
+}
 
+val awsAccessKeyId = System.getenv("AWS_ACCESS_KEY_ID")
+val awsSecretAccessKey = System.getenv("AWS_SECRET_ACCESS_KEY")
+val s3Repo = if (awsAccessKeyId == null || awsSecretAccessKey == null) {
+  logger.lifecycle(
+    "Note: Set the environment variables AWS_ACCESS_KEY_ID ({} set) and AWS_SECRET_ACCESS_KEY ({} set) to publish the plugin to s3://gradle-josm-plugin .",
+    if (awsAccessKeyId == null) { "not" } else { "is" },
+    if (awsSecretAccessKey == null) { "not" } else { "is" }
+  )
+  null
+} else {
+  publishing.repositories.maven {
+    name = "s3"
+    setUrl("s3://gradle-josm-plugin")
+    credentials(AwsCredentials::class.java) {
+      setAccessKey(System.getenv("AWS_ACCESS_KEY_ID"))
+      setSecretKey(System.getenv("AWS_SECRET_ACCESS_KEY"))
+    }
   }
 }
 
-tasks {
-  "publish" {
-    description = "Deploys the gradle-josm-plugin to a local Maven repository inside the $buildDir"
+project.afterEvaluate {
+  tasks.withType(PublishToMavenRepository::class).configureEach {
+    if (repository == buildDirRepo) {
+      description = "Deploys the gradle-josm-plugin to a local Maven repository at ${repository.url}"
+    } else if (repository == s3Repo) {
+      description = "Deploys the gradle-josm-plugin to a Maven repository on AWS S3: ${repository.url}"
+    }
     doLast {
-      logger.lifecycle("Version {} is now deployed to {}", project.version.toString(), publishing.repositories.withType(MavenArtifactRepository::class.java)[0].url)
+      logger.lifecycle("Version ${project.version} is now deployed to ${repository.url}")
     }
   }
 }
