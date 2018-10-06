@@ -72,12 +72,6 @@ open class BaseGithubReleaseTaskTest() {
             .printWriter().use { it.println(content) }
     }
 
-    protected fun prepareGradleProperties(content: String,
-                                          propertiesFile: File? = null) {
-        (propertiesFile ?: File(buildDir, "gradle.properties"))
-            .printWriter().use { it.println(content) }
-    }
-
     protected fun BuildResult.dumpOutputOnError(taskName: String) {
         if (this.task(":$taskName")?.outcome != SUCCESS) {
             println(this.output)

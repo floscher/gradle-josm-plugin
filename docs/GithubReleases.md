@@ -34,7 +34,7 @@ A plugin `MANIFEST` includes two kinds of download URLs:
 
 ### How to add a new JOSM plugin to the plugin directory? <a id="how-to-add-plugin-to-directory"></a>
 
-Add a stable, release indepdent download URL for the latest release of the new plugin to [this page][josm-plugin-sources] in the JOSM wiki.
+Add a stable, release independent download URL for the latest release of the new plugin to [this page][josm-plugin-sources] in the JOSM wiki.
 
 Every 10 minutes, a script in the backend infrastructure of the JOSM development team fetches the `jar`-file from this download URL, extracts the `MANIFEST` file and updates the [directory with the plugin metadata][josm-plugin-list].
 
@@ -54,22 +54,16 @@ The gradle plugin manages to kinds of GitHub releases:
 ### `releases.yml` - configuration file for releases
 You have to maintain a configuration file for the plugin releases.
 
-Its default name is `releases.yml` and its default location is the project root. To configure another location
+Its default name is `releases.yml` and its default location is the project root.
 
-1. set the gradle property `josm.releases_config_file` either in `gradle.properties` or directly in `build.gradle`.
-   ```properties
-   # in gradle.properties
-   josm.releases_config_file=/full/path/to/my_releases.yml
-   ```
-   or
-   ```groovy
-    //in build.gradle
-    ext {
-        josm {
-            releases_config_file="/full/path/to/my_releases.yml"
-        }
-    }
-   ```
+To configure another location, set the gradle property `josm.github.releasesConfig` directly in `build.gradle`:
+ ```groovy
+ josm {
+   github {
+     releasesConfig=file("path/to/my_releases.yml")
+   }
+ }
+ ```
 
 Here is annotated example `releases.yml`:
 ```yml
@@ -301,35 +295,31 @@ $ ./gradlew publishToGithubRelease \
 
 ## Configuration options
 
-A configuration option is derived from command line arguments, properties, and environment variables in the following order:
+A configuration option is derived from command line arguments, properties, and environment variables in the following order (the first of these options that has a non-blank value is used):
 
 1. command line argument
 2. task configuration in `build.gradle`
-3. gradle property
-4. environment variable
-5. hard coded default value
+3. properties in the JosmPluginExtension (`josm {}` block in `build.gradle`)
+4. gradle property (only some properties)
+5. environment variable
+6. hard coded default value
 
 ### common environement variables
 | environment variable | description |
 | --------------------- | ----------- |
-| `GITHUB_USER`       | the name of the github user |
+| `GITHUB_REPOSITORY_OWNER`       | the name of the github user |
 | `GITHUB_ACCESS_TOKEN`       | the Github access token |
-| `GITHUB_REPOSITORY`       | the name of the github repositoy. Defaults  to the project name. |
+| `GITHUB_REPOSITORY_NAME`       | the name of the github repositoy. Defaults  to the project name. |
 | `GITHUB_API_URL` | the base API URL for the Github releases API. Defaults to `https://api.github.com` |
 | `GITHUB_UPLOAD_URL` | the base API URL to upload release assets. Defaults to `https://uploads.github.com` |
-| `GITHUB_URL`| the base GitHub URL. Defaults to `http://github.com` |
+| `GITHUB_MAIN_URL`| the base GitHub URL. Defaults to `http://github.com` |
 
 ### common gradle properties
 | gradle property | description |
 | --------------------- | ----------- |
-| `josm.github.user`       | the name of the github user |
-| `josm.github.access_token`       | the Github access token |
-| `josm.github.repository`       | the name of the github repositoy.  Defaults  to the project name. |
-| `josm.github.api_url`  | the base API URL for the Github releases API. Defaults to `https://api.github.com` |
-| `josm.github.upload_url` | the base API URL to upload release assets. Defaults to `https://uploads.github.com` |
-| `josm.github.url` | the base GitHub URL. Defaults to `http://github.com` |
-| `josm.releases_config_file` | the full path to the local releases file. Defaults to `releases.yml` in the base project directory | 
-| `josm.target_commitish` | Specifies the commitish value that determines where the Git tag is created from. Can be any branch or commit SHA. Defaults to `master`. |
+| `josm.github.repositoryOwner`       | the name of the github user |
+| `josm.github.accessToken`       | the Github access token |
+| `josm.github.repositoryName`       | the name of the github repositoy.  Defaults  to the project name. |
 
 
 ## Sample and template configuration files
@@ -341,14 +331,14 @@ A configuration option is derived from command line arguments, properties, and e
 # save as 'github.env' and load using 'source github.env'
 #
 
-# the GitHub user name
-#export GITHUB_USER=a-user-name
+# the GitHub account that owns the repository
+#export GITHUB_REPOSITORY_OWNER=a-user-name
 
 # the GitHub access token
 #export GITHUB_ACCESS_TOKEN=asldiu0w98357oasjf
 
-# the GitHub repository
-#export GITHUB_REPOSITORY=my-repo
+# the GitHub repository name
+#export GITHUB_REPOSITORY_NAME=my-repo
 
 # the GitHub upload URL if different from https://uploads.github.com
 #export GITHUB_API_URL=https://api.my-github-host.test
@@ -357,34 +347,19 @@ A configuration option is derived from command line arguments, properties, and e
 # export GITHUB_UPLOAD_URL=https://uploads.my-github-host.test
 
 # the base GitHub URL. Defaults to http://github.com 
-# export GITHUB_URL=http://my-github.test
+# export GITHUB_MAIN_URL=http://my-github.test
 ```
 
 ### template for `gradle.properties`
 ```properties
-# the GitHub user name
-#josm.github.user=a-user-name
+# the GitHub account that owns the repository (user or org)
+#josm.github.repositoryOwner=a-user-name
 
 # the GitHub access token
-#josm.github.access_token=asldiu0w98357oasjf
+#josm.github.accessToken=asldiu0w98357oasjf
 
 # the GitHub repository
-#josm.github.repository=my-repo
-
-# the GitHub API URL if different from https://api.github.com
-#josm.github.api_url=https://api.my-github-host.test
-
-# the GitHub upload URL if different from https://uploads.github.com
-#josm.github.upload_url=https://uploads.my-github-host.test
-
-# the base GitHub URL. Defaults to http://github.com
-#josm.github.url=http://my-github.test
-
-# the full path to the local releases config file
-#josm.releases_config_file=/full/path/to/my_releases.yml
-
-# the target commitish, if different from 'master'
-#josm.target_commitish=deploy
+#josm.github.repositoryName=my-repo
 ```
 
 ### template for `build.gradle`
@@ -396,26 +371,15 @@ plugins {
     id 'eclipse'
 }
 
-// optional inline configuration block, or configure these properties in
-// 'gradle.properties'
-//ext {
-//   josm {
-//        github {
-//            user="a-user-name"
-//            access_token="asldiu0w98357oasjf"
-//            repository="my-repo"
-//            api_url="https://api.my-github-host.test"
-//            upload_url="https://uploads.my-github-host.test"
-//            url = "http://my-github.test"
-//        }
-//        releases_config_file="/full/path/to/my_releases.yml"
-//        target_commitish="deploy"
-//    }
-//}
-
-version="v0.0.5"      //  the current release label
+version="0.0.5"      //  the current release label
 
 josm {
+//  //optional inline configuration block
+//  github { // for more configuration options, see https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/-github-config/index.html
+//    repositoryOwner = "a-github-user"
+//    repositoryName = "my-repo"
+//    accessToken = "asldiu0w98357oasjf"
+//  }
     josmCompileVersion = "latest"
     manifest {
         // if true, the plugin will include download URLs for GitHub
@@ -445,7 +409,7 @@ createGithubRelease {
 // uncomment to create your own task for creating GitHub releases
 /* 
 import org.openstreetmap.josm.gradle.plugin.task.CreateGithubReleaseTask
-task myCreateGithubReleas(task: CreateGithubReleaseTask) {
+task myCreateGithubRelease(task: CreateGithubReleaseTask) {
     // optional. if different from the project 'version'
     //releaseLabel = "v0.0.5-GA"
 

@@ -2,18 +2,16 @@ package org.openstreetmap.josm.gradle.plugin
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
+import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.openstreetmap.josm.gradle.plugin.task.CONFIG_OPT_GITHUB_ACCESS_TOKEN
-import org.openstreetmap.josm.gradle.plugin.task.CONFIG_OPT_GITHUB_API_URL
-import org.openstreetmap.josm.gradle.plugin.task.CONFIG_OPT_GITHUB_REPOSITORY
-import org.openstreetmap.josm.gradle.plugin.task.CONFIG_OPT_GITHUB_USER
-import org.openstreetmap.josm.gradle.plugin.task.ENV_VAR_GITHUB_USER
+import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
 import org.openstreetmap.josm.gradle.plugin.task.MEDIA_TYPE_JAR
 import org.openstreetmap.josm.gradle.plugin.task.ReleasesSpec
+import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver
 import java.io.File
@@ -23,14 +21,11 @@ import java.util.jar.JarInputStream
 class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
     val GITHUB_REPO = "repo_xy"
 
-    private fun prepareTestGradleProperties(apiUri: String) {
-        val gradlePropertiesContent = """
-            $CONFIG_OPT_GITHUB_REPOSITORY = $GITHUB_REPO
-            $CONFIG_OPT_GITHUB_API_URL = $apiUri
-            $CONFIG_OPT_GITHUB_USER = $GITHUB_USER
-            $CONFIG_OPT_GITHUB_ACCESS_TOKEN = alsdkjfoiauosf
-            """.trimIndent()
-        prepareGradleProperties(gradlePropertiesContent)
+    private fun githubConfig(apiUri: String): GithubConfig = GithubConfig(ProjectBuilder.builder().build()).apply {
+      repositoryOwner = GITHUB_USER
+      repositoryName = GITHUB_REPO
+      apiUrl = apiUri
+      accessToken = "42alsdkj-foiau_osf0123456789"
     }
 
     @Test
@@ -44,9 +39,6 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
         // prepare test plugin source
         prepareTestPluginSource()
-
-        // prepare gradle properties
-        prepareTestGradleProperties(apiUri)
 
         // prepare releases file
         val releasesContent = """
@@ -71,6 +63,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
             version = "$currentRelease"
             jar.archiveName = "test.jar"
             josm {
+              ${githubConfig(apiUri).toGradleBuildscript()}
               josmCompileVersion = "latest"
               manifest {
                   includeLinksToGithubReleases = true
@@ -150,9 +143,6 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         // prepare test plugin source
         prepareTestPluginSource()
 
-        // prepare gradle properties
-        prepareTestGradleProperties(apiUri)
-
         // prepare releases file
         val releasesContent = """
               releases:
@@ -181,6 +171,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
             version = "$currentRelease"
             jar.archiveName = "test.jar"
             josm {
+              ${githubConfig(apiUri).toGradleBuildscript()}
               josmCompileVersion = "latest"
               manifest {
                   includeLinksToGithubReleases = true
@@ -273,9 +264,6 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         // prepare test plugin source
         prepareTestPluginSource()
 
-        // prepare gradle properties
-        prepareTestGradleProperties(apiUri)
-
         // prepare releases file
         val releasesContent = """
               releases:
@@ -304,6 +292,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
             version = "$currentRelease"
             jar.archiveName = "test.jar"
             josm {
+              ${githubConfig(apiUri).toGradleBuildscript()}
               josmCompileVersion = "latest"
               manifest {
                   includeLinksToGithubReleases = true

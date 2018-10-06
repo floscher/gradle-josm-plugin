@@ -2,13 +2,14 @@ package org.openstreetmap.josm.gradle.plugin
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
+import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.openstreetmap.josm.gradle.plugin.task.*
+import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
+import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver
 import java.net.HttpURLConnection.HTTP_CREATED
@@ -39,17 +40,12 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
 
-        val githubUser = "github_user"
-        val githubAccessToken = "aaaabbbb"
-        val githubRepo = "repo"
-
-        val gradlePropertiesContent = """
-            $CONFIG_OPT_GITHUB_USER = $githubUser
-            $CONFIG_OPT_GITHUB_ACCESS_TOKEN = $githubAccessToken
-            $CONFIG_OPT_GITHUB_REPOSITORY = $githubRepo
-            $CONFIG_OPT_GITHUB_API_URL = $apiUri
-            """.trimIndent()
-        prepareGradleProperties(gradlePropertiesContent)
+        val githubConfig = GithubConfig(ProjectBuilder.builder().build()).apply {
+          repositoryOwner = "github_user"
+          accessToken = "aaaabbbb"
+          repositoryName = "repo"
+          apiUrl = apiUri
+        }
 
         val buildFileContent = """
             plugins {
@@ -57,6 +53,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             }
             project.version="v0.0.1"
             josm {
+                ${githubConfig.toGradleBuildscript()}
                 josmCompileVersion = 14002
                 manifest {
                     minJosmVersion = 14002
@@ -70,10 +67,10 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             """.trimIndent()
         prepareBuildFile(buildFileContent)
 
-        val path = "/repos/$githubUser/$githubRepo/releases"
+        val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
         server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
-            .withBasicAuth(githubUser, githubAccessToken)
+            .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
             .withStatus(200)
             // assume we already have one release with label 'v0.0.1'
@@ -86,7 +83,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 "$[?(@.tag_name == '$releaseLabel')]"))
             .withRequestBody(WireMock.matchingJsonPath(
                 "$[?(@.name == '$releaseName')]"))
-            .withBasicAuth(githubUser, githubAccessToken)
+            .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
             .withStatus(HTTP_CREATED)
             .withBody("""{"id": 1}""")
@@ -124,17 +121,12 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
 
-        val githubUser = "github_user"
-        val githubAccessToken = "aaaabbbb"
-        val githubRepo = "repo"
-
-        val gradlePropertiesContent = """
-            $CONFIG_OPT_GITHUB_USER = $githubUser
-            $CONFIG_OPT_GITHUB_ACCESS_TOKEN = $githubAccessToken
-            $CONFIG_OPT_GITHUB_REPOSITORY = $githubRepo
-            $CONFIG_OPT_GITHUB_API_URL = $apiUri
-            """.trimIndent()
-        prepareGradleProperties(gradlePropertiesContent)
+        val githubConfig = GithubConfig(ProjectBuilder.builder().build()).apply {
+          repositoryOwner = "JOSM"
+          repositoryName = "some-repo"
+          accessToken = "abcdefghijklmnopqrstuvwxyz"
+          apiUrl = apiUri
+        }
 
         val buildFileContent = """
             plugins {
@@ -142,6 +134,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             }
             project.version="v0.0.1"
             josm {
+                ${githubConfig.toGradleBuildscript()}
                 josmCompileVersion = 14002
                 manifest {
                     minJosmVersion = 14002
@@ -154,10 +147,10 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             """.trimIndent()
         prepareBuildFile(buildFileContent)
 
-        val path = "/repos/$githubUser/$githubRepo/releases"
+        val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
         server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
-            .withBasicAuth(githubUser, githubAccessToken)
+            .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
                 .withStatus(HTTP_OK)
                 // assume we already have one release with label 'v0.0.1'
@@ -170,7 +163,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 "$[?(@.tag_name == '$releaseLabel')]"))
             .withRequestBody(WireMock.matchingJsonPath(
                 "$[?(@.name == '$releaseName')]"))
-            .withBasicAuth(githubUser, githubAccessToken)
+            .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
                 .withStatus(HTTP_CREATED)
                 .withBody("""{"id": 1}""")
@@ -207,20 +200,12 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
 
-        val githubUser = "github_user"
-        val githubAccessToken = "aaaabbbb"
-
-        // the name of the build dir is the default github repo name
-        val githubRepo = buildDir!!.name
-
-        // don't configure the github repo, should be derived from the project
-        // name
-        val gradlePropertiesContent = """
-            $CONFIG_OPT_GITHUB_USER = $githubUser
-            $CONFIG_OPT_GITHUB_ACCESS_TOKEN = $githubAccessToken
-            $CONFIG_OPT_GITHUB_API_URL = $apiUri
-            """.trimIndent()
-        prepareGradleProperties(gradlePropertiesContent)
+        val githubConfig = GithubConfig(ProjectBuilder.builder().build()).apply {
+          repositoryOwner = "github_user"
+          repositoryName = "repoName"
+          accessToken = "aaaabbbb"
+          apiUrl = apiUri
+        }
 
         val buildFileContent = """
             plugins {
@@ -229,6 +214,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
             project.version="v0.0.1"
             josm {
+                ${githubConfig.toGradleBuildscript()}
                 josmCompileVersion = 14002
                 manifest {
                     minJosmVersion = 14002
@@ -244,10 +230,10 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             """.trimIndent()
         prepareBuildFile(buildFileContent)
 
-        val path = "/repos/$githubUser/$githubRepo/releases"
+        val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
         server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
-            .withBasicAuth(githubUser, githubAccessToken)
+            .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
                 .withStatus(HTTP_OK)
                 // assume we only have one release with label 'v0.0.1'
@@ -257,7 +243,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
         server.stubFor(WireMock.post(WireMock.urlPathEqualTo(path))
             .withRequestBody(WireMock.matchingJsonPath(
                 "$[?(@.tag_name == '$releaseLabel')]"))
-            .withBasicAuth(githubUser, githubAccessToken)
+            .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
                 .withStatus(HTTP_CREATED)
                 .withBody("""{"id": 1}""")
@@ -296,17 +282,12 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
 
-        val githubUser = "github_user"
-        val githubAccessToken = "aaaabbbb"
-        val githubRepo = "repo"
-
-        val gradlePropertiesContent = """
-            $CONFIG_OPT_GITHUB_USER = $githubUser
-            $CONFIG_OPT_GITHUB_ACCESS_TOKEN = $githubAccessToken
-            $CONFIG_OPT_GITHUB_REPOSITORY = $githubRepo
-            $CONFIG_OPT_GITHUB_API_URL = $apiUri
-            """.trimIndent()
-        prepareGradleProperties(gradlePropertiesContent)
+        val githubConfig = GithubConfig(ProjectBuilder.builder().build()).apply {
+          repositoryOwner = "github_user"
+          repositoryName = "repo"
+          accessToken = "aaaabbbb"
+          apiUrl = apiUri
+        }
 
         val buildFileContent = """
             plugins {
@@ -314,6 +295,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             }
             project.version="v0.0.1"
             josm {
+                ${githubConfig.toGradleBuildscript()}
                 josmCompileVersion = 14002
                 manifest {
                     minJosmVersion = 14002
@@ -323,10 +305,10 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             """.trimIndent()
         prepareBuildFile(buildFileContent)
 
-        val path = "/repos/$githubUser/$githubRepo/releases"
+        val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
         server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
-            .withBasicAuth(githubUser, githubAccessToken)
+            .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
                 .withStatus(HTTP_OK)
                 // assume we already have one release with label 'v0.0.1'
@@ -339,7 +321,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 "$[?(@.tag_name == '$releaseLabel')]"))
             .withRequestBody(WireMock.matchingJsonPath(
                 "$[?(@.name == '$releaseName')]"))
-            .withBasicAuth(githubUser, githubAccessToken)
+            .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
                 .withStatus(HTTP_CREATED)
                 .withBody("""{"id": 1}""")
@@ -379,17 +361,12 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
 
-        val githubUser = "github_user"
-        val githubAccessToken = "aaaabbbb"
-        val githubRepo = "repo"
-
-        val gradlePropertiesContent = """
-            $CONFIG_OPT_GITHUB_USER = $githubUser
-            $CONFIG_OPT_GITHUB_ACCESS_TOKEN = $githubAccessToken
-            $CONFIG_OPT_GITHUB_REPOSITORY = $githubRepo
-            $CONFIG_OPT_GITHUB_API_URL = $apiUri
-            """.trimIndent()
-        prepareGradleProperties(gradlePropertiesContent)
+        val githubConfig = GithubConfig(ProjectBuilder.builder().build()).apply {
+          repositoryOwner = "github_user"
+          repositoryName = "repo"
+          accessToken = "aaaabbbb"
+          apiUrl = apiUri
+        }
 
         val buildFileContent = """
             plugins {
@@ -397,6 +374,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             }
             version="$releaseLabel"
             josm {
+                ${githubConfig.toGradleBuildscript()}
                 josmCompileVersion = 14002
                 manifest {
                     minJosmVersion = 14002
@@ -406,10 +384,10 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             """.trimIndent()
         prepareBuildFile(buildFileContent)
 
-        val path = "/repos/$githubUser/$githubRepo/releases"
+        val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
         server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
-            .withBasicAuth(githubUser, githubAccessToken)
+            .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
                 .withStatus(HTTP_OK)
                 // assume we already have one release with label 'v0.0.1'
@@ -422,7 +400,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 "$[?(@.tag_name == '$releaseLabel')]"))
             .withRequestBody(WireMock.matchingJsonPath(
                 "$[?(@.name == '$releaseName')]"))
-            .withBasicAuth(githubUser, githubAccessToken)
+            .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
                 .withStatus(HTTP_CREATED)
                 .withBody("""{"id": 1}""")

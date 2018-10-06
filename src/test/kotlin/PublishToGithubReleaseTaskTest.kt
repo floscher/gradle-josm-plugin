@@ -1,15 +1,23 @@
 package org.openstreetmap.josm.gradle.plugin
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.equalTo
+import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.patch
+import com.github.tomakehurst.wiremock.client.WireMock.post
+import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
+import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.openstreetmap.josm.gradle.plugin.task.*
+import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
+import org.openstreetmap.josm.gradle.plugin.task.MEDIA_TYPE_JAR
+import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver
 
@@ -18,6 +26,14 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
     fun BuildResult.assertMessageInOutput(message: String) {
         val pattern = Regex(message, setOf(RegexOption.MULTILINE))
         assertTrue(pattern.containsMatchIn(this.output))
+    }
+
+    fun githubConfig(uri: String) = GithubConfig(ProjectBuilder.builder().build()).apply {
+      repositoryName = "repo_xy"
+      apiUrl = uri
+      uploadUrl = uri
+      repositoryOwner = GITHUB_USER
+      accessToken = "asdfalkasdhf"
     }
 
     /**
@@ -35,16 +51,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
         val minJosmVersion = 1111
         val releaseId = 12345678
         val releaseLabel = "v0.0.1"
-        val githubRepo = "repo_xy"
 
-        val gradlePropertiesContent = """
-            $CONFIG_OPT_GITHUB_REPOSITORY = $githubRepo
-            $CONFIG_OPT_GITHUB_API_URL = $uri
-            $CONFIG_OPT_GITHUB_UPLOAD_URL = $uri
-            $CONFIG_OPT_GITHUB_USER = $GITHUB_USER
-            $CONFIG_OPT_GITHUB_ACCESS_TOKEN = asdfalkasdhf
-            """.trimIndent()
-        prepareGradleProperties(gradlePropertiesContent)
+        val githubConfig = githubConfig(uri)
 
         val localJarName = "test-$releaseLabel.jar"
         val remoteJarName = "test.jar"
@@ -57,6 +65,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             project.version = "$releaseLabel"
             jar.archiveName = "$localJarName"
             josm {
+              ${githubConfig.toGradleBuildscript()}
               josmCompileVersion = "latest"
               manifest {
                   description = 'test'
@@ -80,9 +89,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
         prepareReleasesSpecs(releasesContent)
 
         fun prepareAPIStub() {
-            val githubUser = GITHUB_USER
             // stub for "get releases"
-            val path1 = "/repos/$githubUser/$githubRepo/releases"
+            val path1 = "/repos/$GITHUB_USER/${githubConfig.repositoryName}/releases"
             server.stubFor(get(urlPathEqualTo(path1))
                 .inScenario("upload-non-existing-asset")
                 .willReturn(aResponse()
@@ -95,7 +103,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             )
 
             // stub get release assets
-            val path2 = "/repos/$githubUser/$githubRepo/releases/$releaseId/assets"
+            val path2 = "/repos/$GITHUB_USER/${githubConfig.repositoryName}/releases/$releaseId/assets"
             server.stubFor(get(urlPathEqualTo(path2))
                 .inScenario("upload-non-existing-asset")
                 .willReturn(aResponse()
@@ -106,7 +114,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             )
 
             // stub for "upload release asset"
-            val path3 = "/repos/$githubUser/$githubRepo/releases/$releaseId/assets"
+            val path3 = "/repos/$GITHUB_USER/${githubConfig.repositoryName}/releases/$releaseId/assets"
             server.stubFor(post(urlPathEqualTo(path3))
                 .inScenario("upload-non-existing-asset")
                 .withHeader("Content-Type", equalTo(MEDIA_TYPE_JAR))
@@ -146,7 +154,6 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
      * description.
      */
     @Test
-    @Disabled
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
     fun test_02(
         @WiremockResolver.Wiremock server: WireMockServer,
@@ -155,16 +162,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
         val minJosmVersion = 1111
         val releaseId = 12345678
         val releaseLabel = "v0.0.1"
-        val githubRepo = "repo_xy"
 
-        val gradlePropertiesContent = """
-            $CONFIG_OPT_GITHUB_REPOSITORY = $githubRepo
-            $CONFIG_OPT_GITHUB_API_URL = $uri
-            $CONFIG_OPT_GITHUB_UPLOAD_URL = $uri
-            $CONFIG_OPT_GITHUB_USER = $GITHUB_USER
-            $CONFIG_OPT_GITHUB_ACCESS_TOKEN = asdfalkasdhf
-            """.trimIndent()
-        prepareGradleProperties(gradlePropertiesContent)
+        val githubConfig = githubConfig(uri)
 
         val pickupReleaseLabel = "most_recent"
         val pickupReleaseId = "45681234"
@@ -179,6 +178,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             project.version = "$releaseLabel"
             jar.archiveName = "$localJarName"
             josm {
+              ${githubConfig.toGradleBuildscript()}
               josmCompileVersion = "latest"
               manifest {
                   description = 'test'
@@ -212,8 +212,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
 
         fun prepareAPIStub() {
-            val githubUser = GITHUB_USER
-            val leadingPath = "/repos/$githubUser/$githubRepo/releases"
+            val leadingPath = "/repos/$GITHUB_USER/${githubConfig.repositoryName}/releases"
 
             // stub for "get releases"
             server.stubFor(get(urlPathEqualTo(leadingPath))
@@ -346,16 +345,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
         val minJosmVersion = 1111
         val releaseId = 12345678
         val releaseLabel = "v0.0.1"
-        val githubRepo = "repo_xy"
 
-        val gradlePropertiesContent = """
-            $CONFIG_OPT_GITHUB_REPOSITORY = $githubRepo
-            $CONFIG_OPT_GITHUB_API_URL = $uri
-            $CONFIG_OPT_GITHUB_UPLOAD_URL = $uri
-            $CONFIG_OPT_GITHUB_USER = $GITHUB_USER
-            $CONFIG_OPT_GITHUB_ACCESS_TOKEN = asdfalkasdhf
-            """.trimIndent()
-        prepareGradleProperties(gradlePropertiesContent)
+        val githubConfig = githubConfig(uri)
 
         // the standard pattern for the jar name the gradle-josm-plugin sets
         // for the plugin jar
@@ -368,6 +359,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             }
             project.version = "$releaseLabel"
             josm {
+              ${githubConfig.toGradleBuildscript()}
               josmCompileVersion = "latest"
               manifest {
                   description = 'test'
@@ -387,9 +379,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
 
         fun prepareAPIStub() {
-            val githubUser = GITHUB_USER
             // stub for "get releases"
-            val leadingPath = "/repos/$githubUser/$githubRepo/releases"
+            val leadingPath = "/repos/$GITHUB_USER/${githubConfig.repositoryName}/releases"
             server.stubFor(get(urlPathEqualTo(leadingPath))
                 .inScenario("upload-asset")
                 .willReturn(aResponse()
@@ -466,16 +457,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
         val minJosmVersion = 1111
         val releaseId = 12345678
         val releaseLabel = "v0.0.1"
-        val githubRepo = "repo_xy"
 
-        val gradlePropertiesContent = """
-            $CONFIG_OPT_GITHUB_REPOSITORY = $githubRepo
-            $CONFIG_OPT_GITHUB_API_URL = $uri
-            $CONFIG_OPT_GITHUB_UPLOAD_URL = $uri
-            $CONFIG_OPT_GITHUB_USER = $GITHUB_USER
-            $CONFIG_OPT_GITHUB_ACCESS_TOKEN = asdfalkasdhf
-            """.trimIndent()
-        prepareGradleProperties(gradlePropertiesContent)
+        val githubConfig = githubConfig(uri)
 
         val pickupReleaseLabel = "most_recent"
         val pickupReleaseId = "45681234"
@@ -491,6 +474,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
             project.version = "$releaseLabel"
             jar.archiveName = "$localJarName"
             josm {
+              ${githubConfig.toGradleBuildscript()}
               josmCompileVersion = "latest"
               manifest {
                   description = 'test'
@@ -519,10 +503,9 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
 
         fun prepareAPIStub() {
-            val githubUser = GITHUB_USER
 
             // stub for "get releases"
-            val leadingPath = "/repos/$githubUser/$githubRepo/releases"
+            val leadingPath = "/repos/$GITHUB_USER/${githubConfig.repositoryName}/releases"
             server.stubFor(get(urlPathEqualTo(leadingPath))
                 .inScenario("upload-asset")
                 .willReturn(aResponse()

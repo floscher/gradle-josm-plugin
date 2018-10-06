@@ -12,11 +12,6 @@ import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
 import org.openstreetmap.josm.gradle.plugin.josm
 import org.openstreetmap.josm.gradle.plugin.task.LangCompile
 import org.openstreetmap.josm.gradle.plugin.task.ReleasesSpec
-import org.openstreetmap.josm.gradle.plugin.task.configuredGithubAccessToken
-import org.openstreetmap.josm.gradle.plugin.task.configuredGithubApiUrl
-import org.openstreetmap.josm.gradle.plugin.task.configuredGithubRepository
-import org.openstreetmap.josm.gradle.plugin.task.configuredGithubUser
-import org.openstreetmap.josm.gradle.plugin.task.configuredReleasesConfigFile
 import java.io.File
 import java.net.URL
 import java.util.GregorianCalendar
@@ -217,12 +212,12 @@ class JosmManifest(private val project: Project) {
         ?.find { it.endsWith(".jar") }
     }
 
-    val specs = ReleasesSpec.load(project.configuredReleasesConfigFile)
+    val specs = ReleasesSpec.load(project.extensions.josm.github.releasesConfig)
     val client = GithubReleasesClient(
-      user = project.configuredGithubUser,
-      accessToken =  project.configuredGithubAccessToken,
-      repository = project.configuredGithubRepository,
-      apiUrl = project.configuredGithubApiUrl
+      user = project.extensions.josm.github.repositoryOwner,
+      accessToken =  project.extensions.josm.github.accessToken,
+      repository = project.extensions.josm.github.repositoryName,
+      apiUrl = project.extensions.josm.github.apiUrl
     )
     val remoteReleases = client.getReleases()
 

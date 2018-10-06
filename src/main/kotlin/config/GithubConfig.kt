@@ -69,7 +69,7 @@ class GithubConfig(project: Project) {
    *
    * @since 0.5.3
    */
-  var mainUrl: String = System.getenv("GITHUB_URL") ?: DEFAULT_GITHUB_URL
+  var mainUrl: String = System.getenv("GITHUB_MAIN_URL") ?: DEFAULT_GITHUB_URL
 
   /**
    * The list of releases in YAML format. The file must exist and be readable,
@@ -102,11 +102,11 @@ class GithubConfig(project: Project) {
 
   private fun unsetFieldException(fieldName: String, fieldDescription: String, property: String? = null, env: String? = null) =
     GithubReleaseTaskException(
-      "No $fieldDescription configured!\n  Configure it by:\n  * " +
+      "No $fieldDescription configured!\n  Configure it by adding:\n  * " +
         listOfNotNull(
-          "adding a value for project.josm.github.$fieldName to your Gradle build script",
-          if (property != null) "adding project property $property" else null,
-          if (env != null) "adding environment variable $env" else null
+          "a value for project.josm.github.$fieldName to your Gradle build script",
+          if (property != null) "a project property $property" else null,
+          if (env != null) "an environment variable $env" else null
         ).joinToString("\n  * ")
     )
 }
