@@ -40,7 +40,7 @@ open class PoCompile
 
   @TaskAction
   fun action() {
-    outDir.mkdirs();
+    outDir.mkdirs()
 
     if (sourceSet.po.isEmpty) {
       this.logger.lifecycle("No *.po files found for this source set '{}'.", sourceSet.name)

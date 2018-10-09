@@ -282,7 +282,7 @@ class JosmManifest(private val project: Project) {
     } else {
       // Add links to older versions of the plugin
       for (value in oldVersionDownloadLinks) {
-        manifestAtts.put(value.minJosmVersion.toString() + "_Plugin-Url", value.pluginVersion + ';' + value.downloadURL.toString())
+        manifestAtts["${value.minJosmVersion}_Plugin-Url"] = "${value.pluginVersion};${value.downloadURL}"
       }
     }
 
@@ -313,13 +313,13 @@ class JosmManifest(private val project: Project) {
     loadPriority?.let { manifestAtts.put("Plugin-Stage", it.toString()) }
     website?.let { manifestAtts.put("Plugin-Link", it.toString()) }
     if (!pluginDependencies.isEmpty()) {
-      manifestAtts.put("Plugin-Requires", pluginDependencies.joinToString(";"))
+      manifestAtts["Plugin-Requires"] = pluginDependencies.joinToString(";")
     }
 
     if (project.logger.isInfoEnabled()) {
-      project.getLogger().info("The following lines will be added to the manifest of the plugin *.jar file:")
+      project.logger.info("The following lines will be added to the manifest of the plugin *.jar file:")
       for (e in manifestAtts.toSortedMap()) {
-        project.getLogger().info("  ${e.key}: ${e.value}")
+        project.logger.info("  ${e.key}: ${e.value}")
       }
     }
     return manifestAtts
@@ -334,9 +334,9 @@ class JosmManifest(private val project: Project) {
     if (!language.matches(Regex("[a-z]{2,3}(_[A-Z]{2})?"))) {
       throw IllegalArgumentException("The given language string '$language' is not a valid abbreviation for a language.")
     }
-    if (translatedDescription.isEmpty()) {
-      throw IllegalArgumentException("The translated description must not be empty")
+    if (translatedDescription.isBlank()) {
+      throw IllegalArgumentException("The translated description must not be blank!")
     }
-    translatedDescriptions.put(language, translatedDescription)
+    translatedDescriptions[language] = translatedDescription
   }
 }

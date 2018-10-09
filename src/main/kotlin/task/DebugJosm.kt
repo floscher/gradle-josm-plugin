@@ -33,7 +33,7 @@ open class DebugJosm : RunJosmTask() {
         throw TaskExecutionException(this, NullPointerException(
           "You have to set the property `project.josm.debugPort` to the port on which you'll listen for debug output. " +
           "If you don't want to debug, simply use the task `runJosm` instead of `debugJosm`."
-        ));
+        ))
       }
     }
   }

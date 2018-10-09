@@ -114,7 +114,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         val manifest = JarInputStream(jarFile.inputStream()).manifest
 
         val success = ReleasesSpec.load(File(buildDir, "releases.yml"))
-            ?.releases
+            .releases
             // don't check for the current release. Because we are building it
             // now, there is no download URL available yet
             ?.filter {it.label != currentRelease}
@@ -232,7 +232,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         val manifest = JarInputStream(jarFile.inputStream()).manifest
 
         val success = ReleasesSpec.load(File(buildDir, "releases.yml"))
-            ?.releases
+            .releases
             // don't check for the current release. Because we are building it
             // now  there is no download URL available yet
             ?.filter {it.label != currentRelease}

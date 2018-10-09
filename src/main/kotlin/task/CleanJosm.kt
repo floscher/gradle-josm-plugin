@@ -32,7 +32,7 @@ open class CleanJosm : DefaultTask() {
     task.description = "Delete ${taskSuffix.toLowerCase(Locale.UK)} directory (${dir.absolutePath})"
     task.delete(dir)
     task.doFirst {
-      logger.lifecycle("Delete [{}]", task.targetFiles.files.map { it.absolutePath }.joinToString(", "))
+      logger.lifecycle("Delete [{}]", task.targetFiles.files.joinToString(", ") { it.absolutePath })
     }
     dependsOn(task)
   }

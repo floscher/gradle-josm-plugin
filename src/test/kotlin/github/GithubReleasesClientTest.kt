@@ -25,10 +25,10 @@ import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock
 import ru.lanwen.wiremock.ext.WiremockUriResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver.WiremockUri
 import java.net.HttpURLConnection.HTTP_CREATED
+import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_NO_CONTENT
 import java.net.HttpURLConnection.HTTP_OK
-import java.net.HttpURLConnection.HTTP_SERVER_ERROR
 
 const val GITHUB_USER = "a-user"
 const val GITHUB_ACCESS_TOKEN = "an-access-token"
@@ -111,7 +111,7 @@ class GithubReleasesClientTest {
         // replies two release in the first page
         server.stubFor(get(urlPathEqualTo(path))
             .willReturn(aResponse()
-                .withStatus(HTTP_SERVER_ERROR)
+                .withStatus(HTTP_INTERNAL_ERROR)
                 // link to the next page of releases
                 .withBody("Server Error")
             )

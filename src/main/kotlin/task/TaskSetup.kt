@@ -115,7 +115,7 @@ private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSe
     }
     it.iconBase64Provider = { iconPath ->
       try {
-        val iconFile = sourceSetJosmPlugin.resources.srcDirs.map { File(it, iconPath) }.filter { it.exists() }.firstOrNull()
+        val iconFile = sourceSetJosmPlugin.resources.srcDirs.map { File(it, iconPath) }.firstOrNull { it.exists() }
         if (iconFile != null) {
           val contentType = Files.probeContentType(Paths.get(iconFile.toURI()))
             ?: FileInputStream(iconFile).use {

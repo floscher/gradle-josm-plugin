@@ -76,7 +76,7 @@ private fun Project.resolveJosm(version: String): Dependency {
 fun Project.getAllRequiredJosmPlugins(directlyRequiredPlugins: Collection<String>): Set<Dependency> {
   logger.lifecycle("Resolving required JOSM plugins…")
   val result = getAllRequiredJosmPlugins(0, mutableSetOf(), directlyRequiredPlugins.toSet())
-  logger.lifecycle("{} JOSM plugins are required: {}", result.size, result.map { it.name }.joinToString(", "))
+  logger.lifecycle("{} JOSM plugins are required: {}", result.size, result.joinToString(", ") { it.name })
   return result
 }
 
@@ -102,7 +102,7 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
       val resolvedFiles = conf.fileCollection(dep).files
       alreadyResolvedPlugins.add(pluginName)
       for (file in resolvedFiles) {
-        logger.info("{}* {}", indentation, pluginName);
+        logger.info("{}* {}", indentation, pluginName)
         ZipFile(file).use {
           val entries = it.entries()
           while (entries.hasMoreElements()) {

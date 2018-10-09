@@ -1,6 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.task.github
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.tasks.options.Option
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
 import org.openstreetmap.josm.gradle.plugin.josm
@@ -12,6 +13,20 @@ private const val CMDLINE_OPT_TARGET_COMMITISH = "target-commitish"
  * Base class for tasks related to the management of github releases
  */
 open class BaseGithubReleaseTask: DefaultTask() {
+
+  private val releaseLabelNotConfigured by lazy {
+    GithubReleaseException(
+      """Release label not configured or blank.
+        |Configure it in the task, i.e.
+        |   ${this.name} {
+        |       releaseLabel = "v1.0.0"
+        |   }
+        |or set the project property 'version', i.e.
+        |   version = "v1.0.0"
+        |or use the command line option --$CMDLINE_OPT_RELEASE_LABEL"""
+        .trimMargin("|")
+    )
+  }
 
   @Option(
     option = CMDLINE_OPT_RELEASE_LABEL,
@@ -25,34 +40,12 @@ open class BaseGithubReleaseTask: DefaultTask() {
   var targetCommitish: String? = null
 
   val configuredReleaseLabel: String by lazy {
-    val notConfigured = GithubReleaseException(
-      """Release label not configured or blank.
-        |Configure it in the task, i.e.
-        |   createGithubRelease {
-        |       releaseLabel = "v1.0.0"
-        |   }
-        |or set the project property 'version', i.e.
-        |   version = "v1.0.0"
-        |or use the command line option --$CMDLINE_OPT_RELEASE_LABEL"""
-        .trimMargin("|")
-    )
-
-    fun labelFromVersion() : String? {
-      val version = project.findProperty("version")?.toString()
-      return if (version.isNullOrBlank()) null else version
-    }
-
-    (if (releaseLabel.isNullOrBlank()) null else releaseLabel)
-      ?: labelFromVersion()
-      ?: throw notConfigured
+    releaseLabel.takeIf { !it.isNullOrBlank() }
+      ?: project.version.toString().takeIf { !it.isBlank() && it != Project.DEFAULT_VERSION }
+      ?: throw releaseLabelNotConfigured
   }
 
   val configuredTargetCommitish: String by lazy {
-    val tmpCommitish = targetCommitish
-    if (tmpCommitish != null && !tmpCommitish.isNullOrBlank()) {
-      tmpCommitish
-    } else {
-      project.extensions.josm.github.targetCommitish
-    }
+    targetCommitish.takeIf { !it.isNullOrBlank() } ?: project.extensions.josm.github.targetCommitish
   }
 }

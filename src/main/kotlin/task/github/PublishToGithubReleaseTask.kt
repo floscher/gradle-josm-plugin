@@ -87,24 +87,6 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
   }
 
   /**
-   * true, if this file can be uploaded to a github release, i.e. if it
-   * is an existing, readable, locally available file
-   */
-  private val File.canUpload: Boolean
-    get() = this.exists() && this.isFile && this.canRead()
-
-  /**
-   * true, if this is a valid JAR file
-   */
-  internal val File.isJar: Boolean
-    get() = try {
-      JarFile(this)
-      true
-    } catch(e:Throwable) {
-      false
-    }
-
-  /**
    * throws an exception if this file isn't a valid jar file with a manifest
    * including
    *   * an attribute `Plugin-Version`
@@ -209,7 +191,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
 
     val releaseId = remoteRelease["id"].toString().toInt()
     val localFile = File(configuredLocalJarPath)
-    if (!localFile.canUpload) {
+    if (!localFile.exists() || !localFile.isFile || !localFile.canRead()) {
       throw GithubReleaseException(
         "Local jar file '$configuredLocalJarPath' doesn't exist " +
         "or isn't readable. Can't upload it as release asset."

@@ -186,15 +186,15 @@ data class ReleasesSpec(val pickupRelease: PickupRelaseSpec,
             ?.sorted()?.distinct()
             ?: listOf()
 
-    /**
-     * Replies the list of relevant releases whose download URLs
-     * have to be included in  the `MANIFEST` file of a plugin
-     * jar.
-     */
-    fun relevantReleasesForDownloadUrls(): List<ReleaseSpec> =
-        josmVersions().map { v ->
-            releases?.first { it.numericJosmVersion == v }
-        }.filterNotNull()
+  /**
+   * Replies the list of relevant releases whose download URLs
+   * have to be included in  the `MANIFEST` file of a plugin
+   * jar.
+   */
+  fun relevantReleasesForDownloadUrls(): List<ReleaseSpec> =
+    josmVersions().mapNotNull { v ->
+      releases?.first { it.numericJosmVersion == v }
+    }
 }
 
 

@@ -151,11 +151,11 @@ val buildDirRepo = publishing.repositories.maven("$buildDir/maven") {
   name = "buildDir"
 }
 
-val awsAccessKeyId = System.getenv("AWS_ACCESS_KEY_ID")
-val awsSecretAccessKey = System.getenv("AWS_SECRET_ACCESS_KEY")
+val awsAccessKeyId: String? = System.getenv("AWS_ACCESS_KEY_ID")
+val awsSecretAccessKey: String? = System.getenv("AWS_SECRET_ACCESS_KEY")
 val s3Repo = if (awsAccessKeyId == null || awsSecretAccessKey == null) {
   logger.lifecycle(
-    "Note: Set the environment variables AWS_ACCESS_KEY_ID ({} set) and AWS_SECRET_ACCESS_KEY ({} set) to publish the plugin to s3://gradle-josm-plugin .",
+    "Note: Set the environment variables AWS_ACCESS_KEY_ID ({} set) and AWS_SECRET_ACCESS_KEY ({} set) to be able to publish the plugin to s3://gradle-josm-plugin .",
     if (awsAccessKeyId == null) { "not" } else { "is" },
     if (awsSecretAccessKey == null) { "not" } else { "is" }
   )
