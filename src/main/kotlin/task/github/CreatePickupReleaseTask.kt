@@ -2,6 +2,7 @@ package org.openstreetmap.josm.gradle.plugin.task.github
 
 import org.gradle.api.tasks.TaskAction
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
+import org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient
 import org.openstreetmap.josm.gradle.plugin.github.ReleasesSpec
 import org.openstreetmap.josm.gradle.plugin.josm
 
@@ -13,7 +14,7 @@ open class CreatePickupReleaseTask: BaseGithubReleaseTask() {
     val releaseConfig = ReleasesSpec.load(releaseConfigFile)
 
     val release = releaseConfig.pickupRelease
-    val client = githubReleaseClient()
+    val client = GithubReleasesClient(project.extensions.josm.github, project.extensions.josm.github.apiUrl)
 
     client.getReleases().find {it["tag_name"] == release.label}?.let {
       throw GithubReleaseException(

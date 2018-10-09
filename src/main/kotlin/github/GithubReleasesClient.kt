@@ -9,7 +9,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
-import org.openstreetmap.josm.gradle.plugin.config.DEFAULT_API_URL
+import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URLEncoder
@@ -55,7 +55,7 @@ class Pagination(linkHeader: String?) {
     linkHeader?.let {header ->
       val relNextRegex = """rel="next"""".toRegex()
       val urlPatternRegex = """<(.*)>""".toRegex()
-      _nextUrl = header.split(",")
+      _nextUrl = header.split(",").asSequence()
         .map(String::trim)
         .filter {relNextRegex.containsMatchIn(it)}
         .map {
@@ -75,26 +75,22 @@ class Pagination(linkHeader: String?) {
 }
 
 class GithubReleasesClient(
-  var repository: String? = null,
-  var user: String? = null,
-  var accessToken: String? = null,
-  var apiUrl: String = DEFAULT_API_URL
+  val repository: String,
+  val user: String,
+  val accessToken: String,
+  val apiUrl: String
 ) {
+  constructor(github: GithubConfig, apiUrl: String): this(
+    github.repositoryName,
+    github.repositoryOwner,
+    github.accessToken,
+    apiUrl
+  )
 
   private val client = OkHttpClient()
 
-  private fun ensureParametersComplete() {
-    accessToken ?: throw GithubReleaseException(
-      "GitHub access token is missing"
-    )
-    user ?: throw GithubReleaseException(
-      "GitHub user name is missing"
-    )
-  }
-
   private fun createBaseRequestBuilder() : Request.Builder {
-    ensureParametersComplete()
-    val credential = Credentials.basic(user!!, accessToken!!)
+    val credential = Credentials.basic(user, accessToken)
     return Request.Builder()
       .addHeader("Content-Type", "application/json")
       .addHeader("Accept", "application/vnd.github.v3.full+json")
@@ -310,12 +306,10 @@ class GithubReleasesClient(
 
     val url = "$apiUrl/repos/$user/$repository/releases/$releaseId" +
       "/assets?" +
-      listOf(
+      listOfNotNull(
         kvpair("name", name),
         kvpair("label", label)
-      )
-        .filterNotNull()
-        .joinToString(separator = "&")
+      ).joinToString("&")
 
     val request = createBaseRequestBuilder()
       .post(requestBody)

@@ -201,9 +201,6 @@ class JosmManifest(private val project: Project) {
    */
   private fun buildMapOfGitHubDownloadLinks() : Map<String,String> {
 
-    fun JsonArray<JsonObject>.releaseByLabel(label: String): JsonObject? =
-      this.find { it["tag_name"] == label }
-
     fun JsonObject.downloadUrl() : String? {
       val assets = this["assets"] as? JsonArray<JsonObject>
       return assets?.mapNotNull {
@@ -213,18 +210,13 @@ class JosmManifest(private val project: Project) {
     }
 
     val specs = ReleasesSpec.load(project.extensions.josm.github.releasesConfig)
-    val client = GithubReleasesClient(
-      user = project.extensions.josm.github.repositoryOwner,
-      accessToken =  project.extensions.josm.github.accessToken,
-      repository = project.extensions.josm.github.repositoryName,
-      apiUrl = project.extensions.josm.github.apiUrl
-    )
+    val client = GithubReleasesClient(project.extensions.josm.github, project.extensions.josm.github.apiUrl)
     val remoteReleases = client.getReleases()
 
-    return specs?.relevantReleasesForDownloadUrls()
-      ?.fold(initial=mutableMapOf()) fold@{links, release ->
+    return specs.relevantReleasesForDownloadUrls()
+      .fold(initial=mutableMapOf()) fold@{links, release ->
         val key = "${release.numericJosmVersion}_Plugin-Url"
-        val remoteRelease = remoteReleases?.releaseByLabel(release.label)
+        val remoteRelease = remoteReleases.find { it["tag_name"] == release.label}
           ?: run {
             project.logger.warn(
               "Could not find a remote release for the release label " +
@@ -233,7 +225,7 @@ class JosmManifest(private val project: Project) {
             )
             return@fold links
           }
-        val downloadUrl = remoteRelease?.downloadUrl() ?: run {
+        val downloadUrl = remoteRelease.downloadUrl() ?: run {
           project.logger.warn(
             "Could not find a jar download url for the remote release with " +
               "label '${release.label}'. No download link included in the " +
@@ -260,7 +252,7 @@ class JosmManifest(private val project: Project) {
     isRequiredFieldMissing(mainClass == null, "the main class of your plugin", "josm.manifest.mainClass = ‹full name of main class›")
     isRequiredFieldMissing(description == null, "the description of your plugin", "josm.manifest.description = ‹a textual description›")
 
-    val missingException: GradleException = GradleException("The JOSM plugin ${project.name} misses required configuration options. See above for which options are missing.")
+    val missingException = GradleException("The JOSM plugin ${project.name} misses required configuration options. See above for which options are missing.")
 
     val minJosmVersion: String = minJosmVersion ?: throw missingException
     val mainClass: String = mainClass ?: throw missingException
@@ -271,7 +263,7 @@ class JosmManifest(private val project: Project) {
     }
 
     // Required attributes
-    val manifestAtts: MutableMap<String,String> = mutableMapOf<String, String>(
+    val manifestAtts: MutableMap<String,String> = mutableMapOf(
       "Created-By" to System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")",
       "Gradle-Version" to project.gradle.gradleVersion,
       "Groovy-Version" to GroovySystem.getVersion(),

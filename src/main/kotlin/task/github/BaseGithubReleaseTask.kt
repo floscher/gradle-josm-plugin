@@ -3,7 +3,6 @@ package org.openstreetmap.josm.gradle.plugin.task.github
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.options.Option
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
-import org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient
 import org.openstreetmap.josm.gradle.plugin.josm
 
 private const val CMDLINE_OPT_RELEASE_LABEL = "release-label"
@@ -56,13 +55,4 @@ open class BaseGithubReleaseTask: DefaultTask() {
       project.extensions.josm.github.targetCommitish
     }
   }
-
-  protected fun githubReleaseClient(
-    url: String = project.extensions.josm.github.apiUrl) =
-    GithubReleasesClient(
-      repository = project.extensions.josm.github.repositoryName,
-      user = project.extensions.josm.github.repositoryOwner,
-      accessToken = project.extensions.josm.github.accessToken,
-      apiUrl = url
-    )
 }

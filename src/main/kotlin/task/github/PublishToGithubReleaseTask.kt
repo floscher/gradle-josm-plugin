@@ -5,6 +5,7 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.options.Option
 import org.openstreetmap.josm.gradle.plugin.github.DEFAULT_PICKUP_RELEASE_LABEL
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
+import org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient
 import org.openstreetmap.josm.gradle.plugin.github.ReleaseSpec
 import org.openstreetmap.josm.gradle.plugin.github.ReleasesSpec
 import org.openstreetmap.josm.gradle.plugin.josm
@@ -167,7 +168,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
   }
 
   private fun deleteExistingReleaseAssetForName(releaseId: Int, name: String) {
-    val apiClient = githubReleaseClient()
+    val apiClient = GithubReleasesClient(project.extensions.josm.github, project.extensions.josm.github.apiUrl)
     val assets = apiClient.getReleaseAssets(releaseId)
     // not sure whether we can have multiple assets with the same 'name'.
     // Just in case: use 'filter' and 'forEach' instead of
@@ -183,7 +184,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
   fun publishToGithubRelease() {
 
     val releaseLabel = configuredReleaseLabel
-    val githubClient = githubReleaseClient()
+    val githubClient = GithubReleasesClient(project.extensions.josm.github, project.extensions.josm.github.apiUrl)
 
     val releaseConfig = ReleasesSpec.load(project.extensions.josm.github.releasesConfig)
 
@@ -218,7 +219,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
 
     deleteExistingReleaseAssetForName(releaseId, configuredRemoteJarName)
 
-    val githubUploadClient = githubReleaseClient(project.extensions.josm.github.uploadUrl)
+    val githubUploadClient = GithubReleasesClient(project.extensions.josm.github, project.extensions.josm.github.uploadUrl)
     val asset = githubUploadClient.uploadReleaseAsset(
       releaseId = releaseId,
       name = configuredRemoteJarName,
