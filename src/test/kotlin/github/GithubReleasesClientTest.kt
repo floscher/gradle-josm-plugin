@@ -1,4 +1,4 @@
-package org.openstreetmap.josm.gradle.plugin.ghreleases
+package org.openstreetmap.josm.gradle.plugin.github
 
 import com.beust.klaxon.JsonObject
 import com.github.tomakehurst.wiremock.WireMockServer
@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock
 import ru.lanwen.wiremock.ext.WiremockUriResolver
@@ -34,14 +35,12 @@ const val GITHUB_ACCESS_TOKEN = "an-access-token"
 
 class GithubReleasesClientTest {
 
-    private fun buildClient(apiUri: String) : GithubReleasesClient {
-        val client = GithubReleasesClient()
-        client.user = GITHUB_USER
-        client.repository = "josm-scripting-plugin"
-        client.accessToken = GITHUB_ACCESS_TOKEN
-        client.apiUrl = apiUri
-        return client
-    }
+    private fun buildClient(apiUri: String) = GithubReleasesClient(
+      "josm-scripting-plugin",
+      GITHUB_USER,
+      GITHUB_ACCESS_TOKEN,
+      apiUri
+    )
 
     @Test
     fun `pagination with an empty Link header should work`() {
@@ -52,7 +51,7 @@ class GithubReleasesClientTest {
     @Test
     fun `pagination with a url of type rel="next" should work`() {
         val pagination = Pagination(
-            "<https://api.github.com" +
+          "<https://api.github.com" +
             "/search/code?q=addClass+user%3Amozilla&page=15>; rel=\"next\"")
         assertEquals(
             pagination.nextUrl,
@@ -117,7 +116,7 @@ class GithubReleasesClientTest {
                 .withBody("Server Error")
             )
         )
-        assertThrows(GithubReleaseClientException::class.java) {
+        assertThrows(GithubReleaseException::class.java) {
             client.getLatestRelease()
         }
     }
@@ -500,7 +499,7 @@ class GithubReleasesClientTest {
                 """.trimIndent())
             )
         )
-        assertThrows(GithubReleaseClientException::class.java) {
+        assertThrows(GithubReleaseException::class.java) {
             client.deleteReleaseAsset(assetId = assetId)
         }
     }

@@ -1,4 +1,4 @@
-package org.openstreetmap.josm.gradle.plugin.task
+package org.openstreetmap.josm.gradle.plugin.github
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
@@ -6,12 +6,6 @@ import com.github.mustachejava.DefaultMustacheFactory
 import java.io.File
 import java.io.StringReader
 import java.io.StringWriter
-
-class ReleaseSpecException(override var message: String,
-                           override var cause: Throwable?)
-  : Exception(message, cause) {
-  constructor(message: String) : this(message, null)
-}
 
 const val DEFAULT_PICKUP_RELEASE_LABEL = "pickup-release"
 const val DEFAULT_PICKUP_RELEASE_NAME = "Pickup Release"
@@ -140,7 +134,7 @@ data class ReleasesSpec(val pickupRelease: PickupRelaseSpec,
             val releases = root.get("releases")
                 ?.mapIndexedNotNull {i, release ->
                 val label = release.get("label")?.asText() ?:
-                    throw ReleaseSpecException(
+                    throw GithubReleaseException(
                       """Missing label for release with index $i
                       | releases:
                       |   ....
@@ -153,12 +147,12 @@ data class ReleasesSpec(val pickupRelease: PickupRelaseSpec,
                     try {
                         it.asText().toInt()
                     } catch(e: NumberFormatException) {
-                        throw ReleaseSpecException(
+                        throw GithubReleaseException(
                             """Illegal numeric_josm_version for release
                             | specification with label '$label'
                              """.trimMargin("|"), e)
                     }
-                } ?: throw ReleaseSpecException(
+                } ?: throw GithubReleaseException(
                     """Missing numeric_josm_version for release
                     | specification with label '$label'"""
                         .trimMargin("|"))

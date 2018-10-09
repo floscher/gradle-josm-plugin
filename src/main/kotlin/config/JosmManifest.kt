@@ -5,13 +5,13 @@ import com.beust.klaxon.JsonObject
 import groovy.lang.GroovySystem
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.openstreetmap.josm.gradle.plugin.ghreleases.GithubReleasesClient
+import org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient
+import org.openstreetmap.josm.gradle.plugin.github.ReleasesSpec
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangReader
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
 import org.openstreetmap.josm.gradle.plugin.josm
 import org.openstreetmap.josm.gradle.plugin.task.LangCompile
-import org.openstreetmap.josm.gradle.plugin.task.ReleasesSpec
 import java.io.File
 import java.net.URL
 import java.util.GregorianCalendar

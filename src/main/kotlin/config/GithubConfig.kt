@@ -1,12 +1,30 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
 import org.gradle.api.Project
-import org.openstreetmap.josm.gradle.plugin.ghreleases.DEFAULT_GITHUB_API_URL
-import org.openstreetmap.josm.gradle.plugin.ghreleases.DEFAULT_GITHUB_UPLOAD_URL
-import org.openstreetmap.josm.gradle.plugin.ghreleases.DEFAULT_GITHUB_URL
-import org.openstreetmap.josm.gradle.plugin.task.GithubReleaseTaskException
+import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
 import java.io.File
 import java.io.IOException
+
+
+// the default API URL for the GitHub API
+const val DEFAULT_API_URL = "https://api.github.com"
+// the default upload URL to upload a release asset
+private const val DEFAULT_UPLOAD_URL = "https://uploads.github.com"
+// the default base URL to access a release
+private const val DEFAULT_MAIN_URL = "https://github.com"
+
+private const val PROPERTY_REPOSITORY_OWNER = "josm.github.repositoryOwner"
+private const val ENV_REPOSITORY_OWNER = "GITHUB_REPOSITORY_OWNER"
+
+private const val PROPERTY_REPOSITORY_NAME = "josm.github.repositoryName"
+private const val ENV_REPOSITORY_NAME = "GITHUB_REPOSITORY_NAME"
+
+private const val PROPERTY_ACCESS_TOKEN = "josm.github.accessToken"
+private const val ENV_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN"
+
+private const val ENV_API_URL = "GITHUB_API_URL"
+private const val ENV_UPLOAD_URL = "GITHUB_UPLOAD_URL"
+private const val ENV_MAIN_URL = "GITHUB_MAIN_URL"
 
 /**
  * Configuration options for the new GitHub releases feature.
@@ -17,35 +35,29 @@ class GithubConfig(project: Project) {
 
   private fun Project.findNonBlankProperty(name: String) = findProperty(name)?.toString()?.takeIf { it.isNotBlank() }
 
-  private val repositoryOwnerProperty = "josm.github.repositoryOwner"
-  private val repositoryOwnerEnv = "GITHUB_REPOSITORY_OWNER"
   /**
    * The GitHub account that owns the repository to which releases will be published.
    *
    * @since 0.5.3
    */
-  var repositoryOwner: String? = project.findNonBlankProperty(repositoryOwnerProperty) ?: System.getenv(repositoryOwnerEnv)
-    get() = field ?: throw unsetFieldException("repositoryOwner", "GitHub repository owner (user or org)", repositoryOwnerProperty, repositoryOwnerEnv)
+  var repositoryOwner: String? = project.findNonBlankProperty(PROPERTY_REPOSITORY_OWNER) ?: System.getenv(ENV_REPOSITORY_OWNER)
+    get() = field ?: throw unsetFieldException("repositoryOwner", "GitHub repository owner (user or org)", PROPERTY_REPOSITORY_OWNER, ENV_REPOSITORY_OWNER)
 
-  private val repositoryProperty = "josm.github.repositoryName"
-  private val repositoryEnv = "GITHUB_REPOSITORY_NAME"
   /**
    * The name of the repository to which releases will be published.
    *
    * @since 0.5.3
    */
-  var repositoryName: String? = project.findNonBlankProperty(repositoryProperty) ?: System.getenv(repositoryEnv)
-    get() = field ?: throw unsetFieldException("repositoryName", "GitHub repository name", repositoryProperty, repositoryEnv)
+  var repositoryName: String? = project.findNonBlankProperty(PROPERTY_REPOSITORY_NAME) ?: System.getenv(ENV_REPOSITORY_NAME)
+    get() = field ?: throw unsetFieldException("repositoryName", "GitHub repository name", PROPERTY_REPOSITORY_NAME, ENV_REPOSITORY_NAME)
 
-  private val accessTokenProperty = "josm.github.accessToken"
-  private val accessTokenEnv = "GITHUB_ACCESS_TOKEN"
   /**
    * The access token that will be used for authentication when uploading the release.
    *
    * @since 0.5.3
    */
-  var accessToken: String? = project.findNonBlankProperty(accessTokenProperty) ?: System.getenv(accessTokenEnv)
-    get() = field ?: throw unsetFieldException("accessToken", "GitHub access token", accessTokenProperty, accessTokenEnv)
+  var accessToken: String? = project.findNonBlankProperty(PROPERTY_ACCESS_TOKEN) ?: System.getenv(ENV_ACCESS_TOKEN)
+    get() = field ?: throw unsetFieldException("accessToken", "GitHub access token", PROPERTY_ACCESS_TOKEN, ENV_ACCESS_TOKEN)
 
   /**
    * The base API URL for the Github releases API.
@@ -53,7 +65,7 @@ class GithubConfig(project: Project) {
    *
    * @since 0.5.3
    */
-  var apiUrl: String = System.getenv("GITHUB_API_URL") ?: DEFAULT_GITHUB_API_URL
+  var apiUrl: String = System.getenv(ENV_API_URL) ?: DEFAULT_API_URL
 
   /**
    * The base API URL to upload release assets.
@@ -61,7 +73,7 @@ class GithubConfig(project: Project) {
    *
    * @since 0.5.3
    */
-  var uploadUrl: String = System.getenv("GITHUB_UPLOAD_URL") ?: DEFAULT_GITHUB_UPLOAD_URL
+  var uploadUrl: String = System.getenv(ENV_UPLOAD_URL) ?: DEFAULT_UPLOAD_URL
 
   /**
    * The base GitHub URL.
@@ -69,7 +81,7 @@ class GithubConfig(project: Project) {
    *
    * @since 0.5.3
    */
-  var mainUrl: String = System.getenv("GITHUB_MAIN_URL") ?: DEFAULT_GITHUB_URL
+  var mainUrl: String = System.getenv(ENV_MAIN_URL) ?: DEFAULT_MAIN_URL
 
   /**
    * The list of releases in YAML format. The file must exist and be readable,
@@ -101,7 +113,7 @@ class GithubConfig(project: Project) {
   fun getReleaseUrl(tagLabel: String) = "$mainUrl/$repositoryOwner/$repositoryName/releases/tag/$tagLabel"
 
   private fun unsetFieldException(fieldName: String, fieldDescription: String, property: String? = null, env: String? = null) =
-    GithubReleaseTaskException(
+    GithubReleaseException(
       "No $fieldDescription configured!\n  Configure it by adding:\n  * " +
         listOfNotNull(
           "a value for project.josm.github.$fieldName to your Gradle build script",

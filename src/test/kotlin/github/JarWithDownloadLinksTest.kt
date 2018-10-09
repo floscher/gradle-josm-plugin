@@ -1,4 +1,4 @@
-package org.openstreetmap.josm.gradle.plugin
+package org.openstreetmap.josm.gradle.plugin.github
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -8,9 +8,9 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.openstreetmap.josm.gradle.plugin.BaseGithubReleaseTaskTest
 import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
-import org.openstreetmap.josm.gradle.plugin.task.MEDIA_TYPE_JAR
-import org.openstreetmap.josm.gradle.plugin.task.ReleasesSpec
+import org.openstreetmap.josm.gradle.plugin.task.github.MEDIA_TYPE_JAR
 import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver

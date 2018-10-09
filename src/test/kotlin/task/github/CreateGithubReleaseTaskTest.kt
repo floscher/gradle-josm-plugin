@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
+import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
 import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver
@@ -60,8 +61,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                     mainClass = "test_plugin.TestPlugin"
                 }
             }
-            import org.openstreetmap.josm.gradle.plugin.task.CreateGithubReleaseTask
-            task myCreateGithubRelease(type: CreateGithubReleaseTask){
+            task myCreateGithubRelease(type: ${CreateGithubReleaseTask::class.qualifiedName}){
               releaseLabel = "$releaseLabel"
             }
             """.trimIndent()
@@ -221,8 +221,6 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                     mainClass = "test_plugin.TestPlugin"
                 }
             }
-
-            import org.openstreetmap.josm.gradle.plugin.task.CreateGithubReleaseTask
 
             createGithubRelease {
               releaseLabel = "$releaseLabel"

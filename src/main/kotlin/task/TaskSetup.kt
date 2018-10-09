@@ -10,6 +10,9 @@ import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.openstreetmap.josm.gradle.plugin.java
 import org.openstreetmap.josm.gradle.plugin.josm
+import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
+import org.openstreetmap.josm.gradle.plugin.task.github.CreatePickupReleaseTask
+import org.openstreetmap.josm.gradle.plugin.task.github.PublishToGithubReleaseTask
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException

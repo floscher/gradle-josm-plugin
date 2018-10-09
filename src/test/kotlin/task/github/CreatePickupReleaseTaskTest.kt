@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
-import org.openstreetmap.josm.gradle.plugin.task.DEFAULT_PICKUP_RELEASE_LABEL
-import org.openstreetmap.josm.gradle.plugin.task.DEFAULT_PICKUP_RELEASE_NAME
+import org.openstreetmap.josm.gradle.plugin.github.DEFAULT_PICKUP_RELEASE_NAME
+import org.openstreetmap.josm.gradle.plugin.github.DEFAULT_PICKUP_RELEASE_LABEL
 import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver

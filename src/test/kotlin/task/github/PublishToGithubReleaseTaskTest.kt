@@ -16,7 +16,8 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
-import org.openstreetmap.josm.gradle.plugin.task.MEDIA_TYPE_JAR
+import org.openstreetmap.josm.gradle.plugin.task.github.MEDIA_TYPE_JAR
+import org.openstreetmap.josm.gradle.plugin.task.github.PublishToGithubReleaseTask
 import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver
@@ -74,8 +75,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
               }
             }
 
-            import org.openstreetmap.josm.gradle.plugin.task.PublishToGithubReleaseTask
-            task myPublishToGithubRelease(type: PublishToGithubReleaseTask){
+            task myPublishToGithubRelease(type: ${PublishToGithubReleaseTask::class.qualifiedName}){
                 releaseLabel = "$releaseLabel"
                 remoteJarName = "$remoteJarName"
             }
@@ -187,8 +187,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
               }
             }
 
-            import org.openstreetmap.josm.gradle.plugin.task.PublishToGithubReleaseTask
-            task myPublishToGithubRelease(type: PublishToGithubReleaseTask){
+            task myPublishToGithubRelease(type: ${PublishToGithubReleaseTask::class.qualifiedName}){
                 releaseLabel = "$releaseLabel"
                 remoteJarName = "$remoteJarName"
                 // publish to the pickup release task too
