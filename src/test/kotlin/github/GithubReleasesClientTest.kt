@@ -154,12 +154,10 @@ class GithubReleasesClientTest {
         val targetCommitish = "acommitish"
         val body = "abody"
 
-        // only included in the request body if different from default value,
-        // i.e. false
-        val draft = false
-        // only included in the request body if different from default value,
-        // i.e. false
-        val prerelease = false
+        // only included in the request body if set to true (false is the default)
+        val draft = true
+        // only included in the request body if set to true (false is the default)
+        val prerelease = true
 
         // replies two release in the first page
         server.stubFor(post(urlPathEqualTo(path))
@@ -169,8 +167,8 @@ class GithubReleasesClientTest {
             .withRequestBody(matchingJsonPath(
                 "$[?(@.target_commitish == '$targetCommitish')]"))
             .withRequestBody(matchingJsonPath("$[?(@.body == '$body')]"))
-            .withRequestBody(matchingJsonPath("$[?(@.draft == false)]"))
-            .withRequestBody(matchingJsonPath("$[?(@.prerelease == false)]"))
+            .withRequestBody(matchingJsonPath("$[?(@.draft == true)]"))
+            .withRequestBody(matchingJsonPath("$[?(@.prerelease == true)]"))
             .willReturn(aResponse()
               .withStatus(HTTP_CREATED)
               .withBody("""{"id": 1}""")

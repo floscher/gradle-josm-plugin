@@ -192,12 +192,10 @@ class GithubReleasesClient(
     name?.let {requestJson["name"] = it}
     // body: optional. Only include if available
     body?.let {requestJson["body"] = it}
-    // draft: only include, if not equal to default value, i.e. false
-    if (!draft) {
+    if (draft) {
       requestJson["draft"] = draft
     }
-    // prerelease: only include, if not equal to default value, i.e. false
-    if (!prerelease) {
+    if (prerelease) {
       requestJson["prerelease"] = prerelease
     }
 
