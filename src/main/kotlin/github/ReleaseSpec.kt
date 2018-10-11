@@ -86,6 +86,6 @@ open class ReleaseSpec(
 fun List<ReleaseSpec>.onlyFallbackVersions() =
   this.asSequence()
     .groupBy { it.minJosmVersion }
-    .map { it.value.first() } // TODO: Reverse required order of releases file: last item should be the newest one, not first
+    .map { it.value.last() }
 
 operator fun List<ReleaseSpec>.get(label: String) = find { it.label == label }

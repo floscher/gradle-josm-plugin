@@ -6,6 +6,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -44,14 +45,14 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         // prepare releases file
         val releasesContent = """
           releases:
-            # the current release
-            - label: $currentRelease
-              minJosmVersion: $currentMinJosmVersion
-
             # an former release. A download link for this release
             # should be included in the Manifest
             - label: v0.0.1
               minJosmVersion: 1111
+
+            # the current release
+            - label: $currentRelease
+              minJosmVersion: $currentMinJosmVersion
           """.trimIndent()
         prepareReleasesSpecs(releasesContent)
 
@@ -147,19 +148,19 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
     // prepare releases file
     val releasesContent = """
       releases:
-        # the current release
-        - label: $currentRelease
-          minJosmVersion: $currentMinJosmVersion
+        # an former release. A download link for this release
+        # should be included in the Manifest
+        - label: v0.0.1
+          minJosmVersion: 1111
 
         # an former release. A download link for this release
         # should be included in the Manifest
         - label: v0.0.2
           minJosmVersion: 1111
 
-        # an former release. A download link for this release
-        # should be included in the Manifest
-        - label: v0.0.1
-          minJosmVersion: 1111
+        # the current release
+        - label: $currentRelease
+          minJosmVersion: $currentMinJosmVersion
       """.trimIndent()
     prepareReleasesSpecs(releasesContent)
 
@@ -224,7 +225,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
             .withArguments("build")
             .build()
 
-        Assertions.assertEquals(
+        assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":build")?.outcome
         )
@@ -267,18 +268,18 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
     // prepare releases file
     val releasesContent = """
       releases:
-        # the current release
-        - label: $currentRelease
-          minJosmVersion: $currentMinJosmVersion
-
-        - label: v0.1.2
-          minJosmVersion: 2000
+        - label: v0.0.1
+          minJosmVersion: 1000
 
         - label: v0.1.1
           minJosmVersion: 2000
 
-        - label: v0.0.1
-          minJosmVersion: 1000
+        - label: v0.1.2
+          minJosmVersion: 2000
+
+        # the current release
+        - label: $currentRelease
+          minJosmVersion: $currentMinJosmVersion
       """.trimIndent()
 
         prepareReleasesSpecs(releasesContent)

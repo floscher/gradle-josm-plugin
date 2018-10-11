@@ -92,11 +92,11 @@ class ReleasesSpecTest {
   fun `fallback releases - multiple releases, same josm version`() {
     val releasesStream = """
       releases:
-      - label: 0.0.3
+      - label: 0.0.1
         minJosmVersion: 1234
       - label: 0.0.2
         minJosmVersion: 1234
-      - label: 0.0.1
+      - label: 0.0.3
         minJosmVersion: 1234
       """.trimIndent().byteInputStream()
     val releases = ReleaseSpec.loadListFrom(releasesStream)
@@ -111,25 +111,25 @@ class ReleasesSpecTest {
   fun `fallback releases - multiple releases, multiple josm version`() {
     val releasesStream = """
       releases:
-        - label: 0.0.4
-          minJosmVersion: 2
-        - label: 0.0.3
-          minJosmVersion: 2
-        - label: 0.0.2
-          minJosmVersion: 1
         - label: 0.0.1
           minJosmVersion: 1
+        - label: 0.0.2
+          minJosmVersion: 1
+        - label: 0.0.3
+          minJosmVersion: 2
+        - label: 0.0.4
+          minJosmVersion: 2
       """.trimIndent().byteInputStream()
     val releases = ReleaseSpec.loadListFrom(releasesStream)
     val fallback = releases.onlyFallbackVersions()
     assertEquals(4, releases.size)
-    assertIterableEquals(listOf("0.0.4", "0.0.3", "0.0.2", "0.0.1"), releases.map { it.label })
-    assertIterableEquals(listOf(2, 2, 1, 1), releases.map { it.minJosmVersion })
+    assertIterableEquals(listOf("0.0.1", "0.0.2", "0.0.3", "0.0.4"), releases.map { it.label })
+    assertIterableEquals(listOf(1, 1, 2, 2), releases.map { it.minJosmVersion })
     assertEquals(2, fallback.size)
-    assertEquals("0.0.4", fallback[0].label)
-    assertEquals(2, fallback[0].minJosmVersion)
-    assertEquals("0.0.2", fallback[1].label)
-    assertEquals(1, fallback[1].minJosmVersion)
+    assertEquals("0.0.2", fallback[0].label)
+    assertEquals(1, fallback[0].minJosmVersion)
+    assertEquals("0.0.4", fallback[1].label)
+    assertEquals(2, fallback[1].minJosmVersion)
   }
 }
 
