@@ -18,7 +18,7 @@ private const val ENV_REPOSITORY_OWNER = "GITHUB_REPOSITORY_OWNER"
 private const val PROPERTY_REPOSITORY_NAME = "josm.github.repositoryName"
 private const val ENV_REPOSITORY_NAME = "GITHUB_REPOSITORY_NAME"
 
-private const val PROPERTY_ACCESS_TOKEN = "josm.github.accessToken"
+const val PROPERTY_ACCESS_TOKEN = "josm.github.accessToken"
 private const val ENV_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN"
 
 private const val ENV_API_URL = "GITHUB_API_URL"
@@ -54,10 +54,15 @@ class GithubConfig(project: Project) {
   /**
    * The access token that will be used for authentication when uploading the release.
    *
+   * This property is readonly, because the token should not be stored in the `build.gradle` file.
+   * Set this property by providing the environment variable [ENV_ACCESS_TOKEN] or setting the property
+   * [PROPERTY_ACCESS_TOKEN] in `~/.gradle/gradle.properties`!
+   * Do **not** store it in a file that is committed to version control!
+   *
    * @since 0.5.3
    */
-  var accessToken: String = project.findNonBlankProperty(PROPERTY_ACCESS_TOKEN) ?: System.getenv(ENV_ACCESS_TOKEN) ?: EMPTY_STRING
-    get() = field.takeIf { it.isNotBlank() } ?: throw unsetFieldException("accessToken", "GitHub access token", PROPERTY_ACCESS_TOKEN, ENV_ACCESS_TOKEN)
+  val accessToken: String = project.findNonBlankProperty(PROPERTY_ACCESS_TOKEN) ?: System.getenv(ENV_ACCESS_TOKEN) ?: EMPTY_STRING
+    get() = field.takeIf { it.isNotBlank() } ?: throw unsetFieldException("accessToken", "GitHub access token", PROPERTY_ACCESS_TOKEN, ENV_ACCESS_TOKEN, true)
 
   /**
    * The base API URL for the Github releases API.
@@ -97,13 +102,13 @@ class GithubConfig(project: Project) {
    */
   var targetCommitish: String = DEFAULT_TARGET_COMMITTISH
 
-  private fun unsetFieldException(fieldName: String, fieldDescription: String, property: String? = null, env: String? = null) =
+  private fun unsetFieldException(fieldName: String, fieldDescription: String, property: String? = null, env: String? = null, isFinalField: Boolean = false) =
     GithubReleaseException(
       "No $fieldDescription configured!\n  Configure it by adding:\n  * " +
         listOfNotNull(
-          "a value for project.josm.github.$fieldName to your Gradle build script",
-          if (property != null) "a project property $property" else null,
-          if (env != null) "an environment variable $env" else null
+          if (isFinalField) null else "a value for project.josm.github.$fieldName to your Gradle build script",
+          if (property == null) null else "a Gradle property $property",
+          if (env == null) null else "an environment variable $env"
         ).joinToString("\n  * ")
     )
 }

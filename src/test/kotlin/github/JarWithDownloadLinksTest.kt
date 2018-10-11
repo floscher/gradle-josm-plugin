@@ -2,7 +2,6 @@ package org.openstreetmap.josm.gradle.plugin.github
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
-import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Assertions
@@ -10,9 +9,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
+import org.openstreetmap.josm.gradle.plugin.config.PROPERTY_ACCESS_TOKEN
 import org.openstreetmap.josm.gradle.plugin.task.github.BaseGithubReleaseTaskTest
 import org.openstreetmap.josm.gradle.plugin.task.github.MEDIA_TYPE_JAR
+import org.openstreetmap.josm.gradle.plugin.testutils.buildGithubConfig
 import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver
@@ -22,13 +22,6 @@ import java.util.jar.JarInputStream
 
 class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
     val GITHUB_REPO = "repo_xy"
-
-    private fun githubConfig(apiUri: String): GithubConfig = GithubConfig(ProjectBuilder.builder().build()).apply {
-      repositoryOwner = GITHUB_USER
-      repositoryName = GITHUB_REPO
-      apiUrl = apiUri
-      accessToken = "42alsdkj-foiau_osf0123456789"
-    }
 
     @Test
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
@@ -56,6 +49,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         prepareReleasesSpecs(releasesContent)
 
+        val githubConfig = buildGithubConfig(apiUri, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
         // prepare build file
         val buildFileContent = """
             plugins {
@@ -65,7 +59,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
             version = "$currentRelease"
             jar.archiveName = "test.jar"
             josm {
-              ${githubConfig(apiUri).toGradleBuildscript()}
+              ${githubConfig.toGradleBuildscript()}
               josmCompileVersion = "latest"
               manifest {
                   includeLinksToGithubReleases = true
@@ -104,7 +98,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("build")
+            .withArguments("-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}", "build")
             .build()
 
         Assertions.assertEquals(
@@ -164,6 +158,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
       """.trimIndent()
     prepareReleasesSpecs(releasesContent)
 
+        val githubConfig = buildGithubConfig(apiUri, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
         // prepare build file
         val buildFileContent = """
             plugins {
@@ -173,7 +168,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
             version = "$currentRelease"
             jar.archiveName = "test.jar"
             josm {
-              ${githubConfig(apiUri).toGradleBuildscript()}
+              ${githubConfig.toGradleBuildscript()}
               josmCompileVersion = "latest"
               manifest {
                   includeLinksToGithubReleases = true
@@ -222,7 +217,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("build")
+            .withArguments("-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}", "build")
             .build()
 
         assertEquals(
@@ -284,6 +279,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
         prepareReleasesSpecs(releasesContent)
 
+        val githubConfig = buildGithubConfig(apiUri, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
         // prepare build file
         val buildFileContent = """
             plugins {
@@ -293,7 +289,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
             version = "$currentRelease"
             jar.archiveName = "test.jar"
             josm {
-              ${githubConfig(apiUri).toGradleBuildscript()}
+              ${githubConfig.toGradleBuildscript()}
               josmCompileVersion = "latest"
               manifest {
                   includeLinksToGithubReleases = true
@@ -348,7 +344,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("build")
+            .withArguments("-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}", "build")
             .build()
 
         Assertions.assertEquals(

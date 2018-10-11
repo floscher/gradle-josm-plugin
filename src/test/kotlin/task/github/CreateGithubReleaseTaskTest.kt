@@ -2,14 +2,13 @@ package org.openstreetmap.josm.gradle.plugin.task.github
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
-import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
-import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
+import org.openstreetmap.josm.gradle.plugin.config.PROPERTY_ACCESS_TOKEN
+import org.openstreetmap.josm.gradle.plugin.testutils.buildGithubConfig
 import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver
@@ -41,12 +40,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
 
-        val githubConfig = GithubConfig(ProjectBuilder.builder().build()).apply {
-          repositoryOwner = "github_user"
-          accessToken = "aaaabbbb"
-          repositoryName = "repo"
-          apiUrl = apiUri
-        }
+        val githubConfig = buildGithubConfig(apiUri, "github_user", "repo", "aaaabbbb")
 
         val buildFileContent = """
             plugins {
@@ -91,8 +85,11 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
           .withProjectDir(buildDir)
-          .withArguments("myCreateGithubRelease",
-              "--stacktrace")
+          .withArguments(
+            "-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}",
+            "myCreateGithubRelease",
+            "--stacktrace"
+          )
           .build()
         result.dumpOutputOnError("myCreateGithubRelease")
         assertEquals(SUCCESS, result.task(":myCreateGithubRelease")?.outcome)
@@ -121,12 +118,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
 
-        val githubConfig = GithubConfig(ProjectBuilder.builder().build()).apply {
-          repositoryOwner = "JOSM"
-          repositoryName = "some-repo"
-          accessToken = "abcdefghijklmnopqrstuvwxyz"
-          apiUrl = apiUri
-        }
+        val githubConfig = buildGithubConfig(apiUri, "JOSM", "some-repo", "abcdefghijklmnopqrstuvwxyz")
 
         val buildFileContent = """
             plugins {
@@ -171,8 +163,11 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("createGithubRelease",
-                "--stacktrace")
+            .withArguments(
+              "-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}",
+              "createGithubRelease",
+              "--stacktrace"
+            )
             .build()
 
         result.dumpOutputOnError("createGithubRelease")
@@ -200,12 +195,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
 
-        val githubConfig = GithubConfig(ProjectBuilder.builder().build()).apply {
-          repositoryOwner = "github_user"
-          repositoryName = "repoName"
-          accessToken = "aaaabbbb"
-          apiUrl = apiUri
-        }
+        val githubConfig = buildGithubConfig(apiUri, "github_user", "repoName", "aaaabbbb")
 
         val buildFileContent = """
             plugins {
@@ -250,8 +240,11 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("createGithubRelease",
-                "--stacktrace")
+            .withArguments(
+              "-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}",
+              "createGithubRelease",
+              "--stacktrace"
+            )
             .build()
         result.dumpOutputOnError("createGithubRelease")
         assertEquals(SUCCESS, result.task(":createGithubRelease")?.outcome)
@@ -280,12 +273,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
 
-        val githubConfig = GithubConfig(ProjectBuilder.builder().build()).apply {
-          repositoryOwner = "github_user"
-          repositoryName = "repo"
-          accessToken = "aaaabbbb"
-          apiUrl = apiUri
-        }
+        val githubConfig = buildGithubConfig(apiUri, "github_user", "repo", "aaaabbbb")
 
         val buildFileContent = """
             plugins {
@@ -327,9 +315,12 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("createGithubRelease",
-                "--release-label", releaseLabel,
-                "--stacktrace")
+            .withArguments(
+              "-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}",
+              "createGithubRelease",
+              "--release-label", releaseLabel,
+              "--stacktrace"
+            )
             .build()
 
         result.dumpOutputOnError("createGithubRelease")
@@ -359,12 +350,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
 
-        val githubConfig = GithubConfig(ProjectBuilder.builder().build()).apply {
-          repositoryOwner = "github_user"
-          repositoryName = "repo"
-          accessToken = "aaaabbbb"
-          apiUrl = apiUri
-        }
+        val githubConfig = buildGithubConfig(apiUri, "github_user", "repo", "aaaabbbb")
 
         val buildFileContent = """
             plugins {
@@ -406,8 +392,11 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("createGithubRelease",
-                "--stacktrace")
+            .withArguments(
+              "-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}",
+              "createGithubRelease",
+              "--stacktrace"
+            )
             .build()
 
         result.dumpOutputOnError("createGithubRelease")

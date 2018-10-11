@@ -6,7 +6,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
-import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
@@ -14,7 +13,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
+import org.openstreetmap.josm.gradle.plugin.config.PROPERTY_ACCESS_TOKEN
+import org.openstreetmap.josm.gradle.plugin.testutils.buildGithubConfig
 import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockUriResolver
@@ -24,14 +24,6 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
   private fun BuildResult.assertMessageInOutput(message: String) {
     val pattern = Regex(message, RegexOption.MULTILINE)
     assertTrue(pattern.containsMatchIn(this.output), "Pattern $message not found in:\n${this.output}")
-  }
-
-  private fun githubConfig(uri: String) = GithubConfig(ProjectBuilder.builder().build()).apply {
-    repositoryName = "repo_xy"
-    apiUrl = uri
-    uploadUrl = uri
-    repositoryOwner = GITHUB_USER
-    accessToken = "asdfalkasdhf"
   }
 
   /**
@@ -50,7 +42,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
     val releaseId = 12345678
     val releaseLabel = "v0.0.1"
 
-    val githubConfig = githubConfig(uri)
+    val githubConfig = buildGithubConfig(uri, GITHUB_USER, "repo_xy", "asdfalkasdhf")
 
     val localJarName = "test-$releaseLabel.jar"
     val remoteJarName = "test.jar"
@@ -135,6 +127,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
     val result = GradleRunner.create()
       .withProjectDir(buildDir)
       .withArguments(
+        "-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}",
         "--stacktrace",
         "build",
         "myPublishToGithubRelease"
@@ -165,7 +158,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
     val releaseId = 12345678
     val releaseLabel = "v0.0.1"
 
-    val githubConfig = githubConfig(uri)
+    val githubConfig = buildGithubConfig(uri, GITHUB_USER, "repo_xy", "asdfalkasdhf")
 
     // the standard pattern for the jar name the gradle-josm-plugin sets
     // for the plugin jar
@@ -253,6 +246,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
     val result = GradleRunner.create()
       .withProjectDir(buildDir)
       .withArguments(
+        "-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}",
         "--stacktrace",
         "build",
         "publishToGithubRelease",

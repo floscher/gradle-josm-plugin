@@ -1,7 +1,10 @@
 package org.openstreetmap.josm.gradle.plugin.testutils
 
+import org.gradle.testfixtures.ProjectBuilder
 import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
+import org.openstreetmap.josm.gradle.plugin.config.PROPERTY_ACCESS_TOKEN
 import java.io.File
+import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.memberProperties
@@ -14,7 +17,7 @@ import kotlin.reflect.full.withNullability
  */
 fun GithubConfig.toGradleBuildscript(suppressFields: List<String> = listOf("releasesConfig")) = "github {\n  " +
   GithubConfig::class.memberProperties
-    .filter { it.visibility == KVisibility.PUBLIC && !suppressFields.contains(it.name) }
+    .filter { it.visibility == KVisibility.PUBLIC && it is KMutableProperty1 && !it.isConst && !suppressFields.contains(it.name) }
     .map{
 
       when(it.returnType) {
@@ -24,3 +27,17 @@ fun GithubConfig.toGradleBuildscript(suppressFields: List<String> = listOf("rele
       }
     }
     .joinToString("\n  ") + "\n}"
+
+private val emptyProject by lazy { ProjectBuilder.builder().build() }
+
+fun buildGithubConfig(apiUrl: String, repoOwner: String, repoName: String, accessToken: String, uploadUrl: String = apiUrl): GithubConfig {
+  synchronized(emptyProject) {
+    emptyProject.extensions.extraProperties.set(PROPERTY_ACCESS_TOKEN, accessToken)
+    return GithubConfig(emptyProject).apply {
+      repositoryOwner = repoOwner
+      repositoryName = repoName
+      this.apiUrl = apiUrl
+      this.uploadUrl = uploadUrl
+    }
+  }
+}
