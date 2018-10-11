@@ -2,11 +2,11 @@ image: registry.gitlab.com/josm/docker-library/openjdk-8-git:latest
 
 before_script:
 - export GRADLE_USER_HOME=`pwd`/.gradle
+- mkdir "$GRADLE_USER_HOME" && echo "org.gradle.caching=true" >> "$GRADLE_USER_HOME/gradle.properties"
 
 cache:
   paths:
-    - .gradle/wrapper
-    - .gradle/caches
+  - .gradle/caches/build-cache-*
 
 assemble:
   stage: build
@@ -25,6 +25,26 @@ assemble on java10:
     paths:
     - build/
 
+assemble on java11:
+  stage: build
+  image: registry.gitlab.com/josm/docker-library/openjdk-11-git:latest
+  script:
+  - ./gradlew assemble
+  artifacts:
+    paths:
+    - build/
+  allow_failure: true
+
+assemble on java12:
+  stage: build
+  image: registry.gitlab.com/josm/docker-library/openjdk-12-git:latest
+  script:
+  - ./gradlew assemble
+  artifacts:
+    paths:
+    - build/
+  allow_failure: true
+
 test:
   stage: test
   script:
@@ -42,6 +62,24 @@ test on java10:
   - ./gradlew build
   dependencies:
   - assemble on java10
+
+test on java11:
+  stage: test
+  image: registry.gitlab.com/josm/docker-library/openjdk-11-git:latest
+  script:
+  - ./gradlew build
+  dependencies:
+  - assemble on java11
+  allow_failure: true
+
+test on java12:
+  stage: test
+  image: registry.gitlab.com/josm/docker-library/openjdk-12-git:latest
+  script:
+  - ./gradlew build
+  dependencies:
+  - assemble on java12
+  allow_failure: true
 
 publishPlugin:
   stage: deploy
