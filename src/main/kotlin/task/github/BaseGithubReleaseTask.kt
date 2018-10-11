@@ -3,7 +3,7 @@ package org.openstreetmap.josm.gradle.plugin.task.github
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.options.Option
-import org.openstreetmap.josm.gradle.plugin.config.DEFAULT_TARGET_COMMITTISH
+import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
 import org.openstreetmap.josm.gradle.plugin.josm
 
@@ -37,7 +37,7 @@ open class BaseGithubReleaseTask: DefaultTask() {
   @Option(
     option = CMDLINE_OPT_TARGET_COMMITISH,
     description = "the target commitish for the release, i.e. 'master' "
-      + "or 'deploy'. Default: '${DEFAULT_TARGET_COMMITTISH}' (if not configured differently)")
+      + "or 'deploy'. Default: '${GithubConfig.DEFAULT_TARGET_COMMITTISH}' (if not configured differently)")
   var targetCommitish: String? = null
 
   val configuredReleaseLabel: String by lazy {

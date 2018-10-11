@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.openstreetmap.josm.gradle.plugin.config.PROPERTY_ACCESS_TOKEN
+import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
 import org.openstreetmap.josm.gradle.plugin.task.github.BaseGithubReleaseTaskTest
 import org.openstreetmap.josm.gradle.plugin.task.github.MEDIA_TYPE_JAR
 import org.openstreetmap.josm.gradle.plugin.testutils.buildGithubConfig
@@ -98,7 +98,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}", "build")
+            .withArguments("-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}", "build")
             .build()
 
         Assertions.assertEquals(
@@ -217,7 +217,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}", "build")
+            .withArguments("-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}", "build")
             .build()
 
         assertEquals(
@@ -344,7 +344,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
         val result = GradleRunner.create()
             .withProjectDir(buildDir)
-            .withArguments("-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}", "build")
+            .withArguments("-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}", "build")
             .build()
 
         Assertions.assertEquals(

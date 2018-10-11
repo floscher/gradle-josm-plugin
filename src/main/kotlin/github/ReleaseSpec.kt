@@ -38,7 +38,7 @@ open class ReleaseSpec(
 
     fun loadListFrom(stream: InputStream): List<ReleaseSpec> =
       ObjectMapper(YAMLFactory()).readTree(stream)
-        .takeIf { !it.isNull } // null, if root node has null type
+        ?.takeIf { !it.isNull } // null, if root node has null type
         ?.get(KEY_RELEASES) // get releases node
         ?.mapIndexedNotNull { i, release ->
           val labelNode = release[KEY_RELEASE_LABEL]

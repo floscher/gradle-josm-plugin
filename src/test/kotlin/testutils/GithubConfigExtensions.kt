@@ -2,7 +2,6 @@ package org.openstreetmap.josm.gradle.plugin.testutils
 
 import org.gradle.testfixtures.ProjectBuilder
 import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
-import org.openstreetmap.josm.gradle.plugin.config.PROPERTY_ACCESS_TOKEN
 import java.io.File
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KVisibility
@@ -32,7 +31,7 @@ private val emptyProject by lazy { ProjectBuilder.builder().build() }
 
 fun buildGithubConfig(apiUrl: String, repoOwner: String, repoName: String, accessToken: String, uploadUrl: String = apiUrl): GithubConfig {
   synchronized(emptyProject) {
-    emptyProject.extensions.extraProperties.set(PROPERTY_ACCESS_TOKEN, accessToken)
+    emptyProject.extensions.extraProperties.set(GithubConfig.PROPERTY_ACCESS_TOKEN, accessToken)
     return GithubConfig(emptyProject).apply {
       repositoryOwner = repoOwner
       repositoryName = repoName

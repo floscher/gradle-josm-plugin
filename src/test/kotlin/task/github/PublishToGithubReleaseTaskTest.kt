@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.openstreetmap.josm.gradle.plugin.config.PROPERTY_ACCESS_TOKEN
+import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
 import org.openstreetmap.josm.gradle.plugin.testutils.buildGithubConfig
 import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
 import ru.lanwen.wiremock.ext.WiremockResolver
@@ -127,7 +127,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
     val result = GradleRunner.create()
       .withProjectDir(buildDir)
       .withArguments(
-        "-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}",
+        "-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}",
         "--stacktrace",
         "build",
         "myPublishToGithubRelease"
@@ -246,7 +246,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
     val result = GradleRunner.create()
       .withProjectDir(buildDir)
       .withArguments(
-        "-P$PROPERTY_ACCESS_TOKEN=${githubConfig.accessToken}",
+        "-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}",
         "--stacktrace",
         "build",
         "publishToGithubRelease",

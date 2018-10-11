@@ -20,7 +20,7 @@ open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
 
     val notFound = GithubReleaseException(
       """The releases config file '$releaseConfigFile' doesn't include a
-        |release with release label '$releaseLabel yet. Add and configure
+        |release with release label '$releaseLabel' yet. Add and configure
         |a release with this label in '$releaseConfigFile' and rerun."""
         .trimMargin()
     )
