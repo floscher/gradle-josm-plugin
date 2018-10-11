@@ -71,25 +71,24 @@ gradle.projectsEvaluated {
 dependencies {
   val junitVersion = "5.3.1"
   val kotlinVersion: String by project.project(":buildSrc").extra
+  val jacksonVersion = "2.9.7"
 
   implementation(localGroovy())
   implementation(kotlin("stdlib-jdk8", kotlinVersion))
-  implementation("com.squareup.okhttp3", "okhttp", "3.10.0")
-  implementation("com.beust","klaxon", "2.1.14")
-  implementation("com.fasterxml.jackson.module", "jackson-module-kotlin", "2.9.5")
-  implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", "2.9.5")
-  implementation("com.github.spullara.mustache.java","core", "0.6.3")
-  implementation("com.github.spullara.mustache.java","compiler", "0.9.5")
-  implementation("com.vladsch.flexmark:flexmark-all:0.34.46")
+  implementation("com.squareup.okhttp3", "okhttp", "3.11.0")
+  implementation("com.beust","klaxon", "3.0.8").because("versions 3.0.9 and 3.0.10 are broken, see https://github.com/cbeust/klaxon/issues/202")
+  implementation("com.fasterxml.jackson.module", "jackson-module-kotlin", jacksonVersion)
+  implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", jacksonVersion)
+  implementation("com.vladsch.flexmark:flexmark:0.34.48")
   testImplementation("org.junit.jupiter", "junit-jupiter-api", junitVersion)
-  testImplementation("com.github.tomakehurst","wiremock","2.16.0")
-  testImplementation("ru.lanwen.wiremock", "wiremock-junit5", "1.1.1")
+  testImplementation("com.github.tomakehurst","wiremock","2.19.0")
+  testImplementation("ru.lanwen.wiremock", "wiremock-junit5", "1.2.0")
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", junitVersion)
   testImplementation(kotlin("reflect", kotlinVersion))
 }
 
 jacoco {
-  toolVersion = "0.8.1"
+  toolVersion = "0.8.2"
 }
 tasks.withType(JacocoReport::class.java) {
   this.logCoverage()
