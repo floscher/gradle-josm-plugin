@@ -6,10 +6,11 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.openstreetmap.josm.gradle.plugin.BaseGithubReleaseTaskTest
 import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
+import org.openstreetmap.josm.gradle.plugin.task.github.BaseGithubReleaseTaskTest
 import org.openstreetmap.josm.gradle.plugin.task.github.MEDIA_TYPE_JAR
 import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
 import ru.lanwen.wiremock.ext.WiremockResolver
@@ -42,16 +43,16 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
         // prepare releases file
         val releasesContent = """
-              releases:
-                # the current release
-                - label: $currentRelease
-                  numeric_josm_version: $currentMinJosmVersion
+          releases:
+            # the current release
+            - label: $currentRelease
+              minJosmVersion: $currentMinJosmVersion
 
-                # an former release. A download link for this release
-                # should be included in the Manifest
-                - label: v0.0.1
-                  numeric_josm_version: 1111
-            """.trimIndent()
+            # an former release. A download link for this release
+            # should be included in the Manifest
+            - label: v0.0.1
+              minJosmVersion: 1111
+          """.trimIndent()
         prepareReleasesSpecs(releasesContent)
 
         // prepare build file
@@ -113,54 +114,54 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         val jarFile = File(buildDir, "build/libs/test.jar")
         val manifest = JarInputStream(jarFile.inputStream()).manifest
 
-        val success = ReleasesSpec.load(File(buildDir, "releases.yml"))
-            .releases
-            // don't check for the current release. Because we are building it
-            // now, there is no download URL available yet
-            ?.filter {it.label != currentRelease}
-            ?.all { release->
-                val josmVersion = release.numericJosmVersion
-                val key = Attributes.Name("${josmVersion}_Plugin-Url")
-                val ret = manifest.mainAttributes.keys.contains(key)
-                if (!ret) {
-                    println("Error: no Plugin-Url for " +
-                        " $josmVersion  included in Manifest")
-                }
-                ret
-            } ?: false
-        Assertions.assertTrue(success)
-    }
+    assertTrue(
+      ReleaseSpec.loadListFrom(File(buildDir, "releases.yml").inputStream())
+      // don't check for the current release. Because we are building it
+      // now, there is no download URL available yet
+      .filter {it.label != currentRelease}
+      .all { release->
+        val josmVersion = release.minJosmVersion
+        val key = Attributes.Name("${josmVersion}_Plugin-Url")
+        val ret = manifest.mainAttributes.keys.contains(key)
+        if (!ret) {
+          println("Error: no Plugin-Url for $josmVersion  included in Manifest")
+        }
+        ret
+      }
+    )
+  }
 
-    @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun case02(
-        @WiremockResolver.Wiremock server: WireMockServer,
-        @WiremockUriResolver.WiremockUri apiUri: String) {
+  @Test
+  @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+  fun case02(
+    @WiremockResolver.Wiremock server: WireMockServer,
+    @WiremockUriResolver.WiremockUri apiUri: String
+  ) {
 
-        val currentMinJosmVersion = 2222
-        val currentRelease = "v0.1.0"
+    val currentMinJosmVersion = 2222
+    val currentRelease = "v0.1.0"
 
-        // prepare test plugin source
-        prepareTestPluginSource()
+    // prepare test plugin source
+    prepareTestPluginSource()
 
-        // prepare releases file
-        val releasesContent = """
-              releases:
-                # the current release
-                - label: $currentRelease
-                  numeric_josm_version: $currentMinJosmVersion
+    // prepare releases file
+    val releasesContent = """
+      releases:
+        # the current release
+        - label: $currentRelease
+          minJosmVersion: $currentMinJosmVersion
 
-                # an former release. A download link for this release
-                # should be included in the Manifest
-                - label: v0.0.2
-                  numeric_josm_version: 1111
+        # an former release. A download link for this release
+        # should be included in the Manifest
+        - label: v0.0.2
+          minJosmVersion: 1111
 
-                # an former release. A download link for this release
-                # should be included in the Manifest
-                - label: v0.0.1
-                  numeric_josm_version: 1111
-            """.trimIndent()
-        prepareReleasesSpecs(releasesContent)
+        # an former release. A download link for this release
+        # should be included in the Manifest
+        - label: v0.0.1
+          minJosmVersion: 1111
+      """.trimIndent()
+    prepareReleasesSpecs(releasesContent)
 
         // prepare build file
         val buildFileContent = """
@@ -231,55 +232,54 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         val jarFile = File(buildDir, "build/libs/test.jar")
         val manifest = JarInputStream(jarFile.inputStream()).manifest
 
-        val success = ReleasesSpec.load(File(buildDir, "releases.yml"))
-            .releases
-            // don't check for the current release. Because we are building it
-            // now  there is no download URL available yet
-            ?.filter {it.label != currentRelease}
-            ?.all { release->
-                val josmVersion = release.numericJosmVersion
-                val key = Attributes.Name("${josmVersion}_Plugin-Url")
-                val ret = manifest.mainAttributes.keys.contains(key)
-                if (!ret) {
-                    println("Error: no Plugin-Url for " +
-                        " JOSM version $josmVersion included in Manifest")
-                }
-                ret
-            } ?: false
-        Assertions.assertTrue(success)
-        val value = manifest.mainAttributes.getValue("1111_Plugin-Url")
-        Assertions.assertTrue(value.contains("v0.0.2"))
-    }
+    assertTrue(
+      ReleaseSpec.loadListFrom(File(buildDir, "releases.yml").inputStream())
+        // don't check for the current release. Because we are building it
+        // now  there is no download URL available yet
+        .filter {it.label != currentRelease}
+        .all { release->
+          val josmVersion = release.minJosmVersion
+          val key = Attributes.Name("${josmVersion}_Plugin-Url")
+          val ret = manifest.mainAttributes.keys.contains(key)
+          if (!ret) {
+            println("Error: no Plugin-Url for JOSM version $josmVersion included in Manifest")
+          }
+          ret
+        }
+    )
+    assertTrue(manifest.mainAttributes.getValue("1111_Plugin-Url").contains("v0.0.2"))
+  }
 
 
-    @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun case03(
-        @WiremockResolver.Wiremock server: WireMockServer,
-        @WiremockUriResolver.WiremockUri apiUri: String) {
+  @Test
+  @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
+  fun case03(
+    @WiremockResolver.Wiremock server: WireMockServer,
+    @WiremockUriResolver.WiremockUri apiUri: String
+  ) {
 
-        val currentMinJosmVersion = 3000
-        val currentRelease = "v0.2.0"
+    val currentMinJosmVersion = 3000
+    val currentRelease = "v0.2.0"
 
-        // prepare test plugin source
-        prepareTestPluginSource()
+    // prepare test plugin source
+    prepareTestPluginSource()
 
-        // prepare releases file
-        val releasesContent = """
-              releases:
-                # the current release
-                - label: $currentRelease
-                  numeric_josm_version: $currentMinJosmVersion
+    // prepare releases file
+    val releasesContent = """
+      releases:
+        # the current release
+        - label: $currentRelease
+          minJosmVersion: $currentMinJosmVersion
 
-                - label: v0.1.2
-                  numeric_josm_version: 2000
+        - label: v0.1.2
+          minJosmVersion: 2000
 
-                - label: v0.1.1
-                  numeric_josm_version: 2000
+        - label: v0.1.1
+          minJosmVersion: 2000
 
-                - label: v0.0.1
-                  numeric_josm_version: 1000
-            """.trimIndent()
+        - label: v0.0.1
+          minJosmVersion: 1000
+      """.trimIndent()
 
         prepareReleasesSpecs(releasesContent)
 

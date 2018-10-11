@@ -3,7 +3,8 @@ package org.openstreetmap.josm.gradle.plugin.task.github
 import org.gradle.api.tasks.TaskAction
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient
-import org.openstreetmap.josm.gradle.plugin.github.ReleasesSpec
+import org.openstreetmap.josm.gradle.plugin.github.ReleaseSpec
+import org.openstreetmap.josm.gradle.plugin.github.get
 import org.openstreetmap.josm.gradle.plugin.josm
 
 /**
@@ -15,7 +16,7 @@ open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
   fun createGithubRelease() {
     val releaseConfigFile = project.extensions.josm.github.releasesConfig
     val releaseLabel = configuredReleaseLabel
-    val releaseConfig = ReleasesSpec.load(releaseConfigFile)
+    val releaseConfig = ReleaseSpec.loadListFrom(releaseConfigFile.inputStream())
 
     val notFound = GithubReleaseException(
       """The releases config file '$releaseConfigFile' doesn't include a

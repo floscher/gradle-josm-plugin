@@ -6,7 +6,8 @@ import groovy.lang.GroovySystem
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient
-import org.openstreetmap.josm.gradle.plugin.github.ReleasesSpec
+import org.openstreetmap.josm.gradle.plugin.github.ReleaseSpec
+import org.openstreetmap.josm.gradle.plugin.github.onlyFallbackVersions
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangReader
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
@@ -209,19 +210,19 @@ class JosmManifest(private val project: Project) {
         ?.find { it.endsWith(".jar") }
     }
 
-    val specs = ReleasesSpec.load(project.extensions.josm.github.releasesConfig)
+    val specs = ReleaseSpec.loadListFrom(project.extensions.josm.github.releasesConfig.inputStream())
     val client = GithubReleasesClient(project.extensions.josm.github, project.extensions.josm.github.apiUrl)
     val remoteReleases = client.getReleases()
 
-    return specs.relevantReleasesForDownloadUrls()
+    return specs.onlyFallbackVersions()
       .fold(initial=mutableMapOf()) fold@{links, release ->
-        val key = "${release.numericJosmVersion}_Plugin-Url"
+        val key = "${release.minJosmVersion}_Plugin-Url"
         val remoteRelease = remoteReleases.find { it["tag_name"] == release.label}
           ?: run {
             project.logger.warn(
               "Could not find a remote release for the release label " +
                 "'${release.label}'. No download link included in the " +
-                "MANIFEST file for JOSM release ${release.numericJosmVersion}"
+                "MANIFEST file for JOSM release ${release.minJosmVersion}"
             )
             return@fold links
           }
@@ -229,7 +230,7 @@ class JosmManifest(private val project: Project) {
           project.logger.warn(
             "Could not find a jar download url for the remote release with " +
               "label '${release.label}'. No download link included in the " +
-              "MANIFEST file for JOSM release ${release.numericJosmVersion}"
+              "MANIFEST file for JOSM release ${release.minJosmVersion}"
           )
           return@fold links
         }

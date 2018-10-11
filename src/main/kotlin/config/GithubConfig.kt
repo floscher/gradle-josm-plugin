@@ -11,8 +11,6 @@ private const val EMPTY_STRING = ""
 private const val DEFAULT_API_URL = "https://api.github.com"
 // the default upload URL to upload a release asset
 private const val DEFAULT_UPLOAD_URL = "https://uploads.github.com"
-// the default base URL to access a release
-private const val DEFAULT_MAIN_URL = "https://github.com"
 
 private const val PROPERTY_REPOSITORY_OWNER = "josm.github.repositoryOwner"
 private const val ENV_REPOSITORY_OWNER = "GITHUB_REPOSITORY_OWNER"
@@ -25,7 +23,8 @@ private const val ENV_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN"
 
 private const val ENV_API_URL = "GITHUB_API_URL"
 private const val ENV_UPLOAD_URL = "GITHUB_UPLOAD_URL"
-private const val ENV_MAIN_URL = "GITHUB_MAIN_URL"
+
+const val DEFAULT_TARGET_COMMITTISH = "master"
 
 /**
  * Configuration options for the new GitHub releases feature.
@@ -77,14 +76,6 @@ class GithubConfig(project: Project) {
   var uploadUrl: String = System.getenv(ENV_UPLOAD_URL) ?: DEFAULT_UPLOAD_URL
 
   /**
-   * The base GitHub URL.
-   * Defaults to `https://github.com`
-   *
-   * @since 0.5.3
-   */
-  var mainUrl: String = System.getenv(ENV_MAIN_URL) ?: DEFAULT_MAIN_URL
-
-  /**
    * The list of releases in YAML format. The file must exist and be readable,
    * otherwise an exception is thrown on first access of this property.
    * Defaults to the file `releases.yml` in [Project.getProjectDir].
@@ -104,14 +95,7 @@ class GithubConfig(project: Project) {
    *
    * @since 0.5.3
    */
-  var targetCommitish: String = "master"
-
-  /**
-   * @param [tagLabel] the label of the tag for which the URL is returned
-   * @return the full URL to a specific tag in the webinterface of GitHub
-   * @since 0.5.3
-   */
-  fun getReleaseUrl(tagLabel: String) = "$mainUrl/$repositoryOwner/$repositoryName/releases/tag/$tagLabel"
+  var targetCommitish: String = DEFAULT_TARGET_COMMITTISH
 
   private fun unsetFieldException(fieldName: String, fieldDescription: String, property: String? = null, env: String? = null) =
     GithubReleaseException(

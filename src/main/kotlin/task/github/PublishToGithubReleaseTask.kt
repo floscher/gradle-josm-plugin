@@ -3,11 +3,10 @@ package org.openstreetmap.josm.gradle.plugin.task.github
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.options.Option
-import org.openstreetmap.josm.gradle.plugin.github.DEFAULT_PICKUP_RELEASE_LABEL
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient
 import org.openstreetmap.josm.gradle.plugin.github.ReleaseSpec
-import org.openstreetmap.josm.gradle.plugin.github.ReleasesSpec
+import org.openstreetmap.josm.gradle.plugin.github.get
 import org.openstreetmap.josm.gradle.plugin.josm
 import java.io.File
 import java.io.IOException
@@ -16,7 +15,6 @@ import java.util.jar.JarFile
 const val MEDIA_TYPE_JAR = "application/java-archive"
 
 private const val CMDLINE_OPT_LOCAL_JAR_PATH = "local-jar-path"
-private const val CMDLINE_OPT_PUBLISH_TO_PICKUP_RELEASE = "publish-to-pickup-release"
 private const val CMDLINE_OPT_REMOTE_JAR_NAME = "remote-jar-name"
 
 open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
@@ -32,15 +30,6 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
     description = "the name of the jar after uploading.\n"
       + "Default: the name of the local jar")
   var remoteJarName: String? = null
-
-  @Option(
-    option = CMDLINE_OPT_PUBLISH_TO_PICKUP_RELEASE,
-    description =
-    "indicates whether the asset is also updated to the pickup release.\n"
-      + "The label of the pickup release is configured in 'releases.yml' and "
-      + "defaults to '$DEFAULT_PICKUP_RELEASE_LABEL'.\n"
-  )
-  var publishToPickupRelease: Boolean? = null
 
   private val jarArchivePath: String?  by lazy {
     project.tasks.withType(Jar::class.java).getByName("jar")
@@ -82,10 +71,6 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
       ?: throw notConfigured
   }
 
-  private val configuredPublishToPickupRelease: Boolean by lazy {
-    publishToPickupRelease ?: false
-  }
-
   /**
    * throws an exception if this file isn't a valid jar file with a manifest
    * including
@@ -114,7 +99,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
       throw GithubReleaseException(
         """The jar file '${this.absolutePath}' doesn't include an
           |attribute 'Plugin-Version'""""
-          .trimMargin("|")
+          .trimMargin()
       )
     } else if (pluginVersion != release.label) {
       throw GithubReleaseException(
@@ -123,7 +108,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
           | of the release.
           | Release label:                  ${release.label}
           | Plugin-version in the MANIFEST: $pluginVersion
-          """.trimMargin("|")
+          """.trimMargin()
       )
     }
 
@@ -135,16 +120,16 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
       """The jar file '${this.absolutePath}' does either not include
         |an attribute 'Plugin-Main-Version' or its value isn't a
         |positive number""""
-        .trimMargin("|")
+        .trimMargin()
     )
-    if (josmVersion != release.numericJosmVersion) {
+    if (josmVersion != release.minJosmVersion) {
       throw GithubReleaseException(
-        """The numeric JOSM version in the MANIFEST of the jar file
-          |'${this.absolutePath}' doesn't match with the numeric JOSM version
+        """The minimum JOSM version in the MANIFEST of the jar file
+          |'${this.absolutePath}' doesn't match with the minimum JOSM version
           | of the release.
-          | Numeric JOSM version for the release: ${release.numericJosmVersion}
-          | Numeric JOSM version in the MANIFEST: $josmVersion"""
-          .trimMargin("|")
+          | Version for the release: ${release.minJosmVersion}
+          | Version in the MANIFEST: $josmVersion"""
+          .trimMargin()
       )
     }
   }
@@ -168,7 +153,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
     val releaseLabel = configuredReleaseLabel
     val githubClient = GithubReleasesClient(project.extensions.josm.github, project.extensions.josm.github.apiUrl)
 
-    val releaseConfig = ReleasesSpec.load(project.extensions.josm.github.releasesConfig)
+    val releaseConfig = ReleaseSpec.loadListFrom(project.extensions.josm.github.releasesConfig.inputStream())
 
     val notFound = GithubReleaseException(
       """The releases config file '${project.extensions.josm.github.releasesConfig}'
@@ -215,45 +200,5 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
       configuredRemoteJarName,
       asset["id"]
     )
-
-    if (configuredPublishToPickupRelease) {
-
-      val pickupReleaseLabel = releaseConfig.pickupRelease.label
-      val pickupReleaseNotFound = GithubReleaseException
-        .remotePickupReleaseDoesntExit(pickupReleaseLabel)
-
-      val remotePickupRelease = remoteReleases
-        .find {it["tag_name"] == pickupReleaseLabel}
-        ?: throw pickupReleaseNotFound
-
-      val pickupReleaseId = remotePickupRelease["id"].toString().toInt()
-      deleteExistingReleaseAssetForName(pickupReleaseId,
-        configuredRemoteJarName)
-
-      val pickupReleaseBody = releaseConfig.pickupRelease
-        .descriptionForPickedUpRelease(
-          pickedUpRelase =  localRelease,
-          pickedUpReleaseUrl = project.extensions.josm.github.getReleaseUrl(localRelease.label)
-        )
-
-      githubClient.updateRelease(
-        releaseId = pickupReleaseId,
-        body = pickupReleaseBody)
-
-      val latestReleaseAsset = githubUploadClient.uploadReleaseAsset(
-        releaseId = pickupReleaseId,
-        name = configuredRemoteJarName,
-        contentType = MEDIA_TYPE_JAR,
-        file = localFile
-      )
-
-      logger.lifecycle(
-        "Uploaded '{}' to release '{}' with asset name '{}'. Asset id is '{}'.",
-        localFile.name,
-        pickupReleaseLabel,
-        configuredRemoteJarName,
-        latestReleaseAsset["id"]
-      )
-    }
   }
 }

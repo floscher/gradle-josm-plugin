@@ -1,4 +1,4 @@
-package org.openstreetmap.josm.gradle.plugin
+package org.openstreetmap.josm.gradle.plugin.task.github
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -36,7 +36,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           releases:
             - label: "$releaseLabel"
               name: "$releaseName"
-              numeric_josm_version: 5678
+              minJosmVersion: 5678
               description: a test description
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
@@ -116,7 +116,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           releases:
             - label: "$releaseLabel"
               name: "$releaseName"
-              numeric_josm_version: 5678
+              minJosmVersion: 5678
               description: a test description
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
@@ -196,7 +196,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
         val releaseFileContent = """
           releases:
             - label: "$releaseLabel"
-              numeric_josm_version: 5678
+              minJosmVersion: 5678
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
 
@@ -275,7 +275,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           releases:
             - label: "$releaseLabel"
               name: "$releaseName"
-              numeric_josm_version: 5678
+              minJosmVersion: 5678
               description: a test description
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)
@@ -354,7 +354,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           releases:
             - label: "$releaseLabel"
               name: "$releaseName"
-              numeric_josm_version: 5678
+              minJosmVersion: 5678
               description: a test description
           """.trimIndent()
         prepareReleasesSpecs(releaseFileContent)

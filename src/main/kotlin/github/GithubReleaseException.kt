@@ -22,17 +22,5 @@ class GithubReleaseException(message: String?, cause: Throwable?): Exception(mes
         """.trimMargin("|")
       return GithubReleaseException(msg)
     }
-
-    fun remotePickupReleaseDoesntExit(releaseLabel: String)
-      : GithubReleaseException {
-      val msg = """Remote pickup release with label '$releaseLabel'
-        |doesn't exist on the GitHub server.
-        |Can't upload release jar to the pickup release '$releaseLabel'.
-        |Create pickup release first, i.e.
-        |   ./gradlew createPickupRelease
-        |"""
-        .trimMargin("|")
-      return GithubReleaseException(msg)
-    }
   }
 }

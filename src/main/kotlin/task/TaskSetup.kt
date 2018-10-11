@@ -11,7 +11,6 @@ import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.openstreetmap.josm.gradle.plugin.java
 import org.openstreetmap.josm.gradle.plugin.josm
 import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
-import org.openstreetmap.josm.gradle.plugin.task.github.CreatePickupReleaseTask
 import org.openstreetmap.josm.gradle.plugin.task.github.PublishToGithubReleaseTask
 import java.io.File
 import java.io.FileInputStream
@@ -185,11 +184,6 @@ private fun setupGithubReleaseTasks(project: Project) {
     PublishToGithubReleaseTask::class.java) {
       it.description = "Publish a JOSM plugin jar as GitHub release asset " +
         "to a GitHub release"
-  }
-
-  project.tasks.create("createPickupRelease",
-    CreatePickupReleaseTask::class.java) {
-      it.description = "Creates the pickup release for JOSM release using "
   }
 }
 
