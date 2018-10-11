@@ -9,6 +9,8 @@ import org.openstreetmap.josm.gradle.plugin.josm
 
 /**
  * Task to create a github release using the github API.
+ *
+ * Note: This is currently in beta stage, so expect sudden changes to this class anytime.
  */
 open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
 

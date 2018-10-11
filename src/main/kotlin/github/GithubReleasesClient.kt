@@ -169,6 +169,15 @@ class GithubReleasesClient(
 
   /**
    * Creates a github release with the tag `tagName`.
+   *
+   * See [API documentation](https://developer.github.com/v3/repos/releases/#create-a-release)
+   * @param [tagName] The name of the tag
+   * @param [targetCommitish] the commitish value that determines where the Git tag is created from
+   * @param [name] the title displayed together with the body
+   * @param [body] a description of the release
+   * @param [draft] if set to true, the release is only a drafting stage
+   * @param [prerelease] if set to true, the release is only in alpha or beta stage, not a final release
+   * @return the JSON object that should be sent to the GitHub API
    */
   @Throws(GithubReleaseException::class)
   fun createRelease(tagName: String, targetCommitish: String? = null,
@@ -214,6 +223,8 @@ class GithubReleasesClient(
 
   /**
    * Creates a github release with the tag `tagName`.
+   *
+   * See [GitHub API documentation](https://developer.github.com/v3/repos/releases/#edit-a-release).
    */
   @Throws(GithubReleaseException::class)
   fun updateRelease(releaseId: Int,

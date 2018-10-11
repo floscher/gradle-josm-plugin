@@ -12,6 +12,8 @@ private const val CMDLINE_OPT_TARGET_COMMITISH = "target-commitish"
 
 /**
  * Base class for tasks related to the management of github releases
+ *
+ * Note: This is currently in beta stage, so expect sudden changes to this class anytime.
  */
 open class BaseGithubReleaseTask: DefaultTask() {
 
@@ -36,7 +38,7 @@ open class BaseGithubReleaseTask: DefaultTask() {
 
   @Option(
     option = CMDLINE_OPT_TARGET_COMMITISH,
-    description = "the target commitish for the release, i.e. 'master' "
+    description = "the target commitish for the release, e.g. 'master' "
       + "or 'deploy'. Default: '${GithubConfig.DEFAULT_TARGET_COMMITTISH}' (if not configured differently)")
   var targetCommitish: String? = null
 

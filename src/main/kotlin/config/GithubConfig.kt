@@ -53,8 +53,8 @@ class GithubConfig(project: Project) {
    * The access token that will be used for authentication when uploading the release.
    *
    * This property is readonly, because the token should not be stored in the `build.gradle` file.
-   * Set this property by providing the environment variable [ENV_ACCESS_TOKEN] or setting the property
-   * [PROPERTY_ACCESS_TOKEN] in `~/.gradle/gradle.properties`!
+   * Set this property by providing the environment variable `GITHUB_ACCESS_TOKEN` or setting the property
+   * `josm.github.accessToken` in `~/.gradle/gradle.properties`!
    * Do **not** store it in a file that is committed to version control!
    *
    * @since 0.5.3

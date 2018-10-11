@@ -17,6 +17,11 @@ const val MEDIA_TYPE_JAR = "application/java-archive"
 private const val CMDLINE_OPT_LOCAL_JAR_PATH = "local-jar-path"
 private const val CMDLINE_OPT_REMOTE_JAR_NAME = "remote-jar-name"
 
+/**
+ * Task to publish a release to GitHub releases.
+ *
+ * Note: This is currently in beta stage, so expect sudden changes to this class anytime.
+ */
 open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
 
   @Option(
@@ -168,8 +173,13 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
 
     val remoteReleases = githubClient.getReleases()
 
-    val remoteReleaseNotFound = GithubReleaseException
-      .remoteReleaseDoesntExist(releaseLabel)
+    val remoteReleaseNotFound = GithubReleaseException("""
+      |Remote release with label '$releaseLabel' doesn't
+      |exist on the GitHub server.
+      |Can't upload release jar to the release '$releaseLabel.
+      |Create release '$releaseLabel' first, i.e.
+      |  ./gradlew createGithubRelease --release-label $releaseLabel
+      """.trimMargin())
     val remoteRelease = remoteReleases
       .find {it["tag_name"] == releaseLabel}
       ?: throw remoteReleaseNotFound

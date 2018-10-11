@@ -200,14 +200,14 @@ open class JosmPluginExtension(private val project: Project) {
   val github: GithubConfig = GithubConfig(project)
 
   /**
-   * Configure the field [github] using a Groovy [Closure].
+   * Configure the field [JosmPluginExtension.github] using a Groovy [Closure].
    *
    * @since 0.5.3
    */
   fun github(c: Closure<GithubConfig>): Any = project.configure(github, c)
 
   /**
-   * Configure the field [github] using an [Action].
+   * Configure the field [JosmPluginExtension.github] using an [Action].
    *
    * @since 0.5.3
    */

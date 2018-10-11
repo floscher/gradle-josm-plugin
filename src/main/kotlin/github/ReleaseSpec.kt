@@ -36,6 +36,11 @@ open class ReleaseSpec(
     private const val KEY_RELEASE_DESCRIPTION = "description"
     private const val KEY_RELEASE_NAME = "name"
 
+    /**
+     * Load the YAML configuration of the releases
+     * @param [stream] the [InputStream] from which the configuration is read
+     * @return the list of all releases from the input stream
+     */
     fun loadListFrom(stream: InputStream): List<ReleaseSpec> =
       ObjectMapper(YAMLFactory()).readTree(stream)
         ?.takeIf { !it.isNull } // null, if root node has null type
@@ -79,7 +84,7 @@ open class ReleaseSpec(
 
 /**
  * Replies a list of only the relevant releases whose download URLs
- * have to be included in  the `MANIFEST` file of a plugin jar.
+ * have to be included in  the `MANIFEST.MF` file of a plugin jar.
  * For each of the resulting releases, it is true that there is no
  * other release with the same `minJosmVersion` that is newer.
  */
