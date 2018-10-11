@@ -19,7 +19,7 @@ fun Configuration.setupAsMainConfiguration(project: Project) {
     // Adding dependencies for JOSM and the required plugins
     val josmDependency = project.dependencies.createJosm(project, josmCompileVersion)
     if (josmDependency is ExternalModuleDependency && josmDependency.isChanging) {
-      project.logger.info("Compile against the variable JOSM version ${josmCompileVersion}")
+      project.logger.info("Compile against the variable JOSM version $josmCompileVersion")
     } else {
       project.logger.info("Compile against the JOSM version ${josmCompileVersion.toInt()}")
     }

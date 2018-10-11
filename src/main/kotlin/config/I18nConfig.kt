@@ -9,7 +9,10 @@ import java.util.regex.Pattern
  * Holds configuration options regarding internationalization.
  */
 class I18nConfig(private val project: Project) {
-  private val LINE_NUMBER_PATTERN = Pattern.compile(".*:([1-9][0-9]*)")
+
+  companion object {
+    private val LINE_NUMBER_PATTERN = Pattern.compile(".*:([1-9][0-9]*)")
+  }
 
   /**
    * E-Mail address to which bugs regarding i18n should be reported.
@@ -55,7 +58,7 @@ class I18nConfig(private val project: Project) {
    * **Default value:** `{a -> a}` (identity)
    * @see getPathTransformer
    */
-  var pathTransformer: (String) -> String = {a -> a};
+  var pathTransformer: (String) -> String = {a -> a}
 
   /**
    * Alternative to the setter of property [pathTransformer] using a Groovy [Closure].

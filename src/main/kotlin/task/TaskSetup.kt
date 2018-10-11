@@ -10,6 +10,8 @@ import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.openstreetmap.josm.gradle.plugin.java
 import org.openstreetmap.josm.gradle.plugin.josm
+import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
+import org.openstreetmap.josm.gradle.plugin.task.github.PublishToGithubReleaseTask
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -60,6 +62,7 @@ fun Project.setupJosmTasks() {
 
   setupI18nTasks(this, sourceSetJosmPlugin)
   setupPluginDistTasks(this, sourceSetJosmPlugin)
+  setupGithubReleaseTasks(this)
 }
 
 private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSet) {
@@ -111,7 +114,7 @@ private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSe
     }
     it.iconBase64Provider = { iconPath ->
       try {
-        val iconFile = sourceSetJosmPlugin.resources.srcDirs.map { File(it, iconPath) }.filter { it.exists() }.firstOrNull()
+        val iconFile = sourceSetJosmPlugin.resources.srcDirs.map { File(it, iconPath) }.firstOrNull { it.exists() }
         if (iconFile != null) {
           val contentType = Files.probeContentType(Paths.get(iconFile.toURI()))
             ?: FileInputStream(iconFile).use {
@@ -169,3 +172,18 @@ private fun setupI18nTasks(project: Project, sourceSetJosmPlugin: SourceSet) {
 
   project.tasks.create("transifexDownload", TransifexDownload::class.java)
 }
+
+private fun setupGithubReleaseTasks(project: Project) {
+
+  project.tasks.create("createGithubRelease",
+    CreateGithubReleaseTask::class.java) {
+      it.description =  "Creates a new GitHub release"
+  }
+
+  project.tasks.create("publishToGithubRelease",
+    PublishToGithubReleaseTask::class.java) {
+      it.description = "Publish a JOSM plugin jar as GitHub release asset " +
+        "to a GitHub release"
+  }
+}
+

@@ -74,9 +74,18 @@ dependencies {
 
   implementation(localGroovy())
   implementation(kotlin("stdlib-jdk8", kotlinVersion))
+  implementation("com.squareup.okhttp3", "okhttp", "3.10.0")
+  implementation("com.beust","klaxon", "2.1.14")
+  implementation("com.fasterxml.jackson.module", "jackson-module-kotlin", "2.9.5")
+  implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", "2.9.5")
+  implementation("com.github.spullara.mustache.java","core", "0.6.3")
+  implementation("com.github.spullara.mustache.java","compiler", "0.9.5")
   implementation("com.vladsch.flexmark:flexmark-all:0.34.46")
   testImplementation("org.junit.jupiter", "junit-jupiter-api", junitVersion)
+  testImplementation("com.github.tomakehurst","wiremock","2.16.0")
+  testImplementation("ru.lanwen.wiremock", "wiremock-junit5", "1.1.1")
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", junitVersion)
+  testImplementation(kotlin("reflect", kotlinVersion))
 }
 
 jacoco {
@@ -138,18 +147,40 @@ gradlePlugin {
   }
 }
 
-publishing {
-  repositories {
-    maven {
-      setUrl("$buildDir/maven")
+val buildDirRepo = publishing.repositories.maven("$buildDir/maven") {
+  name = "buildDir"
+}
+
+val awsAccessKeyId: String? = System.getenv("AWS_ACCESS_KEY_ID")
+val awsSecretAccessKey: String? = System.getenv("AWS_SECRET_ACCESS_KEY")
+val s3Repo = if (awsAccessKeyId == null || awsSecretAccessKey == null) {
+  logger.lifecycle(
+    "Note: Set the environment variables AWS_ACCESS_KEY_ID ({} set) and AWS_SECRET_ACCESS_KEY ({} set) to be able to publish the plugin to s3://gradle-josm-plugin .",
+    if (awsAccessKeyId == null) { "not" } else { "is" },
+    if (awsSecretAccessKey == null) { "not" } else { "is" }
+  )
+  null
+} else {
+  publishing.repositories.maven {
+    name = "s3"
+    setUrl("s3://gradle-josm-plugin")
+    credentials(AwsCredentials::class.java) {
+      setAccessKey(System.getenv("AWS_ACCESS_KEY_ID"))
+      setSecretKey(System.getenv("AWS_SECRET_ACCESS_KEY"))
     }
   }
 }
-tasks {
-  "publish" {
-    description = "Deploys the gradle-josm-plugin to a local Maven repository inside the $buildDir"
+
+project.afterEvaluate {
+  tasks.withType(PublishToMavenRepository::class).configureEach {
+    if (repository == buildDirRepo) {
+      description = "Deploys the gradle-josm-plugin to a local Maven repository at ${repository.url}"
+      tasks.withType(Test::class).forEach { it.dependsOn(this) }
+    } else if (repository == s3Repo) {
+      description = "Deploys the gradle-josm-plugin to a Maven repository on AWS S3: ${repository.url}"
+    }
     doLast {
-      logger.lifecycle("Version {} is now deployed to {}", project.version.toString(), publishing.repositories.withType(MavenArtifactRepository::class.java)[0].url)
+      logger.lifecycle("Version ${project.version} is now deployed to ${repository.url}")
     }
   }
 }

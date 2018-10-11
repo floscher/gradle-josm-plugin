@@ -193,12 +193,33 @@ open class JosmPluginExtension(private val project: Project) {
   }
 
   /**
+   * Configuration options for GitHub releases
+   *
+   * @since 0.5.3
+   */
+  val github: GithubConfig = GithubConfig(project)
+
+  /**
+   * Configure the field [JosmPluginExtension.github] using a Groovy [Closure].
+   *
+   * @since 0.5.3
+   */
+  fun github(c: Closure<GithubConfig>): Any = project.configure(github, c)
+
+  /**
+   * Configure the field [JosmPluginExtension.github] using an [Action].
+   *
+   * @since 0.5.3
+   */
+  fun github(a: Action<GithubConfig>) = a.execute(github)
+
+  /**
    * Configuration options for i18n
    */
   val i18n: I18nConfig = I18nConfig(project)
 
   /**
-   * Configure the field [JosmPluginExtension.i18n] using a Groovy [Closure]
+   * Configure the field [JosmPluginExtension.i18n] using a Groovy [Closure].
    */
   public fun i18n(c: Closure<I18nConfig>) {
     project.configure(i18n, c)

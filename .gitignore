@@ -7,3 +7,5 @@
 /.classpath
 /.project
 /*.iml
+/github.env
+/aws-credentials.env

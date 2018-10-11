@@ -13,7 +13,9 @@ import java.io.File
  * This way you can provide a default JOSM configuration for the [RunJosmTask].
  */
 open class InitJosmPrefs: DefaultTask() {
-  private val PREF_FILE_NAME = "preferences.xml"
+  companion object {
+    private const val PREF_FILE_NAME = "preferences.xml"
+  }
 
   init {
     project.afterEvaluate {

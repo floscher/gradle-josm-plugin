@@ -1,8 +1,13 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
+import com.beust.klaxon.JsonArray
+import com.beust.klaxon.JsonObject
 import groovy.lang.GroovySystem
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient
+import org.openstreetmap.josm.gradle.plugin.github.ReleaseSpec
+import org.openstreetmap.josm.gradle.plugin.github.onlyFallbackVersions
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangReader
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
@@ -114,6 +119,11 @@ class JosmManifest(private val project: Project) {
   var minJosmVersion: String? = project.findProperty("plugin.main.version")?.toString()
 
   /**
+   * If true, load the old version download links from GitHub releases.
+   */
+  var includeLinksToGithubReleases: Boolean = false
+
+  /**
    * A collection of the names of all JOSM plugins that must be installed for this JOSM plugin to work
    *
    * **Default:** the value of property `plugin.requires` split at every semicolon (do not rely on the order, as it is not necessarily maintained) or `null` if that property is not set.</dd>
@@ -188,6 +198,50 @@ class JosmManifest(private val project: Project) {
   }
 
   /**
+   * Builds the map of download URLs
+   */
+  private fun buildMapOfGitHubDownloadLinks() : Map<String,String> {
+
+    fun JsonObject.downloadUrl() : String? {
+      val assets = this["assets"] as? JsonArray<JsonObject>
+      return assets?.mapNotNull {
+          it["browser_download_url"]?.toString()
+        }
+        ?.find { it.endsWith(".jar") }
+    }
+
+    val specs = ReleaseSpec.loadListFrom(project.extensions.josm.github.releasesConfig.inputStream())
+    val client = GithubReleasesClient(project.extensions.josm.github, project.extensions.josm.github.apiUrl)
+    val remoteReleases = client.getReleases()
+
+    return specs.onlyFallbackVersions()
+      .fold(initial=mutableMapOf()) fold@{links, release ->
+        val key = "${release.minJosmVersion}_Plugin-Url"
+        val remoteRelease = remoteReleases.find { it["tag_name"] == release.label}
+          ?: run {
+            project.logger.warn(
+              "Could not find a remote release for the release label " +
+                "'${release.label}'. No download link included in the " +
+                "MANIFEST file for JOSM release ${release.minJosmVersion}"
+            )
+            return@fold links
+          }
+        val downloadUrl = remoteRelease.downloadUrl() ?: run {
+          project.logger.warn(
+            "Could not find a jar download url for the remote release with " +
+              "label '${release.label}'. No download link included in the " +
+              "MANIFEST file for JOSM release ${release.minJosmVersion}"
+          )
+          return@fold links
+        }
+        val value = "${release.label};$downloadUrl"
+
+        links[key] = value
+        links
+      }
+  }
+
+  /**
    * Returns a map containing all manifest attributes, which are set.
    * This map can then be fed into [org.gradle.api.java.archives.Manifest.attributes()]. That's already done automatically by the gradle-josm-plugin, so you normally don't need to call this yourself.
    *
@@ -199,7 +253,7 @@ class JosmManifest(private val project: Project) {
     isRequiredFieldMissing(mainClass == null, "the main class of your plugin", "josm.manifest.mainClass = ‹full name of main class›")
     isRequiredFieldMissing(description == null, "the description of your plugin", "josm.manifest.description = ‹a textual description›")
 
-    val missingException: GradleException = GradleException("The JOSM plugin ${project.name} misses required configuration options. See above for which options are missing.")
+    val missingException = GradleException("The JOSM plugin ${project.name} misses required configuration options. See above for which options are missing.")
 
     val minJosmVersion: String = minJosmVersion ?: throw missingException
     val mainClass: String = mainClass ?: throw missingException
@@ -210,7 +264,7 @@ class JosmManifest(private val project: Project) {
     }
 
     // Required attributes
-    val manifestAtts: MutableMap<String,String> = mutableMapOf<String, String>(
+    val manifestAtts: MutableMap<String,String> = mutableMapOf(
       "Created-By" to System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")",
       "Gradle-Version" to project.gradle.gradleVersion,
       "Groovy-Version" to GroovySystem.getVersion(),
@@ -223,9 +277,14 @@ class JosmManifest(private val project: Project) {
       "Plugin-Canloadatruntime" to canLoadAtRuntime.toString()
     )
 
-    // Add links to older versions of the plugin
-    for(value in oldVersionDownloadLinks) {
-      manifestAtts.put(value.minJosmVersion.toString() + "_Plugin-Url",  value.pluginVersion + ';' + value.downloadURL.toString())
+    if (includeLinksToGithubReleases) {
+      // Add download links to github releases
+      manifestAtts.putAll(buildMapOfGitHubDownloadLinks())
+    } else {
+      // Add links to older versions of the plugin
+      for (value in oldVersionDownloadLinks) {
+        manifestAtts["${value.minJosmVersion}_Plugin-Url"] = "${value.pluginVersion};${value.downloadURL}"
+      }
     }
 
     // Add translated versions of the project description
@@ -255,13 +314,13 @@ class JosmManifest(private val project: Project) {
     loadPriority?.let { manifestAtts.put("Plugin-Stage", it.toString()) }
     website?.let { manifestAtts.put("Plugin-Link", it.toString()) }
     if (!pluginDependencies.isEmpty()) {
-      manifestAtts.put("Plugin-Requires", pluginDependencies.joinToString(";"))
+      manifestAtts["Plugin-Requires"] = pluginDependencies.joinToString(";")
     }
 
     if (project.logger.isInfoEnabled()) {
-      project.getLogger().info("The following lines will be added to the manifest of the plugin *.jar file:")
+      project.logger.info("The following lines will be added to the manifest of the plugin *.jar file:")
       for (e in manifestAtts.toSortedMap()) {
-        project.getLogger().info("  ${e.key}: ${e.value}")
+        project.logger.info("  ${e.key}: ${e.value}")
       }
     }
     return manifestAtts
@@ -276,9 +335,9 @@ class JosmManifest(private val project: Project) {
     if (!language.matches(Regex("[a-z]{2,3}(_[A-Z]{2})?"))) {
       throw IllegalArgumentException("The given language string '$language' is not a valid abbreviation for a language.")
     }
-    if (translatedDescription.isEmpty()) {
-      throw IllegalArgumentException("The translated description must not be empty")
+    if (translatedDescription.isBlank()) {
+      throw IllegalArgumentException("The translated description must not be blank!")
     }
-    translatedDescriptions.put(language, translatedDescription)
+    translatedDescriptions[language] = translatedDescription
   }
 }

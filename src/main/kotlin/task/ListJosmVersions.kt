@@ -10,7 +10,9 @@ import java.nio.charset.StandardCharsets
  * Task for showing the current `latest` and `tested` JOSM versions
  */
 open class ListJosmVersions : DefaultTask() {
-  private val BASE_URL = "https://josm.openstreetmap.de"
+  companion object {
+    private const val BASE_URL = "https://josm.openstreetmap.de"
+  }
 
   init {
     group = "JOSM"

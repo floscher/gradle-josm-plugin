@@ -40,8 +40,7 @@ open class WriteRequiredPluginConfig : DefaultTask() {
       val pluginListEntries = requiredPluginConfig.dependencies
         .map { it.name }
         .plus(project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName)
-        .map { "<entry value=\"$it\"/>" }
-        .joinToString("\n      ")
+        .joinToString("\n      ") { "<entry value=\"$it\"/>" }
 
       destinationFile.bufferedWriter(Charsets.UTF_8).use {
         it.write(

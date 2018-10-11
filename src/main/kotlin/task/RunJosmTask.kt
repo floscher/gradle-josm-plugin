@@ -37,7 +37,7 @@ open class RunJosmTask : JavaExec() {
     super.mustRunAfter(project.tasks.getByName("cleanJosm"))
     super.dependsOn(project.tasks.getByName("updateJosmPlugins"))
 
-    project.afterEvaluate{
+    project.afterEvaluate{ project ->
       description = "Runs an independent clean JOSM instance (v${project.extensions.josm.josmCompileVersion}) with temporary JOSM home directories (by default inside `build/.josm/`) and the freshly compiled plugin active."
       // doFirst has to be added after the project initialized, otherwise it won't be executed before the main part of the JavaExec task is run.
       doFirst{

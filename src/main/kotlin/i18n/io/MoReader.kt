@@ -18,19 +18,12 @@ class MoReader(private val moFileURL: URL) {
   }
 
   private var bigEndian: Boolean = true
-    private set
   private var formatRev: Long = 0
-    private set
   private var numStrings: Int = 0
-    private set
   private var offsetOrigStrings: Long = 0
-    private set
   private var offsetTranslatedStrings: Long = 0
-    private set
   private var sizeHashingTable: Long = 0
-    private set
   private var offsetHashingTable: Long = 0
-    private set
 
   /**
    * Reads the *.mo file at the given [URL] and returns the contained strings as a [Map] from [MsgId]s to [MsgStr]s.
