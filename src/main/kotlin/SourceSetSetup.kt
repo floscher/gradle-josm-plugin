@@ -6,15 +6,22 @@ import org.gradle.api.internal.plugins.DslObject
 import org.gradle.api.tasks.SourceSet
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.openstreetmap.josm.gradle.plugin.i18n.DefaultI18nSourceSet
+import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 import org.openstreetmap.josm.gradle.plugin.task.LangCompile
 import org.openstreetmap.josm.gradle.plugin.task.MoCompile
 import org.openstreetmap.josm.gradle.plugin.task.PoCompile
 import org.openstreetmap.josm.gradle.plugin.task.ShortenPoFiles
 
+/**
+ * Add the [I18nSourceSet] and create the associated tasks ([PoCompile], [MoCompile], [LangCompile], [ShortenPoFiles]).
+ * This allows this source set to also contain files of types `*.po`, `*.mo` and `*.lang`.
+ * @param [project] the [Project] to which this source set belongs
+ * @param [sdsf] the [SourceDirectorySetFactory] of the project
+ */
 fun SourceSet.setup(project: Project, sdsf: SourceDirectorySetFactory) {
   if (name.isNotEmpty()) {
     // Inspired by https://github.com/gradle/gradle/blob/9d86f98b01acb6496d05e05deddbc88c1e35d038/subprojects/plugins/src/main/java/org/gradle/api/plugins/GroovyBasePlugin.java#L88-L113
-    val i18nSourceSet = DefaultI18nSourceSet(this, sdsf)
+    val i18nSourceSet: I18nSourceSet = DefaultI18nSourceSet(this, sdsf)
     DslObject(this).convention.plugins["i18n"] = i18nSourceSet
 
     // Create "shortenPoFiles" task for the current i18n source set

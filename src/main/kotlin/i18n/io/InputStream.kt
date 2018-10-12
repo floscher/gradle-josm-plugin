@@ -9,6 +9,7 @@ import java.io.InputStream
  * @throws IOException if reading from the [InputStream] fails (see [InputStream.read]) or if the number of bytes that
  *   can be read is below the parameter [b].
  */
+@Throws(IOException::class)
 fun InputStream.readAllOrException(b: ByteArray): Int {
   val numBytes = this.read(b)
   if (numBytes != b.size) {
@@ -34,6 +35,7 @@ fun InputStream.skipAllOrException(n: Long): Long {
  * @return -1 if no bytes can be read, otherwise the number that
  * @throws IOException if only one byte can be read from the [InputStream]
  */
+@Throws(IOException::class)
 fun InputStream.readTwoBytesAsInt(): Int {
   val bytes = Pair(read(), read())
   if (bytes.first < 0) {

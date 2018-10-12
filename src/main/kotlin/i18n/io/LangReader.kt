@@ -54,6 +54,12 @@ class LangReader {
     }.toMap().plus(baseLang to baseStrings.associate { it to it.id })
   }
 
+  /**
+   * Reads the strings of the base language from the input stream.
+   * @return a [List] of all [MsgId]s that can be read from the [InputStream]
+   * @throws [IOException] if the data in the [InputStream] is not in the *.lang format
+   */
+  @Throws(IOException::class)
   fun readBaseLangStream(stream: InputStream) = readLangStream(stream) {
     if (it.isEmpty()) {
       throw IOException("A MsgId must have one or more strings (${it.size} given)!")

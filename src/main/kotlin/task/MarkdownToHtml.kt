@@ -12,8 +12,16 @@ import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.util.Locale
 
+/**
+ * Convert all `*.md` files found among the source files of this task to *.html files.
+ */
 open class MarkdownToHtml: SourceTask() {
 
+  /**
+   * The directory where the *.html files will be created in.
+   * All files will be created directly inside the directory (not in subdirectories)
+   * using the name of the source file, replacing the ".md" extension with ".html".
+   */
   var destDir: File? = null
 
   init {

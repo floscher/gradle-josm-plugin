@@ -51,7 +51,7 @@ fun Project.getNextJosmVersion(startVersion: String?): Dependency {
 }
 
 private fun Project.resolveJosm(version: String): Dependency {
-  val dep = dependencies.create("org.openstreetmap.josm:josm:$version")
+  val dep = dependencies.createJosm(version)
   val conf = configurations.detachedConfiguration(dep)
   try {
     conf.resolve()
@@ -128,21 +128,22 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
   return result
 }
 
-fun DependencyHandler.createJosm(project: Project, version: String, findNextAvailable: Boolean = false): Dependency {
-  return if (findNextAvailable) {
-    project.getNextJosmVersion(version)
-  } else {
-    when (version) {
-      "latest", "tested" -> {
-        (create("org.openstreetmap.josm:josm:$version") as ExternalModuleDependency).setChanging(true)
-      }
-      else -> {
-        create("org.openstreetmap.josm:josm:${version.toInt()}")
-      }
-    }
+/**
+ * Creates a dependency onto JOSM using the given version number
+ * @param [version] the version number for JOSM (latest and tested are special versions that are [ExternalModuleDependency.isChanging])
+ * @return the dependency as created by [DependencyHandler.create]
+ */
+fun DependencyHandler.createJosm(version: String) =
+  when (version) {
+    "latest", "tested" ->
+      (create("org.openstreetmap.josm:josm:$version") as ExternalModuleDependency).setChanging(true)
+    else ->
+      create("org.openstreetmap.josm:josm:$version")
   }
-}
 
+/**
+ * @return true iff the given dependency contains JOSM (the group and name of the dependency are checked to determine this)
+ */
 fun DependencyHandler.isJosmDependency(dep: Dependency) = dep.group == "org.openstreetmap.josm" && dep.name == "josm"
 
 /**
