@@ -2,7 +2,7 @@ image: registry.gitlab.com/josm/docker-library/openjdk-8-git:latest
 
 before_script:
 - export GRADLE_USER_HOME=`pwd`/.gradle
-- mkdir "$GRADLE_USER_HOME" && echo "org.gradle.caching=true" >> "$GRADLE_USER_HOME/gradle.properties"
+- mkdir -p "$GRADLE_USER_HOME" && echo "org.gradle.caching=true" >> "$GRADLE_USER_HOME/gradle.properties"
 
 cache:
   paths:
