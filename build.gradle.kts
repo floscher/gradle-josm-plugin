@@ -150,6 +150,22 @@ val buildDirRepo = publishing.repositories.maven("$buildDir/maven") {
   name = "buildDir"
 }
 
+val ciJobToken: String? = System.getenv("CI_JOB_TOKEN")
+val projectId: String? = System.getenv("PROJECT_ID")
+val gitlabRepo = if (ciJobToken != null && projectId != null) {
+  publishing.repositories.maven("https://gitlab.com/api/v4/projects/$projectId/packages/maven") {
+    name = "gitlab"
+    credentials(HttpHeaderCredentials::class) {
+      name = "Job-Token"
+      value = ciJobToken
+    }
+    authentication {
+      create("auth", HttpHeaderAuthentication::class)
+    }
+    createPublishToTask(this)
+  }
+} else null
+
 val awsAccessKeyId: String? = System.getenv("AWS_ACCESS_KEY_ID")
 val awsSecretAccessKey: String? = System.getenv("AWS_SECRET_ACCESS_KEY")
 val s3Repo = if (awsAccessKeyId == null || awsSecretAccessKey == null) {
@@ -160,26 +176,28 @@ val s3Repo = if (awsAccessKeyId == null || awsSecretAccessKey == null) {
   )
   null
 } else {
-  publishing.repositories.maven {
+  publishing.repositories.maven("s3://gradle-josm-plugin") {
     name = "s3"
-    setUrl("s3://gradle-josm-plugin")
     credentials(AwsCredentials::class.java) {
       setAccessKey(System.getenv("AWS_ACCESS_KEY_ID"))
       setSecretKey(System.getenv("AWS_SECRET_ACCESS_KEY"))
     }
+    createPublishToTask(this)
   }
 }
 
 project.afterEvaluate {
   tasks.withType(PublishToMavenRepository::class).configureEach {
     if (repository == buildDirRepo) {
-      description = "Deploys the gradle-josm-plugin to a local Maven repository at ${repository.url}"
-      tasks.withType(Test::class).forEach { it.dependsOn(this) }
-    } else if (repository == s3Repo) {
-      description = "Deploys the gradle-josm-plugin to a Maven repository on AWS S3: ${repository.url}"
+      tasks.withType(Test::class).forEach {
+        it.dependsOn(this)
+      }
     }
-    doLast {
-      logger.lifecycle("Version ${project.version} is now deployed to ${repository.url}")
+
+    if (publication.name == "pluginMaven") {
+      doLast {
+        logger.lifecycle("Version ${project.version} is now deployed to ${repository.url}")
+      }
     }
   }
 }
@@ -193,4 +211,14 @@ eclipse.project {
   buildCommand("org.eclipse.buildship.core.gradleprojectbuilder")
   buildCommand("org.eclipse.jdt.core.javabuilder")
   buildCommand("org.jetbrains.kotlin.ui.kotlinBuilder")
+}
+
+fun createPublishToTask(repo: MavenArtifactRepository) {
+  project.afterEvaluate {
+    tasks.create("publishTo${repo.name.capitalize()}") {
+      group = "Publishing"
+      description = "Publishes all Maven publications produced by this project to the '${repo.name}' Maven repository at ${repo.url}"
+      dependsOn(tasks.withType(PublishToMavenRepository::class).filter { it.repository == repo })
+    }
+  }
 }
