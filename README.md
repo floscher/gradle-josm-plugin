@@ -14,15 +14,15 @@ If you miss something here, found something that's broken, or need more info abo
 
 The plugin is available [in the default Gradle plugin repository](https://plugins.gradle.org/plugin/org.openstreetmap.josm).
 
-See [`docs/Setup.md`](docs/Setup.md) for detailed setup instructions.
+See [`docs/Setup.md`](docs/Setup.md) for detailed **setup instructions**.
 
-See [`docs/Tasks.md`](docs/Tasks.md) for information, from which tasks you can choose.
+See [`docs/Tasks.md`](docs/Tasks.md) for information, from which **tasks** you can choose.
 
-And if you need external dependencies for your plugin, maybe [`docs/Dependencies.md`](docs/Dependencies.md) can help.
+And if you need **external dependencies** for your plugin, maybe [`docs/Dependencies.md`](docs/Dependencies.md) can help.
 
-If you want to know how i18n works, have a look at [`docs/I18n.md`](docs/I18n.md).
+If you want to know how **i18n** works, have a look at [`docs/I18n.md`](docs/I18n.md).
 
-Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/) for this Gradle plugin are available online.
+Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/) for this Gradle plugin is available online.
 
 ## Projects using this Gradle plugin
 * [Gubaer/josm-**contourmerge**-plugin](https://github.com/Gubaer/josm-contourmerge-plugin)

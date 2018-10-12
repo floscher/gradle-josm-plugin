@@ -1,5 +1,7 @@
 # GitHub Releases for JOSM plugins
 
+> **NOTE:** Publishing to GitHub releases is currently in beta stage. Expect this guide to change unexpectedly or be out of date until this notice is removed.
+
 ## Intro
 
 ### What are GitHub releases?
@@ -42,17 +44,9 @@ Every 10 minutes, a script in the backend infrastructure of the JOSM development
 
 The `gradle-josm-plugin` includes tasks to create GitHub releases and to upload a plugin jar as GitHub release asset.
 
-### Two kinds of releases
+### Release configuration in `releases.yml` file
 
-The gradle plugin manages to kinds of GitHub releases:
-
-1. a so called _pickup release_: a release with a stable, version indepenent name. The download URL for this release [can
-   be registered with the JOSM backend infrastructure](#how-to-add-plugin-to-directory)
-
-2. a list of _versioned releases_ with a release label, usually following the the conentions of [semantic versioning](https://semver.org/)
-
-### `releases.yml` - configuration file for releases
-You have to maintain a configuration file for the plugin releases.
+You have to maintain a configuration file for the plugin releases. It contains a list of _versioned releases_ with a release label, usually following the the conventions of [semantic versioning](https://semver.org/)
 
 Its default name is `releases.yml` and its default location is the project root.
 
@@ -67,59 +61,23 @@ To configure another location, set the gradle property `josm.github.releasesConf
 
 Here is annotated example `releases.yml`:
 ```yml
-# OPTIONAL: declare the label, name, and description of the pickup release. If missing, hardcoded
-# default values are assumed
-pickup_release_for_josm:
-  label: pickup-release
-  name: JOSM Pickup Release
-  description: |
-    This is the pickup release for the JOSM plugin system. The services
-    provided by the [JOSM dev team](https://josm.openstreetmap.de)
-
-    * download the plugin jar in this release every 10 minutes
-    * extract the metadata from `META-INF/MANIFEST.INF`
-    * update the metadata in the [JOSM plugin directory](https://josm.openstreetmap.de/plugin)
-
-    ---
-
-    {{#pickedUpReleaseLabel}}
-    This release currently provides the plugin release {{pickedUpReleaseLabel}}.
-    {{/pickedUpReleaseLabel}}
-
-    {{#pickedUpReleaseDescription}}
-    __Description__:
-    {{pickedUpReleaseDescription}}
-    {{/pickedUpReleaseDescription}}
-
-# MANDATORY: a list of releases
+# A list of releases
 #
-# Entries should be ordered by label (most recent label at the top of the list) and the by
-# nummeric_josm_version (highest nummeric_josm_version at the top). 
+# Entries should be ordered chronologically by release date (from oldest release at the top and the most recent release at the bottom of the file)
 #
 releases:
   # the first entry in the releases list
-  - label: v0.0.2                     # MANDATORY: the release label
-    numeric_josm_version: 5678        # MANDATORY: the minimal numeric josm version 
-                                      # this release is  compatible with
+  - label: v0.0.1                     # MANDATORY: the release label
+    minJosmVersion: 1234              # MANDATORY: the lowest numeric josm version
+                                      # that this release is  compatible with
 
   # the second entry in the releases list
-  - label: v0.0.1                     # MANDATORY:
-    numeric_josm_version: 1234        # MANDATORY:
+  - label: v0.0.2                     # MANDATORY:
+    minJosmVersion: 5678        # MANDATORY:
     description: a description        # OPTIONAL
     name: a name for the release      # OPTIONAL
 
   # ... more entries in the releases list 
-```
-
-A minimal `releases.yml` which includes two releases `v0.0.1`and `v0.0.2` looks as follows
-(note that the section for `pickup_release_for_josm` is optional):
-```yml
-releases:
-  - label: v0.0.2
-    numeric_josm_version: 5678
-
-  - label: v0.0.1
-    numeric_josm_version: 1234
 ```
 
 
@@ -135,7 +93,7 @@ This creates a GitHub release for the plugin version currently configured with t
 # releases.yml
 releases:
   - label: v0.0.1
-    numeric_josm_version: 1234
+    minJosmVersion: 1234
 
   # more ...
 ```
@@ -196,26 +154,19 @@ task createMyRelease(type: CreateGithubReleaseTask){
 $ ./gradlew createMyRelease
 ```
 
-#### for the pickup release
-Use the dedicated task `creatPickupRelease` to create the pickup release.
-
-```bash
-$ ./gradlew createPickupRelease
-```
-
 ### Publish the plugin jar to a GitHub release
 
 #### Publish to the release with the current release label
 
 Publishes the current plugin jar as release asset to the GitHub release with the label given by the project property `version`. Note that
   * `releases.yml` must include an entry for this label.
-  * an GitHub release for this label has to exist
+  * a GitHub release for this label has to exist
 
 ```yml
 # releases.yml
 releases:
   - label: v0.0.1
-    numeric_josm_version: 1234
+    minJosmVersion: 1234
     # ...
   # more ...
 ```
@@ -280,19 +231,6 @@ $ ./gradlew publishToGithubRelease \
     --remote-jar-name my_other_name.jar
 ```
 
-#### Publish to the pickup release
-
-Use the command line option `--publish-to-pickup-release` to publish a plugin jar not only to a normal release, but also
-__to the pickup release__.
-
-```bash
-# publishes the plugin jar to the release with label 'v0.0.1' and
-# to pickup release
-$ ./gradlew publishToGithubRelease \
-    --release-label v0.0.1 \
-    --publish-to-pickup-release
-```
-
 ## Configuration options
 
 A configuration option is derived from command line arguments, properties, and environment variables in the following order (the first of these options that has a non-blank value is used):
@@ -312,14 +250,9 @@ A configuration option is derived from command line arguments, properties, and e
 | `GITHUB_REPOSITORY_NAME`       | the name of the github repositoy. Defaults  to the project name. |
 | `GITHUB_API_URL` | the base API URL for the Github releases API. Defaults to `https://api.github.com` |
 | `GITHUB_UPLOAD_URL` | the base API URL to upload release assets. Defaults to `https://uploads.github.com` |
-| `GITHUB_MAIN_URL`| the base GitHub URL. Defaults to `http://github.com` |
 
-### common gradle properties
-| gradle property | description |
-| --------------------- | ----------- |
-| `josm.github.repositoryOwner`       | the name of the github user |
-| `josm.github.accessToken`       | the Github access token |
-| `josm.github.repositoryName`       | the name of the github repositoy.  Defaults  to the project name. |
+The access token can also be configured using the Gradle property `josm.github.accessToken`. **Make sure you don't commit it to the git repository, since you should keep the value a secret!**
+You could put it into `~/.gradle/gradle.properties` or use the environment variable instead.
 
 
 ## Sample and template configuration files
@@ -350,18 +283,6 @@ A configuration option is derived from command line arguments, properties, and e
 # export GITHUB_MAIN_URL=http://my-github.test
 ```
 
-### template for `gradle.properties`
-```properties
-# the GitHub account that owns the repository (user or org)
-#josm.github.repositoryOwner=a-user-name
-
-# the GitHub access token
-#josm.github.accessToken=asldiu0w98357oasjf
-
-# the GitHub repository
-#josm.github.repositoryName=my-repo
-```
-
 ### template for `build.gradle`
 ```groovy
 plugins {
@@ -373,30 +294,24 @@ plugins {
 
 version="0.0.5"      //  the current release label
 
+//
 josm {
-//  //optional inline configuration block
-//  github { // for more configuration options, see https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/-github-config/index.html
-//    repositoryOwner = "a-github-user"
-//    repositoryName = "my-repo"
-//    accessToken = "asldiu0w98357oasjf"
-//  }
-    josmCompileVersion = "latest"
-    manifest {
-        // if true, the plugin will include download URLs for GitHub
-        // release assets in the MANIFEST file
-        includeLinksToGithubReleases = true
-        //  minimal required JOSM version for the current build
-        minJosmVersion = 13893
-        description = 'you plugin description'
-        mainClass = 'the.fully.qualified.name.of.YourPlugin'
-        //iconPath = 'images/your-plugin-icon.png'
-        //website = new URL("https://your.plugin.host/info-page.html")
-        canLoadAtRuntime = true
-    }
+  github { // for more configuration options, see https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/-github-config/index.html
+    repositoryOwner = "a-github-user"
+    repositoryName = "my-repo"
+    // the access token is configured either through the environment variable `GITHUB_ACCESS_TOKEN`,
+    // or by adding the property `josm.github.accessToken` to the file `~/.gradle/gradle.properties`
+  }
+  josmCompileVersion = "latest"
+  manifest {
+    // if true, the plugin will include download URLs for GitHub
+    // release assets in the MANIFEST file
+    includeLinksToGithubReleases = true
+  }
 }
 
-// uncomment to configure the provided task 'createGithubRelease'
-/*
+// uncomment options to configure the provided task 'createGithubRelease'
+
 createGithubRelease {
     // optional. if different from the project 'version'
     //releaseLabel = "v0.0.5-GA"
@@ -404,23 +319,11 @@ createGithubRelease {
     // optional. if different from 'master'
     //targetCommitish="deploy"
 }
-*/
-
-// uncomment to create your own task for creating GitHub releases
-/* 
-import org.openstreetmap.josm.gradle.plugin.task.CreateGithubReleaseTask
-task myCreateGithubRelease(task: CreateGithubReleaseTask) {
-    // optional. if different from the project 'version'
-    //releaseLabel = "v0.0.5-GA"
-
-    // optional. if different from 'master'
-    //targetCommitish="deploy"
-}
-*/
 
 
-// uncomment to configure the provided task 'publishToGithubRelease'
-/*
+
+// uncomment options to configure the provided task 'publishToGithubRelease'
+
 publishToGithubRelease {
     // optional. if different from the project 'version'
     //releaseLabel = "v0.0.5-GA"
@@ -434,37 +337,7 @@ publishToGithubRelease {
     
     // optional. if different from the name of the jar file built locally
     //remoteJarName="my-plugin.jar"
-    
-    // optional. Set to true, if the jar should be published to two
-    // releases: the release with the current release label and the
-    // pickup release
-    //publishToPickupRelease=true
 }
-*/
-
-// uncomment to create your own task for uploading to GitHub releases
-/* 
-import org.openstreetmap.josm.gradle.plugin.task.PublishToGithubReleaseTask
-task myPublishToGithubRelease(task: PublishToGithubReleaseTask) {
-    // optional. if different from the project 'version'
-    //releaseLabel = "v0.0.5-GA"
-    
-    // optional. if different from 'master'
-    //targetCommitish="deploy"
-
-    // optional. if different from the standard path where gradle build
-    // the jar
-    //localJarPath="/full/path/to/the/local/my-plugin.jar"
-
-    // optional. if different from the name of the jar file built locally
-    //remoteJarName="my-plugin.jar"
-    
-    // optional. Set to true, if the jar should be published to two
-    // releases: the release with the current release label and the
-    // pickup release
-    //publishToPickupRelease=true}
-*/
-```
 
 
 [github-releases]: https://help.github.com/articles/about-releases/
