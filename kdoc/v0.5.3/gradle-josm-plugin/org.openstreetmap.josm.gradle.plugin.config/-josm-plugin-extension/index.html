@@ -1,0 +1,265 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>JosmPluginExtension - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.config</a>&nbsp;/&nbsp;<a href="./index.html">JosmPluginExtension</a><br/>
+<br/>
+<h1>JosmPluginExtension</h1>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">JosmPluginExtension</span></code>
+<p>This extension is added to the project as <code>project.josm</code></p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">JosmPluginExtension</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$<init>(org.gradle.api.Project)/project">project</span><span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/Project.html"><span class="identifier">Project</span></a><span class="symbol">)</span></code>
+<p>instantiates the extension, takes project properties into account</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="debug-port.html">debugPort</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">debugPort</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">?</span></code>
+<p>This is required, when you want to run the task <code>debugJosm</code>. Set this to the port
+on which you want to listen for the debug output.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="github.html">github</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">github</span><span class="symbol">: </span><a href="../-github-config/index.html"><span class="identifier">GithubConfig</span></a></code>
+<p>Configuration options for GitHub releases</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="i18n.html">i18n</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">i18n</span><span class="symbol">: </span><a href="../-i18n-config/index.html"><span class="identifier">I18nConfig</span></a></code>
+<p>Configuration options for i18n</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="josm-compile-version.html">josmCompileVersion</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">josmCompileVersion</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>The version number of JOSM against which the plugin should be compiled.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="josm-config-dir.html">josmConfigDir</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">josmConfigDir</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/8/docs/api/java/io/File.html"><span class="identifier">File</span></a></code>
+<p>The directory where the default <code>preferences.xml</code> file is located, which will be used
+when the directory defined in <code>tmpJosmHome</code> is empty.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="log-jacoco-coverage.html">logJacocoCoverage</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">logJacocoCoverage</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Iff this is <code>true</code>, the coverage numbers for instruction, branch and line coverage are logged for every tasks
+with type <a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/testing/jacoco/tasks/JacocoReport.html">org.gradle.testing.jacoco.tasks.JacocoReport</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="log-skipped-tasks.html">logSkippedTasks</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">logSkippedTasks</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Iff this is <code>true</code>, then after the build has finished, all skipped tasks are listed like this:</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="log-task-duration.html">logTaskDuration</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">logTaskDuration</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Iff this is <code>true</code>, the number of seconds each task needed for execution is logged,
+when execution of a task finishes.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="manifest.html">manifest</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">manifest</span><span class="symbol">: </span><a href="../-josm-manifest/index.html"><span class="identifier">JosmManifest</span></a></code>
+<p>The manifest for the JOSM plugin</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="max-plugin-dependency-depth.html">maxPluginDependencyDepth</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">maxPluginDependencyDepth</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>When determining on which JOSM plugins this project depends, dependency chains are followed this number of steps.
+This number is the termination criterion when recursively searching for JOSM plugins that are required through <a href="../-josm-manifest/plugin-dependencies.html">JosmManifest.pluginDependencies</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="pack-into-jar-file-filter.html">packIntoJarFileFilter</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">packIntoJarFileFilter</span><span class="symbol">: </span><span class="symbol">(</span><a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/tasks/util/PatternFilterable.html"><span class="identifier">PatternFilterable</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/tasks/util/PatternFilterable.html"><span class="identifier">PatternFilterable</span></a></code>
+<p>When packing the dependencies of the <code>packIntoJar</code> configuration into the distribution *.jar,
+this closure is applied to the file tree. If you want to exclude certain files in your dependencies into
+your release, you can modify this.
+By default the <code>/META-INF/</code> directory of dependencies is discarded.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="repositories.html">repositories</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">repositories</span><span class="symbol">: </span><span class="symbol">(</span><a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/artifacts/dsl/RepositoryHandler.html"><span class="identifier">RepositoryHandler</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>The repositories that are added to the repository list.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="tmp-josm-cache-dir.html">tmpJosmCacheDir</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">tmpJosmCacheDir</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/8/docs/api/java/io/File.html"><span class="identifier">File</span></a></code>
+<p>The directory in which the JOSM cache for the JOSM instance used by <code>runJosm</code> and <code>debugJosm</code> is stored.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="tmp-josm-pref-dir.html">tmpJosmPrefDir</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">tmpJosmPrefDir</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/8/docs/api/java/io/File.html"><span class="identifier">File</span></a></code>
+<p>The directory in which the JOSM preferences for the JOSM instance used by <code>runJosm</code> and <code>debugJosm</code> are stored.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="tmp-josm-userdata-dir.html">tmpJosmUserdataDir</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">tmpJosmUserdataDir</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/8/docs/api/java/io/File.html"><span class="identifier">File</span></a></code>
+<p>The directory in which the JOSM user data for the JOSM instance used by <code>runJosm</code> and <code>debugJosm</code> is stored.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="version-from-vcs.html">versionFromVcs</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><s><span class="identifier">versionFromVcs</span></s><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Determines if the version number of the project should be derived from the
+version control system (git, or SVN if git is not present).</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="version-without-leading-v.html">versionWithoutLeadingV</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">versionWithoutLeadingV</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Determines if the leading 'v' character is trimmed from the beginning of <a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/Project.html#getVersion()">Project.getVersion</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="github.html">github</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">github</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$github(groovy.lang.Closure((org.openstreetmap.josm.gradle.plugin.config.GithubConfig)))/c">c</span><span class="symbol">:</span>&nbsp;<a href="http://docs.groovy-lang.org/2.4.15/html/api/groovy/lang/Closure.html"><span class="identifier">Closure</span></a><span class="symbol">&lt;</span><a href="../-github-config/index.html"><span class="identifier">GithubConfig</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html"><span class="identifier">Any</span></a></code>
+<p>Configure the field <a href="github.html">JosmPluginExtension.github</a> using a Groovy <a href="http://docs.groovy-lang.org/2.4.15/html/api/groovy/lang/Closure.html">Closure</a>.</p>
+<code><span class="keyword">fun </span><span class="identifier">github</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$github(org.gradle.api.Action((org.openstreetmap.josm.gradle.plugin.config.GithubConfig)))/a">a</span><span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/Action.html"><span class="identifier">Action</span></a><span class="symbol">&lt;</span><a href="../-github-config/index.html"><span class="identifier">GithubConfig</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Configure the field <a href="github.html">JosmPluginExtension.github</a> using an <a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/Action.html">Action</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="i18n.html">i18n</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">i18n</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$i18n(groovy.lang.Closure((org.openstreetmap.josm.gradle.plugin.config.I18nConfig)))/c">c</span><span class="symbol">:</span>&nbsp;<a href="http://docs.groovy-lang.org/2.4.15/html/api/groovy/lang/Closure.html"><span class="identifier">Closure</span></a><span class="symbol">&lt;</span><a href="../-i18n-config/index.html"><span class="identifier">I18nConfig</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Configure the field <a href="i18n.html">JosmPluginExtension.i18n</a> using a Groovy <a href="http://docs.groovy-lang.org/2.4.15/html/api/groovy/lang/Closure.html">Closure</a>.</p>
+<code><span class="keyword">fun </span><span class="identifier">i18n</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$i18n(org.gradle.api.Action((org.openstreetmap.josm.gradle.plugin.config.I18nConfig)))/a">a</span><span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/Action.html"><span class="identifier">Action</span></a><span class="symbol">&lt;</span><a href="../-i18n-config/index.html"><span class="identifier">I18nConfig</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Configure the field <a href="i18n.html">JosmPluginExtension.i18n</a> using an <a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/Action.html">Action</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="manifest.html">manifest</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">manifest</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$manifest(groovy.lang.Closure((org.openstreetmap.josm.gradle.plugin.config.JosmManifest)))/c">c</span><span class="symbol">:</span>&nbsp;<a href="http://docs.groovy-lang.org/2.4.15/html/api/groovy/lang/Closure.html"><span class="identifier">Closure</span></a><span class="symbol">&lt;</span><a href="../-josm-manifest/index.html"><span class="identifier">JosmManifest</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Configure the field <a href="manifest.html">manifest</a> using a Groovy <a href="http://docs.groovy-lang.org/2.4.15/html/api/groovy/lang/Closure.html">Closure</a>.</p>
+<code><span class="keyword">fun </span><span class="identifier">manifest</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$manifest(org.gradle.api.Action((org.openstreetmap.josm.gradle.plugin.config.JosmManifest)))/a">a</span><span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/Action.html"><span class="identifier">Action</span></a><span class="symbol">&lt;</span><a href="../-josm-manifest/index.html"><span class="identifier">JosmManifest</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Configure the field <a href="manifest.html">manifest</a> using an <a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/Action.html">Action</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="pack-into-jar-file-filter.html">packIntoJarFileFilter</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">packIntoJarFileFilter</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$packIntoJarFileFilter(groovy.lang.Closure((org.gradle.api.tasks.util.PatternFilterable)))/closure">closure</span><span class="symbol">:</span>&nbsp;<a href="http://docs.groovy-lang.org/2.4.15/html/api/groovy/lang/Closure.html"><span class="identifier">Closure</span></a><span class="symbol">&lt;</span><a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/tasks/util/PatternFilterable.html"><span class="identifier">PatternFilterable</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set the <a href="pack-into-jar-file-filter.html">packIntoJarFileFilter</a> with a Groovy <a href="http://docs.groovy-lang.org/2.4.15/html/api/groovy/lang/Closure.html">Closure</a></p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="repositories.html">repositories</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">repositories</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$repositories(groovy.lang.Closure((org.gradle.api.artifacts.dsl.RepositoryHandler)))/closure">closure</span><span class="symbol">:</span>&nbsp;<a href="http://docs.groovy-lang.org/2.4.15/html/api/groovy/lang/Closure.html"><span class="identifier">Closure</span></a><span class="symbol">&lt;</span><a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/artifacts/dsl/RepositoryHandler.html"><span class="identifier">RepositoryHandler</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Set the <a href="repositories.html">repositories</a> with a Groovy <a href="http://docs.groovy-lang.org/2.4.15/html/api/groovy/lang/Closure.html">Closure</a> (replaces any previous setting).</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Companion Object Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="for-project.html">forProject</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><s><span class="identifier">forProject</span></s><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension.Companion$forProject(org.gradle.api.Project)/project">project</span><span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/Project.html"><span class="identifier">Project</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">JosmPluginExtension</span></a></code>
+<p>Returns the <a href="./index.html">JosmPluginExtension</a> for a particular <a href="https://docs.gradle.org/4.10.2/javadoc/org/gradle/api/Project.html">Project</a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
