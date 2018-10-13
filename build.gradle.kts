@@ -151,7 +151,7 @@ val buildDirRepo = publishing.repositories.maven("$buildDir/maven") {
 }
 
 val ciJobToken: String? = System.getenv("CI_JOB_TOKEN")
-val projectId: String? = System.getenv("PROJECT_ID")
+val projectId: String? = System.getenv("CI_PROJECT_ID")
 val gitlabRepo = if (ciJobToken != null && projectId != null) {
   publishing.repositories.maven("https://gitlab.com/api/v4/projects/$projectId/packages/maven") {
     name = "gitlab"
