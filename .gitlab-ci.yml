@@ -1,19 +1,12 @@
-image: openjdk:8-jdk-alpine
-
-before_script:
-- export GRADLE_USER_HOME=`pwd`/.gradle
-
-cache:
-  paths:
-    - .gradle/wrapper
-    - .gradle/caches
+image: registry.gitlab.com/josm/docker-library/openjdk-8-josmplugin:latest
 
 assemble:
   stage: build
   script:
   - ./gradlew assemble
   artifacts:
-    untracked: true
+    paths:
+    - build/
 
 build:
   stage: test
