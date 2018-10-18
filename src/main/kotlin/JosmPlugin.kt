@@ -2,20 +2,18 @@ package org.openstreetmap.josm.gradle.plugin
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.internal.file.SourceDirectorySetFactory
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.jvm.tasks.Jar
 import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.task.setupJosmTasks
-import javax.inject.Inject
 
 /**
  * Main class of the plugin, sets up the custom configurations <code>requiredPlugin</code> and <code>packIntoJar</code>,
  * the additional repositories and the custom tasks.
  */
-class JosmPlugin @Inject constructor(val sourceDirectorySetFactory: SourceDirectorySetFactory?): Plugin<Project> {
+class JosmPlugin: Plugin<Project> {
 
   /**
    * Set up the JOSM plugin.
@@ -91,12 +89,8 @@ class JosmPlugin @Inject constructor(val sourceDirectorySetFactory: SourceDirect
     project.configurations.getByName("implementation").setupAsMainConfiguration(project)
     project.setupJosmTasks()
 
-    if (sourceDirectorySetFactory == null) {
-      project.logger.warn("No source directory set factory given! The i18n source sets are not configured.")
-    } else {
-      project.convention.java.sourceSets.all {
-        it.setup(project, sourceDirectorySetFactory)
-      }
+    project.convention.java.sourceSets.all {
+      it.setup(project)
     }
   }
 }
