@@ -119,7 +119,7 @@ tasks.withType(DokkaTask::class) {
   skipEmptyPackages = false
 
   externalDocumentationLinks.add(DokkaConfiguration.ExternalDocumentationLink.Builder(URL("https://docs.gradle.org/${project.gradle.gradleVersion}/javadoc/")).build())
-  externalDocumentationLinks.add(DokkaConfiguration.ExternalDocumentationLink.Builder(URL("http://docs.groovy-lang.org/${GroovySystem.getVersion()}/html/api/")).build())
+  externalDocumentationLinks.add(DokkaConfiguration.ExternalDocumentationLink.Builder(URL("http://docs.groovy-lang.org/2.5.3/html/api/")).build()) // TODO: Use dynamic Groovy version
 }
 
 group = "org.openstreetmap.josm"
