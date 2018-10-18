@@ -5,7 +5,6 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.IvyArtifactRepository
-import org.gradle.api.artifacts.repositories.IvyPatternRepositoryLayout
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.tasks.util.PatternFilterable
 import org.openstreetmap.josm.gradle.plugin.josm
@@ -168,23 +167,23 @@ open class JosmPluginExtension(private val project: Project) {
     rh.maven {
       it.url = URI("https://josm.openstreetmap.de/nexus/content/repositories/releases/")
     }
-    rh.ivy {
-      it.url = URI("https://josm.openstreetmap.de/download/")
-      it.layout("pattern", Action<IvyPatternRepositoryLayout> {
+    rh.ivy { repo ->
+      repo.url = URI("https://josm.openstreetmap.de/download/")
+      repo.patternLayout {
         it.artifact("[artifact].jar")
         it.artifact("[artifact]-[revision].jar")
         it.artifact("[artifact]-snapshot-[revision].jar")
         it.artifact("Archiv/[artifact]-snapshot-[revision].jar")
-      })
+      }
     }
     rh.maven {
       it.url = URI("https://josm.openstreetmap.de/nexus/content/repositories/snapshots/")
     }
-    rh.ivy {
-      it.url = URI("https://svn.openstreetmap.org/applications/editors/josm/dist/")
-      it.layout("pattern", Action<IvyPatternRepositoryLayout> {
+    rh.ivy { repo ->
+      repo.url = URI("https://svn.openstreetmap.org/applications/editors/josm/dist/")
+      repo.patternLayout {
         it.artifact("[artifact].jar")
-      })
+      }
     }
     rh.maven {
       it.url = URI("https://gitlab.com/api/v4/projects/8611940/packages/maven")

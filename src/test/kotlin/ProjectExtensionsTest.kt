@@ -1,9 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin
 
-import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.api.artifacts.repositories.IvyPatternRepositoryLayout
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -20,11 +18,11 @@ class ProjectExtensionsTest {
 
   private fun createRequiredPluginsTestRepo(): Project {
     val pro = createGradleJosmProjectWithoutRepos()
-    pro.repositories.add(pro.repositories.ivy {
-      it.url = ProjectExtensionsTest::class.java.getResource("/josmPluginRepo").toURI()
-      it.layout("pattern", Action<IvyPatternRepositoryLayout> {
+    pro.repositories.add(pro.repositories.ivy { repo ->
+      repo.url = ProjectExtensionsTest::class.java.getResource("/josmPluginRepo").toURI()
+      repo.patternLayout {
         it.artifact("[artifact].jar")
-      })
+      }
     })
     return pro
   }
@@ -43,11 +41,11 @@ class ProjectExtensionsTest {
 
   private fun createNextJosmTestRepo(): Project {
     val pro = createGradleJosmProjectWithoutRepos()
-    pro.repositories.add(pro.repositories.ivy {
-      it.url = ProjectExtensionsTest::class.java.getResource("/josmRepo").toURI()
-      it.layout("pattern", Action<IvyPatternRepositoryLayout> {
+    pro.repositories.add(pro.repositories.ivy { repo ->
+      repo.url = ProjectExtensionsTest::class.java.getResource("/josmRepo").toURI()
+      repo.patternLayout {
         it.artifact("[artifact]-[revision]")
-      })
+      }
     })
     return pro
   }
