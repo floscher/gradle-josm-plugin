@@ -20,8 +20,11 @@ open class CustomJosmVersionCompile
     group = "JOSM"
     description = "Compile the JOSM plugin against ${if (findNextVersion) { "the first available JOSM version since" } else { "JOSM version" }} $customVersion"
     classpath = additionalClasspath
-    source.add(sourceSet.java)
     destinationDir =  File(project.buildDir, "classes/java/${sourceSet.name}_${customVersion}")
+
+    project.afterEvaluate {
+      source(sourceSet.java)
+    }
 
     project.gradle.taskGraph.whenReady { graph ->
       if (graph.hasTask(this)) {
