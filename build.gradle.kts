@@ -90,35 +90,34 @@ dependencies {
 jacoco {
   toolVersion = "0.8.2"
 }
-tasks.withType(JacocoReport::class.java) {
+tasks.withType(JacocoReport::class) {
   this.logCoverage()
 }
 
-tasks.withType(Test::class.java) {
+tasks.withType(Test::class) {
   useJUnitPlatform()
   finalizedBy(tasks.getByName("jacocoTestReport"))
 }
 
-tasks {
-  "dokka"(DokkaTask::class) {
-    outputFormat = "html"
-    outputDirectory = "$buildDir/docs/kdoc"
-    gradle.projectsEvaluated {
-      project(":buildSrc").sourceSets["main"].withConvention(KotlinSourceSet::class) {
-        kotlin.srcDirs.forEach {
-          sourceDirs = sourceDirs.toList().plus(it).asIterable()
-        }
-      }
-    }
+// Configure "dokka" task
+val dokkaTask = tasks.withType(DokkaTask::class)["dokka"]
+dokkaTask.apply {
+  outputFormat = "html"
+  outputDirectory = "$buildDir/docs/kdoc"
+}
+gradle.projectsEvaluated {
+  project(":buildSrc").sourceSets["main"].withConvention(KotlinSourceSet::class) {
+    dokkaTask.sourceDirs = dokkaTask.sourceDirs.plus(kotlin.srcDirs)
   }
-  withType(DokkaTask::class.java) {
-    includes = listOfNotNull("src/main/kotlin/packages.md")
-    jdkVersion = 8
-    skipEmptyPackages = false
+}
+// Configure all Dokka tasks
+tasks.withType(DokkaTask::class) {
+  includes = listOfNotNull("src/main/kotlin/packages.md")
+  jdkVersion = 8
+  skipEmptyPackages = false
 
-    externalDocumentationLinks.add(DokkaConfiguration.ExternalDocumentationLink.Builder(URL("https://docs.gradle.org/${project.gradle.gradleVersion}/javadoc/")).build())
-    externalDocumentationLinks.add(DokkaConfiguration.ExternalDocumentationLink.Builder(URL("http://docs.groovy-lang.org/${GroovySystem.getVersion()}/html/api/")).build())
-  }
+  externalDocumentationLinks.add(DokkaConfiguration.ExternalDocumentationLink.Builder(URL("https://docs.gradle.org/${project.gradle.gradleVersion}/javadoc/")).build())
+  externalDocumentationLinks.add(DokkaConfiguration.ExternalDocumentationLink.Builder(URL("http://docs.groovy-lang.org/${GroovySystem.getVersion()}/html/api/")).build())
 }
 
 group = "org.openstreetmap.josm"
