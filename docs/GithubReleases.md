@@ -15,7 +15,7 @@ A plugin `MANIFEST` includes two kinds of download URLs:
 
 1. the default download URL
 
-   This is the download URL of the latest plugin release. Usually, it doesn't include neither a version numer nor a release label. 
+   This is the download URL of the latest plugin release. Usually, it doesn't include neither a version number nor a release label. 
    For instance, the default download URL for the `scripting` plugin is 
    ```
    https://raw.githubusercontent.com/Gubaer/josm-scripting-plugin/deploy/dist/scripting.jar
@@ -69,7 +69,7 @@ releases:
   # the first entry in the releases list
   - label: v0.0.1                     # MANDATORY: the release label
     minJosmVersion: 1234              # MANDATORY: the lowest numeric josm version
-                                      # that this release is  compatible with
+                                      # that this release is compatible with
 
   # the second entry in the releases list
   - label: v0.0.2                     # MANDATORY:
@@ -105,7 +105,7 @@ $ ./gradlew createGithubRelease
 
 ### for a specific label, using the command line
 
-This creates a GitHub release with the label `v0.0.1`. Note that  `releases.yml` must include an entry for this label.
+This creates a GitHub release with the label `v0.0.1`. Note that `releases.yml` must include an entry for this label.
 
 ```yml
 # releases.yml
@@ -159,7 +159,7 @@ $ ./gradlew createMyRelease
 #### Publish to the release with the current release label
 
 Publishes the current plugin jar as release asset to the GitHub release with the label given by the project property `version`. Note that
-  * `releases.yml` must include an entry for this label.
+  * `releases.yml` must include an entry for this label
   * a GitHub release for this label has to exist
 
 ```yml
@@ -242,12 +242,12 @@ A configuration option is derived from command line arguments, properties, and e
 5. environment variable
 6. hard coded default value
 
-### common environement variables
+### common environment variables
 | environment variable | description |
 | --------------------- | ----------- |
 | `GITHUB_REPOSITORY_OWNER`       | the name of the github user |
 | `GITHUB_ACCESS_TOKEN`       | the Github access token |
-| `GITHUB_REPOSITORY_NAME`       | the name of the github repositoy. Defaults  to the project name. |
+| `GITHUB_REPOSITORY_NAME`       | the name of the github repository |
 | `GITHUB_API_URL` | the base API URL for the Github releases API. Defaults to `https://api.github.com` |
 | `GITHUB_UPLOAD_URL` | the base API URL to upload release assets. Defaults to `https://uploads.github.com` |
 
