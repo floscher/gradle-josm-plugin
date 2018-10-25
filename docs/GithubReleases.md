@@ -15,8 +15,8 @@ A plugin `MANIFEST` includes two kinds of download URLs:
 
 1. the default download URL
 
-   This is the download URL of the latest plugin release. Usually, it doesn't include neither a version numer nor a release label. 
-   For instance, the default download URL for the `scripting` plugin is 
+   This is the download URL of the latest plugin release. Usually, it includes neither a version number nor a release label.
+   For instance, the default download URL for the `scripting` plugin is
    ```
    https://raw.githubusercontent.com/Gubaer/josm-scripting-plugin/deploy/dist/scripting.jar
    ```
@@ -32,7 +32,7 @@ A plugin `MANIFEST` includes two kinds of download URLs:
    12875_Plugin-Url: 30772;https://raw.github.com/Gubaer/josm-scripting-plugin/for-josm-12875/dist/scripting.jar
    13007_Plugin-Url: 30775;https://raw.github.com/Gubaer/josm-scripting-plugin/for-josm-13007/dist/scripting.jar
    ```
-   (you can look it up [here][josm-plugin-list]) 
+   (you can look it up [here][josm-plugin-list])
 
 ### How to add a new JOSM plugin to the plugin directory? <a id="how-to-add-plugin-to-directory"></a>
 
@@ -69,7 +69,7 @@ releases:
   # the first entry in the releases list
   - label: v0.0.1                     # MANDATORY: the release label
     minJosmVersion: 1234              # MANDATORY: the lowest numeric josm version
-                                      # that this release is  compatible with
+                                      # that this release is compatible with
 
   # the second entry in the releases list
   - label: v0.0.2                     # MANDATORY:
@@ -77,7 +77,7 @@ releases:
     description: a description        # OPTIONAL
     name: a name for the release      # OPTIONAL
 
-  # ... more entries in the releases list 
+  # ... more entries in the releases list
 ```
 
 
@@ -105,7 +105,7 @@ $ ./gradlew createGithubRelease
 
 ### for a specific label, using the command line
 
-This creates a GitHub release with the label `v0.0.1`. Note that  `releases.yml` must include an entry for this label.
+This creates a GitHub release with the label `v0.0.1`. Note that `releases.yml` must include an entry for this label.
 
 ```yml
 # releases.yml
@@ -159,7 +159,7 @@ $ ./gradlew createMyRelease
 #### Publish to the release with the current release label
 
 Publishes the current plugin jar as release asset to the GitHub release with the label given by the project property `version`. Note that
-  * `releases.yml` must include an entry for this label.
+  * `releases.yml` must include an entry for this label
   * a GitHub release for this label has to exist
 
 ```yml
@@ -176,7 +176,7 @@ $ ./gradlew publishToGithubRelease
 
 #### Publish to a GitHub release with a specific label, using the command line
 
-Publishes the current plugin jar as release asset to the Github release with the 
+Publishes the current plugin jar as release asset to the Github release with the
 label `v0.0.1`.
 The local name and path of the plugin jar is derived from the name and location of the jar built by the gradle `jar` task. The name of the published jar is the same as the name  of the local jar.
 
@@ -224,7 +224,7 @@ publishToGithubRelease {
 ```
 
 
-On the command line: 
+On the command line:
 ```bash
 $ ./gradlew publishToGithubRelease \
     --local-jar-path /path/to/my/asset/plugin.jar \
@@ -242,12 +242,12 @@ A configuration option is derived from command line arguments, properties, and e
 5. environment variable
 6. hard coded default value
 
-### common environement variables
+### common environment variables
 | environment variable | description |
 | --------------------- | ----------- |
 | `GITHUB_REPOSITORY_OWNER`       | the name of the github user |
 | `GITHUB_ACCESS_TOKEN`       | the Github access token |
-| `GITHUB_REPOSITORY_NAME`       | the name of the github repositoy. Defaults  to the project name. |
+| `GITHUB_REPOSITORY_NAME`       | the name of the github repository |
 | `GITHUB_API_URL` | the base API URL for the Github releases API. Defaults to `https://api.github.com` |
 | `GITHUB_UPLOAD_URL` | the base API URL to upload release assets. Defaults to `https://uploads.github.com` |
 
@@ -279,8 +279,8 @@ You could put it into `~/.gradle/gradle.properties` or use the environment varia
 #  the GitHub upload URL if different from https://uploads.github.com
 # export GITHUB_UPLOAD_URL=https://uploads.my-github-host.test
 
-# the base GitHub URL. Defaults to http://github.com 
-# export GITHUB_MAIN_URL=http://my-github.test
+# the base GitHub URL. Defaults to https://github.com
+# export GITHUB_MAIN_URL=https://my-github.test
 ```
 
 ### template for `build.gradle`
@@ -330,11 +330,11 @@ publishToGithubRelease {
 
     // optional. if different from 'master'
     //targetCommitish="deploy"
-    
+
     // optional. if different from the standard path where gradle build
     // the jar
     //localJarPath="/full/path/to/the/local/my-plugin.jar"
-    
+
     // optional. if different from the name of the jar file built locally
     //remoteJarName="my-plugin.jar"
 }
