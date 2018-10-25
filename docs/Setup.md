@@ -68,6 +68,7 @@ plugin.main.version=1234
 # plugin.icon=path/to/my/icon.svg
 # plugin.requires=apache-commons;apache-http
 # plugin.stage=50
+# plugin.link=http://host/path/to/doc/website
 ```
 In the `build.xml` file put the following where the properties were defined previously:
 ```xml
