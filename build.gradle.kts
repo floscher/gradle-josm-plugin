@@ -71,22 +71,25 @@ gradle.projectsEvaluated {
 }
 
 dependencies {
-  val junitVersion = "5.3.1"
-  val kotlinVersion: String by project.project(":buildSrc").extra
+  val junitVersion = "5.3.2"
   val jacksonVersion = "2.9.7"
 
   implementation(localGroovy())
-  implementation(kotlin("stdlib-jdk8", kotlinVersion))
-  implementation("com.squareup.okhttp3", "okhttp", "3.11.0")
-  implementation("com.beust","klaxon", "3.0.8").because("versions 3.0.9 and 3.0.10 are broken, see https://github.com/cbeust/klaxon/issues/202")
+  implementation(kotlin("stdlib-jdk8"))
+  implementation("com.squareup.okhttp3", "okhttp", "3.12.0")
+  implementation("com.beust","klaxon", "4.0.1")
+  constraints {
+    val kotlinVersion: String by rootProject.project(":buildSrc").extra
+    implementation(kotlin("reflect", kotlinVersion)) { because("Align Kotlin version used by Klaxon dependencies with the one used by gradle-josm-plugin.") }
+  }
   implementation("com.fasterxml.jackson.module", "jackson-module-kotlin", jacksonVersion)
   implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", jacksonVersion)
-  implementation("com.vladsch.flexmark:flexmark:0.34.48")
+  implementation("com.vladsch.flexmark:flexmark:0.34.58")
   testImplementation("org.junit.jupiter", "junit-jupiter-api", junitVersion)
   testImplementation("com.github.tomakehurst","wiremock","2.19.0")
   testImplementation("ru.lanwen.wiremock", "wiremock-junit5", "1.2.0")
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", junitVersion)
-  testImplementation(kotlin("reflect", kotlinVersion))
+  testImplementation(kotlin("reflect"))
 }
 
 jacoco {
@@ -119,7 +122,7 @@ tasks.withType(DokkaTask::class) {
   skipEmptyPackages = false
 
   externalDocumentationLinks.add(DokkaConfiguration.ExternalDocumentationLink.Builder(URL("https://docs.gradle.org/${project.gradle.gradleVersion}/javadoc/")).build())
-  externalDocumentationLinks.add(DokkaConfiguration.ExternalDocumentationLink.Builder(URL("http://docs.groovy-lang.org/2.5.3/html/api/")).build()) // TODO: Use dynamic Groovy version
+  externalDocumentationLinks.add(DokkaConfiguration.ExternalDocumentationLink.Builder(URL("http://docs.groovy-lang.org/${GroovySystem.getVersion()}/html/api/")).build())
 }
 
 group = "org.openstreetmap.josm"
