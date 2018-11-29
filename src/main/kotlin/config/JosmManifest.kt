@@ -203,9 +203,10 @@ class JosmManifest(private val project: Project) {
   private fun buildMapOfGitHubDownloadLinks() : Map<String,String> {
 
     fun JsonObject.downloadUrl() : String? {
-      val assets = this["assets"] as? JsonArray<JsonObject>
-      return assets?.mapNotNull {
-          it["browser_download_url"]?.toString()
+      val assets = this["assets"] as? JsonArray<*>
+      return assets
+        ?.mapNotNull {
+          (it as? JsonObject)?.get("browser_download_url")?.toString()
         }
         ?.find { it.endsWith(".jar") }
     }

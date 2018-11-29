@@ -21,7 +21,7 @@ private fun Response.toFormattedErrorMessage() : String {
       "Unexpected error response body from GitHub API"
     )
   return try {
-    Parser().parse(StringBuilder(body)) as JsonObject
+    Parser.default().parse(StringBuilder(body)) as JsonObject
   } catch(t: Throwable) {
     null
   }?.toJsonString(prettyPrint = true) ?: body
@@ -116,10 +116,15 @@ class GithubReleasesClient(
         }
         val pagination = Pagination(response.header("Link"))
 
-        val releases = Parser().parse(StringBuilder(
-          response.body()?.string() ?: "[]"
-        )) as JsonArray<JsonObject>
-        ret.addAll(releases)
+        ret.addAll(
+          (
+            Parser.default().parse(StringBuilder(
+              response.body()?.string() ?: "[]"
+            )) as? JsonArray<*>
+          )
+          ?.mapNotNull { it as? JsonObject }
+          ?: listOf()
+        )
         requestUrl = pagination.nextUrl
       } catch(e: GithubReleaseException) {
         throw e
@@ -135,7 +140,7 @@ class GithubReleasesClient(
     throw GithubReleaseException(
       "Unexpected response body from GitHub API"
     )
-    return Parser().parse(StringBuilder(body)) as JsonObject
+    return Parser.default().parse(StringBuilder(body)) as JsonObject
   }
 
   private fun invokeWrapped(executor: () -> JsonObject?) : JsonObject? {
@@ -283,10 +288,15 @@ class GithubReleasesClient(
         }
         val pagination = Pagination(response.header("Link"))
 
-        val releases = Parser().parse(StringBuilder(
-          response.body()?.string() ?: "[]"
-        )) as JsonArray<JsonObject>
-        ret.addAll(releases)
+        ret.addAll(
+          (
+            Parser.default().parse(StringBuilder(
+              response.body()?.string() ?: "[]"
+            )) as? JsonArray<*>
+          )
+          ?.mapNotNull { it as? JsonObject }
+          ?: listOf()
+        )
         requestUrl = pagination.nextUrl
       }
       return ret
