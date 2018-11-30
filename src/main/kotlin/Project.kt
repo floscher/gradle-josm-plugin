@@ -73,12 +73,18 @@ private fun Project.resolveJosm(version: String): Dependency {
  * @return a set of [Dependency] objects, including the requested plugins, plus all plugins required by the requested
  *   plugins
  */
-fun Project.getAllRequiredJosmPlugins(directlyRequiredPlugins: Collection<String>): Set<Dependency> {
-  logger.lifecycle("Resolving required JOSM plugins…")
-  val result = getAllRequiredJosmPlugins(0, mutableSetOf(), directlyRequiredPlugins.toSet())
-  logger.lifecycle("{} JOSM plugins are required: {}", result.size, result.joinToString(", ") { it.name })
-  return result
-}
+fun Project.getAllRequiredJosmPlugins(directlyRequiredPlugins: Collection<String>): Set<Dependency> =
+  if (directlyRequiredPlugins.isNullOrEmpty()) {
+    logger.info("No other JOSM plugins required by this plugin.")
+
+    setOf()
+  } else {
+    logger.lifecycle("Resolving required JOSM plugins…")
+    val result = getAllRequiredJosmPlugins(0, mutableSetOf(), directlyRequiredPlugins.toSet())
+    logger.lifecycle("{} JOSM plugins are required: {}", result.size, result.joinToString(", ") { it.name })
+
+    result
+  }
 
 private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolvedPlugins: MutableSet<String>, directlyRequiredPlugins: Set<String>): Set<Dependency> {
   val realRecursionDepth = max(0, recursionDepth)
