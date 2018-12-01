@@ -21,12 +21,13 @@ fun InputStream.readAllOrException(b: ByteArray): Int {
 /**
  * Skip over `n` bytes. If there are only less than `n` bytes, an exception is thrown.
  */
-fun InputStream.skipAllOrException(n: Long): Long {
-  val numBytes = this.skip(n)
-  if (numBytes < n) {
+@ExperimentalUnsignedTypes
+fun InputStream.skipAllOrException(n: UInt): UInt {
+  val numBytes = this.skip(n.toLong())
+  if (numBytes < n.toLong()) {
     throw IOException("Could not skip over $n bytes. The stream ended unexpectedly!")
   }
-  return numBytes
+  return numBytes.toUInt()
 }
 
 /**
