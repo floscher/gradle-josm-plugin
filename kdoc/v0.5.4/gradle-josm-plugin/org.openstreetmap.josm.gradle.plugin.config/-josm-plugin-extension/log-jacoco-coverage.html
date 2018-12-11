@@ -1,0 +1,25 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>JosmPluginExtension.logJacocoCoverage - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.config</a>&nbsp;/&nbsp;<a href="index.html">JosmPluginExtension</a>&nbsp;/&nbsp;<a href="./log-jacoco-coverage.html">logJacocoCoverage</a><br/>
+<br/>
+<h1>logJacocoCoverage</h1>
+<a name="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$logJacocoCoverage"></a>
+<code><span class="keyword">var </span><span class="identifier">logJacocoCoverage</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Iff this is <code>true</code>, the coverage numbers for instruction, branch and line coverage are logged for every tasks
+with type <a href="https://docs.gradle.org/5.0/javadoc/org/gradle/testing/jacoco/tasks/JacocoReport.html">org.gradle.testing.jacoco.tasks.JacocoReport</a>.</p>
+<p>The format is as follows:</p>
+<pre><code>Instruction coverage: 25.0000 % (25 of 100)
+     Branch coverage: 50.0000 % (5 of 10)
+       Line coverage: 75.0000 % (3 of 4)
+</code></pre>
+<p>The message is printed via <a href="https://docs.gradle.org/5.0/javadoc/org/gradle/api/Project.html#getLogger()">Project.getLogger</a>, logging level is <a href="https://docs.gradle.org/5.0/javadoc/org/gradle/api/logging/Logger.html#lifecycle(java.lang.String)">org.gradle.api.logging.Logger.lifecycle</a>.</p>
+<p><strong>Default value:</strong> <code>true</code></p>
+<p><strong>Since</strong><br/>
+0.5.1</p>
+</BODY>
+</HTML>

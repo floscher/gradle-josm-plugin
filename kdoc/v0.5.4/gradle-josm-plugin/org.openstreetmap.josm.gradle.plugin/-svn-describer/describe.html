@@ -1,0 +1,25 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>SvnDescriber.describe - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin</a>&nbsp;/&nbsp;<a href="index.html">SvnDescriber</a>&nbsp;/&nbsp;<a href="./describe.html">describe</a><br/>
+<br/>
+<h1>describe</h1>
+<a name="org.openstreetmap.josm.gradle.plugin.SvnDescriber$describe(kotlin.Boolean)"></a>
+<code><span class="keyword">fun </span><span class="identifier">describe</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.SvnDescriber$describe(kotlin.Boolean)/dirty">dirty</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>Overrides <a href="../-describer/describe.html">Describer.describe</a></p>
+<h3>Parameters</h3>
+<p><a name="dirty"></a>
+<code>dirty</code> - if this is true, the revision number is appended with "-dirty",
+when there are uncommitted changes in the repository.</p>
+<h3>Exceptions</h3>
+<p><a name="IOException"></a>
+<code>IOException</code> - if the process of <code>svn info</code> is not executed successfully within 2 minutes,
+or if the result does not contain a revision.</p>
+<p><strong>Return</strong><br/>
+the SVN revision in the format "r123"</p>
+</BODY>
+</HTML>
