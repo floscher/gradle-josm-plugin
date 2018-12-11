@@ -46,6 +46,7 @@ open class MoCompile
     }
   }
 
+  @ExperimentalUnsignedTypes
   @TaskAction
   fun action() {
     outDir.mkdirs()

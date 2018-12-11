@@ -10,6 +10,9 @@ import org.openstreetmap.josm.gradle.plugin.isJosmDependency
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * This task compiles the given source set against a specific JOSM version.
+ */
 open class CustomJosmVersionCompile
   @Inject
   constructor(customVersion: String, findNextVersion: Boolean, sourceSet: SourceSet, additionalClasspath: FileCollection): JavaCompile() {

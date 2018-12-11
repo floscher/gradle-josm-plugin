@@ -41,15 +41,16 @@ open class GeneratePot
 
     workingDir = project.getProjectDir()
     executable = "xgettext"
-    args(
-      "--from-code=UTF-8", "--language=Java",
-      "--output-dir=" + outDir.absolutePath,
-      "--add-comments",
-      "--sort-output",
-      "-k", "-ktrc:1c,2", "-kmarktrc:1c,2", "-ktr", "-kmarktr", "-ktrn:1,2", "-ktrnc:1c,2,3"
-    )
 
     project.afterEvaluate {
+      args(
+        "--from-code=UTF-8", "--language=Java",
+        "--output-dir=" + outDir.absolutePath,
+        "--add-comments",
+        "--sort-output",
+        "-k", "-ktrc:1c,2", "-kmarktrc:1c,2", "-ktr", "-kmarktr", "-ktrn:1,2", "-ktrnc:1c,2,3"
+      )
+
       dependsOn(fileListGenTask)
       inputs.files(fileListGenTask.inputs.files)
 

@@ -48,7 +48,7 @@ open class ShortenPoFiles
           var modifiedLine = line
           if (isHeader) {
             // Rewrite the generic parts of the file header
-            if (modifiedLine.startsWith("# ")) {
+            if (modifiedLine.startsWith("# ")) { // TODO: Rewrite translators part of the header comment
               val projectName = project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName
               modifiedLine = modifiedLine.replace("SOME DESCRIPTIVE TITLE.", "Translations for the JOSM plugin '$projectName' (${file.nameWithoutExtension})")
               modifiedLine = modifiedLine.replace("THE PACKAGE'S COPYRIGHT HOLDER", project.extensions.josm.i18n.copyrightHolder ?: "")
@@ -58,9 +58,13 @@ open class ShortenPoFiles
             }
           }
           // Write all lines to the temporary file except the ones containing pointers to the source code or the last translator
-          if (!modifiedLine.startsWith("#: ") && !modifiedLine.startsWith("\"Last-Translator:")) {
-            out.write(modifiedLine)
-            out.newLine()
+          if (
+            !modifiedLine.startsWith("#, ")
+            && !modifiedLine.startsWith("#. ")
+            && !modifiedLine.startsWith("#: ")
+            && !modifiedLine.startsWith("\"Last-Translator:")
+          ) {
+            out.write(modifiedLine.trimEnd() + '\n')
           }
         }
       }
