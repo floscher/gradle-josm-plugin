@@ -79,7 +79,7 @@ class LangWriter {
       // If the translation is not available in the current language
       if (msgstr == null) {
         stream.write(0)
-        // If the file currently written is not the one for the original language and if the translated string is the same as the original
+      // If the file currently written is not the one for the original language and if the translated string is the same as the original
       } else if (!isOriginLanguage && msgstr == msgid.id) {
         stream.write(0xFE)
       } else {

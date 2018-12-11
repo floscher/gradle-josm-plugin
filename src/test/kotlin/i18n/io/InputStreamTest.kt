@@ -4,6 +4,7 @@ import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import java.io.IOException
 
+@ExperimentalUnsignedTypes
 class InputStreamTest {
 
   @Test(expected = IOException::class)
@@ -32,19 +33,19 @@ class InputStreamTest {
 
   @Test(expected = IOException::class)
   fun testSkipAllOrExceptionFail1() {
-    ByteArray(0).inputStream().skipAllOrException(2)
+    ByteArray(0).inputStream().skipAllOrException(2u)
   }
 
   @Test(expected = IOException::class)
   fun testSkipAllOrExceptionFail2() {
-    ByteArray(1).inputStream().skipAllOrException(2)
+    ByteArray(1).inputStream().skipAllOrException(2u)
   }
 
   @Test
   fun testSkipAllOrException() {
-    assertEquals(2, ByteArray(2).inputStream().skipAllOrException(2))
-    assertEquals(2, ByteArray(3).inputStream().skipAllOrException(2))
-    assertEquals(2, ByteArray(72).inputStream().skipAllOrException(2))
+    assertEquals(2, ByteArray(2).inputStream().skipAllOrException(2u))
+    assertEquals(2, ByteArray(3).inputStream().skipAllOrException(2u))
+    assertEquals(2, ByteArray(72).inputStream().skipAllOrException(2u))
   }
 
   @Test(expected = IOException::class)

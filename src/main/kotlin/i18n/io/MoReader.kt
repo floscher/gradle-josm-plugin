@@ -1,31 +1,54 @@
 package org.openstreetmap.josm.gradle.plugin.i18n.io
 
+import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.URL
-import java.nio.charset.StandardCharsets
 
 /**
  * Reads the strings contained inside a *.mo file.
- * @param moFileURL the URL of the *.mo file that you want to read
+ *
+ * @property stream1 reads the indices of the strings
+ * @property stream2 reads the actual strings
  */
 @ExperimentalUnsignedTypes
-class MoReader(private val moFileURL: URL) {
+class MoReader private constructor(private val stream1: InputStream, private val stream2: InputStream) {
+
+  /**
+   * @param moFileURL the URL of the *.mo file that you want to read
+   */
+  constructor(moFileURL: URL): this(moFileURL.openStream(), moFileURL.openStream())
+  internal constructor(bytes: ByteArray): this(ByteArrayInputStream(bytes), ByteArrayInputStream(bytes))
+
   companion object {
     /**
      * The big-endian magic bytes of *.mo files (little-endian would be reversed)
      */
     @JvmStatic
     val BE_MAGIC: ByteArray = listOf(0x95, 0x04, 0x12, 0xde).map { it.toUByte().toByte() }.toByteArray()
+
+    /**
+     * 7 times 4 bytes (≙ 7 32bit numbers)
+     */
+    const val HEADER_SIZE_IN_BYTES = 28u
   }
 
-  private var bigEndian: Boolean = true
-  private var formatRev: UInt = 0u
-  private var numStrings: Int = 0
-  private var offsetOrigStrings: UInt = 0u
-  private var offsetTranslatedStrings: UInt = 0u
-  private var sizeHashingTable: UInt = 0u
-  private var offsetHashingTable: UInt = 0u
+  class HeaderValues(val isBigEndian: Boolean, uints: List<UInt>) {
+    init {
+      require(uints.size == 6)
+    }
+    val formatRev: UInt = uints[0]
+    val numStrings: Int = uints[1].toInt()
+    val offsetOrigStrings: UInt = uints[2]
+    val offsetTranslatedStrings: UInt = uints[3]
+    val sizeHashingTable: UInt = uints[4]
+    val offsetHashingTable: UInt = uints[5]
+    init {
+      if (this.numStrings < 0) {
+        throw NotImplementedError("Reading MO files containing more than ${Int.MAX_VALUE} strings is not implemented (this file claims to contain $numStrings strings)!")
+      }
+    }
+  }
 
   /**
    * Reads the *.mo file at the given [URL] and returns the contained strings as a [Map] from [MsgId]s to [MsgStr]s.
@@ -33,25 +56,22 @@ class MoReader(private val moFileURL: URL) {
    * @throws IOException If the
    */
   fun readFile(): Map<MsgId, MsgStr> {
-    // Stream 1 reads the indices of the strings
-    val stream1 = moFileURL.openStream()
-    // Stream 2 reads the actual strings
-    val stream2 = moFileURL.openStream()
     val stringMap: MutableMap<MsgId, MsgStr> = mutableMapOf()
     stream1.use { s1 ->
       // Read the header (sets the header fields)
-      var stream1Pos: UInt = readHeader(s1)
+      val header: HeaderValues = readHeader(s1)
+      var stream1Pos: UInt = HEADER_SIZE_IN_BYTES
       stream2.use { s2 ->
         var stream2Pos: UInt = 0u
 
-        stream1Pos += s1.skipAllOrException(offsetOrigStrings - stream1Pos)
+        stream1Pos += s1.skipAllOrException(header.offsetOrigStrings - stream1Pos)
 
         // Read msgid strings
         val stringLengthOffset = ByteArray(8) { 0 }
         val msgIds: MutableList<MsgId> = mutableListOf()
-        for (i in 0 until numStrings) {
+        for (i in 0 until header.numStrings) {
           stream1Pos += s1.readAllOrException(stringLengthOffset).toUInt()
-          val stringDescriptor = stringLengthOffset.toUIntList(bigEndian)
+          val stringDescriptor = stringLengthOffset.toUIntList(header.isBigEndian)
           val stringLength = stringDescriptor[0].toInt()
           if (stringLength < 0) {
             throw NotImplementedError("Reading strings longer than ${Int.MAX_VALUE} is not implemented! You are trying to read one of length ${stringLength.toUInt()}!")
@@ -64,18 +84,18 @@ class MoReader(private val moFileURL: URL) {
           msgIds.add(stringBytes.toMsgId())
         }
 
-        stream1Pos += s1.skipAllOrException(offsetTranslatedStrings - stream1Pos)
+        stream1Pos += s1.skipAllOrException(header.offsetTranslatedStrings - stream1Pos)
 
         // Read msgstr strings
-        for (i in 0 until numStrings) {
+        for (i in 0 until header.numStrings) {
           stream1Pos += s1.readAllOrException(stringLengthOffset).toUInt()
-          val stringDescriptor = stringLengthOffset.toUIntList(bigEndian)
+          val stringDescriptor = stringLengthOffset.toUIntList(header.isBigEndian)
 
           stream2Pos += s2.skipAllOrException(stringDescriptor[1] - stream2Pos)
           val stringBytes = ByteArray(stringDescriptor[0].toInt()) {0}
           stream2Pos += s2.readAllOrException(stringBytes).toUInt()
 
-          stringMap[msgIds[i]] = MsgStr(String(stringBytes, StandardCharsets.UTF_8).split('\u0000'))
+          stringMap[msgIds[i]] = MsgStr(String(stringBytes, Charsets.UTF_8).split(MsgStr.GRAMMATICAL_NUMBER_SEPARATOR))
         }
       }
     }
@@ -85,8 +105,8 @@ class MoReader(private val moFileURL: URL) {
   /**
    * Read the file header from the given input stream
    */
-  private fun readHeader(stream: InputStream): UInt {
-    val header = ByteArray(28) { 0 }
+  private fun readHeader(stream: InputStream): HeaderValues {
+    val header = ByteArray(HEADER_SIZE_IN_BYTES.toInt()) { 0 }
     val actualHeaderSize = stream.read(header)
     if (actualHeaderSize != header.size) {
       throw IOException(
@@ -95,38 +115,14 @@ class MoReader(private val moFileURL: URL) {
       )
     }
     val magic = header.sliceArray(0 until BE_MAGIC.size)
-    bigEndian = when {
+    val isBigEndian = when {
       BE_MAGIC.contentEquals(magic) -> true
       BE_MAGIC.reversedArray().contentEquals(magic) -> false
       else -> throw IOException("Not a MO file, magic bytes are incorrect!")
     }
-    val headerInts = header.sliceArray(magic.size until header.size).toUIntList(bigEndian)
-    formatRev = headerInts[0]
-    numStrings = if (headerInts[1] > Int.MAX_VALUE.toUInt())
-      throw NotImplementedError("Reading MO files containing more than ${Int.MAX_VALUE} strings is not implemented (this file claims to contain $headerInts[1] strings)!")
-      else headerInts[1].toInt()
-    offsetOrigStrings = headerInts[2]
-    offsetTranslatedStrings = headerInts[3]
-    sizeHashingTable = headerInts[4]
-    offsetHashingTable = headerInts[5]
+    val headerInts = header.sliceArray(magic.size until header.size).toUIntList(isBigEndian)
 
-    return header.size.toUInt()
-  }
-}
-
-/**
- * Returns a MsgId for a string as it is saved in a *.mo file (context and EOT byte, then the string)
- */
-internal fun ByteArray.toMsgId(contextSeparator: Char = '\u0004', pluralSeparator: Char = '\u0000'): MsgId {
-  val string = this.toString(StandardCharsets.UTF_8)
-  val csIndex = string.indexOf(contextSeparator)
-  return if (csIndex >= 0) {
-    MsgId(
-      MsgStr(string.substring(csIndex + 1).split(pluralSeparator)),
-      string.substring(0, csIndex)
-    )
-  } else {
-    MsgId(MsgStr(string.split(pluralSeparator)))
+    return HeaderValues(isBigEndian, headerInts)
   }
 }
 

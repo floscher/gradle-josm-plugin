@@ -10,13 +10,16 @@ import java.io.InputStream
  *   can be read is below the parameter [b].
  */
 @Throws(IOException::class)
-fun InputStream.readAllOrException(b: ByteArray): Int {
-  val numBytes = this.read(b)
-  if (numBytes != b.size) {
-    throw IOException("Could not read ${b.size} bytes. The stream ended unexpectedly!")
+fun InputStream.readAllOrException(b: ByteArray): Int =
+  if (b.isEmpty()) {
+    0
+  } else {
+    this.read(b).also {
+      if (it != b.size) {
+        throw IOException("Could not read ${b.size} bytes. The stream ended unexpectedly!")
+      }
+    }
   }
-  return numBytes
-}
 
 /**
  * Skip over `n` bytes. If there are only less than `n` bytes, an exception is thrown.

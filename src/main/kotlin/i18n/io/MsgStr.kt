@@ -6,6 +6,10 @@ package org.openstreetmap.josm.gradle.plugin.i18n.io
  *   the rest of the elements are the plurals.
  */
 data class MsgStr(val strings: List<String>) {
+  companion object {
+    const val GRAMMATICAL_NUMBER_SEPARATOR = '\u0000'
+  }
+
   /**
    * @param singularString the singular version of the translatable string
    * @param pluralStrings the plural versions of the translatable string
@@ -14,4 +18,7 @@ data class MsgStr(val strings: List<String>) {
   init {
     require(strings.isNotEmpty()){"A MsgStr has to consist of at least one string!"}
   }
+
+  fun toByteArray(grammaticalNumberSeparator: Char = GRAMMATICAL_NUMBER_SEPARATOR): ByteArray =
+    strings.joinToString("$grammaticalNumberSeparator").toByteArray()
 }
