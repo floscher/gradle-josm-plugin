@@ -21,6 +21,6 @@ dependencies {
   val kotlinVersion: String by project.extra
 
   implementation(gradleApi())
-  implementation("org.eclipse.jgit:org.eclipse.jgit:5.1.3.201810200350-r")
-  implementation(kotlin("stdlib-jdk8"))
+  implementation("org.eclipse.jgit:org.eclipse.jgit:5.2.0.201812061821-r")
+  implementation(kotlin("stdlib-jdk8", kotlinVersion))
 }

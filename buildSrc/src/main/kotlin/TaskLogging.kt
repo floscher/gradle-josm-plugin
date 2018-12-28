@@ -3,6 +3,7 @@ package org.openstreetmap.josm.gradle.plugin
 import org.gradle.api.Project
 import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.testing.jacoco.tasks.JacocoReport
+import org.gradle.testing.jacoco.tasks.JacocoReportsContainer
 import java.time.Duration
 import java.time.Instant
 import java.util.Locale
@@ -31,13 +32,13 @@ fun TaskExecutionGraph.logTaskDuration() {
 fun Project.logSkippedTasks() {
   gradle.buildFinished {
     var wereTasksSkipped = false
-    tasks.forEach {
+    rootProject.allprojects.flatMap { it.tasks }.forEach {
       if (it.state.skipped) {
         if (!wereTasksSkipped) {
           it.logger.lifecycle("\nSkipped tasks:")
           wereTasksSkipped = true
         }
-        it.logger.lifecycle(" ⏭️  :${it.name} (${it.state.skipMessage})")
+        it.logger.lifecycle(" ⏭️  ${it.path} (${it.state.skipMessage})")
       }
     }
   }
@@ -72,19 +73,20 @@ fun JacocoReport.logCoverage() {
         }
       }
 
-    logger.lifecycle("Instruction coverage: ${coverageLogMessage(colValues[0], colValues[1])}")
-    logger.lifecycle("     Branch coverage: ${coverageLogMessage(colValues[2], colValues[3])}")
-    logger.lifecycle("       Line coverage: ${coverageLogMessage(colValues[4], colValues[5])}")
+    logger.lifecycle("Instruction coverage${coverageLogMessage(it.project, colValues[0], colValues[1])}")
+    logger.lifecycle("     Branch coverage${coverageLogMessage(it.project, colValues[2], colValues[3])}")
+    logger.lifecycle("       Line coverage${coverageLogMessage(it.project, colValues[4], colValues[5])}")
   }
 }
 
 /**
  * @return the given numbers of covered and missed lines formatted as [String], e.g. "25.0000 % (2 of 8)"
  */
-private fun coverageLogMessage(coveredCount: Int, missedCount: Int) =
+private fun coverageLogMessage(project: Project, coveredCount: Int, missedCount: Int) =
   String.format(
     Locale.UK,
-    "%.4f %% (%d of %d)",
+    "%s: %.4f %% (%d of %d)",
+    if (project.path == ":") "" else " ${project.path}",
     100 * coveredCount.toDouble() / (coveredCount + missedCount),
     coveredCount,
     coveredCount + missedCount
