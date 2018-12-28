@@ -1,29 +1,19 @@
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.openstreetmap.josm.gradle.plugin.Versions
 
-buildscript {
-  repositories {
-    jcenter()
-  }
-  dependencies {
-    val kotlinVersion: String by project.project(":buildSrc").extra
-    classpath(kotlin("gradle-plugin", kotlinVersion))
-  }
-}
 plugins {
   `java-library`
   jacoco
 }
 apply(plugin = "kotlin")
 
-val versions: Map<String, String> by rootProject.extra
-
 dependencies {
-  implementation(kotlin("stdlib-jdk8"))
+  implementation(kotlin("stdlib-jdk8", Versions.kotlin))
 
-  testImplementation("org.junit.jupiter", "junit-jupiter-api", versions["junit"])
-  testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", versions["junit"])
+  testImplementation("org.junit.jupiter", "junit-jupiter-api", Versions.junit)
+  testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", Versions.junit)
 }
 
 attachToRootProject(rootProject, this)

@@ -6,6 +6,7 @@ import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
+import org.openstreetmap.josm.gradle.plugin.Versions
 import org.openstreetmap.josm.gradle.plugin.logCoverage
 import org.openstreetmap.josm.gradle.plugin.logSkippedTasks
 import org.openstreetmap.josm.gradle.plugin.logTaskDuration
@@ -15,26 +16,6 @@ import java.time.Instant
 import java.net.URL
 import java.util.Locale
 
-buildscript {
-  repositories {
-    jcenter()
-  }
-
-  val versions by rootProject.extra {
-    val kotlinVersion: String by project(":buildSrc").extra
-    mapOf(
-      "jacoco" to "0.8.2",
-      "jackson" to "2.9.8",
-      "junit" to "5.3.2",
-      "kotlin" to kotlinVersion
-    )
-  }
-
-  dependencies {
-    classpath(kotlin("gradle-plugin", versions["kotlin"]))
-  }
-}
-
 plugins {
   id("com.gradle.plugin-publish").version("0.10.0")
   id("com.github.ben-manes.versions").version("0.20.0")
@@ -42,14 +23,12 @@ plugins {
 
   jacoco
   maven
-  eclipse
   `java-gradle-plugin`
   `maven-publish`
 }
 
 apply(plugin = "kotlin")
 
-val versions: Map<String, String> by rootProject.extra
 
 // Logging
 logSkippedTasks()
@@ -81,7 +60,7 @@ allprojects {
   }
 
   this.extensions.findByType(JacocoPluginExtension::class)?.apply {
-    toolVersion = versions.getValue("jacoco")
+    toolVersion = Versions.jacoco
   }
 }
 
@@ -93,41 +72,35 @@ afterEvaluate {
   }
 }
 
-// Reuse the kotlin sources from the "buildSrc" project
-gradle.projectsEvaluated {
-  sourceSets.main {
-    // the following line is here so IntelliJ correctly picks up the dependency on project :buildSrc
-    compileClasspath += project(":buildSrc").sourceSets.main.get().output
-    // Add all source directories of Kotlin source sets from project :buildSrc as source directories of the `main` source set
-    withConvention(KotlinSourceSet::class) {
-      project(":buildSrc").sourceSets.main.get()
-        .withConvention(KotlinSourceSet::class) { kotlin.srcDirs }
-        .forEach { this.kotlin.srcDir(it) }
-    }
-  }
-  project(":buildSrc").configurations.implementation.get().dependencies.forEach {
-    // Add all `implementation` dependencies of the `buildSrc` project
-    dependencies.implementation(it)
+// Reuse the kotlin sources from the "buildSrc" project in the plugin itself
+sourceSets.main.get().withConvention(KotlinSourceSet::class) {
+  kotlin.srcDir("$projectDir/buildSrc/src/dual/kotlin")
+}
+// Add dependencies of "buildSrc" sources
+val mainProject = this
+project(":buildSrc").afterEvaluate {
+  this.configurations.getByName(this.sourceSets.getByName("dual").implementationConfigurationName).dependencies.forEach {
+    // Add all `dual` dependencies of the `buildSrc` project to `main` source set of this project
+    mainProject.dependencies.implementation(it)
   }
 }
 
-
 dependencies {
   implementation(localGroovy())
-  implementation(kotlin("stdlib-jdk8", versions["kotlin"]))
-  implementation("com.squareup.okhttp3", "okhttp", "3.12.1")
-  implementation("com.beust","klaxon", "5.0.2")
+  implementation(kotlin("stdlib-jdk8", Versions.kotlin))
+  implementation("com.squareup.okhttp3", "okhttp", Versions.okhttp)
+  implementation("com.beust","klaxon", Versions.klaxon)
   constraints {
-    implementation(kotlin("reflect", versions["kotlin"])) { because("Align Kotlin version used by Klaxon dependencies with the one used by gradle-josm-plugin.") }
+    implementation(kotlin("reflect", Versions.kotlin)) { because("Align Kotlin version used by Klaxon dependencies with the one used by gradle-josm-plugin.") }
   }
-  implementation("com.fasterxml.jackson.module", "jackson-module-kotlin", versions["jackson"])
-  implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", versions["jackson"])
-  implementation("com.vladsch.flexmark:flexmark:0.40.0")
+  implementation("com.fasterxml.jackson.module", "jackson-module-kotlin", Versions.jackson)
+  implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", Versions.jackson)
+  implementation("com.vladsch.flexmark:flexmark:${Versions.flexmark}")
 
-  testImplementation("org.junit.jupiter", "junit-jupiter-api", versions["junit"])
-  testImplementation("com.github.tomakehurst","wiremock","2.20.0")
-  testImplementation("ru.lanwen.wiremock", "wiremock-junit5", "1.2.0")
-  testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", versions["junit"])
+  testImplementation("org.junit.jupiter", "junit-jupiter-api", Versions.junit)
+  testImplementation("com.github.tomakehurst","wiremock",Versions.wiremock)
+  testImplementation("ru.lanwen.wiremock", "wiremock-junit5", Versions.wiremockJunit5)
+  testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", Versions.junit)
   testImplementation(kotlin("reflect"))
 }
 
@@ -136,11 +109,13 @@ val dokkaTask = tasks.withType(DokkaTask::class).getByName("dokka") {
   outputFormat = "html"
   outputDirectory = "$buildDir/docs/kdoc"
 }
+
 gradle.projectsEvaluated {
-  project(":buildSrc").sourceSets["main"].withConvention(KotlinSourceSet::class) {
-    dokkaTask.sourceDirs = dokkaTask.sourceDirs.plus(kotlin.srcDirs)
+  project(":buildSrc").sourceSets.getByName("dual").withConvention(KotlinSourceSet::class) {
+    dokkaTask.sourceDirs = dokkaTask.sourceDirs.plus(this.kotlin.srcDirs)
   }
 }
+
 // Configure all Dokka tasks
 tasks.withType(DokkaTask::class) {
   includes = listOfNotNull("src/main/kotlin/packages.md")
@@ -219,23 +194,10 @@ project.afterEvaluate {
       }
     }
 
-    if (publication.name == "pluginMaven") {
-      doLast {
-        logger.lifecycle("Version ${project.version} is now deployed to ${repository.url}")
-      }
+    doLast {
+      logger.lifecycle("Version ${publication.version} of artifact ${publication.artifactId} is now deployed to ${repository.url} .")
     }
   }
-}
-
-eclipse.project {
-  natures(
-    "org.eclipse.buildship.core.gradleprojectnature",
-    "org.eclipse.jdt.core.javanature",
-    "org.jetbrains.kotlin.core.kotlinNature"
-  )
-  buildCommand("org.eclipse.buildship.core.gradleprojectbuilder")
-  buildCommand("org.eclipse.jdt.core.javabuilder")
-  buildCommand("org.jetbrains.kotlin.ui.kotlinBuilder")
 }
 
 fun createPublishToTask(repo: MavenArtifactRepository) {

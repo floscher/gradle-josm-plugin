@@ -1,22 +1,27 @@
 package org.openstreetmap.josm.gradle.plugin.i18n.io
 
-import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.io.IOException
 
 @ExperimentalUnsignedTypes
 class InputStreamTest {
 
-  @Test(expected = IOException::class)
+  @Test
   fun testReadAllOrExceptionFail1() {
     // too short input stream
-    ByteArray(0).inputStream().readAllOrException(ByteArray(2))
+    assertThrows<IOException> {
+      ByteArray(0).inputStream().readAllOrException(ByteArray(2))
+    }
   }
 
-  @Test(expected = IOException::class)
+  @Test
   fun testReadAllOrExceptionFail2() {
     // too short input stream
-    ByteArray(1).inputStream().readAllOrException(ByteArray(2))
+    assertThrows<IOException> {
+      ByteArray(1).inputStream().readAllOrException(ByteArray(2))
+    }
   }
 
   @Test
@@ -31,26 +36,32 @@ class InputStreamTest {
     assertEquals(2, ByteArray(42).inputStream().readAllOrException(ByteArray(2)))
   }
 
-  @Test(expected = IOException::class)
+  @Test
   fun testSkipAllOrExceptionFail1() {
-    ByteArray(0).inputStream().skipAllOrException(2u)
+    assertThrows<IOException> {
+      ByteArray(0).inputStream().skipAllOrException(2u)
+    }
   }
 
-  @Test(expected = IOException::class)
+  @Test
   fun testSkipAllOrExceptionFail2() {
-    ByteArray(1).inputStream().skipAllOrException(2u)
+    assertThrows<IOException> {
+      ByteArray(1).inputStream().skipAllOrException(2u)
+    }
   }
 
   @Test
   fun testSkipAllOrException() {
-    assertEquals(2, ByteArray(2).inputStream().skipAllOrException(2u))
-    assertEquals(2, ByteArray(3).inputStream().skipAllOrException(2u))
-    assertEquals(2, ByteArray(72).inputStream().skipAllOrException(2u))
+    assertEquals(2u, ByteArray(2).inputStream().skipAllOrException(2u))
+    assertEquals(2u, ByteArray(3).inputStream().skipAllOrException(2u))
+    assertEquals(2u, ByteArray(72).inputStream().skipAllOrException(2u))
   }
 
-  @Test(expected = IOException::class)
+  @Test
   fun testReadTwoBytesFail() {
-    ByteArray(1).inputStream().readTwoBytesAsInt()
+    assertThrows<IOException> {
+      ByteArray(1).inputStream().readTwoBytesAsInt()
+    }
   }
 
   @Test
