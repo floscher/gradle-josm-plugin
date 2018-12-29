@@ -3,10 +3,13 @@ package org.openstreetmap.josm.gradle.plugin.i18n.io
 import java.io.OutputStream
 import java.util.Comparator
 
+/**
+ * Writes a MO file for given base strings and associated translated strings.
+ */
 @ExperimentalUnsignedTypes
 class MoWriter {
   /**
-   * Writes the (low-endian) *.mo file to the given output stream
+   * Writes the given translations as (low-endian) MO file to the given output stream
    */
   fun writeStream(stream: OutputStream, translations: Map<MsgId, MsgStr>, isBigEndian: Boolean) {
     // offset 0: magic number

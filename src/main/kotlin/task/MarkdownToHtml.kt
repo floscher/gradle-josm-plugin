@@ -14,6 +14,8 @@ import java.util.Locale
 
 /**
  * Convert all `*.md` files found among the source files of this task to *.html files.
+ *
+ * By default this is not used in the `gradle-josm-plugin`, but tasks of this type can be created as needed by projects using the `gradle-josm-plugin`.
  */
 open class MarkdownToHtml: SourceTask() {
 

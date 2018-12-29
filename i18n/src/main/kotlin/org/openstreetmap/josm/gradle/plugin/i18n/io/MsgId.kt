@@ -1,18 +1,26 @@
 package org.openstreetmap.josm.gradle.plugin.i18n.io
 
 /**
- * A translatable string ([MsgStr]) with an optional [String] context.
+ * A translatable string ([MsgStr]) in the base language with an optional [String] context.
  * @param id the string (optonally with plural versions) to be translated
  * @param context an optional context with additional information for which situations the string should be translated
  *   (e.g. for disambiguation of multiple identicals strings that should be translated differently in different situations)
  */
 data class MsgId(val id: MsgStr, val context: String? = null) {
   companion object {
+    /**
+     * The `0x04` character that is used by default to separate the [context] from the [id]
+     * in the [ByteArray] representation of this object.
+     */
     const val CONTEXT_SEPARATOR = '\u0004'
   }
 
+  /**
+   * Converts this object to the default [ByteArray] representation as used in *.mo files.
+   * The [id] is converted according to [MsgStr.toByteArray], it is separated from the context by [CONTEXT_SEPARATOR].
+   */
   fun toByteArray(): ByteArray =
-    String(id.toByteArray(MsgStr.GRAMMATICAL_NUMBER_SEPARATOR))
+    String(id.toByteArray())
       .let { if (context == null) it else "$context$CONTEXT_SEPARATOR$it" }
       .toByteArray(Charsets.UTF_8)
 }

@@ -17,13 +17,10 @@ import javax.inject.Inject
  * Also some fields in the file header are filled out (package name, copyright holder and a descriptive title).
  *
  * This task should be run after downloading fresh translations from Transifex (e.g. with [TransifexDownload]).
+ *
+ * @property sourceSet The source set for which this task will shorten the *.po files
  */
-open class ShortenPoFiles
-  /**
-   * @property sourceSet The source set for which this task will shorten the *.po files
-   */
-  @Inject
-  constructor(private val sourceSet: I18nSourceSet): DefaultTask() {
+open class ShortenPoFiles @Inject constructor(private val sourceSet: I18nSourceSet): DefaultTask() {
 
   init {
     group = "JOSM-i18n"

@@ -13,17 +13,20 @@ import javax.inject.Inject
  * This is not really a compilation task, it's only named like that analogous to [MoCompile] and [PoCompile].
  *
  * It copies (more precisely it [Sync]s) the *.lang files to `$buildDir/i18n/lang/$sourceSetName/data`
+ *
+ * @property sourceSet
+ * The source set from which all *.lang files are synced to the destination
+ * @property moCompile
+ * The task for compiling *.mo files to *.lang files. These outputs are then used as inputs for this task.
  */
-open class LangCompile
-  /**
-   * @property sourceSet
-   * The source set from which all *.lang files are synced to the destination
-   * @property moCompile
-   * The task for compiling *.mo files to *.lang files. These outputs are then used as inputs for this task.
-   */
-  @Inject
-  constructor(@Internal val moCompile: MoCompile, @Internal val sourceSet: I18nSourceSet): Sync() {
+open class LangCompile @Inject constructor(
+  @Internal val moCompile: MoCompile,
+  @Internal val sourceSet: I18nSourceSet
+): Sync() {
 
+  /**
+   * The subdirectory of the [LangCompile.getDestinationDir] to which the files will be written
+   */
   @Input
   val subdirectory = "data"
 
@@ -45,6 +48,9 @@ open class LangCompile
     }
   }
 
+  /**
+   * The main task action, copies the *.lang files to the target directory.
+   */
   @TaskAction
   fun action() {
     logger.lifecycle("Copy *.lang files …")

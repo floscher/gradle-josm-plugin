@@ -12,14 +12,22 @@ Classes for configuring the Gradle build of your JOSM plugin.
 
 [I18nConfig] and [JosmManifest] provide some specialized options for internationalization and the `MANIFEST.MF` file of your JOSM plugin. These are accessible via `project.josm.i18n` and `project.josm.manifest`.
 
+# Package org.openstreetmap.josm.gradle.plugin.task.github
+
+Classes needed for pushing releases to GitHub releases.
+
 # Package org.openstreetmap.josm.gradle.plugin.i18n
 
 The source set definition for the different translation formats (*.lang, *.po and *.mo).
 
 # Package org.openstreetmap.josm.gradle.plugin.i18n.io
 
-A reader for *.mo files and a writer for JOSM's *.lang files
+Readers and writers for *.mo files (binary format used by gettext) and *.lang files (custom binary format used by JOSM)
 
 # Package org.openstreetmap.josm.gradle.plugin.task
 
 Reusable Gradle tasks.
+
+# Package org.openstreetmap.josm.gradle.plugin.task.github
+
+Tasks used for publishing to GitHub releases

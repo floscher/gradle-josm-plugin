@@ -17,22 +17,18 @@ import javax.inject.Inject
  * This task "compiles" several *.mo files to *.lang files.
  * For the language specified in [I18nConfig.mainLanguage], only the "msgid" is used (the text which will be translated).
  * For the other languages, the "msgstr" is used (the text which is already translated to this language).
+ * @property poCompile The task for compiling *.po files to *.mo files. Its outputs are used as inputs for this task
+ * @property sourceSet The [I18nSourceSet] for which the *.mo files will be compiled
  */
-open class MoCompile
+open class MoCompile @Inject constructor(
+  @Internal val poCompile: PoCompile,
+  @Internal val sourceSet: I18nSourceSet
+): DefaultTask() {
+
   /**
-   * @property poCompile
-   * The task for compiling *.po files to *.mo files. Its outputs are used as inputs for this task
-   * @property sourceSet
-   * The [I18nSourceSet] for which the *.mo files will be compiled
+   * The target directory where the *.lang files will be placed (automatically initialized after the project is evaluated)
    */
-  @Inject
-  constructor(
-    @Internal val poCompile: PoCompile,
-    @Internal val sourceSet: I18nSourceSet
-  ): DefaultTask() {
-
-
-  private lateinit var outDir: File
+  lateinit var outDir: File
 
   init {
     project.afterEvaluate {
@@ -46,6 +42,9 @@ open class MoCompile
     }
   }
 
+  /**
+   * The main task action, compiles the MO files to *.lang files and puts them into the [outDir].
+   */
   @ExperimentalUnsignedTypes
   @TaskAction
   fun action() {

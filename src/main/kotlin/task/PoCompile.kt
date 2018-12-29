@@ -16,16 +16,15 @@ import javax.inject.Inject
  *
  * This task requires the command line tool `msgfmt` (part of GNU gettext) to work properly! If the tool is not
  * installed, it will only issue a warning (not fail), but translations from *.po files won't be available.
+ *
+ * @property sourceSet The source set, for which all *.po files will be compiled to *.mo files.
  */
-open class PoCompile
-  /**
-   * @property sourceSet
-   * The source set, for which all *.po files will be compiled to *.mo files.
-   */
-  @Inject
-  constructor(@Internal val sourceSet: I18nSourceSet): DefaultTask() {
+open class PoCompile @Inject constructor(@Internal val sourceSet: I18nSourceSet): DefaultTask() {
 
-  private lateinit var outDir: File
+  /**
+   * The target directory where the MO files will be placed (automatically initialized after the project is evaluated)
+   */
+  lateinit var outDir: File
 
   init {
     project.afterEvaluate {
@@ -38,6 +37,9 @@ open class PoCompile
     }
   }
 
+  /**
+   * The main action of this task. Compiles the *.po files in the [sourceSet] to MO files in the [outDir].
+   */
   @TaskAction
   fun action() {
     outDir.mkdirs()

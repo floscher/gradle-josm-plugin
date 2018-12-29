@@ -17,15 +17,13 @@ import kotlin.reflect.full.withNullability
 fun GithubConfig.toGradleBuildscript(suppressFields: List<String> = listOf("releasesConfig")) = "github {\n  " +
   GithubConfig::class.memberProperties
     .filter { it.visibility == KVisibility.PUBLIC && it is KMutableProperty1 && !it.isConst && !suppressFields.contains(it.name) }
-    .map{
-
+    .joinToString("\n  ") {
       when(it.returnType) {
         String::class.createType(), String::class.createType().withNullability(true) -> "${it.name} = ${if (it.get(this) == null) "null" else "\"${it.get(this)}\"" }"
         File::class.createType() -> "${it.name} = File(\"${(it.get(this) as File).absolutePath}\")"
         else -> TODO("type ${it.returnType} can't be printed to Gradle build script")
       }
-    }
-    .joinToString("\n  ") + "\n}"
+    } + "\n}"
 
 private val emptyProject by lazy { ProjectBuilder.builder().build() }
 

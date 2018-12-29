@@ -2,6 +2,7 @@ package org.openstreetmap.josm.gradle.plugin.i18n.io
 
 import java.io.IOException
 import java.io.InputStream
+import kotlin.UInt
 
 /**
  * Read bytes from the input stream into the array. If there are not enough
@@ -23,8 +24,10 @@ fun InputStream.readAllOrException(b: ByteArray): Int =
 
 /**
  * Skip over `n` bytes. If there are only less than `n` bytes, an exception is thrown.
+ * @param n the number of bytes to skip
  */
 @ExperimentalUnsignedTypes
+@Throws(IOException::class)
 fun InputStream.skipAllOrException(n: UInt): UInt {
   val numBytes = this.skip(n.toLong())
   if (numBytes < n.toLong()) {
