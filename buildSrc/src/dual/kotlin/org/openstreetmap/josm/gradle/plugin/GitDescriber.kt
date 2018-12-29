@@ -17,27 +17,24 @@ class GitDescriber(val workTree: File) : Describer {
   /**
    * Replicates the `git describe` command. Never null, either returns a [String] or throws an exception
    * @param dirty if true, the string "-dirty" is appended when there are modified files in the work tree compared to the HEAD
+   * @param trimLeading iff true, the leading character `v` is removed from the version number (if present)
    * @return a string that describes the current HEAD of the git repository
    */
   @Throws(IOException::class, GitAPIException::class)
-  override fun describe(dirty: Boolean): String {
-    val description = git.describe().call()
-    return if (description == null) {
-      // return abbreviated hash
-      commitHash()
-    } else if (dirty && git.status().call().hasUncommittedChanges()) {
-      "$description-dirty"
-    } else {
-      description
-    }
-  }
+  override fun describe(dirty: Boolean, trimLeading: Boolean): String =
+    // result of `git describe`, if not applicable the commit hash
+    (git.describe().call() ?: commitHash())
+      .let { if (trimLeading && it.length >= 2 && it[0] == 'v') it.substring(1) else it  }
+      .let {
+        // append `-dirty` if there are uncommitted changes
+        if (dirty && git.status().call().hasUncommittedChanges()) "$it-dirty" else it
+      }
 
   /**
-   * Returns the abbreviated but unique commit hash of the current HEAD
+   * @return the abbreviated but unique commit hash of the current HEAD
    */
-  fun commitHash(): String {
-    return git.repository.newObjectReader().abbreviate(
+  fun commitHash(): String =
+    git.repository.newObjectReader().abbreviate(
       git.log().setMaxCount(1).call().first().toObjectId()
     ).name()
-  }
 }

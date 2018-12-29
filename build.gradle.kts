@@ -43,7 +43,7 @@ gradle.taskGraph.logTaskDuration()
 
 allprojects {
   group = "org.openstreetmap.josm"
-  version = GitDescriber(projectDir).describe().let { if (it[0] == 'v') it.substring(1) else it }
+  version = GitDescriber(projectDir).describe(trimLeading = true)
 
   repositories {
     jcenter()

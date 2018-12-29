@@ -38,12 +38,10 @@ open class BaseGithubReleaseTaskTest() {
         //buildDir?.deleteRecursively()
     }
 
-    // copy/paste of the code in build.gradle.kts which assembles the plugin
-    // version
-    fun  pluginUnderTestVersion(): String {
-        val tmpVersion = GitDescriber(File(".")).describe()
-        return if (tmpVersion[0] == 'v') tmpVersion.substring(1) else tmpVersion
-    }
+    // copy/paste of the code in build.gradle.kts which assembles the plugin version
+    fun  pluginUnderTestVersion(): String =
+      GitDescriber(File(".")).describe(trimLeading = true)
+
 
     protected fun prepareTestPluginSource() {
         val testPluginContent = """

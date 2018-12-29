@@ -49,26 +49,20 @@ class JosmPlugin: Plugin<Project> {
 
     project.afterEvaluate {
       if (project.extensions.josm.versionFromVcs && project.version == Project.DEFAULT_VERSION) {
-        val version = try {
-          GitDescriber(project.projectDir).describe(dirty = true)
+        try {
+          GitDescriber(project.projectDir).describe(dirty = true, trimLeading = project.extensions.josm.versionWithoutLeadingV)
         } catch (e: Exception) {
           project.logger.info("Error getting project version for ${project.projectDir} using git!", e)
           try {
             // Fall back to SVN revision if `git describe` does nor work
-            SvnDescriber(project.projectDir).describe(dirty = true)
+            SvnDescriber(project.projectDir).describe(dirty = true, trimLeading = project.extensions.josm.versionWithoutLeadingV)
           } catch (e: Exception) {
             project.logger.info("Error getting project version for ${project.projectDir} using SVN!", e)
             // Don't set the project version
             null
           }
-        }
-        if (version != null) {
-          project.version =
-            if (project.extensions.josm.versionWithoutLeadingV && version.length >= 2 && version[0] == 'v') {
-              version.substring(1)
-            } else {
-              version
-            }
+        }?.let {
+          project.version = it
         }
       }
 

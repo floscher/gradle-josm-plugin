@@ -13,12 +13,13 @@ class SvnDescriber(val workTree: File): Describer {
   /**
    * @param [dirty] if this is true, the revision number is appended with "-dirty",
    *   when there are uncommitted changes in the repository.
+   * @param [trimLeading] true, if the version number has the leading `r` stripped
    * @return the SVN revision in the format "r123"
    * @throws [IOException] if the process of `svn info` is not executed successfully within 2 minutes,
    *   or if the result does not contain a revision.
    */
   @Throws(IOException::class)
-  override fun describe(dirty: Boolean): String {
+  override fun describe(dirty: Boolean, trimLeading: Boolean): String {
     val process = ProcessBuilder("svn", "info").directory(workTree).start()
     if (process.waitFor(2, TimeUnit.MINUTES) && process.exitValue() == 0) {
       val prefix = "Revision: "
@@ -29,10 +30,10 @@ class SvnDescriber(val workTree: File): Describer {
         .orElseThrow {
           IOException("`svn info` did not respond with a line starting with $prefix")
         }
-      return if (dirty && isDirty()) {
-        "r$description-dirty"
+      return (if (trimLeading) "" else "r") + if (dirty && isDirty()) {
+        "$description-dirty"
       } else {
-        "r$description"
+        description
       }
     }
     throw IOException("Could not determine SVN revision of ${workTree.absolutePath}")

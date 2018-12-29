@@ -9,8 +9,9 @@ interface Describer {
   /**
    * @param [dirty] iff set to true, the return value gets appended with "-dirty" if there are changes
    *   to the repository that are not recorded in the current revision of the VCS.
+   * @param [trimLeading] iff set to true, the leading character (`r` for SVN, `v` for git) is not included in the returned version number
    * @return an identifier of the current version of the repository
    */
   @Throws(IOException::class)
-  fun describe(dirty: Boolean = true): String
+  fun describe(dirty: Boolean = true, trimLeading: Boolean = false): String
 }
