@@ -9,9 +9,9 @@ import java.io.ByteArrayOutputStream
 @ExperimentalUnsignedTypes
 class I18nReadWriteTest {
 
-  val emptyTranslations: Map<MsgId, MsgStr> = mapOf()
+  val emptyTranslations: Map<MsgId, MsgStr> = mapOf(MsgId(MsgStr("")) to MsgStr("Content-Type: text/plain; charset=UTF-8"))
   val translations1: Map<MsgId, MsgStr> = mapOf(
-    MsgId(MsgStr("")) to MsgStr("Sing"),
+    MsgId(MsgStr("")) to MsgStr("Sing\nSing2\nContent-Type: text/plain; charset=UTF-8"),
     MsgId(MsgStr("1", "2", "3")) to MsgStr("Sing"),
     MsgId(MsgStr("1", "2"), "context") to MsgStr("Singular", "Plural"),
     MsgId(MsgStr("Many plurals (253 is maximum of *.lang)", *(2..253).map { it.toString() }.toTypedArray())) to MsgStr("1", *(2..253).map { it.toString() }.toTypedArray()),
@@ -31,7 +31,7 @@ class I18nReadWriteTest {
   private fun testSerializationPersistence(translations: Map<MsgId, MsgStr>, isBigEndian: Boolean) {
     val writeResult1 = ByteArrayOutputStream()
     MoWriter().writeStream(writeResult1, translations, isBigEndian)
-    println("Written size: " + writeResult1.size())
+
     val readResult1 = MoReader(writeResult1.toByteArray()).readFile()
     val writeResult2 = ByteArrayOutputStream()
     MoWriter().writeStream(writeResult2, readResult1, isBigEndian)

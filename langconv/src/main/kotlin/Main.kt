@@ -58,7 +58,7 @@ fun main(vararg args: String) {
 
   val strings = mode.readFunction.invoke(inputFiles)
   val baseLang = strings["en"] ?: if (mode.isNeedsBaseLanguage) failWithException(IllegalArgumentException("No strings in base language 'en' found! Note, that at the moment the base language can't be changed for the 'langconv' program.")) else strings.flatMap { it.value.keys }.map { it to it.id }.toMap()
-  val numBaseStrings = baseLang.size
+  val numBaseStrings = baseLang.filter { it.key != MoWriter.EMPTY_MSGID }.size
 
   println("Base language is 'en' with $numBaseStrings strings\n")
 
@@ -69,7 +69,7 @@ fun main(vararg args: String) {
       .filter { it.key != "en" }
       .sortedBy { it.key }
       .joinToString("\n") { stringEntry ->
-        val numTranslated = stringEntry.value.keys.size
+        val numTranslated = stringEntry.value.keys.filter { it != MoWriter.EMPTY_MSGID }.size
         val percentage = numTranslated / numBaseStrings.toDouble() * 100
         val endChar = if (numTranslated == numBaseStrings) '▒' else '░'
 

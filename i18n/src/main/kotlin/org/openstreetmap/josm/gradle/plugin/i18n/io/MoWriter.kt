@@ -8,6 +8,14 @@ import java.util.Comparator
  */
 @ExperimentalUnsignedTypes
 class MoWriter {
+  companion object {
+    /**
+     * A [MsgId] with the empty string "" as the only string and no [MsgId.context].
+     * The [MoWriter] adds the line "Content-Type: text/plain; charset=utf-8" to the translation of this empty string (if not already present).
+     */
+    val EMPTY_MSGID = MsgId(MsgStr(""))
+  }
+
   /**
    * Writes the given translations as (low-endian) MO file to the given output stream
    */
@@ -16,6 +24,8 @@ class MoWriter {
     val magicBytes = MoReader.BE_MAGIC.let { if (isBigEndian) it else it.reversedArray() }
 
     val sortedOriginalMsgIds = translations
+      .minus(EMPTY_MSGID)
+      .plus(EMPTY_MSGID to MsgStr((translations[EMPTY_MSGID]?.strings?.map { it.lines().filter { !it.startsWith("Content-Type:") } } ?: listOf(listOf())).map { it.plus("Content-Type: text/plain; charset=UTF-8").joinToString("\n") } ))
       .toSortedMap(Comparator { o1, o2 -> String(o1.toByteArray()).compareTo(String(o2.toByteArray())) })
 
     val numStrings = sortedOriginalMsgIds.size.toUInt()
