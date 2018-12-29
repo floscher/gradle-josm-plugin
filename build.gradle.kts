@@ -195,7 +195,15 @@ project.afterEvaluate {
     }
 
     doLast {
-      logger.lifecycle("Version ${publication.version} of artifact ${publication.artifactId} is now deployed to ${repository.url} .")
+      logger.lifecycle("""
+        Published artifact:
+
+           to URL: ${repository.url}
+            Group: ${publication.groupId}
+               ID: ${publication.artifactId}
+          Version: ${publication.version}
+
+      """.trimIndent())
     }
   }
 }
