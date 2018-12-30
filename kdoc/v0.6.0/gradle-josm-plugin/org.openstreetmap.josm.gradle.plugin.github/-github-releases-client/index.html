@@ -1,0 +1,129 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>GithubReleasesClient - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.github</a>&nbsp;/&nbsp;<a href="./index.html">GithubReleasesClient</a><br/>
+<br/>
+<h1>GithubReleasesClient</h1>
+<code><span class="keyword">class </span><span class="identifier">GithubReleasesClient</span></code>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">GithubReleasesClient</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$<init>(org.openstreetmap.josm.gradle.plugin.config.GithubConfig, kotlin.String)/github">github</span><span class="symbol">:</span>&nbsp;<a href="../../org.openstreetmap.josm.gradle.plugin.config/-github-config/index.html"><span class="identifier">GithubConfig</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$<init>(org.openstreetmap.josm.gradle.plugin.config.GithubConfig, kotlin.String)/apiUrl">apiUrl</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span></code><br/>
+<code><span class="identifier">GithubReleasesClient</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$<init>(kotlin.String, kotlin.String, kotlin.String, kotlin.String)/repository">repository</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$<init>(kotlin.String, kotlin.String, kotlin.String, kotlin.String)/user">user</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$<init>(kotlin.String, kotlin.String, kotlin.String, kotlin.String)/accessToken">accessToken</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$<init>(kotlin.String, kotlin.String, kotlin.String, kotlin.String)/apiUrl">apiUrl</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="access-token.html">accessToken</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">accessToken</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="api-url.html">apiUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">apiUrl</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="repository.html">repository</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">repository</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="user.html">user</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">user</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="create-release.html">createRelease</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">createRelease</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$createRelease(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/tagName">tagName</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$createRelease(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/targetCommitish">targetCommitish</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$createRelease(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$createRelease(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/body">body</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$createRelease(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/draft">draft</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$createRelease(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/prerelease">prerelease</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span class="symbol">)</span><span class="symbol">: </span><span class="identifier">JsonObject</span></code>
+<p>Creates a github release with the tag <code>tagName</code>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="delete-release-asset.html">deleteReleaseAsset</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">deleteReleaseAsset</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$deleteReleaseAsset(kotlin.Int)/assetId">assetId</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Deletes the release asset <code>assetId</code></p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-latest-release.html">getLatestRelease</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getLatestRelease</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">JsonObject</span><span class="symbol">?</span></code>
+<p>Replies the latest release or null, if no such release exists.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-release-assets.html">getReleaseAssets</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getReleaseAssets</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$getReleaseAssets(kotlin.Int)/releaseId">releaseId</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">JsonArray</span><span class="symbol">&lt;</span><span class="identifier">JsonObject</span><span class="symbol">&gt;</span></code>
+<p>Fetch the list of release assets for the release <code>releaseId</code>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-releases.html">getReleases</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getReleases</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">JsonArray</span><span class="symbol">&lt;</span><span class="identifier">JsonObject</span><span class="symbol">&gt;</span></code>
+<p>Fetches the list of releases</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="update-release.html">updateRelease</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">updateRelease</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$updateRelease(kotlin.Int, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/releaseId">releaseId</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$updateRelease(kotlin.Int, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/tagName">tagName</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$updateRelease(kotlin.Int, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/targetCommitish">targetCommitish</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$updateRelease(kotlin.Int, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$updateRelease(kotlin.Int, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/body">body</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$updateRelease(kotlin.Int, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/draft">draft</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$updateRelease(kotlin.Int, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/prerelease">prerelease</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">)</span><span class="symbol">: </span><span class="identifier">JsonObject</span></code>
+<p>Creates a github release with the tag <code>tagName</code>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="upload-release-asset.html">uploadReleaseAsset</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">uploadReleaseAsset</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$uploadReleaseAsset(kotlin.Int, java.io.File, kotlin.String, kotlin.String, kotlin.String)/releaseId">releaseId</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$uploadReleaseAsset(kotlin.Int, java.io.File, kotlin.String, kotlin.String, kotlin.String)/file">file</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/io/File.html"><span class="identifier">File</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$uploadReleaseAsset(kotlin.Int, java.io.File, kotlin.String, kotlin.String, kotlin.String)/contentType">contentType</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$uploadReleaseAsset(kotlin.Int, java.io.File, kotlin.String, kotlin.String, kotlin.String)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$uploadReleaseAsset(kotlin.Int, java.io.File, kotlin.String, kotlin.String, kotlin.String)/label">label</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">)</span><span class="symbol">: </span><span class="identifier">JsonObject</span></code>
+<p>Upload a release asset <code>file</code> to the release <code>releaseId</code>. <code>name</code> is the
+(optional) new name of the uploaded file. <code>label</code> is an (optional) short
+description for the asset.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

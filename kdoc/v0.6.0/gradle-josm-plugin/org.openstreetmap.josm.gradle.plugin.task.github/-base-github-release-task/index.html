@@ -1,0 +1,85 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>BaseGithubReleaseTask - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.task.github</a>&nbsp;/&nbsp;<a href="./index.html">BaseGithubReleaseTask</a><br/>
+<br/>
+<h1>BaseGithubReleaseTask</h1>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">BaseGithubReleaseTask</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/5.0/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a></code>
+<p>Base class for tasks related to the management of github releases</p>
+<p>Note: This is currently in beta stage, so expect sudden changes to this class anytime.</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">BaseGithubReleaseTask</span><span class="symbol">(</span><span class="symbol">)</span></code>
+<p>Base class for tasks related to the management of github releases</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="configured-release-label.html">configuredReleaseLabel</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">configuredReleaseLabel</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="configured-target-commitish.html">configuredTargetCommitish</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">configuredTargetCommitish</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="release-label.html">releaseLabel</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">releaseLabel</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="target-commitish.html">targetCommitish</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">targetCommitish</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-create-github-release-task/index.html">CreateGithubReleaseTask</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">CreateGithubReleaseTask</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">BaseGithubReleaseTask</span></a></code>
+<p>Task to create a github release using the github API.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="../-publish-to-github-release-task/index.html">PublishToGithubReleaseTask</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">PublishToGithubReleaseTask</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">BaseGithubReleaseTask</span></a></code>
+<p>Task to publish a release to GitHub releases.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
