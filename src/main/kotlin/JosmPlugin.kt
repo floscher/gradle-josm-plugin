@@ -48,7 +48,7 @@ class JosmPlugin: Plugin<Project> {
     }
 
     project.afterEvaluate {
-      if (project.extensions.josm.versionFromVcs && project.version == Project.DEFAULT_VERSION) {
+      if (project.version == Project.DEFAULT_VERSION) {
         try {
           GitDescriber(project.projectDir).describe(dirty = true, trimLeading = project.extensions.josm.versionWithoutLeadingV)
         } catch (e: Exception) {
