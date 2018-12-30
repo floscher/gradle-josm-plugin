@@ -11,7 +11,7 @@ import java.io.IOException
 
 open class WriteRequiredPluginConfig : DefaultTask() {
   @Internal
-  val destinationFile = File(project.buildDir, "josm-custom-config/requiredPlugins.xml")
+  val destinationFile: File = File(project.buildDir, "josm-custom-config/requiredPlugins.xml")
 
   @Internal
   val template = WriteRequiredPluginConfig::class.java.getResourceAsStream("/requiredPluginConfigTemplate.xml")

@@ -51,8 +51,8 @@ fun Project.setupJosmTasks() {
   }
 
   // Standard run-task
-  tasks.create("runJosm", RunJosmTask::class.java)
-  tasks.create("debugJosm", DebugJosm::class.java)
+  tasks.create("runJosm", RunJosmTask::class.java, writePluginConfig.destinationFile)
+  tasks.create("debugJosm", DebugJosm::class.java, writePluginConfig.destinationFile)
 
   tasks.create("${sourceSetJosmPlugin.compileJavaTaskName}_latestJosm", CustomJosmVersionCompile::class.java, "latest", false, sourceSetJosmPlugin, configurationRequiredPlugin + configurationPackIntoJar)
   tasks.create("${sourceSetJosmPlugin.compileJavaTaskName}_testedJosm", CustomJosmVersionCompile::class.java, "tested", false, sourceSetJosmPlugin, configurationRequiredPlugin + configurationPackIntoJar)

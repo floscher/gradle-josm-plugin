@@ -6,6 +6,7 @@ import org.gradle.api.tasks.JavaExec
 import org.openstreetmap.josm.gradle.plugin.josm
 import org.openstreetmap.josm.gradle.plugin.useSeparateTmpJosmDirs
 import java.io.File
+import javax.inject.Inject
 
 /**
  * A task that can execute a JOSM instance. There's also the class [DebugJosm], which extends this class and allows to
@@ -16,7 +17,7 @@ import java.io.File
  *
  * By default the source set `main` is added to the classpath.
  */
-open class RunJosmTask : JavaExec() {
+open class RunJosmTask @Inject constructor(prefFile: File) : JavaExec() {
 
   /**
    * Text that should be displayed in the console output right before JOSM is started up. Defaults to the empty string.
@@ -26,14 +27,9 @@ open class RunJosmTask : JavaExec() {
   @Internal
   var extraInformation: String = ""
 
-
   init {
-    val arguments: MutableList<String> = if (project.hasProperty("josmArgs")) project.property("josmArgs").toString().split("\\\\").toMutableList() else mutableListOf()
-    arguments.add("--load-preferences=" + File(project.buildDir, "/josm-custom-config/requiredPlugins.xml").toURI().toURL().toString())
-
     group = "JOSM"
     main = "org.openstreetmap.josm.gui.MainApplication"
-    args = arguments
     super.mustRunAfter(project.tasks.getByName("cleanJosm"))
     super.dependsOn(project.tasks.getByName("updateJosmPlugins"))
 
@@ -41,6 +37,9 @@ open class RunJosmTask : JavaExec() {
       description = "Runs an independent clean JOSM instance (v${project.extensions.josm.josmCompileVersion}) with temporary JOSM home directories (by default inside `build/.josm/`) and the freshly compiled plugin active."
       // doFirst has to be added after the project initialized, otherwise it won't be executed before the main part of the JavaExec task is run.
       doFirst{
+        val userSuppliedArgs = args ?: listOf()
+        this.args = userSuppliedArgs.plus("""--load-preferences="${prefFile.toURI().toURL()}"""")
+
         if (project.useSeparateTmpJosmDirs()) {
           systemProperty("josm.cache", project.extensions.josm.tmpJosmCacheDir)
           systemProperty("josm.pref", project.extensions.josm.tmpJosmPrefDir)
@@ -64,8 +63,8 @@ open class RunJosmTask : JavaExec() {
         } else {
           logger.lifecycle("\nPassing these arguments to JOSM:\n  {}", args.joinToString("\n  "))
         }
-        if (!project.hasProperty("josmArgs")) {
-          logger.lifecycle("\nIf you want to pass additional arguments to JOSM add '-PjosmArgs=\"arg0\\\\arg1\\\\arg2\\\\...\"' when starting Gradle from the commandline (separate the arguments with double-backslashes).")
+        if (userSuppliedArgs.isEmpty()) {
+          logger.lifecycle("\nIf you want to pass additional arguments to JOSM add something like the following when starting Gradle from the commandline: --args=\"--debug --language=\\\"es\\\"\"")
         }
 
         logger.lifecycle(extraInformation)

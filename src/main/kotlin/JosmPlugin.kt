@@ -52,33 +52,32 @@ class JosmPlugin: Plugin<Project> {
         try {
           GitDescriber(project.projectDir).describe(dirty = true, trimLeading = project.extensions.josm.versionWithoutLeadingV)
         } catch (e: Exception) {
-          project.logger.info("Error getting project version for ${project.projectDir} using git!", e)
+          project.logger.info("Error getting project version for ${project.projectDir.absolutePath} using git!", e)
           try {
             // Fall back to SVN revision if `git describe` does nor work
             SvnDescriber(project.projectDir).describe(dirty = true, trimLeading = project.extensions.josm.versionWithoutLeadingV)
           } catch (e: Exception) {
-            project.logger.info("Error getting project version for ${project.projectDir} using SVN!", e)
+            project.logger.info("Error getting project version for ${project.projectDir.absolutePath} using SVN!", e)
             // Don't set the project version
+            val msg = { ->
+              project.logger.warn("""
+                WARNING: Could not detect the project version, you are probably not building inside a git repository!
+                WARNING: The project version is currently the default value `${project.version}`.
+                WARNING: To change the version number, either build in a git-repository or set the version manually by adding the line `project.version = "1.2.3"` to the Gradle buildscript.
+              """.trimIndent())
+            }
+            msg.invoke() // Immediately print warning …
+            project.gradle.buildFinished { // … and print warning when build is finished.
+              msg.invoke()
+            }
+
             null
           }
-        }?.let {
+        }?.let { // If a version can be determined through VCS systems
           project.version = it
         }
       }
 
-      if (project.version == Project.DEFAULT_VERSION) {
-        val msg = { ->
-          project.logger.warn("""
-          WARNING: Could not detect the project version, you are probably not building inside a git repository!
-          WARNING: The project version is currently the default value `${project.version}`.
-          WARNING: To change the version number, either build in a git-repository or set the version manually by adding the line `project.version = "1.2.3"` to the Gradle buildscript.
-        """.trimIndent())
-        }
-        msg.invoke()
-        project.gradle.buildFinished {
-          msg.invoke()
-        }
-      }
 
       // Add the repositories defined in the JOSM configuration
       project.extensions.josm.repositories.invoke(project.repositories)
