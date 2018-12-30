@@ -31,6 +31,7 @@ apply(plugin = "kotlin")
 
 
 // Logging
+gradle.taskGraph.logTaskDuration()
 logSkippedTasks()
 allprojects {
   afterEvaluate {
@@ -38,12 +39,8 @@ allprojects {
       logCoverage()
     }
   }
-}
-gradle.taskGraph.logTaskDuration()
-
-allprojects {
   group = "org.openstreetmap.josm"
-  version = GitDescriber(projectDir).describe(trimLeading = true)
+  version = GitDescriber(rootProject.projectDir).describe(trimLeading = true)
 
   repositories {
     jcenter()
