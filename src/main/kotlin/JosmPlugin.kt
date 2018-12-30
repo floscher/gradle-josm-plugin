@@ -66,6 +66,20 @@ class JosmPlugin: Plugin<Project> {
         }
       }
 
+      if (project.version == Project.DEFAULT_VERSION) {
+        val msg = { ->
+          project.logger.warn("""
+          WARNING: Could not detect the project version, you are probably not building inside a git repository!
+          WARNING: The project version is currently the default value `${project.version}`.
+          WARNING: To change the version number, either build in a git-repository or set the version manually by adding the line `project.version = "1.2.3"` to the Gradle buildscript.
+        """.trimIndent())
+        }
+        msg.invoke()
+        project.gradle.buildFinished {
+          msg.invoke()
+        }
+      }
+
       // Add the repositories defined in the JOSM configuration
       project.extensions.josm.repositories.invoke(project.repositories)
 

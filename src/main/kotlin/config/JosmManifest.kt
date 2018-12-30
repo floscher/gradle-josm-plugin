@@ -250,7 +250,6 @@ class JosmManifest(private val project: Project) {
    */
   public fun createJosmPluginJarManifest(): Map<String,String> {
     isRequiredFieldMissing(minJosmVersion == null, "the minimum JOSM version your plugin is compatible with", "josm.manifest.minJosmVersion = ‹a JOSM version›")
-    isRequiredFieldMissing(project.version == Project.DEFAULT_VERSION, "the version of your plugin", "version = ‹a version number›")
     isRequiredFieldMissing(mainClass == null, "the main class of your plugin", "josm.manifest.mainClass = ‹full name of main class›")
     isRequiredFieldMissing(description == null, "the description of your plugin", "josm.manifest.description = ‹a textual description›")
 
@@ -260,9 +259,6 @@ class JosmManifest(private val project: Project) {
     val mainClass: String = mainClass ?: throw missingException
     val description: String = description ?: throw missingException
     val projectVersion: String = project.version.toString()
-    if (projectVersion == Project.DEFAULT_VERSION) {
-      throw missingException
-    }
 
     // Required attributes
     val manifestAtts: MutableMap<String,String> = mutableMapOf(
