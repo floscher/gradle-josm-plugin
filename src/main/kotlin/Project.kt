@@ -4,6 +4,7 @@ package org.openstreetmap.josm.gradle.plugin
  * Extends [Project] with methods specific to JOSM development.
  */
 
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
@@ -14,6 +15,8 @@ import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.plugins.JavaPluginConvention
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
+import java.io.IOException
+import java.net.URL
 import java.util.jar.Manifest
 import java.util.zip.ZipFile
 import kotlin.math.max
@@ -63,6 +66,25 @@ private fun Project.resolveJosm(version: String): Dependency {
   }
 }
 
+val Project.josmPluginInfo: JosmPluginListParser by lazy {
+  JosmPluginListParser(URL("https://josm.openstreetmap.de/plugin"))
+}
+
+fun Project.getVirtualPlugins(): Map<String, List<Pair<String, String>>> = try {
+  this.josmPluginInfo.plugins
+    .mapNotNull {
+      it.manifestAtts["Plugin-Platform"]?.let { platform ->
+        it.manifestAtts["Plugin-Provides"]?.let { provides ->
+          Triple(provides, platform, if (it.pluginName.endsWith(".jar")) it.pluginName.substring(0..it.pluginName.length - 5) else it.pluginName)
+        }
+      }
+    }
+    .groupBy({ it.first }, { Pair(it.second, it.third) })
+} catch (e: IOException) {
+  logger.warn("WARN: Virtual plugins cannot be resolved, since the plugin list can't be read from the web!")
+  mapOf()
+}
+
 /**
  * Resolves the JOSM plugin names given as parameter, using the available repositories for this project.
  * Not only are the given plugin names resolved to Dependencies, but also all JOSM plugins on which these plugins depend.
@@ -81,7 +103,7 @@ fun Project.getAllRequiredJosmPlugins(directlyRequiredPlugins: Collection<String
   } else {
     logger.lifecycle("Resolving required JOSM plugins…")
     val result = getAllRequiredJosmPlugins(0, mutableSetOf(), directlyRequiredPlugins.toSet())
-    logger.lifecycle("{} JOSM plugins are required: {}", result.size, result.joinToString(", ") { it.name })
+    logger.lifecycle("{} JOSM {} required: {}", result.size, if (result.size == 1) "plugin is" else "plugins are", result.joinToString(", ") { it.name })
 
     result
   }
@@ -95,12 +117,31 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
     )
   }
 
+  val virtualPlugins = getVirtualPlugins()
+
   val indentation = "  ".repeat(maxOf(0, recursionDepth))
   val result = HashSet<Dependency>()
   for (pluginName in directlyRequiredPlugins) {
     val conf = configurations.detachedConfiguration()
     if (alreadyResolvedPlugins.contains(pluginName)) {
       logger.info("{}* {} (see above for dependencies)", indentation, pluginName)
+    } else if (virtualPlugins.containsKey(pluginName)) {
+      val suitableImplementation = virtualPlugins.getValue(pluginName).filter {
+        when (it.first.toLowerCase()) {
+          "unixoid" -> Os.isFamily(Os.FAMILY_UNIX)
+          "osx" -> Os.isFamily(Os.FAMILY_MAC)
+          "windows" -> Os.isFamily(Os.FAMILY_WINDOWS) || Os.isFamily(Os.FAMILY_9X) || Os.isFamily(Os.FAMILY_NT)
+          else -> false
+        }
+      }.firstOrNull()
+
+      if (suitableImplementation == null) {
+        logger.warn("WARN: No suitable implementation found for virtual JOSM plugin $pluginName!")
+      } else {
+        alreadyResolvedPlugins.add(pluginName)
+        logger.info("{}* {} (virtual) → {} (chosen from: {})", indentation, pluginName, suitableImplementation.second, virtualPlugins.getValue(pluginName).map { "${it.second} for ${it.first}" }.joinToString())
+        result.addAll(getAllRequiredJosmPlugins(realRecursionDepth + 1, alreadyResolvedPlugins, setOf(suitableImplementation.second)))
+      }
     } else {
       val dep = dependencies.create("org.openstreetmap.josm.plugins:$pluginName:SNAPSHOT") as ExternalModuleDependency
       dep.setChanging(true)

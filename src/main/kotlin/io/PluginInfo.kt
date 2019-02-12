@@ -1,0 +1,13 @@
+package org.openstreetmap.josm.gradle.plugin.io
+
+import java.net.URL
+
+data class PluginInfo(val pluginName: String, val downloadUrl: URL, val manifestAtts: Map<String, String>) {
+  companion object {
+    fun build(pluginName: String?, downloadUrl: URL?, manifestAtts: Map<String, String>) = pluginName?.let { name ->
+      downloadUrl?.let { url ->
+        PluginInfo(name, url, manifestAtts.toMap())
+      }
+    }
+  }
+}
