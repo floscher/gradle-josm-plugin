@@ -38,7 +38,7 @@ open class RunJosmTask @Inject constructor(prefFile: File) : JavaExec() {
       // doFirst has to be added after the project initialized, otherwise it won't be executed before the main part of the JavaExec task is run.
       doFirst{
         val userSuppliedArgs = args ?: listOf()
-        this.args = userSuppliedArgs.plus("""--load-preferences="${prefFile.toURI().toURL()}"""")
+        this.args = userSuppliedArgs.plus("""--load-preferences=${prefFile.toURI().toURL()}""")
 
         if (project.useSeparateTmpJosmDirs()) {
           systemProperty("josm.cache", project.extensions.josm.tmpJosmCacheDir)
@@ -64,7 +64,7 @@ open class RunJosmTask @Inject constructor(prefFile: File) : JavaExec() {
           logger.lifecycle("\nPassing these arguments to JOSM:\n  {}", args.joinToString("\n  "))
         }
         if (userSuppliedArgs.isEmpty()) {
-          logger.lifecycle("\nIf you want to pass additional arguments to JOSM add something like the following when starting Gradle from the commandline: --args=\"--debug --language=\\\"es\\\"\"")
+          logger.lifecycle("""\nIf you want to pass additional arguments to JOSM add something like the following when starting Gradle from the commandline: --args='--debug --language="es"'""")
         }
 
         logger.lifecycle(extraInformation)
