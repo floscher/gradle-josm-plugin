@@ -15,8 +15,8 @@ import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.plugins.JavaPluginConvention
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
+import org.openstreetmap.josm.gradle.plugin.io.JosmPluginListParser
 import java.io.IOException
-import java.net.URL
 import java.util.jar.Manifest
 import java.util.zip.ZipFile
 import kotlin.math.max
@@ -66,12 +66,8 @@ private fun Project.resolveJosm(version: String): Dependency {
   }
 }
 
-val Project.josmPluginInfo: JosmPluginListParser by lazy {
-  JosmPluginListParser(URL("https://josm.openstreetmap.de/plugin"))
-}
-
 fun Project.getVirtualPlugins(): Map<String, List<Pair<String, String>>> = try {
-  this.josmPluginInfo.plugins
+  JosmPluginListParser(this).plugins
     .mapNotNull {
       it.manifestAtts["Plugin-Platform"]?.let { platform ->
         it.manifestAtts["Plugin-Provides"]?.let { provides ->
@@ -103,7 +99,7 @@ fun Project.getAllRequiredJosmPlugins(directlyRequiredPlugins: Collection<String
   } else {
     logger.lifecycle("Resolving required JOSM plugins…")
     val result = getAllRequiredJosmPlugins(0, mutableSetOf(), directlyRequiredPlugins.toSet())
-    logger.lifecycle("{} JOSM {} required: {}", result.size, if (result.size == 1) "plugin is" else "plugins are", result.joinToString(", ") { it.name })
+    logger.lifecycle(" → {} JOSM {} required: {}", result.size, if (result.size == 1) "plugin is" else "plugins are", result.map { it.name }.sorted().joinToString())
 
     result
   }
@@ -126,25 +122,25 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
     if (alreadyResolvedPlugins.contains(pluginName)) {
       logger.info("{}* {} (see above for dependencies)", indentation, pluginName)
     } else if (virtualPlugins.containsKey(pluginName)) {
-      val suitableImplementation = virtualPlugins.getValue(pluginName).filter {
+      val suitableImplementation = virtualPlugins.getValue(pluginName).firstOrNull {
         when (it.first.toLowerCase()) {
           "unixoid" -> Os.isFamily(Os.FAMILY_UNIX)
           "osx" -> Os.isFamily(Os.FAMILY_MAC)
           "windows" -> Os.isFamily(Os.FAMILY_WINDOWS) || Os.isFamily(Os.FAMILY_9X) || Os.isFamily(Os.FAMILY_NT)
           else -> false
         }
-      }.firstOrNull()
+      }
 
       if (suitableImplementation == null) {
         logger.warn("WARN: No suitable implementation found for virtual JOSM plugin $pluginName!")
       } else {
         alreadyResolvedPlugins.add(pluginName)
-        logger.info("{}* {} (virtual) → {} (chosen from: {})", indentation, pluginName, suitableImplementation.second, virtualPlugins.getValue(pluginName).map { "${it.second} for ${it.first}" }.joinToString())
+        logger.info("{}* {} (virtual): provided by {}", indentation, pluginName, virtualPlugins.getValue(pluginName).joinToString { "${it.second} for ${it.first}" })
         result.addAll(getAllRequiredJosmPlugins(realRecursionDepth + 1, alreadyResolvedPlugins, setOf(suitableImplementation.second)))
       }
     } else {
       val dep = dependencies.create("org.openstreetmap.josm.plugins:$pluginName:SNAPSHOT") as ExternalModuleDependency
-      dep.setChanging(true)
+      dep.isChanging = true
       conf.dependencies.add(dep)
       val resolvedFiles = conf.fileCollection(dep).files
       alreadyResolvedPlugins.add(pluginName)

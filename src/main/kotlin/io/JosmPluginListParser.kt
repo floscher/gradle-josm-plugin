@@ -1,9 +1,13 @@
-package org.openstreetmap.josm.gradle.plugin
+package org.openstreetmap.josm.gradle.plugin.io
 
-import org.openstreetmap.josm.gradle.plugin.io.PluginInfo
+import org.gradle.api.Project
+import org.gradle.api.artifacts.ExternalModuleDependency
 import org.openstreetmap.josm.gradle.plugin.task.GeneratePluginList
 import java.net.MalformedURLException
+import java.net.URI
 import java.net.URL
+
+const val DEFAULT_PLUGIN_LIST_URL: String = "https://josm.openstreetmap.de"
 
 /**
  * Reads a plugin info file like it is found at [https://josm.openstreetmap.de/plugin]
@@ -13,7 +17,7 @@ import java.net.URL
  * any errors that occured while parsing can be retrieved by accessing [errors]. If there are no parsing errors,
  * [errors] will be an empty list.
  */
-class JosmPluginListParser(val url: URL) {
+class JosmPluginListParser(val project: Project, val url: URL = URL(DEFAULT_PLUGIN_LIST_URL)) {
 
   companion object {
     val TITLE_LINE_REGEX = Regex("^([^;]+)(\\.jar)?;(.+)$")
@@ -28,7 +32,30 @@ class JosmPluginListParser(val url: URL) {
     val errors: MutableList<String> = mutableListOf()
     val plugins: MutableList<PluginInfo> = mutableListOf()
 
-    val listLines = url.openStream().bufferedReader().readLines()
+    // Resolve plugin list as dependency
+    val dependency = project.dependencies.create("org.openstreetmap.josm.pluginLists:plugin:")
+      .also {
+        if (it is ExternalModuleDependency) {
+          it.isChanging = true
+        }
+      }
+    val conf = project.configurations.detachedConfiguration(dependency)
+    val repo = project.repositories.ivy { repo ->
+      repo.url = URI(DEFAULT_PLUGIN_LIST_URL)
+      repo.patternLayout {
+        it.artifact("[artifact]")
+      }
+      repo.content {
+        it.onlyForConfigurations(conf.name)
+        it.includeModule(dependency.group ?: "", dependency.name)
+      }
+    }
+    val resolvedFiles = conf.resolve()
+    project.repositories.remove(repo)
+
+    require(resolvedFiles.size == 1) { "The plugin list wasn't resolved correctly!" }
+
+    val listLines = resolvedFiles.iterator().next().readLines()
 
     // Temporary variables to collect properties of the next PluginInfo object
     var pluginName: String? = null
