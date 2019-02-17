@@ -3,7 +3,6 @@ package org.openstreetmap.josm.gradle.plugin
 import org.gradle.api.Project
 import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.testing.jacoco.tasks.JacocoReport
-import org.gradle.testing.jacoco.tasks.JacocoReportsContainer
 import java.time.Duration
 import java.time.Instant
 import java.util.Locale

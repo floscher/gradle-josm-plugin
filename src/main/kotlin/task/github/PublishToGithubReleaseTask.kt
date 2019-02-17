@@ -38,12 +38,12 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
 
   private val jarArchivePath: String?  by lazy {
     project.tasks.withType(Jar::class.java).getByName("jar")
-      .archivePath.absolutePath
+      .archiveFile.get().asFile.absolutePath
   }
 
   private val jarArchiveName: String?  by lazy {
     project.tasks.withType(Jar::class.java).getByName("jar")
-      .archivePath.name
+      .archiveFile.get().asFile.name
   }
 
   private val configuredLocalJarPath: String? by lazy {

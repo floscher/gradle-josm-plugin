@@ -1,6 +1,4 @@
 import groovy.lang.GroovySystem
-import org.eclipse.jgit.lib.Repository
-import org.eclipse.jgit.api.Git
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -10,14 +8,10 @@ import org.openstreetmap.josm.gradle.plugin.Versions
 import org.openstreetmap.josm.gradle.plugin.logCoverage
 import org.openstreetmap.josm.gradle.plugin.logSkippedTasks
 import org.openstreetmap.josm.gradle.plugin.logTaskDuration
-
-import java.time.Duration
-import java.time.Instant
 import java.net.URL
-import java.util.Locale
 
 plugins {
-  id("com.gradle.plugin-publish").version("0.10.0")
+  id("com.gradle.plugin-publish").version("0.10.1")
   id("com.github.ben-manes.versions").version("0.20.0")
   id("org.jetbrains.dokka").version("0.9.17")
 
@@ -176,8 +170,8 @@ val s3Repo = if (awsAccessKeyId == null || awsSecretAccessKey == null) {
   publishing.repositories.maven("s3://gradle-josm-plugin") {
     name = "s3"
     credentials(AwsCredentials::class.java) {
-      setAccessKey(System.getenv("AWS_ACCESS_KEY_ID"))
-      setSecretKey(System.getenv("AWS_SECRET_ACCESS_KEY"))
+      accessKey = System.getenv("AWS_ACCESS_KEY_ID")
+      secretKey = System.getenv("AWS_SECRET_ACCESS_KEY")
     }
     createPublishToTask(this)
   }

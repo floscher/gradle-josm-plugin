@@ -5,7 +5,7 @@ import proguard.gradle.ProGuardTask
 
 buildscript {
   dependencies {
-    classpath("net.sf.proguard:proguard-gradle:6.1.0beta1")
+    classpath("net.sf.proguard:proguard-gradle:6.1.0beta2")
   }
 }
 plugins {
@@ -50,14 +50,14 @@ val dependencyJar: Jar = tasks.create("dependencyJar", Jar::class) {
     )
   }
 
-  appendix = "dependencies"
+  archiveAppendix.set("dependencies")
 }
 
 val standaloneJar = tasks.register<ProGuardTask>("standaloneJar") {
   dependsOn(dependencyJar)
 
-  injars(jarTask.archivePath)
-  injars(dependencyJar.archivePath)
+  injars(jarTask.archiveFile.get().asFile)
+  injars(dependencyJar.archiveFile.get().asFile)
   outjars(File(buildDir, "/dist/${project.name}.jar"))
 
   if (JavaVersion.current().isJava11Compatible) { // >= JDK11
