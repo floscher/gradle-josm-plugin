@@ -34,7 +34,7 @@ class MoReader private constructor(private val stream1: InputStream, private val
     /**
      * 28 bytes = 7 × 4 bytes (≙ 7 32bit numbers)
      */
-    const val HEADER_SIZE_IN_BYTES = 28u
+    const val HEADER_SIZE_IN_BYTES: kotlin.UInt = 28u
   }
 
   /**
@@ -51,16 +51,16 @@ class MoReader private constructor(private val stream1: InputStream, private val
    * @property offsetHashingTable the offset of the hashing table (currently always ignored)
    * @param uints list of exactly 6 header values (32bit unsigned integers)
    */
-  class HeaderValues(val isBigEndian: Boolean, uints: List<UInt>) {
+  class HeaderValues(val isBigEndian: Boolean, uints: List<kotlin.UInt>) {
     init {
       require(uints.size == 6)
     }
-    val formatRev: UInt = uints[0]
+    val formatRev: kotlin.UInt = uints[0]
     val numStrings: Int = uints[1].toInt()
-    val offsetOrigStrings: UInt = uints[2]
-    val offsetTranslatedStrings: UInt = uints[3]
-    val sizeHashingTable: UInt = uints[4]
-    val offsetHashingTable: UInt = uints[5]
+    val offsetOrigStrings: kotlin.UInt = uints[2]
+    val offsetTranslatedStrings: kotlin.UInt = uints[3]
+    val sizeHashingTable: kotlin.UInt = uints[4]
+    val offsetHashingTable: kotlin.UInt = uints[5]
     init {
       if (this.numStrings < 0) {
         throw NotImplementedError("Reading MO files containing more than ${Int.MAX_VALUE} strings is not implemented (this file claims to contain $numStrings strings)!")
@@ -153,12 +153,12 @@ class MoReader private constructor(private val stream1: InputStream, private val
 /**
  * Converts a list of bytes to a list of long values.
  *
- * Four [Byte] values are combined to form one [UInt] value (either as little endian or as big endian).
+ * Four [Byte] values are combined to form one [kotlin.UInt] value (either as little endian or as big endian).
  * If the size of the [ByteArray] is not a multiple of 4, the last remainder bytes after
  * dividing the bytes into groups of four are ignored.
  *
  * See [FourBytes] for details on how the byte values are combined.
  */
 @ExperimentalUnsignedTypes
-internal fun ByteArray.toUIntList(bigEndian: Boolean): List<UInt> = (0 until size - 3 step 4)
+internal fun ByteArray.toUIntList(bigEndian: Boolean): List<kotlin.UInt> = (0 until size - 3 step 4)
   .map{ FourBytes(get(it), get(it + 1), get(it + 2), get(it + 3)).getUIntValue(bigEndian) }

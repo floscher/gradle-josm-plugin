@@ -130,6 +130,7 @@ open class JosmPluginExtension(private val project: Project) {
       require(value >= 0) {
         "For property `maxPluginDependencyDepth` only nonnegative integer values are allowed! You are trying to set it to $value."
       }
+      field = value
     }
 
   /**
@@ -147,7 +148,7 @@ open class JosmPluginExtension(private val project: Project) {
   /**
    * Set the [packIntoJarFileFilter] with a Groovy [Closure]
    */
-  public fun packIntoJarFileFilter(closure: Closure<PatternFilterable>) {
+  fun packIntoJarFileFilter(closure: Closure<PatternFilterable>) {
     packIntoJarFileFilter = { closure.call(it) }
   }
 
@@ -193,7 +194,7 @@ open class JosmPluginExtension(private val project: Project) {
   /**
    * Set the [repositories] with a Groovy [Closure] (replaces any previous setting).
    */
-  public fun repositories(closure: Closure<RepositoryHandler>) {
+  fun repositories(closure: Closure<RepositoryHandler>) {
     repositories = { closure.call(it) }
   }
 
@@ -226,14 +227,14 @@ open class JosmPluginExtension(private val project: Project) {
   /**
    * Configure the field [JosmPluginExtension.i18n] using a Groovy [Closure].
    */
-  public fun i18n(c: Closure<I18nConfig>) {
+  fun i18n(c: Closure<I18nConfig>) {
     project.configure(i18n, c)
   }
 
   /**
    * Configure the field [JosmPluginExtension.i18n] using an [Action].
    */
-  public fun i18n(a: Action<I18nConfig>) {
+  fun i18n(a: Action<I18nConfig>) {
     a.execute(i18n)
   }
 
@@ -245,14 +246,14 @@ open class JosmPluginExtension(private val project: Project) {
   /**
    * Configure the field [manifest] using a Groovy [Closure].
    */
-  public fun manifest(c: Closure<JosmManifest>) {
+  fun manifest(c: Closure<JosmManifest>) {
     project.configure(manifest, c)
   }
 
   /**
    * Configure the field [manifest] using an [Action].
    */
-  public fun manifest(a: Action<JosmManifest>) {
+  fun manifest(a: Action<JosmManifest>) {
     a.execute(manifest)
   }
 

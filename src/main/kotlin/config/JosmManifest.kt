@@ -179,7 +179,7 @@ class JosmManifest(private val project: Project) {
    * @param pluginVersion the version number of the linked plugin
    * @param downloadURL the URL where the linked plugin can be downloaded from
    */
-  public fun oldVersionDownloadLink(minJosmVersion: Int, pluginVersion: String, downloadURL: URL) {
+  fun oldVersionDownloadLink(minJosmVersion: Int, pluginVersion: String, downloadURL: URL) {
     oldVersionDownloadLinks.add(PluginDownloadLink(minJosmVersion, pluginVersion, downloadURL))
   }
 
@@ -248,7 +248,7 @@ class JosmManifest(private val project: Project) {
    *
    * Make sure the [langCompileTask] already ran before this method is called, otherwise not all translated descriptions are included in the Manifest.
    */
-  public fun createJosmPluginJarManifest(): Map<String,String> {
+  fun createJosmPluginJarManifest(): Map<String,String> {
     isRequiredFieldMissing(minJosmVersion == null, "the minimum JOSM version your plugin is compatible with", "josm.manifest.minJosmVersion = ‹a JOSM version›")
     isRequiredFieldMissing(mainClass == null, "the main class of your plugin", "josm.manifest.mainClass = ‹full name of main class›")
     isRequiredFieldMissing(description == null, "the description of your plugin", "josm.manifest.description = ‹a textual description›")

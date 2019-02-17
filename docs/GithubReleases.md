@@ -338,6 +338,7 @@ publishToGithubRelease {
     // optional. if different from the name of the jar file built locally
     //remoteJarName="my-plugin.jar"
 }
+```
 
 
 [github-releases]: https://help.github.com/articles/about-releases/

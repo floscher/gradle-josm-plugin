@@ -15,6 +15,7 @@ class LangReader {
    * @param langFileDir the directory containing the *.lang files
    * @param baseLang the base language from which the translators will translate to other languages
    */
+  @Throws(IOException::class)
   fun readLangFiles(langFileDir: File, baseLang: String): Map<String, Map<MsgId, MsgStr>> {
     val langFiles = langFileDir
       .listFiles { file -> file.isFile && file.extension == "lang" }
@@ -40,6 +41,7 @@ class LangReader {
    * @param langStreams a [Map] containing the [InputStream]s for the other languages
    *   (the keys of this map are the names of the *.lang files without extension)
    */
+  @Throws(IOException::class)
   fun readLangStreams(baseLang: String, baseStream: InputStream, langStreams: Map<String, InputStream>): Map<String, Map<MsgId, MsgStr>> {
     val baseStrings = readBaseLangStream(baseStream)
     return langStreams.map { (lang, stream) ->
@@ -77,6 +79,7 @@ class LangReader {
 
   private fun readTranslatedLang(stream: InputStream, baseStrings: List<MsgId>) = readLangStream(stream, baseStrings) { MsgStr(it) }
 
+  @Throws(IOException::class)
   private fun <T> readLangStream(stream: InputStream, baseStrings: List<MsgId>? = null, stringsToResult: (List<String>) -> T): List<T?> {
     val result = mutableListOf<T?>()
     stream.use {
