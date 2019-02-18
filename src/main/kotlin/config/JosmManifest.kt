@@ -28,9 +28,10 @@ import java.util.GregorianCalendar
  * are automatically picked up by both Ant and Gradle, if you define them in your
  * `gradle.properties` file and load them into your `build.xml` file using the following snippet:
  *
- * &#60;!-- edit the properties of this plugin in the file `gradle.properties` -->
- * &#60;property file="${basedir}/gradle.properties"/>
- *
+ * ```
+ * <!-- edit the properties of this plugin in the file `gradle.properties` -->
+ * <property file="${basedir}/gradle.properties"/>
+ * ```
  *
  * The detailed documentation for each field below tells you, which one corresponds
  * to which Ant/Gradle property and to which attribute in the `MANIFEST.MF` file.
@@ -111,23 +112,79 @@ class JosmManifest(private val project: Project) {
   var mainClass: String? = project.findProperty("plugin.class")?.toString()
 
   /**
+   * The minimum Java version needed to run this plugin.
+   *
+   * **Default value:** `null`
+   *
+   * **Influenced MANIFEST.MF attribute:** `Plugin-Minimum-Java-Version`
+   *
+   * @since 0.6.1
+   */
+  var minJavaVersion: Int? = null
+    set(value) {
+      require(value == null || value > 0)
+      field = value
+    }
+
+  /**
    * The minimum JOSM version with which the plugin is compatible.
    *
-   * **Default:** the value of property `plugin.main.version` or `null` if that property is not set.
+   * **Default value:** the value of property `plugin.main.version` or `null` if that property is not set.
+   *
    * **Influenced MANIFEST.MF attribute:** `Plugin-Mainversion`
    */
   var minJosmVersion: String? = project.findProperty("plugin.main.version")?.toString()
 
   /**
-   * If true, load the old version download links from GitHub releases.
+   * If `true`, load the old version download links from GitHub releases (see [GithubConfig]).
+   * Values added through [oldVersionDownloadLink] are ignored, if this is set to `true`.
+   *
+   * **Default value:** `false`
+   *
+   * **Influenced MANIFEST.MF attributes:** `([1-9][0-9]*)_Plugin-Url`
    */
   var includeLinksToGithubReleases: Boolean = false
 
   /**
+   * The platform for which this native implementation of a virtual plugin is made.
+   * Must be set in conjunction with [provides].
+   *
+   * **Default value:** `null`
+   *
+   * **Influenced MANIFEST.MF attribute:** `Plugin-Platform`
+   *
+   * @since 0.6.1
+   */
+  var platform: Platform? = null
+
+  fun setPlatform(name: String) {
+    platform = Platform.valueOf(name)
+  }
+
+  /**
+   * The three platforms for which JOSM supports virtual plugins.
+   */
+  enum class Platform {
+    Osx, Windows, Unixoid
+  }
+
+  /**
+   * The name of a virtual plugin for which this plugin is a native implementation.
+   * Must be set in conjunction with [platform].
+   *
+   * **Default value:** `null`
+   *
+   * **Influenced MANIFEST.MF attribute:** `Plugin-Provides`
+   *
+   * @since 0.6.1
+   */
+  var provides: String? = null
+
+  /**
    * A collection of the names of all JOSM plugins that must be installed for this JOSM plugin to work
    *
-   * **Default:** the value of property `plugin.requires` split at every semicolon (do not rely on the order, as it is not necessarily maintained) or `null` if that property is not set.</dd>
-   *   <dt>Influenced MANIFEST.MF attribute:</dt><dd>Plugin-Requires
+   * **Default value:** the value of property `plugin.requires` split at every semicolon (do not rely on the order, as it is not necessarily maintained) or `null` if that property is not set.
+   * **Influenced MANIFEST.MF attribute:** `Plugin-Requires`
    */
   val pluginDependencies: MutableSet<String> = mutableSetOf()
 
@@ -145,15 +202,15 @@ class JosmManifest(private val project: Project) {
   }
 
   /**
-   * Contains the {@link #description} translated to languages other than English.
-   *
+   * Contains the [description] translated to languages other than English.
+   * Can be set via [translatedDescription].
    */
   private val translatedDescriptions: MutableMap<String, String> = mutableMapOf()
 
   /**
    * A URL pointing to a web resource describing the plugin.
    *
-   * **Default:** The value of property `plugin.link` as URL (might error out with a [MalformedURLException](https://docs.oracle.com/javase/8/docs/api/java/net/MalformedURLException.html) on malformed URLs), or `null` if that property is not set.
+   * **Default value:** The value of property `plugin.link` as URL (might error out with a [java.net.MalformedURLException] on malformed URLs), or `null` if that property is not set.
    *
    * **Influenced MANIFEST.MF attribute:** `Plugin-Link`
    */
@@ -163,7 +220,7 @@ class JosmManifest(private val project: Project) {
    * For compatibility with older JOSM versions, that are not supported by the current version of the plugin.
    * This field contains URLs where versions of the plugin can be downloaded, which are compatible with certain older JOSM versions.
 
-   * See [oldVersionDownloadLink()] on how to add entries to this attribute.
+   * See [oldVersionDownloadLink] on how to add entries to this attribute.
    * The URL value points to a location where the plugin can be downloaded from and the integer key denotes the minimum JOSM version that the plugin at that location is compatible with.
    */
   private val oldVersionDownloadLinks: MutableSet<PluginDownloadLink> = mutableSetOf()
@@ -192,7 +249,7 @@ class JosmManifest(private val project: Project) {
    */
   private fun isRequiredFieldMissing(checkResult: Boolean, fieldDescription: String, requiredValue: String): Boolean {
     if (checkResult) {
-      project.getLogger().error("You haven't configured $fieldDescription. Please add $requiredValue to your build.gradle file.")
+      project.logger.error("You haven't configured $fieldDescription. Please add $requiredValue to your build.gradle file.")
     }
     return checkResult
   }
@@ -244,7 +301,7 @@ class JosmManifest(private val project: Project) {
 
   /**
    * Returns a map containing all manifest attributes, which are set.
-   * This map can then be fed into [org.gradle.api.java.archives.Manifest.attributes()]. That's already done automatically by the gradle-josm-plugin, so you normally don't need to call this yourself.
+   * This map can then be fed into [org.gradle.api.java.archives.Manifest.attributes]. That's already done automatically by the gradle-josm-plugin, so you normally don't need to call this yourself.
    *
    * Make sure the [langCompileTask] already ran before this method is called, otherwise not all translated descriptions are included in the Manifest.
    */
@@ -252,6 +309,8 @@ class JosmManifest(private val project: Project) {
     isRequiredFieldMissing(minJosmVersion == null, "the minimum JOSM version your plugin is compatible with", "josm.manifest.minJosmVersion = ‹a JOSM version›")
     isRequiredFieldMissing(mainClass == null, "the main class of your plugin", "josm.manifest.mainClass = ‹full name of main class›")
     isRequiredFieldMissing(description == null, "the description of your plugin", "josm.manifest.description = ‹a textual description›")
+    isRequiredFieldMissing(platform == null && provides != null, "the platform for which this plugin is written", "josm.manifest.platform = ‹Osx, Windows or Unixoid›")
+    isRequiredFieldMissing(platform != null && provides == null, "the name of the virtual plugin for which this is an implementation", "josm.manifest.provides = ‹virtual plugin name›")
 
     val missingException = GradleException("The JOSM plugin ${project.name} misses required configuration options. See above for which options are missing.")
 
@@ -309,12 +368,15 @@ class JosmManifest(private val project: Project) {
     author?.let { manifestAtts.put("Author", it) }
     iconPath?.let { manifestAtts.put("Plugin-Icon", it) }
     loadPriority?.let { manifestAtts.put("Plugin-Stage", it.toString()) }
+    minJavaVersion?.let { manifestAtts.put("Plugin-Minimum-Java-Version", it.toString()) }
+    platform?.let { manifestAtts["Plugin-Platform"] = it.toString() }
+    provides?.let { manifestAtts["Plugin-Provides"] = it }
     website?.let { manifestAtts.put("Plugin-Link", it.toString()) }
     if (!pluginDependencies.isEmpty()) {
       manifestAtts["Plugin-Requires"] = pluginDependencies.joinToString(";")
     }
 
-    if (project.logger.isInfoEnabled()) {
+    if (project.logger.isInfoEnabled) {
       project.logger.info("The following lines will be added to the manifest of the plugin *.jar file:")
       for (e in manifestAtts.toSortedMap()) {
         project.logger.info("  ${e.key}: ${e.value}")
@@ -328,12 +390,12 @@ class JosmManifest(private val project: Project) {
    * @param language the language abbreviation (e.g. `de_AT` or `es`)
    * @param translatedDescription the description in the language given by the `language` parameter
    */
-  public fun translatedDescription(language: String, translatedDescription: String) {
-    if (!language.matches(Regex("[a-z]{2,3}(_[A-Z]{2})?"))) {
-      throw IllegalArgumentException("The given language string '$language' is not a valid abbreviation for a language.")
+  fun translatedDescription(language: String, translatedDescription: String) {
+    require(language.matches(Regex("[a-z]{2,3}((_[A-Z]{2})|(-[a-z]+))?"))) {
+      "The given language string '$language' is not a valid abbreviation for a language."
     }
-    if (translatedDescription.isBlank()) {
-      throw IllegalArgumentException("The translated description must not be blank!")
+    require(translatedDescription.isNotBlank()) {
+      "The translated description must not be blank!"
     }
     translatedDescriptions[language] = translatedDescription
   }
