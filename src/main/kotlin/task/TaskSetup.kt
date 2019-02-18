@@ -70,49 +70,49 @@ private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSe
   val distDir = File(project.buildDir, "dist")
   val localDistDir = File(project.buildDir, "localDist")
 
-  val localDistTask = project.tasks.create("localDist", GeneratePluginList::class.java) {
-    it.group = "JOSM"
-    it.outputFile = File(localDistDir, "list")
-    it.description = "Generate a local plugin site."
-    it.dependsOn(archiverTask)
+  val localDistTask = project.tasks.create("localDist", GeneratePluginList::class.java) { genListTask ->
+    genListTask.group = "JOSM"
+    genListTask.outputFile = File(localDistDir, "list")
+    genListTask.description = "Generate a local plugin site."
+    genListTask.dependsOn(archiverTask)
 
-    project.afterEvaluate {_ ->
-      val localDistReleaseFile = File(localDistDir, project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName + "-dev.${archiverTask.extension}")
-      it.description += String.format(
+    project.afterEvaluate {
+      val localDistReleaseFile = File(localDistDir, project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName + "-dev.${archiverTask.archiveExtension.get()}")
+      genListTask.description += String.format(
         "Add '%s' as plugin site in JOSM preferences (expert mode) and you'll be able to install the current development state as plugin '%s'",
-        it.outputFile.toURI().toURL(),
+        genListTask.outputFile.toURI().toURL(),
         localDistReleaseFile.nameWithoutExtension
       )
 
       // Make sure translations are available as *.lang files (if there are any)
-      project.extensions.josm.manifest.langCompileTask?.let { langTask ->
-        it.dependsOn(langTask)
+      project.extensions.josm.manifest.langCompileTask?.let {
+        genListTask.dependsOn(it)
       }
 
-      it.doFirst { _ ->
+      genListTask.doFirst {
         project.copy {
           it.from(archiverTask)
           it.into(localDistDir)
           it.duplicatesStrategy = DuplicatesStrategy.FAIL
           it.rename { localDistReleaseFile.name }
         }
-        it.addPlugin(
+        genListTask.addPlugin(
           localDistReleaseFile.nameWithoutExtension,
           project.extensions.josm.manifest.createJosmPluginJarManifest(),
           localDistReleaseFile.toURI().toURL()
         )
       }
 
-      it.doLast { _ ->
+      genListTask.doLast {
         it.logger.lifecycle(
           "A local JOSM update site for plugin '{}' (version {}) has been written to {}",
           localDistReleaseFile.nameWithoutExtension,
           project.version,
-          it.outputFile.absolutePath
+          genListTask.outputFile.absolutePath
         )
       }
     }
-    it.iconBase64Provider = { iconPath ->
+    genListTask.iconBase64Provider = { iconPath ->
       try {
         val iconFile = sourceSetJosmPlugin.resources.srcDirs.map { File(it, iconPath) }.firstOrNull { it.exists() }
         if (iconFile != null) {
@@ -125,23 +125,23 @@ private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSe
           null
         }
       } catch (e: IOException) {
-        it.logger.lifecycle("Error reading icon file!", e)
+        genListTask.logger.lifecycle("Error reading icon file!", e)
         null
       }
     }
   }
 
-  val distTask = project.tasks.create("dist", Sync::class.java) {
-    it.from(project.tasks.getByName(sourceSetJosmPlugin.jarTaskName))
-    it.into(distDir)
-    it.duplicatesStrategy = DuplicatesStrategy.FAIL
-    project.afterEvaluate { _ ->
-      val fileName = project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName + ".${archiverTask.extension}"
-      it.doFirst { _ ->
-        it.rename { fileName }
+  val distTask = project.tasks.create("dist", Sync::class.java) { distTask ->
+    distTask.from(project.tasks.getByName(sourceSetJosmPlugin.jarTaskName))
+    distTask.into(distDir)
+    distTask.duplicatesStrategy = DuplicatesStrategy.FAIL
+    project.afterEvaluate {
+      val fileName = project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName + ".${archiverTask.archiveExtension.get()}"
+      distTask.doFirst {
+        distTask.rename { fileName }
       }
-      it.doLast {
-        it.logger.lifecycle(
+      distTask.doLast {
+        distTask.logger.lifecycle(
           "Distribution {} (version {}) has been written into {}",
           fileName,
           project.version,

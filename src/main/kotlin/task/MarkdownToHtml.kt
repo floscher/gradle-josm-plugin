@@ -39,7 +39,7 @@ open class MarkdownToHtml: SourceTask() {
     val parser = Parser.builder().build()
     val renderer = HtmlRenderer.builder().build()
 
-    val files = getSource().files.filter { it.extension.toLowerCase(Locale.ENGLISH) == "md" }
+    val files = source.files.filter { it.extension.toLowerCase(Locale.ENGLISH) == "md" }
 
     if (files.map { it.nameWithoutExtension }.distinct().size < files.size) {
       throw TaskExecutionException(this, GradleException("There are multiple files with the same name for task ${this.name}!"))

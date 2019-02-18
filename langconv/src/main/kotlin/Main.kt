@@ -38,9 +38,9 @@ fun main(vararg args: String) {
       }
     } ?: failWithException(IllegalArgumentException("The given input file/directory does not exist or you can't read from it!: ${ File(inputArg).safeCanonicalPath() }"))
 
-  val filesWithSameName = inputFiles.groupBy { it.nameWithoutExtension }
-  if (filesWithSameName.values.any { it.size > 1 }) {
-    failWithException(IllegalArgumentException("The given input directory contains more than one file with the same name (${filesWithSameName.values.filter { it.size > 1 }.flatMap { it.map { it.name } }.joinToString()})! This would lead to name collisions with the output files."))
+  val filesWithSameName = inputFiles.groupBy { it.nameWithoutExtension }.values.filter { it.size > 1 }
+  if (filesWithSameName.isNotEmpty()) {
+    failWithException(IllegalArgumentException("The given input directory contains more than one file with the same name (${filesWithSameName.flatMap { it.map { it.name } }.joinToString()})! This would lead to name collisions with the output files."))
   }
 
   val outputDir: File =

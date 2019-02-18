@@ -23,7 +23,7 @@ open class CustomJosmVersionCompile
     group = "JOSM"
     description = "Compile the JOSM plugin against ${if (findNextVersion) { "the first available JOSM version since" } else { "JOSM version" }} $customVersion"
     classpath = additionalClasspath
-    destinationDir =  File(project.buildDir, "classes/java/${sourceSet.name}_${customVersion}")
+    destinationDir =  File(project.buildDir, "classes/java/${sourceSet.name}_$customVersion")
 
     project.afterEvaluate {
       source(sourceSet.java)
@@ -34,7 +34,7 @@ open class CustomJosmVersionCompile
         customJosm = if (findNextVersion) { project.getNextJosmVersion(customVersion) } else { project.dependencies.createJosm(customVersion) }
         val customConfig = project.configurations.detachedConfiguration(*
         project.configurations.getByName(sourceSet.compileClasspathConfigurationName).dependencies
-          .filterNot { project.dependencies.isJosmDependency(it) }
+          .filterNot { it.isJosmDependency() }
           .plus(customJosm)
           .toTypedArray()
         )

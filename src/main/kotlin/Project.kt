@@ -30,26 +30,25 @@ import kotlin.math.max
  * @return the next available JOSM dependency. A [DependencySet] consisting only of this one dependency.
  * @throws [GradleException] if no suitable JOSM version can be found.
  */
-fun Project.getNextJosmVersion(startVersion: String?): Dependency {
+fun Project.getNextJosmVersion(startVersion: String): Dependency {
+  val versionsToTest = requireNotNull(startVersion) {
+    "Could not add dependency on min. required JOSM version when null is given as version number! Set JosmManifest.minJosmVersion to fix this."
+  }
+    .toIntOrNull()
+    ?.let {
+      it..it+49
+    }
+    ?: listOf(startVersion)
+
   var cause: Throwable? = null
-  val startVersionInt = startVersion?.toIntOrNull()
-  if (startVersion == null) {
-    throw GradleException("Could not add dependency on min. required JOSM version when null is given as version number! Set JosmManifest.minJosmVersion to fix this.")
-  } else if (startVersionInt == null) {
+  for (v in versionsToTest) {
     try {
-      return resolveJosm(startVersion)
+      return resolveJosm(v.toString())
     } catch (e: GradleException) {
       cause = e
     }
-  } else {
-    for (i in startVersionInt .. startVersionInt + 49) {
-      try {
-        return resolveJosm(i.toString())
-      } catch (e: GradleException) {
-        cause = e
-      }
-    }
   }
+
   throw GradleException("Could not determine the minimum required JOSM version from the given version number '$startVersion'", cause ?: Exception())
 }
 
@@ -176,7 +175,7 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
  * @param [version] the version number for JOSM (latest and tested are special versions that are [ExternalModuleDependency.isChanging])
  * @return the dependency as created by [DependencyHandler.create]
  */
-fun DependencyHandler.createJosm(version: String) =
+fun DependencyHandler.createJosm(version: String): Dependency =
   when (version) {
     "latest", "tested" ->
       (create("org.openstreetmap.josm:josm:$version") as ExternalModuleDependency).setChanging(true)
@@ -187,7 +186,7 @@ fun DependencyHandler.createJosm(version: String) =
 /**
  * @return true iff the given dependency contains JOSM (the group and name of the dependency are checked to determine this)
  */
-fun DependencyHandler.isJosmDependency(dep: Dependency) = dep.group == "org.openstreetmap.josm" && dep.name == "josm"
+fun Dependency.isJosmDependency() = this.group == "org.openstreetmap.josm" && this.name == "josm"
 
 /**
  * @return true if a JOSM version of 7841 or later is used that can be configured to use separate directories for cache, preferences and userdata

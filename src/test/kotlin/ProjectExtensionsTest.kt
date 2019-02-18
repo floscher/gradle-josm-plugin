@@ -68,13 +68,6 @@ class ProjectExtensionsTest {
   }
 
   @Test
-  fun testNextJosmNull() {
-    assertThrows(GradleException::class.java) {
-      createNextJosmTestRepo().getNextJosmVersion(null)
-    }
-  }
-
-  @Test
   fun testNextJosmString() {
     assertEquals("XYZ", createNextJosmTestRepo().getNextJosmVersion("XYZ").version)
   }

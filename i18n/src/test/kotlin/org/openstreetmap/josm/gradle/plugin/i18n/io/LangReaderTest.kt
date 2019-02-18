@@ -70,20 +70,34 @@ class LangReaderTest {
   @Test
   fun testEmptyFiles() {
     val baseLang = "en"
-    val emptyResult = listOf("de", "fr").plus(baseLang).associate { it to mapOf<MsgId, MsgStr>() }
+    val languages = listOf("de", "fr").plus(baseLang)
+    val emptyResult = languages.associate { it to mapOf<MsgId, MsgStr>() }
 
     // Empty
-    testLangStreams(baseLang, emptyResult.keys.toList(), { ByteArray(0) }) {
+    testLangStreams(baseLang, languages, { ByteArray(0) }) {
+      assertEquals(emptyResult, it.invoke())
+    }
+
+    testLangStreams(
+      baseLang,
+      languages,
+      {
+        when(it) {
+          "en" -> ByteArray(0)
+          else -> ByteArray(4) { 0.toSignedByte() }
+        }
+      }
+    ) {
       assertEquals(emptyResult, it.invoke())
     }
 
     // 0xFFFF
-    testLangStreams(baseLang, emptyResult.keys.toList(), { ByteArray(2) { 0xFF.toSignedByte() } }) {
+    testLangStreams(baseLang, languages, { ByteArray(2) { 0xFF.toSignedByte() } }) {
       assertEquals(emptyResult, it.invoke())
     }
 
     // 0xFFFFFF
-    testLangStreams(baseLang, emptyResult.keys.toList(), { ByteArray(3) { 0xFF.toSignedByte() } }) {
+    testLangStreams(baseLang, languages, { ByteArray(3) { 0xFF.toSignedByte() } }) {
       assertEquals(emptyResult, it.invoke())
     }
   }
@@ -201,12 +215,6 @@ class LangReaderTest {
 
   private fun testLangStreams(baseLang: String, languages: List<String>, inputBytes: (String) -> ByteArray, test: (() -> Map<String, Map<MsgId, MsgStr>>) -> Unit) {
     test.invoke {  LangReader().readLangStreams(baseLang, ByteArrayInputStream(inputBytes.invoke(baseLang)), languages.associate { it to ByteArrayInputStream(inputBytes.invoke(it)) }) }
-
-    //test.invoke(LangReader().readLangStreams(baseLang, ByteArrayInputStream(inputBytes.invoke(baseLang)), languages.associate { it to ByteArrayInputStream(inputBytes.invoke(it)) }))
-  }
-
-  private fun getDummyLangStreamsWithInts(baseLang: String, languages: List<String>, langToInts: (String) -> List<Int>): Pair<InputStream, Map<String, InputStream>> {
-    return getDummyLangStreamsWithBytes(baseLang, languages) { langToInts.invoke(it).map { it.toSignedByte() }.toByteArray() }
   }
 
   private fun getDummyLangStreamsWithBytes(baseLang: String, languages: List<String>, langToBytes: (String) -> ByteArray): Pair<InputStream, Map<String, InputStream>> {

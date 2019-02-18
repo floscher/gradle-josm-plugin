@@ -39,7 +39,7 @@ open class GeneratePot
     val outDir = File(project.buildDir, "i18n")
     outputs.dir(outDir)
 
-    workingDir = project.getProjectDir()
+    workingDir = project.projectDir
     executable = "xgettext"
 
     project.afterEvaluate {
@@ -80,7 +80,7 @@ open class GeneratePot
     doLast {
       val destFile = File(outDir, "$outBaseName.pot")
       val replacements = mutableMapOf<String, String>()
-      replacements.put("(C) YEAR", "(C) " + Year.now().getValue())
+      replacements.put("(C) YEAR", "(C) " + Year.now().value)
       replacements.put("charset=CHARSET", "charset=UTF-8")
       try {
         moveFileAndReplaceStrings(
@@ -92,7 +92,7 @@ open class GeneratePot
             } else line
           },
           replacements,
-          "\n#. Plugin description for " + project.getName() + "\nmsgid \"" + project.extensions.josm.manifest.description + "\"\nmsgstr \"\"\n"
+          "\n#. Plugin description for " + project.name + "\nmsgid \"" + project.extensions.josm.manifest.description + "\"\nmsgstr \"\"\n"
         )
       } catch (e: IOException) {
         throw TaskExecutionException(this, e)

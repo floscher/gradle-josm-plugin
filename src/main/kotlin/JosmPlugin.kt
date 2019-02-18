@@ -59,7 +59,7 @@ class JosmPlugin: Plugin<Project> {
           } catch (e: Exception) {
             project.logger.info("Error getting project version for ${project.projectDir.absolutePath} using SVN!", e)
             // Don't set the project version
-            val msg = { ->
+            val msg = {
               project.logger.warn("""
                 WARNING: Could not detect the project version, you are probably not building inside a git repository!
                 WARNING: The project version is currently the default value `${project.version}`.

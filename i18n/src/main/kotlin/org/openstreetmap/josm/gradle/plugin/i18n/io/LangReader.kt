@@ -87,7 +87,7 @@ class LangReader {
       var finishedPluralStrings = false
 
       while (!finishedSingularStrings) {
-        val stringLength = stream.readTwoBytesAsInt()
+        val stringLength = it.readTwoBytesAsInt()
         when (stringLength) {
           in Int.MIN_VALUE..-1 -> { // File ended
             finishedSingularStrings = true
