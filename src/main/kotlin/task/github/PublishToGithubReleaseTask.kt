@@ -7,7 +7,7 @@ import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient
 import org.openstreetmap.josm.gradle.plugin.github.ReleaseSpec
 import org.openstreetmap.josm.gradle.plugin.github.get
-import org.openstreetmap.josm.gradle.plugin.josm
+import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile

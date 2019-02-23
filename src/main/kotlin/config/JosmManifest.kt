@@ -11,8 +11,8 @@ import org.openstreetmap.josm.gradle.plugin.github.onlyFallbackVersions
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangReader
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
-import org.openstreetmap.josm.gradle.plugin.josm
 import org.openstreetmap.josm.gradle.plugin.task.LangCompile
+import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 import java.net.URL
 import java.util.GregorianCalendar
@@ -165,7 +165,7 @@ class JosmManifest(private val project: Project) {
    * The three platforms for which JOSM supports virtual plugins.
    */
   enum class Platform {
-    Osx, Windows, Unixoid
+    OSX, WINDOWS, UNIXOID
   }
 
   /**

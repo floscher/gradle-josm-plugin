@@ -4,15 +4,16 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.compile.JavaCompile
-import org.openstreetmap.josm.gradle.plugin.createJosm
-import org.openstreetmap.josm.gradle.plugin.getNextJosmVersion
-import org.openstreetmap.josm.gradle.plugin.isJosmDependency
+import org.openstreetmap.josm.gradle.plugin.util.createJosm
+import org.openstreetmap.josm.gradle.plugin.util.createJosmDependencyFuzzy
+import org.openstreetmap.josm.gradle.plugin.util.isJosm
 import java.io.File
 import javax.inject.Inject
 
 /**
  * This task compiles the given source set against a specific JOSM version.
  */
+@ExperimentalUnsignedTypes
 open class CustomJosmVersionCompile
   @Inject
   constructor(customVersion: String, findNextVersion: Boolean, sourceSet: SourceSet, additionalClasspath: FileCollection): JavaCompile() {
@@ -31,10 +32,14 @@ open class CustomJosmVersionCompile
 
     project.gradle.taskGraph.whenReady { graph ->
       if (graph.hasTask(this)) {
-        customJosm = if (findNextVersion) { project.getNextJosmVersion(customVersion) } else { project.dependencies.createJosm(customVersion) }
+        this.customJosm = if (findNextVersion && customVersion.matches(Regex("[1-9][0-9]+"))) {
+          project.createJosmDependencyFuzzy(customVersion.toUInt())
+        } else {
+          project.dependencies.createJosm(customVersion)
+        }
         val customConfig = project.configurations.detachedConfiguration(*
         project.configurations.getByName(sourceSet.compileClasspathConfigurationName).dependencies
-          .filterNot { it.isJosmDependency() }
+          .filterNot { it.isJosm() }
           .plus(customJosm)
           .toTypedArray()
         )

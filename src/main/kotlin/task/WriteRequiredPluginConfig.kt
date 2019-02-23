@@ -5,7 +5,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.BasePluginConvention
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskExecutionException
-import org.openstreetmap.josm.gradle.plugin.josm
+import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 import java.io.IOException
 

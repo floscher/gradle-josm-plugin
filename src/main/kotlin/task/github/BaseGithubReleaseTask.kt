@@ -5,7 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.options.Option
 import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
-import org.openstreetmap.josm.gradle.plugin.josm
+import org.openstreetmap.josm.gradle.plugin.util.josm
 
 private const val CMDLINE_OPT_RELEASE_LABEL = "release-label"
 private const val CMDLINE_OPT_TARGET_COMMITISH = "target-commitish"

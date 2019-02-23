@@ -1,13 +1,10 @@
 package org.openstreetmap.josm.gradle.plugin.io
 
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ExternalModuleDependency
 import org.openstreetmap.josm.gradle.plugin.task.GeneratePluginList
+import org.openstreetmap.josm.gradle.plugin.util.josmPluginList
 import java.net.MalformedURLException
-import java.net.URI
 import java.net.URL
-
-const val DEFAULT_PLUGIN_LIST_URL: String = "https://josm.openstreetmap.de"
 
 /**
  * Reads a plugin info file like it is found at [https://josm.openstreetmap.de/plugin]
@@ -17,7 +14,7 @@ const val DEFAULT_PLUGIN_LIST_URL: String = "https://josm.openstreetmap.de"
  * any errors that occured while parsing can be retrieved by accessing [errors]. If there are no parsing errors,
  * [errors] will be an empty list.
  */
-class JosmPluginListParser(val project: Project, val url: URL = URL(DEFAULT_PLUGIN_LIST_URL)) {
+class JosmPluginListParser(val project: Project, val withIcons: Boolean = false) {
 
   companion object {
     val TITLE_LINE_REGEX = Regex("^([^;]+)(\\.jar)?;(.+)$")
@@ -33,23 +30,9 @@ class JosmPluginListParser(val project: Project, val url: URL = URL(DEFAULT_PLUG
     val plugins: MutableList<PluginInfo> = mutableListOf()
 
     // Resolve plugin list as dependency
-    val dependency = project.dependencies.create("org.openstreetmap.josm.pluginLists:plugin:")
-      .also {
-        if (it is ExternalModuleDependency) {
-          it.isChanging = true
-        }
-      }
+    val dependency = project.dependencies.josmPluginList(withIcons)
     val conf = project.configurations.detachedConfiguration(dependency)
-    val repo = project.repositories.ivy { repo ->
-      repo.url = URI(DEFAULT_PLUGIN_LIST_URL)
-      repo.patternLayout {
-        it.artifact("[artifact]")
-      }
-      repo.content {
-        it.onlyForConfigurations(conf.name)
-        it.includeModule(dependency.group ?: "", dependency.name)
-      }
-    }
+    val repo = project.repositories.josmPluginList(conf, dependency)
     val resolvedFiles = conf.resolve()
     project.repositories.remove(repo)
 

@@ -3,7 +3,7 @@ package org.openstreetmap.josm.gradle.plugin.task
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
-import org.openstreetmap.josm.gradle.plugin.josm
+import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 import javax.inject.Inject
 

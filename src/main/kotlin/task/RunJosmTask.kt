@@ -3,8 +3,7 @@ package org.openstreetmap.josm.gradle.plugin.task
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.JavaExec
-import org.openstreetmap.josm.gradle.plugin.josm
-import org.openstreetmap.josm.gradle.plugin.useSeparateTmpJosmDirs
+import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 import javax.inject.Inject
 
@@ -40,7 +39,7 @@ open class RunJosmTask @Inject constructor(prefFile: File) : JavaExec() {
         val userSuppliedArgs = args ?: listOf()
         this.args = userSuppliedArgs.plus("""--load-preferences=${prefFile.toURI().toURL()}""")
 
-        if (project.useSeparateTmpJosmDirs()) {
+        if (project.extensions.josm.useSeparateTmpJosmDirs()) {
           systemProperty("josm.cache", project.extensions.josm.tmpJosmCacheDir)
           systemProperty("josm.pref", project.extensions.josm.tmpJosmPrefDir)
           systemProperty("josm.userdata", project.extensions.josm.tmpJosmUserdataDir)

@@ -8,10 +8,10 @@ import org.gradle.api.plugins.BasePluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
-import org.openstreetmap.josm.gradle.plugin.java
-import org.openstreetmap.josm.gradle.plugin.josm
 import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
 import org.openstreetmap.josm.gradle.plugin.task.github.PublishToGithubReleaseTask
+import org.openstreetmap.josm.gradle.plugin.util.java
+import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -23,6 +23,7 @@ import java.util.Base64
 /**
  * This method sets up all the [Task]s (and [Configuration]s) for a given project that should be there by default.
  */
+@ExperimentalUnsignedTypes
 fun Project.setupJosmTasks() {
   val sourceSetJosmPlugin = project.convention.java.sourceSets.getByName("main")
   val configurationRequiredPlugin = project.configurations.getByName("requiredPlugin")

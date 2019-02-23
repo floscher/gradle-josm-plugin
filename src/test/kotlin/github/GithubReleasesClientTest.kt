@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
+import org.openstreetmap.josm.gradle.plugin.util.Urls
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock
 import ru.lanwen.wiremock.ext.WiremockUriResolver
@@ -51,12 +51,10 @@ class GithubReleasesClientTest {
     @Test
     fun `pagination with a url of type rel="next" should work`() {
         val pagination = Pagination(
-          "<https://api.github.com" +
-            "/search/code?q=addClass+user%3Amozilla&page=15>; rel=\"next\"")
+          "<${Urls.Github.API}/search/code?q=addClass+user%3Amozilla&page=15>; rel=\"next\"")
         assertEquals(
             pagination.nextUrl,
-            "https://api.github.com" +
-            "/search/code?q=addClass+user%3Amozilla&page=15"
+            "${Urls.Github.API}/search/code?q=addClass+user%3Amozilla&page=15"
         )
     }
 

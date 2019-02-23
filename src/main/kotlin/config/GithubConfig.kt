@@ -2,6 +2,7 @@ package org.openstreetmap.josm.gradle.plugin.config
 
 import org.gradle.api.Project
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
+import org.openstreetmap.josm.gradle.plugin.util.Urls
 import java.io.File
 import java.io.IOException
 import kotlin.reflect.KMutableProperty1
@@ -16,11 +17,6 @@ class GithubConfig(project: Project) {
 
   companion object {
     private const val EMPTY_STRING = ""
-
-    // the default API URL for the GitHub API
-    private const val DEFAULT_API_URL = "https://api.github.com"
-    // the default upload URL to upload a release asset
-    private const val DEFAULT_UPLOAD_URL = "https://uploads.github.com"
 
     private const val ENV_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN"
     private const val ENV_API_URL = "GITHUB_API_URL"
@@ -68,7 +64,7 @@ class GithubConfig(project: Project) {
    *
    * @since 0.5.3
    */
-  var apiUrl: String = System.getenv(ENV_API_URL) ?: DEFAULT_API_URL
+  var apiUrl: String = System.getenv(ENV_API_URL) ?: Urls.Github.API.toString()
 
   /**
    * The base API URL to upload release assets.
@@ -76,7 +72,7 @@ class GithubConfig(project: Project) {
    *
    * @since 0.5.3
    */
-  var uploadUrl: String = System.getenv(ENV_UPLOAD_URL) ?: DEFAULT_UPLOAD_URL
+  var uploadUrl: String = System.getenv(ENV_UPLOAD_URL) ?: Urls.Github.UPLOADS.toString()
 
   /**
    * The list of releases in YAML format. The file must exist and be readable,

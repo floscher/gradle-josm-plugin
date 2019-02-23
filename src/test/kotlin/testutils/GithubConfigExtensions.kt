@@ -1,6 +1,5 @@
 package org.openstreetmap.josm.gradle.plugin.testutils
 
-import org.gradle.testfixtures.ProjectBuilder
 import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
 import java.io.File
 import kotlin.reflect.KMutableProperty1
@@ -25,7 +24,7 @@ fun GithubConfig.toGradleBuildscript(suppressFields: List<String> = listOf("rele
       }
     } + "\n}"
 
-private val emptyProject by lazy { ProjectBuilder.builder().build() }
+private val emptyProject = GradleProjectUtil.createEmptyProjectBuilder().build()
 
 fun buildGithubConfig(apiUrl: String, repoOwner: String, repoName: String, accessToken: String, uploadUrl: String = apiUrl): GithubConfig {
   synchronized(emptyProject) {

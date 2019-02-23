@@ -7,10 +7,9 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.IvyArtifactRepository
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.tasks.util.PatternFilterable
-import org.openstreetmap.josm.gradle.plugin.josm
-import org.openstreetmap.josm.gradle.plugin.useSeparateTmpJosmDirs
+import org.openstreetmap.josm.gradle.plugin.util.Urls
+import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
-import java.net.URI
 
 /**
  * This extension is added to the project as `project.josm`
@@ -28,6 +27,8 @@ open class JosmPluginExtension(private val project: Project) {
   /**
    * This is required, when you want to run the task `debugJosm`. Set this to the port
    * on which you want to listen for the debug output.
+   *
+   * **Default value:** `null`
    */
   var debugPort: Int? = null
 
@@ -104,7 +105,7 @@ open class JosmPluginExtension(private val project: Project) {
 
   init {
     project.afterEvaluate {
-      if (!it.useSeparateTmpJosmDirs()) {
+      if (!useSeparateTmpJosmDirs()) {
         it.logger.warn("You are using a very old version of JOSM (< 7841) that doesn't have separate directories for cache and user data.")
         project.extensions.josm.tmpJosmCacheDir = File(project.extensions.josm.tmpJosmPrefDir, "cache")
         project.extensions.josm.tmpJosmUserdataDir = project.extensions.josm.tmpJosmPrefDir
@@ -129,6 +130,27 @@ open class JosmPluginExtension(private val project: Project) {
     set(value) {
       require(value >= 0) {
         "For property `maxPluginDependencyDepth` only nonnegative integer values are allowed! You are trying to set it to $value."
+      }
+      field = value
+    }
+
+  /**
+   * This determines how many JOSM versions are tried out before giving up when a JOSM version is specified that can't
+   * be downloaded through [the download page](https://josm.openstreetmap.de/download).
+   *
+   * The only place where we'll pick one of the following version numbers and not the exact one,
+   * is [JosmManifest.minJosmVersion]. The [JosmPluginExtension.josmCompileVersion] is always used as-is.
+   *
+   * Say you set [JosmManifest.minJosmVersion]=1234 and [minJosmVersionTolerance]=20 ,
+   * then we use the first version between and including 1234 and 1253 that can be downloaded will be used.
+   *
+   * **Default value:** 30
+   * @since 0.6.1
+   */
+  var josmVersionFuzziness: Int = 30
+    set(value) {
+      require(value >= 0) {
+        "For property `josmVersionFuzziness` only nonnegative integer values are allowed! You are trying to set it to $value."
       }
       field = value
     }
@@ -166,10 +188,10 @@ open class JosmPluginExtension(private val project: Project) {
    */
   var repositories: (RepositoryHandler) -> Unit = fun (rh: RepositoryHandler) {
     rh.maven {
-      it.url = URI("https://josm.openstreetmap.de/nexus/content/repositories/releases/")
+      it.url = Urls.MainJosmWebsite.NEXUS_REPO_RELEASES.toURI()
     }
     rh.ivy { repo ->
-      repo.url = URI("https://josm.openstreetmap.de/download/")
+      repo.url = Urls.MainJosmWebsite.DOWNLOADS.toURI()
       repo.patternLayout {
         it.artifact("[artifact].jar")
         it.artifact("[artifact]-[revision].jar")
@@ -178,16 +200,16 @@ open class JosmPluginExtension(private val project: Project) {
       }
     }
     rh.maven {
-      it.url = URI("https://josm.openstreetmap.de/nexus/content/repositories/snapshots/")
+      it.url = Urls.MainJosmWebsite.NEXUS_REPO_SNAPSHOTS.toURI()
     }
     rh.ivy { repo ->
-      repo.url = URI("https://svn.openstreetmap.org/applications/editors/josm/dist/")
+      repo.url = Urls.JOSM_PLUGIN_DIST.toURI()
       repo.patternLayout {
         it.artifact("[artifact].jar")
       }
     }
     rh.maven {
-      it.url = URI("https://gitlab.com/api/v4/projects/8611940/packages/maven")
+      it.url = Urls.GITLAB_JOSM_PLUGINS_REPO.toURI()
     }
   }
 
@@ -264,4 +286,9 @@ open class JosmPluginExtension(private val project: Project) {
    * @since 0.5.2
    */
   var versionWithoutLeadingV = true
+
+  /**
+   * @return true if a JOSM version of 7841 or later is used that can be configured to use separate directories for cache, preferences and userdata
+   */
+  fun useSeparateTmpJosmDirs(): Boolean = josmCompileVersion?.toIntOrNull()?.let { it >= 7841 } ?: true
 }

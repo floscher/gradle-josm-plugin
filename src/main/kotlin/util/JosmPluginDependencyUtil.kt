@@ -1,4 +1,4 @@
-package org.openstreetmap.josm.gradle.plugin
+package org.openstreetmap.josm.gradle.plugin.util
 
 /**
  * Extends [Project] with methods specific to JOSM development.
@@ -7,13 +7,16 @@ package org.openstreetmap.josm.gradle.plugin
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.artifacts.dsl.RepositoryHandler
+import org.gradle.api.artifacts.repositories.IvyArtifactRepository
 import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.plugins.JavaPluginConvention
+import org.openstreetmap.josm.gradle.plugin.config.JosmManifest
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.io.JosmPluginListParser
 import java.io.IOException
@@ -21,60 +24,52 @@ import java.util.jar.Manifest
 import java.util.zip.ZipFile
 import kotlin.math.max
 
+fun RepositoryHandler.josmPluginList(onlyForConfig: Configuration, dependency: Dependency): IvyArtifactRepository = this.ivy { repo ->
+  repo.url = Urls.MainJosmWebsite.BASE.toURI()
+  repo.patternLayout {
+    it.artifact("[artifact]")
+  }
+  repo.content {
+    it.onlyForConfigurations(onlyForConfig.name)
+    it.includeModule(dependency.group ?: "", dependency.name)
+  }
+}
+
+fun DependencyHandler.josmPluginList(withIcons: Boolean): ExternalModuleDependency =
+  (this.create("$GROUP_METADATA:$ARTIFACT_PLUGIN_LIST:$VERSION_SNAPSHOT") as ExternalModuleDependency)
+    .also { dep ->
+      dep.isChanging = true
+      dep.artifact {
+        it.type = "txt"
+        it.name = if (withIcons) {
+          Urls.MainJosmWebsite.PATH_PLUGIN_LIST_WITH_ICONS
+        } else {
+          Urls.MainJosmWebsite.PATH_PLUGIN_LIST
+        }
+      }
+    }
+
 /**
- * Finds the next JOSM version available in the repositories known to Gradle, starting with a given version number.
- *
- * If the number can be parsed as an integer, 50 version numbers beginning with the given number are checked.
- * Otherwise only the given version is checked.
- *
- * @return the next available JOSM dependency. A [DependencySet] consisting only of this one dependency.
- * @throws [GradleException] if no suitable JOSM version can be found.
+ * @return a map with the virtual plugin names as key, the values are a list of pairs, where the first element
+ * is the platform, the seconds element of the pairs is the name of the real plugin providing the virtual plugin.
  */
-fun Project.getNextJosmVersion(startVersion: String): Dependency {
-  val versionsToTest = requireNotNull(startVersion) {
-    "Could not add dependency on min. required JOSM version when null is given as version number! Set JosmManifest.minJosmVersion to fix this."
-  }
-    .toIntOrNull()
-    ?.let {
-      it..it+49
-    }
-    ?: listOf(startVersion)
-
-  var cause: Throwable? = null
-  for (v in versionsToTest) {
-    try {
-      return resolveJosm(v.toString())
-    } catch (e: GradleException) {
-      cause = e
-    }
-  }
-
-  throw GradleException("Could not determine the minimum required JOSM version from the given version number '$startVersion'", cause ?: Exception())
-}
-
-private fun Project.resolveJosm(version: String): Dependency {
-  val dep = dependencies.createJosm(version)
-  val conf = configurations.detachedConfiguration(dep)
-  try {
-    conf.resolve()
-    logger.lifecycle("Using JOSM version $version as minimum version to compile against.")
-    return dep
-  } catch (e: GradleException) {
-    logger.info("JOSM version $version is not available in the available repositories.")
-    throw e
-  }
-}
-
 fun Project.getVirtualPlugins(): Map<String, List<Pair<String, String>>> = try {
-  JosmPluginListParser(this).plugins
+  val parser = JosmPluginListParser(this, true)
+  val result = parser
+    .plugins
     .mapNotNull {
       it.manifestAtts["Plugin-Platform"]?.let { platform ->
         it.manifestAtts["Plugin-Provides"]?.let { provides ->
-          Triple(provides, platform, if (it.pluginName.endsWith(".jar")) it.pluginName.substring(0..it.pluginName.length - 5) else it.pluginName)
+          Triple(provides, platform, if (it.pluginName.endsWith(".jar")) it.pluginName.substring(0 until it.pluginName.length - 4) else it.pluginName)
         }
       }
     }
     .groupBy({ it.first }, { Pair(it.second, it.third) })
+  if (parser.errors.isNotEmpty()) {
+    logger.warn("WARN: There were issues parsing the JOSM plugin list:\n * " + parser.errors.joinToString("\n * "))
+  }
+
+  result
 } catch (e: IOException) {
   logger.warn("WARN: Virtual plugins cannot be resolved, since the plugin list can't be read from the web!")
   mapOf()
@@ -117,15 +112,14 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
   val indentation = "  ".repeat(maxOf(0, recursionDepth))
   val result = HashSet<Dependency>()
   for (pluginName in directlyRequiredPlugins) {
-    val conf = configurations.detachedConfiguration()
     if (alreadyResolvedPlugins.contains(pluginName)) {
       logger.info("{}* {} (see above for dependencies)", indentation, pluginName)
     } else if (virtualPlugins.containsKey(pluginName)) {
       val suitableImplementation = virtualPlugins.getValue(pluginName).firstOrNull {
-        when (it.first.toLowerCase()) {
-          "unixoid" -> Os.isFamily(Os.FAMILY_UNIX)
-          "osx" -> Os.isFamily(Os.FAMILY_MAC)
-          "windows" -> Os.isFamily(Os.FAMILY_WINDOWS) || Os.isFamily(Os.FAMILY_9X) || Os.isFamily(Os.FAMILY_NT)
+        when (it.first.toUpperCase()) {
+          JosmManifest.Platform.UNIXOID.toString() -> Os.isFamily(Os.FAMILY_UNIX)
+          JosmManifest.Platform.OSX.toString() -> Os.isFamily(Os.FAMILY_MAC)
+          JosmManifest.Platform.WINDOWS.toString() -> Os.isFamily(Os.FAMILY_WINDOWS) || Os.isFamily(Os.FAMILY_9X) || Os.isFamily(Os.FAMILY_NT)
           else -> false
         }
       }
@@ -138,10 +132,8 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
         result.addAll(getAllRequiredJosmPlugins(realRecursionDepth + 1, alreadyResolvedPlugins, setOf(suitableImplementation.second)))
       }
     } else {
-      val dep = dependencies.create("org.openstreetmap.josm.plugins:$pluginName:SNAPSHOT") as ExternalModuleDependency
-      dep.isChanging = true
-      conf.dependencies.add(dep)
-      val resolvedFiles = conf.fileCollection(dep).files
+      val dep = dependencies.createJosmPlugin(pluginName)
+      val resolvedFiles = configurations.detachedConfiguration(dep).files
       alreadyResolvedPlugins.add(pluginName)
       for (file in resolvedFiles) {
         logger.info("{}* {}", indentation, pluginName)
@@ -164,36 +156,10 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
           }
         }
       }
+      result.add(dep)
     }
-    result.addAll(conf.dependencies)
   }
   return result
-}
-
-/**
- * Creates a dependency onto JOSM using the given version number
- * @param [version] the version number for JOSM (latest and tested are special versions that are [ExternalModuleDependency.isChanging])
- * @return the dependency as created by [DependencyHandler.create]
- */
-fun DependencyHandler.createJosm(version: String): Dependency =
-  when (version) {
-    "latest", "tested" ->
-      (create("org.openstreetmap.josm:josm:$version") as ExternalModuleDependency).setChanging(true)
-    else ->
-      create("org.openstreetmap.josm:josm:$version")
-  }
-
-/**
- * @return true iff the given dependency contains JOSM (the group and name of the dependency are checked to determine this)
- */
-fun Dependency.isJosmDependency() = this.group == "org.openstreetmap.josm" && this.name == "josm"
-
-/**
- * @return true if a JOSM version of 7841 or later is used that can be configured to use separate directories for cache, preferences and userdata
- */
-fun Project.useSeparateTmpJosmDirs(): Boolean {
-  val josmVersionNum = extensions.josm.josmCompileVersion?.toIntOrNull()
-  return josmVersionNum == null || josmVersionNum >= 7841
 }
 
 /**

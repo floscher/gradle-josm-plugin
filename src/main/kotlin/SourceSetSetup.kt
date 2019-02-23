@@ -10,6 +10,7 @@ import org.openstreetmap.josm.gradle.plugin.task.LangCompile
 import org.openstreetmap.josm.gradle.plugin.task.MoCompile
 import org.openstreetmap.josm.gradle.plugin.task.PoCompile
 import org.openstreetmap.josm.gradle.plugin.task.ShortenPoFiles
+import org.openstreetmap.josm.gradle.plugin.util.josm
 
 /**
  * Add the [I18nSourceSet] and create the associated tasks ([PoCompile], [MoCompile], [LangCompile], [ShortenPoFiles]).

@@ -8,6 +8,8 @@ import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.task.setupJosmTasks
+import org.openstreetmap.josm.gradle.plugin.util.java
+import org.openstreetmap.josm.gradle.plugin.util.josm
 
 /**
  * Main class of the plugin, sets up the custom configurations <code>requiredPlugin</code> and <code>packIntoJar</code>,

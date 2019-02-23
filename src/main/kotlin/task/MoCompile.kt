@@ -9,7 +9,7 @@ import org.openstreetmap.josm.gradle.plugin.i18n.io.LangWriter
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MoReader
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
-import org.openstreetmap.josm.gradle.plugin.josm
+import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 import javax.inject.Inject
 

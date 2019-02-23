@@ -1,6 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
+import org.openstreetmap.josm.gradle.plugin.util.Urls
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.URL
@@ -10,9 +11,6 @@ import java.nio.charset.StandardCharsets
  * Task for showing the current `latest` and `tested` JOSM versions
  */
 open class ListJosmVersions : DefaultTask() {
-  companion object {
-    private const val BASE_URL = "https://josm.openstreetmap.de"
-  }
 
   init {
     group = "JOSM"
@@ -25,8 +23,8 @@ open class ListJosmVersions : DefaultTask() {
     }
   }
 
-  private fun readTestedVersion() = readNumericVersion(URL("$BASE_URL/tested"))
-  private fun readLatestVersion() = readNumericVersion(URL("$BASE_URL/latest"))
+  private fun readTestedVersion() = readNumericVersion(Urls.MainJosmWebsite.VERSION_NUMBER_TESTED)
+  private fun readLatestVersion() = readNumericVersion(Urls.MainJosmWebsite.VERSION_NUMBER_LATEST)
 
   private fun readNumericVersion(url: URL): Int {
     url.openStream().use {
