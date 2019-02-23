@@ -177,7 +177,7 @@ val s3Repo = if (awsAccessKeyId == null || awsSecretAccessKey == null) {
   }
 }
 
-project.afterEvaluate {
+gradle.projectsEvaluated {
   tasks.withType(PublishToMavenRepository::class) {
     if (repository == buildDirRepo) {
       tasks.withType(Test::class).forEach {
@@ -200,7 +200,7 @@ project.afterEvaluate {
 }
 
 fun createPublishToTask(repo: MavenArtifactRepository) {
-  project.afterEvaluate {
+  gradle.projectsEvaluated {
     tasks.create("publishTo${repo.name.capitalize()}") {
       group = "Publishing"
       description = "Publishes all Maven publications produced by this project to the '${repo.name}' Maven repository at ${repo.url}"

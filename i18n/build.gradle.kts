@@ -1,6 +1,4 @@
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.openstreetmap.josm.gradle.plugin.Versions
 
 plugins {

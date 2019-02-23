@@ -22,11 +22,9 @@ dependencies {
 application.mainClassName = "org.openstreetmap.josm.gradle.plugin.langconv.MainKt"
 
 tasks.withType(JavaExec::class).getByName("run") {
-  val args: String? by project.extra
-  args?.let{ setArgsString(it) }
   doFirst {
-    if (args == null) {
-      logger.warn("Arguments for langconv can be supplied via the Gradle command line argument `-Pargs=\"…\"`\n")
+    if (args?.isEmpty() ?: true) {
+      project.logger.warn("Note: Arguments for langconv can be supplied via the Gradle command line argument `--args=\"…\"`\n")
     }
   }
 }
@@ -60,14 +58,14 @@ val standaloneJar = tasks.register<ProGuardTask>("standaloneJar") {
   injars(dependencyJar.archiveFile.get().asFile)
   outjars(File(buildDir, "/dist/${project.name}.jar"))
 
-  if (JavaVersion.current().isJava11Compatible) { // >= JDK11
+  if (JavaVersion.current() >= JavaVersion.VERSION_12) { // >= JDK12
     doFirst {
-      TODO("Proguard currently does not support JDKs 11 or newer")
+      TODO("Proguard currently does not support JDKs 12 or newer")
     }
   } else {
     dependencyJar.finalizedBy(this)
     if (JavaVersion.current().isJava9Compatible) { // >= JDK9
-      libraryjars(listOf("${System.getProperty("java.home")}/jmods", "${System.getProperty("java.home")}/lib"))
+      libraryjars("${System.getProperty("java.home")}/jmods")
     } else { // < JDK9
       libraryjars("${System.getProperty("java.home")}/lib/rt.jar")
     }
@@ -83,7 +81,7 @@ val standaloneJar = tasks.register<ProGuardTask>("standaloneJar") {
   )
 }
 
-val distributionTask = if (JavaVersion.current().isJava11Compatible) tasks.named("distZip") else standaloneJar
+val distributionTask = if (JavaVersion.current() >= JavaVersion.VERSION_12) tasks.named("distZip") else standaloneJar
 
 rootProject.extensions.getByType(PublishingExtension::class).apply {
   publications {
