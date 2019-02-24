@@ -23,6 +23,7 @@ class JosmPlugin: Plugin<Project> {
    * Creates the tasks this plugin provides, defines the <code>josm</code> extension, adds the repositories where JOSM specific dependencies can be found.
    * Overrides <a href="https://docs.gradle.org/current/javadoc/org/gradle/api/Plugin.html#apply-T-">Plugin.apply()</a>.
    */
+  @ExperimentalUnsignedTypes
   override fun apply(project: Project) {
 
     // Apply the Java plugin if not available, because we rely on the `jar` task

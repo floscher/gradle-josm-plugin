@@ -2,12 +2,9 @@ package org.openstreetmap.josm.gradle.plugin.util
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
-import org.gradle.api.artifacts.dsl.RepositoryHandler
-import org.gradle.api.artifacts.repositories.IvyArtifactRepository
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 
 const val GROUP_JMAPVIEWER = "org.openstreetmap.jmapviewer"
@@ -16,6 +13,7 @@ const val GROUP_JOSM_PLUGIN = "$GROUP_JOSM.plugins"
 const val GROUP_METADATA = "$GROUP_JOSM.metadata"
 
 const val ARTIFACT_JOSM = "josm"
+const val ARTIFACT_JOSM_UNITTEST = "josm-unittest"
 const val ARTIFACT_PLUGIN_LIST = "plugin-list"
 const val VERSION_SNAPSHOT = "1.0-SNAPSHOT"
 

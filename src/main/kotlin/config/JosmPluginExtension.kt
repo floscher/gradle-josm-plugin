@@ -8,6 +8,7 @@ import org.gradle.api.artifacts.repositories.IvyArtifactRepository
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.tasks.util.PatternFilterable
 import org.openstreetmap.josm.gradle.plugin.util.ARTIFACT_JOSM
+import org.openstreetmap.josm.gradle.plugin.util.ARTIFACT_JOSM_UNITTEST
 import org.openstreetmap.josm.gradle.plugin.util.GROUP_JMAPVIEWER
 import org.openstreetmap.josm.gradle.plugin.util.GROUP_JOSM
 import org.openstreetmap.josm.gradle.plugin.util.GROUP_JOSM_PLUGIN
@@ -202,6 +203,7 @@ open class JosmPluginExtension(private val project: Project) {
       repo.url = Urls.MainJosmWebsite.DOWNLOADS.toURI()
       repo.content {
         it.includeModule(GROUP_JOSM, ARTIFACT_JOSM)
+        it.includeModule(GROUP_JOSM, ARTIFACT_JOSM_UNITTEST)
       }
       repo.patternLayout {
         it.artifact("[artifact].jar")
