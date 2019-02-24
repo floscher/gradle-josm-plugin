@@ -4,6 +4,7 @@ object Versions {
   const val flexmark = "0.40.16"
   const val klaxon = "5.0.5"
   const val kotlin = "1.3.21"
+  const val kotlinSerialization = "0.10.0"
   const val jackson = "2.9.8"
   const val jacoco = "0.8.2"
   const val jgit = "5.2.1.201812262042-r"

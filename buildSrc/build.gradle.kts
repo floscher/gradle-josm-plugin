@@ -1,3 +1,5 @@
+import java.net.URI
+
 buildscript {
   // Workaround to get the version numbers
   val versions by project.extra {
@@ -14,6 +16,7 @@ buildscript {
   }
   dependencies {
     classpath(kotlin("gradle-plugin", versions["kotlin"]))
+    classpath(kotlin("serialization", versions["kotlin"]))
   }
 }
 plugins {
@@ -21,9 +24,13 @@ plugins {
 }
 
 apply(plugin = "kotlin")
+apply(plugin = "kotlinx-serialization")
 
 repositories {
   jcenter()
+  maven {
+    this.url = URI("https://kotlin.bintray.com/kotlinx")
+  }
 }
 
 val dualSourceSet = sourceSets.create("dual")
@@ -36,11 +43,15 @@ val versions: Map<String, String> by project.extra
 
 dependencies {
 
-  add(dualSourceSet.implementationConfigurationName, gradleApi())
-  add(dualSourceSet.implementationConfigurationName, "org.eclipse.jgit:org.eclipse.jgit:${versions["jgit"]}")
+  listOf(dualSourceSet, sourceSets.main.get()).map { it.implementationConfigurationName }.forEach {
+    this.add(it, gradleApi())
+    this.add(it, "org.eclipse.jgit:org.eclipse.jgit:${versions["jgit"]}")
+  }
+
   add(dualSourceSet.implementationConfigurationName, kotlin("stdlib-jdk8", versions["kotlin"]))
 
   implementation(kotlin("gradle-plugin", versions["kotlin"]))
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:${versions["kotlinSerialization"]}")
 }
 
 afterEvaluate {

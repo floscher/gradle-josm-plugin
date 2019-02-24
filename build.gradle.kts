@@ -3,6 +3,7 @@ import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.openstreetmap.josm.gradle.plugin.PublishGitlabPackageAsRelease
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import org.openstreetmap.josm.gradle.plugin.Versions
 import org.openstreetmap.josm.gradle.plugin.logCoverage
@@ -201,10 +202,20 @@ gradle.projectsEvaluated {
 
 fun createPublishToTask(repo: MavenArtifactRepository) {
   gradle.projectsEvaluated {
-    tasks.create("publishTo${repo.name.capitalize()}") {
+    val publishTask = tasks.create("publishTo${repo.name.capitalize()}") {
       group = "Publishing"
       description = "Publishes all Maven publications produced by this project to the '${repo.name}' Maven repository at ${repo.url}"
       dependsOn(tasks.withType(PublishToMavenRepository::class).filter { it.repository == repo })
+    }
+    if (repo == gitlabRepo) {
+      publishTask.finalizedBy(
+        tasks.create(
+          "releaseToGitlab",
+          PublishGitlabPackageAsRelease::class,
+          project.version.toString(),
+          listOf("org/openstreetmap/josm/gradle-josm-plugin", "org/openstreetmap/josm/langconv")
+        )
+      )
     }
   }
 }
