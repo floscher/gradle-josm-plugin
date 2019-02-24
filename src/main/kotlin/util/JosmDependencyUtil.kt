@@ -10,6 +10,7 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.IvyArtifactRepository
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 
+const val GROUP_JMAPVIEWER = "org.openstreetmap.jmapviewer"
 const val GROUP_JOSM = "org.openstreetmap.josm"
 const val GROUP_JOSM_PLUGIN = "$GROUP_JOSM.plugins"
 const val GROUP_METADATA = "$GROUP_JOSM.metadata"

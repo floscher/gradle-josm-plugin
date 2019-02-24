@@ -7,6 +7,10 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.IvyArtifactRepository
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.tasks.util.PatternFilterable
+import org.openstreetmap.josm.gradle.plugin.util.ARTIFACT_JOSM
+import org.openstreetmap.josm.gradle.plugin.util.GROUP_JMAPVIEWER
+import org.openstreetmap.josm.gradle.plugin.util.GROUP_JOSM
+import org.openstreetmap.josm.gradle.plugin.util.GROUP_JOSM_PLUGIN
 import org.openstreetmap.josm.gradle.plugin.util.Urls
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
@@ -187,11 +191,18 @@ open class JosmPluginExtension(private val project: Project) {
    * @see RepositoryHandler
    */
   var repositories: (RepositoryHandler) -> Unit = fun (rh: RepositoryHandler) {
-    rh.maven {
-      it.url = Urls.MainJosmWebsite.NEXUS_REPO_RELEASES.toURI()
+    rh.maven { repo ->
+      repo.url = Urls.MainJosmWebsite.NEXUS_REPO_RELEASES.toURI()
+      repo.content {
+        it.includeGroup(GROUP_JOSM)
+        it.includeGroup(GROUP_JMAPVIEWER)
+      }
     }
     rh.ivy { repo ->
       repo.url = Urls.MainJosmWebsite.DOWNLOADS.toURI()
+      repo.content {
+        it.includeModule(GROUP_JOSM, ARTIFACT_JOSM)
+      }
       repo.patternLayout {
         it.artifact("[artifact].jar")
         it.artifact("[artifact]-[revision].jar")
@@ -199,17 +210,27 @@ open class JosmPluginExtension(private val project: Project) {
         it.artifact("Archiv/[artifact]-snapshot-[revision].jar")
       }
     }
-    rh.maven {
-      it.url = Urls.MainJosmWebsite.NEXUS_REPO_SNAPSHOTS.toURI()
+    rh.maven { repo ->
+      repo.url = Urls.MainJosmWebsite.NEXUS_REPO_SNAPSHOTS.toURI()
+      repo.content {
+        it.includeGroup(GROUP_JOSM)
+        it.includeGroup(GROUP_JOSM_PLUGIN)
+      }
     }
     rh.ivy { repo ->
       repo.url = Urls.JOSM_PLUGIN_DIST.toURI()
+      repo.content {
+        it.includeGroup(GROUP_JOSM_PLUGIN)
+      }
       repo.patternLayout {
         it.artifact("[artifact].jar")
       }
     }
-    rh.maven {
-      it.url = Urls.GITLAB_JOSM_PLUGINS_REPO.toURI()
+    rh.maven { repo ->
+      repo.url = Urls.GITLAB_JOSM_PLUGINS_REPO.toURI()
+      repo.content {
+        it.includeGroup(GROUP_JOSM_PLUGIN)
+      }
     }
   }
 
