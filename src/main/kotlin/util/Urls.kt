@@ -17,11 +17,14 @@ object Urls {
     val PATH_PLUGIN_LIST_WITH_ICONS = "pluginicons"
   }
   object Github {
-    // the default API URL for the GitHub API
+    /** the default API URL for the GitHub API */
     val API = URL("https://api.github.com")
-    // the default upload URL to upload a release asset
+    /** the default upload URL to upload a release asset */
     val UPLOADS = URL("https://uploads.github.com")
   }
+
+  /** The gitlab.com Maven repository containing all packages released by the `JOSM` group on gitlab.com */
   val GITLAB_JOSM_PLUGINS_REPO = URL("https://gitlab.com/api/v4/groups/JOSM/-/packages/maven")
+  /** The directory in the JOSM SVN where the latest releases of JOSM plugins are stored */
   val JOSM_PLUGIN_DIST = URL("https://svn.openstreetmap.org/applications/editors/josm/dist")
 }

@@ -76,11 +76,16 @@ project(":buildSrc").afterEvaluate {
 }
 
 project.gradle.projectsEvaluated {
-  project.sourceSets.named("main").configure {
-    compileClasspath += project.project(":buildSrc").tasks.named<Jar>("dualJar").get().outputs.files
+  val dualJarFiles = project.project(":buildSrc").tasks.named<Jar>("dualJar").get().outputs.files
+  project.sourceSets.main {
+    compileClasspath += dualJarFiles
   }
-  tasks.named<Jar>("jar").configure {
-    from(project.project(":buildSrc").tasks.named<Jar>("dualJar").get().outputs.files.map { zipTree(it) })
+  project.sourceSets.test {
+    compileClasspath += dualJarFiles
+    runtimeClasspath += dualJarFiles
+  }
+  tasks.jar {
+    from(dualJarFiles.map { zipTree(it) })
   }
 }
 
