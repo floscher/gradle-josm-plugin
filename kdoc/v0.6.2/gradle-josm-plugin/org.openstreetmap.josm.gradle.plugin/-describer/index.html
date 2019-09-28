@@ -1,0 +1,49 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Describer - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin</a>&nbsp;/&nbsp;<a href="./index.html">Describer</a><br/>
+<br/>
+<h1>Describer</h1>
+<code><span class="keyword">interface </span><span class="identifier">Describer</span></code>
+<p>Can describe the current state of a project directory with an identifier (e.g. version number or commit hash).</p>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="describe.html">describe</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">describe</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.Describer$describe(kotlin.Boolean, kotlin.Boolean)/dirty">dirty</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;true<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.Describer$describe(kotlin.Boolean, kotlin.Boolean)/trimLeading">trimLeading</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-git-describer/index.html">GitDescriber</a></p>
+</td>
+<td>
+<code><span class="keyword">class </span><span class="identifier">GitDescriber</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">Describer</span></a></code>
+<p>Uses jGit to describe the current HEAD of a git repository</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="../-svn-describer/index.html">SvnDescriber</a></p>
+</td>
+<td>
+<code><span class="keyword">class </span><span class="identifier">SvnDescriber</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">Describer</span></a></code>
+<p>Use the command <code>svn info</code> to determine the SVN revision.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

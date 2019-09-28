@@ -1,0 +1,23 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>JosmPluginExtension.josmVersionFuzziness - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.config</a>&nbsp;/&nbsp;<a href="index.html">JosmPluginExtension</a>&nbsp;/&nbsp;<a href="./josm-version-fuzziness.html">josmVersionFuzziness</a><br/>
+<br/>
+<h1>josmVersionFuzziness</h1>
+<a name="org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension$josmVersionFuzziness"></a>
+<code><span class="keyword">var </span><span class="identifier">josmVersionFuzziness</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>This determines how many JOSM versions are tried out before giving up when a JOSM version is specified that can't
+be downloaded through <a href="https://josm.openstreetmap.de/download">the download page</a>.</p>
+<p>The only place where we'll pick one of the following version numbers and not the exact one,
+is <a href="../-josm-manifest/min-josm-version.html">JosmManifest.minJosmVersion</a>. The <a href="josm-compile-version.html">JosmPluginExtension.josmCompileVersion</a> is always used as-is.</p>
+<p>Say you set <a href="../-josm-manifest/min-josm-version.html">JosmManifest.minJosmVersion</a>=1234 and <a href="#">minJosmVersionTolerance</a>=20 ,
+then we use the first version between and including 1234 and 1253 that can be downloaded will be used.</p>
+<p><strong>Default value:</strong> 30</p>
+<p><strong>Since</strong><br/>
+0.6.1</p>
+</BODY>
+</HTML>

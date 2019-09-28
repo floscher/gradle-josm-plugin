@@ -1,0 +1,97 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>MoReader.HeaderValues - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../../index.html">org.openstreetmap.josm.gradle.plugin.i18n.io</a>&nbsp;/&nbsp;<a href="../index.html">MoReader</a>&nbsp;/&nbsp;<a href="./index.html">HeaderValues</a><br/>
+<br/>
+<h1>HeaderValues</h1>
+<code><span class="keyword">class </span><span class="identifier">HeaderValues</span></code>
+<p>Groups the header values to one object.</p>
+<p>See <a href="https://www.gnu.org/software/gettext/manual/html_node/MO-Files.html">the documentation of the MO file format</a>.</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">HeaderValues</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.i18n.io.MoReader.HeaderValues$<init>(kotlin.Boolean, kotlin.collections.List((kotlin.UInt)))/isBigEndian">isBigEndian</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.i18n.io.MoReader.HeaderValues$<init>(kotlin.Boolean, kotlin.collections.List((kotlin.UInt)))/uints">uints</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-u-int/index.html"><span class="identifier">UInt</span></a><span class="symbol">&gt;</span><span class="symbol">)</span></code>
+<p>Groups the header values to one object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="format-rev.html">formatRev</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">formatRev</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-u-int/index.html"><span class="identifier">UInt</span></a></code>
+<p>revision of the MO file format, this is usually 0, but will be ignored</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="is-big-endian.html">isBigEndian</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">isBigEndian</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>denotes if the read file is in big endian format</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="num-strings.html">numStrings</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">numStrings</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>the number of strings in the file</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="offset-hashing-table.html">offsetHashingTable</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">offsetHashingTable</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-u-int/index.html"><span class="identifier">UInt</span></a></code>
+<p>the offset of the hashing table (currently always ignored)</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="offset-orig-strings.html">offsetOrigStrings</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">offsetOrigStrings</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-u-int/index.html"><span class="identifier">UInt</span></a></code>
+<p>offset of table with original strings</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="offset-translated-strings.html">offsetTranslatedStrings</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">offsetTranslatedStrings</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-u-int/index.html"><span class="identifier">UInt</span></a></code>
+<p>offset of table with translation strings</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="size-hashing-table.html">sizeHashingTable</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">sizeHashingTable</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-u-int/index.html"><span class="identifier">UInt</span></a></code>
+<p>the size of the hashing table (currently always ignored)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

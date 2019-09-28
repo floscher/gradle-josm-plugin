@@ -1,0 +1,75 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>PublishGitlabPackageAsRelease - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.task.gitlab</a>&nbsp;/&nbsp;<a href="./index.html">PublishGitlabPackageAsRelease</a><br/>
+<br/>
+<h1>PublishGitlabPackageAsRelease</h1>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">PublishGitlabPackageAsRelease</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/5.6.2/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a><span class="symbol">, </span><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html"><span class="identifier">Runnable</span></a></code>
+<p>Creates a Gitlab release from an already existing package in the Gitlab maven repository</p>
+<h3>Parameters</h3>
+<p><a name="version"></a>
+<code>version</code> - a function that returns the version number that should be released (e.g. <code>1.2.3</code>)</p>
+<p><a name="names"></a>
+<code>names</code> - a list of package names (e.g. <code>org/openstreetmap/josm/gradle-josm-plugin</code>)</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">PublishGitlabPackageAsRelease</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.task.gitlab.PublishGitlabPackageAsRelease$<init>(kotlin.Function0((kotlin.Any)), kotlin.collections.List((kotlin.String)))/version">version</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html"><span class="identifier">Any</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.task.gitlab.PublishGitlabPackageAsRelease$<init>(kotlin.Function0((kotlin.Any)), kotlin.collections.List((kotlin.String)))/names">names</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span></code>
+<p>Creates a Gitlab release from an already existing package in the Gitlab maven repository</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="artifact-extension.html">artifactExtension</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">artifactExtension</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="names.html">names</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">names</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span></code>
+<p>a list of package names (e.g. <code>org/openstreetmap/josm/gradle-josm-plugin</code>)</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="version.html">version</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">version</span><span class="symbol">: </span><span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html"><span class="identifier">Any</span></a></code>
+<p>a function that returns the version number that should be released (e.g. <code>1.2.3</code>)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="run.html">run</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">run</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
