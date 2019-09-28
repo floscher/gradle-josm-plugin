@@ -4,10 +4,11 @@ import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import okhttp3.Credentials
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
 import java.io.File
@@ -16,7 +17,7 @@ import java.net.URLEncoder
 
 @Throws(GithubReleaseException::class)
 private fun Response.toFormattedErrorMessage() : String {
-  val body = this.body()?.string()
+  val body = this.body?.string()
     ?: throw GithubReleaseException(
       "Unexpected error response body from GitHub API"
     )
@@ -119,7 +120,7 @@ class GithubReleasesClient(
         ret.addAll(
           (
             Parser.default().parse(StringBuilder(
-              response.body()?.string() ?: "[]"
+              response.body?.string() ?: "[]"
             )) as? JsonArray<*>
           )
           ?.mapNotNull { it as? JsonObject }
@@ -136,7 +137,7 @@ class GithubReleasesClient(
   }
 
   private fun Response.asJsonObject() : JsonObject {
-    val body = this.body()?.string() ?:
+    val body = this.body?.string() ?:
     throw GithubReleaseException(
       "Unexpected response body from GitHub API"
     )
@@ -164,7 +165,7 @@ class GithubReleasesClient(
 
     return invokeWrapped {
       val response = client.newCall(request).execute()
-      when (response.code()) {
+      when (response.code) {
         HttpURLConnection.HTTP_OK -> response.asJsonObject()
         404 -> null
         else -> throw GithubReleaseException(response)
@@ -204,10 +205,8 @@ class GithubReleasesClient(
       requestJson["prerelease"] = prerelease
     }
 
-    val requestBody = RequestBody.create(
-      MediaType.parse("application/json; charset=utf-8"),
-      requestJson.toJsonString()
-    )
+    val requestBody = requestJson.toJsonString()
+      .toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
 
     val request = createBaseRequestBuilder()
       .post(requestBody)
@@ -216,7 +215,7 @@ class GithubReleasesClient(
 
     return invokeWrapped {
       val response = client.newCall(request).execute()
-      when (response.code()) {
+      when (response.code) {
         HttpURLConnection.HTTP_CREATED -> response.asJsonObject()
         else -> throw GithubReleaseException(response)
       }
@@ -246,10 +245,8 @@ class GithubReleasesClient(
     draft?.let {requestJson["draft"] = it}
     prerelease?.let {requestJson["prerelease"] = it}
 
-    val requestBody = RequestBody.create(
-      MediaType.parse("application/json; charset=utf-8"),
-      requestJson.toJsonString()
-    )
+    val requestBody = requestJson.toJsonString()
+      .toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
 
     val request = createBaseRequestBuilder()
       .patch(requestBody)
@@ -258,7 +255,7 @@ class GithubReleasesClient(
 
     return invokeWrapped {
       val response = client.newCall(request).execute()
-      when (response.code()) {
+      when (response.code) {
         HttpURLConnection.HTTP_OK -> response.asJsonObject()
         else -> throw GithubReleaseException(response)
       }
@@ -291,7 +288,7 @@ class GithubReleasesClient(
         ret.addAll(
           (
             Parser.default().parse(StringBuilder(
-              response.body()?.string() ?: "[]"
+              response.body?.string() ?: "[]"
             )) as? JsonArray<*>
           )
           ?.mapNotNull { it as? JsonObject }
@@ -319,8 +316,8 @@ class GithubReleasesClient(
 
     @Suppress("NAME_SHADOWING")
     val name = name ?: file.name
-    val mediaType =  MediaType.parse(contentType)
-    val requestBody = RequestBody.create(mediaType, file)
+    val mediaType = contentType.toMediaTypeOrNull()
+    val requestBody = file.asRequestBody(mediaType)
 
 
     val url = "$apiUrl/repos/$user/$repository/releases/$releaseId" +
@@ -337,7 +334,7 @@ class GithubReleasesClient(
 
     return invokeWrapped {
       val response = client.newCall(request).execute()
-      when (response.code()) {
+      when (response.code) {
         HttpURLConnection.HTTP_CREATED -> response.asJsonObject()
         else -> {
           val errorMessage = response.toFormattedErrorMessage()
@@ -364,7 +361,7 @@ class GithubReleasesClient(
 
     invokeWrapped {
       val response = client.newCall(request).execute()
-      when (response.code()) {
+      when (response.code) {
         204 -> null
         else -> {
           val errorMessage = response.toFormattedErrorMessage()

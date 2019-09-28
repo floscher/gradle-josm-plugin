@@ -12,6 +12,6 @@ class GithubReleaseException(message: String?, cause: Throwable?): Exception(mes
   constructor(message: String) : this(message, null)
   constructor(response: Response) : this(
     "Unexpected response from GitHub API: $response.\n" +
-    "Response body:\n${response.body()?.string() ?: ""}"
+    "Response body:\n${response.body?.string() ?: ""}"
   )
 }
