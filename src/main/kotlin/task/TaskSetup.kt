@@ -8,9 +8,10 @@ import org.gradle.api.plugins.BasePluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
+import org.openstreetmap.josm.gradle.plugin.MainConfigurationSetup
 import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
 import org.openstreetmap.josm.gradle.plugin.task.github.PublishToGithubReleaseTask
-import org.openstreetmap.josm.gradle.plugin.util.java
+import org.openstreetmap.josm.gradle.plugin.util.VERSION_SNAPSHOT
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 import java.io.FileInputStream
@@ -24,16 +25,10 @@ import java.util.Base64
  * This method sets up all the [Task]s (and [Configuration]s) for a given project that should be there by default.
  */
 @ExperimentalUnsignedTypes
-fun Project.setupJosmTasks() {
-  val sourceSetJosmPlugin = project.convention.java.sourceSets.getByName("main")
-  val configurationRequiredPlugin = project.configurations.getByName("requiredPlugin")
-  val configurationPackIntoJar = project.configurations.getByName("packIntoJar")
+fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
 
   tasks.create("listJosmVersions", ListJosmVersions::class.java)
 
-  tasks.create("cleanJosm", CleanJosm::class.java)
-
-  // Init JOSM preferences.xml file
   val initJosmPrefs = tasks.create("initJosmPrefs", InitJosmPrefs::class.java)
 
   val writePluginConfig = tasks.create("writePluginConfig", WriteRequiredPluginConfig::class.java)
@@ -43,26 +38,28 @@ fun Project.setupJosmTasks() {
     it.description = "Put all needed plugin *.jar files into the plugins directory. This task copies files into the temporary JOSM home directory."
     it.dependsOn(initJosmPrefs)
     it.dependsOn(writePluginConfig)
-    it.rename("(.*)-(SNAPSHOT)?\\.jar", "$1.jar")
+    it.rename("(.*)-(${VERSION_SNAPSHOT})?\\.jar", "$1.jar")
   }
   afterEvaluate {
     updateJosmPlugins.from(it.tasks.getByName("dist"))
-    updateJosmPlugins.from(configurationRequiredPlugin)
+    updateJosmPlugins.from(mainConfigSetup.requiredPluginConfiguration)
     updateJosmPlugins.into(File(extensions.josm.tmpJosmUserdataDir, "plugins"))
   }
 
-  // Standard run-task
-  tasks.create("runJosm", RunJosmTask::class.java, writePluginConfig.destinationFile)
-  tasks.create("debugJosm", DebugJosm::class.java, writePluginConfig.destinationFile)
+  val cleanJosm = project.tasks.create("cleanJosm", CleanJosm::class.java)
+  // Standard run-tasks
+  project.tasks.create("runJosm", RunJosmTask::class.java, writePluginConfig.destinationFile, cleanJosm, updateJosmPlugins)
+  project.tasks.create("debugJosm", DebugJosm::class.java, writePluginConfig.destinationFile, cleanJosm, updateJosmPlugins)
 
-  tasks.create("${sourceSetJosmPlugin.compileJavaTaskName}_latestJosm", CustomJosmVersionCompile::class.java, "latest", false, sourceSetJosmPlugin, configurationRequiredPlugin + configurationPackIntoJar)
-  tasks.create("${sourceSetJosmPlugin.compileJavaTaskName}_testedJosm", CustomJosmVersionCompile::class.java, "tested", false, sourceSetJosmPlugin, configurationRequiredPlugin + configurationPackIntoJar)
+  listOf("latest", "tested").forEach { version ->
+    tasks.create("${mainConfigSetup.mainSourceSet.compileJavaTaskName}_${version}Josm", CustomJosmVersionCompile::class.java, { version }, false, mainConfigSetup.mainSourceSet, mainConfigSetup.requiredPluginConfiguration + mainConfigSetup.packIntoJarConfiguration)
+  }
   project.afterEvaluate {
-    tasks.create("${sourceSetJosmPlugin.compileJavaTaskName}_minJosm", CustomJosmVersionCompile::class.java, project.extensions.josm.manifest.minJosmVersion as String, true, sourceSetJosmPlugin, configurationRequiredPlugin + configurationPackIntoJar)
+    tasks.create("${mainConfigSetup.mainSourceSet.compileJavaTaskName}_minJosm", CustomJosmVersionCompile::class.java, { project.extensions.josm.manifest.minJosmVersion as String }, true, mainConfigSetup.mainSourceSet, mainConfigSetup.requiredPluginConfiguration + mainConfigSetup.packIntoJarConfiguration)
   }
 
-  setupI18nTasks(this, sourceSetJosmPlugin)
-  setupPluginDistTasks(this, sourceSetJosmPlugin)
+  setupI18nTasks(this, mainConfigSetup.mainSourceSet)
+  setupPluginDistTasks(this, mainConfigSetup.mainSourceSet)
   setupGithubReleaseTasks(this)
 }
 

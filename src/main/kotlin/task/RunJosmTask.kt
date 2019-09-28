@@ -3,6 +3,7 @@ package org.openstreetmap.josm.gradle.plugin.task
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.Sync
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 import javax.inject.Inject
@@ -16,7 +17,7 @@ import javax.inject.Inject
  *
  * By default the source set `main` is added to the classpath.
  */
-open class RunJosmTask @Inject constructor(prefFile: File) : JavaExec() {
+open class RunJosmTask @Inject constructor(prefFile: File, cleanTask: CleanJosm, updatePluginsTask: Sync) : JavaExec() {
 
   /**
    * Text that should be displayed in the console output right before JOSM is started up. Defaults to the empty string.
@@ -29,8 +30,8 @@ open class RunJosmTask @Inject constructor(prefFile: File) : JavaExec() {
   init {
     group = "JOSM"
     main = "org.openstreetmap.josm.gui.MainApplication"
-    super.mustRunAfter(project.tasks.getByName("cleanJosm"))
-    super.dependsOn(project.tasks.getByName("updateJosmPlugins"))
+    super.mustRunAfter(cleanTask)
+    super.dependsOn(updatePluginsTask)
 
     project.afterEvaluate{ project ->
       description = "Runs an independent clean JOSM instance (v${project.extensions.josm.josmCompileVersion}) with temporary JOSM home directories (by default inside `build/.josm/`) and the freshly compiled plugin active."
@@ -56,18 +57,21 @@ open class RunJosmTask @Inject constructor(prefFile: File) : JavaExec() {
           logger.lifecycle("  {} = {}", key, value)
         }
 
-        val args = args ?: listOf() // make field args final and non-null
-        if (args.isEmpty()) {
-          logger.lifecycle("\nNo command line arguments are passed to JOSM.")
-        } else {
-          logger.lifecycle("\nPassing these arguments to JOSM:\n  {}", args.joinToString("\n  "))
-        }
+        logger.lifecycle(
+          (args ?: listOf()).let {
+            if (it.isEmpty()) {
+              "\nNo command line arguments are passed to JOSM."
+            } else {
+              "\nPassing these ${it.size} arguments to JOSM:\n  ${it.joinToString("\n  ")}"
+            }
+          }
+        )
         if (userSuppliedArgs.isEmpty()) {
           logger.lifecycle("""\nIf you want to pass additional arguments to JOSM add something like the following when starting Gradle from the commandline: --args='--debug --language="es"'""")
         }
 
         logger.lifecycle(extraInformation)
-        logger.lifecycle("\nOutput of JOSM starts with the line after the three equality signs\n===")
+        logger.lifecycle("\nOutput of JOSM starts with the line below the three equality signs\n===")
       }
     }
   }

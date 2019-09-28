@@ -16,39 +16,41 @@ import javax.inject.Inject
 @ExperimentalUnsignedTypes
 open class CustomJosmVersionCompile
   @Inject
-  constructor(customVersion: String, findNextVersion: Boolean, sourceSet: SourceSet, additionalClasspath: FileCollection): JavaCompile() {
+  constructor(customVersionProvider: () -> String, findNextVersion: Boolean, sourceSet: SourceSet, additionalClasspath: FileCollection): JavaCompile() {
 
   private lateinit var customJosm : Dependency
 
   init {
     group = "JOSM"
-    description = "Compile the JOSM plugin against ${if (findNextVersion) { "the first available JOSM version since" } else { "JOSM version" }} $customVersion"
     classpath = additionalClasspath
-    destinationDir =  File(project.buildDir, "classes/java/${sourceSet.name}_$customVersion")
 
     project.afterEvaluate {
       source(sourceSet.java)
-    }
 
-    project.gradle.taskGraph.whenReady { graph ->
-      if (graph.hasTask(this)) {
-        this.customJosm = if (findNextVersion && customVersion.matches(Regex("[1-9][0-9]+"))) {
-          project.createJosmDependencyFuzzy(customVersion.toUInt())
-        } else {
-          project.dependencies.createJosm(customVersion)
-        }
-        val customConfig = project.configurations.detachedConfiguration(*
-        project.configurations.getByName(sourceSet.compileClasspathConfigurationName).dependencies
-          .filterNot { it.isJosm() }
-          .plus(customJosm)
-          .toTypedArray()
-        )
-        classpath += customConfig
+      val customVersion = customVersionProvider.invoke()
+      description = "Compile the JOSM plugin against ${ if (findNextVersion) "the first available JOSM version since" else "JOSM version" } $customVersion"
+      destinationDir =  File(project.buildDir, "classes/java/${sourceSet.name}_$customVersion")
 
-        doFirst {
-          logger.lifecycle("Compiling against JOSM ${customJosm.version}…")
+      project.gradle.taskGraph.whenReady { graph ->
+        if (graph.hasTask(this)) {
+          this.customJosm = if (findNextVersion && customVersion.matches(Regex("[1-9][0-9]+"))) {
+            project.createJosmDependencyFuzzy(customVersion.toUInt())
+          } else {
+            project.dependencies.createJosm(customVersion)
+          }
+          val customConfig = project.configurations.detachedConfiguration(*
+            project.configurations.getByName(sourceSet.compileClasspathConfigurationName).dependencies
+              .filterNot { it.isJosm() }
+              .plus(customJosm)
+              .toTypedArray()
+          )
+          classpath += customConfig
+
+          doFirst {
+            logger.lifecycle("Compiling against JOSM ${customJosm.version}…")
+          }
         }
       }
-    }
+      }
   }
 }

@@ -21,7 +21,7 @@ import java.io.File
  *
  * @constructor instantiates the extension, takes project properties into account
  */
-open class JosmPluginExtension(private val project: Project) {
+open class JosmPluginExtension(val project: Project) {
   /**
    * The version number of JOSM against which the plugin should be compiled.
    *
@@ -180,6 +180,20 @@ open class JosmPluginExtension(private val project: Project) {
   }
 
   /**
+   * Repositories to which the artifacts can be published.
+   * GitLab package repositories can be added via [org.openstreetmap.josm.gradle.plugin.gitlab.addGitlabMavenRepository]
+   *
+   * **Default value:** a Maven repository in `$buildDir/maven`
+   * @since 0.6.2
+   */
+  var publishRepositories: (RepositoryHandler) -> Unit = {
+    it.maven {
+      it.url = project.uri("${project.buildDir}/maven")
+      it.name = "buildDir"
+    }
+  }
+
+  /**
    * The repositories that are added to the repository list.
    *
    * **Default value (in this order):**
@@ -187,11 +201,11 @@ open class JosmPluginExtension(private val project: Project) {
    * 2. Download page for JOSM releases and snapshots: [https://josm.openstreetmap.de/download/](https://josm.openstreetmap.de/download/) (as custom [IvyArtifactRepository], the `Archiv` subdirectory is also included)
    * 3. Nexus repo for JOSM snapshots: [https://josm.openstreetmap.de/nexus/content/repositories/snapshots/](https://josm.openstreetmap.de/nexus/content/repositories/snapshots/) (as [MavenArtifactRepository])
    * 4. Directory in SVN repo where JOSM plugins are published: [https://svn.openstreetmap.org/applications/editors/josm/dist/](https://svn.openstreetmap.org/applications/editors/josm/dist/) (as custom [IvyArtifactRepository])
-   * 5. GitLab Maven repository containing some plugins that are neither in SVN nor in the Nexus repository: [https://gitlab.com/api/v4/projects/8611940/packages/maven](https://gitlab.com/api/v4/projects/8611940/packages/maven) (as [MavenArtifactRepository])
+   * 5. GitLab Maven repository containing some plugins that are neither in SVN nor in the Nexus repository: [https://gitlab.com/api/v4/groups/JOSM/-/packages/maven](https://gitlab.com/api/v4/groups/JOSM/-/packages/maven) (as [MavenArtifactRepository])
    *
    * @see RepositoryHandler
    */
-  var repositories: (RepositoryHandler) -> Unit = fun (rh: RepositoryHandler) {
+  var repositories: (RepositoryHandler) -> Unit = { rh ->
     rh.maven { repo ->
       repo.url = Urls.MainJosmWebsite.NEXUS_REPO_RELEASES.toURI()
       repo.content {
@@ -263,6 +277,27 @@ open class JosmPluginExtension(private val project: Project) {
    * @since 0.5.3
    */
   fun github(a: Action<GithubConfig>) = a.execute(github)
+
+  /**
+   * Configuration options for GitLab repositories for your project
+   *
+   * @since 0.6.2
+   */
+  val gitlab: GitlabConfig = GitlabConfig()
+
+  /**
+   * Configure the field [JosmPluginExtension.gitlab] using a Groovy [Closure]
+   *
+   * @since 0.6.2
+   */
+  fun gitlab(c: Closure<GitlabConfig>): Any = project.configure(gitlab, c)
+
+  /**
+   * Configure the field [JosmPluginExtension.gitlab] using an [Action]
+   *
+   * @since 0.6.2
+   */
+  fun gitlab(a: Action<GitlabConfig>) = a.execute(gitlab)
 
   /**
    * Configuration options for i18n

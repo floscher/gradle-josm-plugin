@@ -22,6 +22,6 @@ object Urls {
     // the default upload URL to upload a release asset
     val UPLOADS = URL("https://uploads.github.com")
   }
-  val GITLAB_JOSM_PLUGINS_REPO = URL("https://gitlab.com/api/v4/projects/8611940/packages/maven")
+  val GITLAB_JOSM_PLUGINS_REPO = URL("https://gitlab.com/api/v4/groups/JOSM/-/packages/maven")
   val JOSM_PLUGIN_DIST = URL("https://svn.openstreetmap.org/applications/editors/josm/dist")
 }

@@ -1,5 +1,3 @@
-import java.net.URI
-
 buildscript {
   // Workaround to get the version numbers
   val versions by project.extra {
@@ -13,6 +11,9 @@ buildscript {
 
   repositories {
     jcenter()
+    maven {
+      this.url = uri("https://kotlin.bintray.com/kotlinx")
+    }
   }
   dependencies {
     classpath(kotlin("gradle-plugin", versions["kotlin"]))
@@ -29,29 +30,48 @@ apply(plugin = "kotlinx-serialization")
 repositories {
   jcenter()
   maven {
-    this.url = URI("https://kotlin.bintray.com/kotlinx")
+    this.url = uri("https://kotlin.bintray.com/kotlinx")
   }
 }
 
+val versions: Map<String, String> by project.extra
+
 val dualSourceSet = sourceSets.create("dual")
+
+val kotlinSerializationConfiguration = configurations.detachedConfiguration().also { configuration ->
+  configuration.dependencies.add(
+    (dependencies.create("org.jetbrains.kotlinx:kotlinx-serialization-runtime:${versions["kotlinSerialization"]}") as ModuleDependency).also {
+      it.exclude("org.jetbrains.kotlin")
+    }
+  )
+}
+
+val dualJarTask = tasks.register<Jar>("dualJar") {
+  from(dualSourceSet.output)
+  from(kotlinSerializationConfiguration.map {zipTree(it)})
+  archiveBaseName.set("dual")
+  destinationDirectory.set(File("$buildDir/libs"))
+}
 
 tasks.withType(Jar::class).getByName("jar") {
   from(dualSourceSet.output)
 }
 
-val versions: Map<String, String> by project.extra
+dualSourceSet.compileClasspath += kotlinSerializationConfiguration
 
 dependencies {
-
-  listOf(dualSourceSet, sourceSets.main.get()).map { it.implementationConfigurationName }.forEach {
-    this.add(it, gradleApi())
-    this.add(it, "org.eclipse.jgit:org.eclipse.jgit:${versions["jgit"]}")
+  dualSourceSet.implementationConfigurationName.let {
+    add(it, gradleApi())
+    add(it, "org.eclipse.jgit:org.eclipse.jgit:${versions["jgit"]}")
+    add(it, kotlin("stdlib", versions["kotlin"]))
+    (dependencies.create("org.jetbrains.kotlinx:kotlinx-serialization-runtime:${versions["kotlinSerialization"]}") as ModuleDependency).also {
+      it.exclude("org.jetbrains.kotlinx")
+    }
   }
 
-  add(dualSourceSet.implementationConfigurationName, kotlin("stdlib-jdk8", versions["kotlin"]))
-
+  // Add kotlin and kotlinx-serialization plugins to classpath of root build script
   implementation(kotlin("gradle-plugin", versions["kotlin"]))
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:${versions["kotlinSerialization"]}")
+  implementation(kotlin("serialization", versions["kotlin"]))
 }
 
 afterEvaluate {

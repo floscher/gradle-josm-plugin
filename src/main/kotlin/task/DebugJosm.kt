@@ -1,6 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.util.josm
@@ -11,7 +12,7 @@ import javax.inject.Inject
  * The same as [RunJosmTask], but the JOSM instance is debuggable via JDWP (Java debug wire protocol) on the port
  * configured at [JosmPluginExtension.debugPort].
  */
-open class DebugJosm @Inject constructor(prefFile: File) : RunJosmTask(prefFile) {
+open class DebugJosm @Inject constructor(prefFile: File, cleanTask: CleanJosm, updatePluginsTask: Sync) : RunJosmTask(prefFile, cleanTask, updatePluginsTask) {
   @Input
   private var debugPort: Int? = null
   init {

@@ -3,10 +3,13 @@ package org.openstreetmap.josm.gradle.plugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.jvm.tasks.Jar
 import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
+import org.openstreetmap.josm.gradle.plugin.gitlab.addGitlabMavenRepository
 import org.openstreetmap.josm.gradle.plugin.task.setupJosmTasks
 import org.openstreetmap.josm.gradle.plugin.util.java
 import org.openstreetmap.josm.gradle.plugin.util.josm
@@ -50,6 +53,9 @@ class JosmPlugin: Plugin<Project> {
       )
     }
 
+    val mainConfigurationSetup = MainConfigurationSetup(project, project.convention.java.sourceSets.getByName("main"))
+    project.setupJosmTasks(mainConfigurationSetup)
+
     project.afterEvaluate {
       if (project.version == Project.DEFAULT_VERSION) {
         try {
@@ -81,9 +87,20 @@ class JosmPlugin: Plugin<Project> {
         }
       }
 
+      // Add the publishing repositories defined in the JOSM configuration
+      if (project.plugins.hasPlugin(MavenPublishPlugin::class.java)) {
+        project.extensions.josm.gitlab.repositories.forEachIndexed { i, repo ->
+          project.extensions.josm.addGitlabMavenRepository(repo, "gitlab${i + 1}")
+        }
+        project.extensions.josm.publishRepositories.invoke(project.extensions.getByType(PublishingExtension::class.java).repositories)
+      } else {
+        project.logger.lifecycle("Note: Add the `maven-publishing` Gradle plugin to your Gradle buildscript to publish your project to a Maven repository.")
+      }
 
       // Add the repositories defined in the JOSM configuration
       project.extensions.josm.repositories.invoke(project.repositories)
+
+      mainConfigurationSetup.afterEvaluate()
 
       if (project.extensions.josm.logSkippedTasks) {
         project.logSkippedTasks()
@@ -95,9 +112,6 @@ class JosmPlugin: Plugin<Project> {
         project.tasks.withType(JacocoReport::class.java) { it.logCoverage() }
       }
     }
-
-    project.configurations.getByName("implementation").setupAsMainConfiguration(project)
-    project.setupJosmTasks()
 
     project.convention.java.sourceSets.all {
       it.setup(project)

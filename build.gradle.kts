@@ -1,9 +1,10 @@
 import groovy.lang.GroovySystem
+import kotlinx.serialization.UnstableDefault
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.openstreetmap.josm.gradle.plugin.PublishGitlabPackageAsRelease
+import org.openstreetmap.josm.gradle.plugin.task.gitlab.PublishGitlabPackageAsRelease
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import org.openstreetmap.josm.gradle.plugin.Versions
 import org.openstreetmap.josm.gradle.plugin.logCoverage
@@ -13,8 +14,8 @@ import java.net.URL
 
 plugins {
   id("com.gradle.plugin-publish").version("0.10.1")
-  id("com.github.ben-manes.versions").version("0.20.0")
-  id("org.jetbrains.dokka").version("0.9.17")
+  id("com.github.ben-manes.versions").version("0.25.0")
+  id("org.jetbrains.dokka").version("0.9.18")
 
   jacoco
   maven
@@ -23,6 +24,7 @@ plugins {
 }
 
 apply(plugin = "kotlin")
+apply(plugin = "kotlinx-serialization")
 
 
 // Logging
@@ -64,10 +66,6 @@ afterEvaluate {
   }
 }
 
-// Reuse the kotlin sources from the "buildSrc" project in the plugin itself
-sourceSets.main.get().withConvention(KotlinSourceSet::class) {
-  kotlin.srcDir("$projectDir/buildSrc/src/dual/kotlin")
-}
 // Add dependencies of "buildSrc" sources
 val mainProject = this
 project(":buildSrc").afterEvaluate {
@@ -77,9 +75,18 @@ project(":buildSrc").afterEvaluate {
   }
 }
 
+project.gradle.projectsEvaluated {
+  project.sourceSets.named("main").configure {
+    compileClasspath += project.project(":buildSrc").tasks.named<Jar>("dualJar").get().outputs.files
+  }
+  tasks.named<Jar>("jar").configure {
+    from(project.project(":buildSrc").tasks.named<Jar>("dualJar").get().outputs.files.map { zipTree(it) })
+  }
+}
+
 dependencies {
   implementation(localGroovy())
-  implementation(kotlin("stdlib-jdk8", Versions.kotlin))
+  implementation(kotlin("stdlib", Versions.kotlin))
   implementation("com.squareup.okhttp3", "okhttp", Versions.okhttp)
   implementation("com.beust","klaxon", Versions.klaxon)
   constraints {
@@ -200,6 +207,13 @@ gradle.projectsEvaluated {
   }
 }
 
+val releaseToGitlab = tasks.create(
+  "releaseToGitlab",
+  PublishGitlabPackageAsRelease::class,
+  { project.version },
+  listOf("org/openstreetmap/josm/gradle-josm-plugin", "org/openstreetmap/josm/langconv")
+)
+
 fun createPublishToTask(repo: MavenArtifactRepository) {
   gradle.projectsEvaluated {
     val publishTask = tasks.create("publishTo${repo.name.capitalize()}") {
@@ -208,14 +222,8 @@ fun createPublishToTask(repo: MavenArtifactRepository) {
       dependsOn(tasks.withType(PublishToMavenRepository::class).filter { it.repository == repo })
     }
     if (repo == gitlabRepo) {
-      publishTask.finalizedBy(
-        tasks.create(
-          "releaseToGitlab",
-          PublishGitlabPackageAsRelease::class,
-          project.version.toString(),
-          listOf("org/openstreetmap/josm/gradle-josm-plugin", "org/openstreetmap/josm/langconv")
-        )
-      )
+      publishTask.finalizedBy(releaseToGitlab)
+      releaseToGitlab.dependsOn(publishTask)
     }
   }
 }
