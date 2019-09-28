@@ -24,6 +24,9 @@ import java.util.jar.Manifest
 import java.util.zip.ZipFile
 import kotlin.math.max
 
+/**
+ * Configures the [RepositoryHandler] to hold another repository that appends the artifact name to [Urls.MainJosmWebsite.BASE] to get the artifact's URL.
+ */
 fun RepositoryHandler.josmPluginList(onlyForConfig: Configuration, dependency: Dependency): IvyArtifactRepository = this.ivy { repo ->
   repo.url = Urls.MainJosmWebsite.BASE.toURI()
   repo.patternLayout {
@@ -35,6 +38,13 @@ fun RepositoryHandler.josmPluginList(onlyForConfig: Configuration, dependency: D
   }
 }
 
+/**
+ * When used together with [RepositoryHandler.josmPluginList], this returns the list of JOSM plugins from
+ * [https://josm.openstreetmap.de/plugin] (for [withIcons] = `false`) or
+ * [https://josm.openstreetmap.de/pluginicons] (for [withIcons] = `true`).
+ * @param withIcons determines if the plugin list includes the icons as Base64 or not
+ * @return the plugin list as a [Dependency]
+ */
 fun DependencyHandler.josmPluginList(withIcons: Boolean): ExternalModuleDependency =
   (this.create("$GROUP_METADATA:$ARTIFACT_PLUGIN_LIST:$VERSION_SNAPSHOT") as ExternalModuleDependency)
     .also { dep ->

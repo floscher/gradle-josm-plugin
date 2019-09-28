@@ -7,14 +7,22 @@ import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 
+/** Constant containing the group used for JMapViewer artifacts in Maven repos */
 const val GROUP_JMAPVIEWER = "org.openstreetmap.jmapviewer"
+/** Constant containing the group used for JOSM artifacts in Maven repos */
 const val GROUP_JOSM = "org.openstreetmap.josm"
+/** Constant containing the group used for JOSM plugins in Maven repos */
 const val GROUP_JOSM_PLUGIN = "$GROUP_JOSM.plugins"
+/** Constant containing the group used for JOSM metadata (e.g. plugin list) in Maven repos */
 const val GROUP_METADATA = "$GROUP_JOSM.metadata"
 
+/** Constant containing the artifact name of JOSM, namely `josm` */
 const val ARTIFACT_JOSM = "josm"
+/** Constant containing the artifact name of the JOSM unittest library, namely `josm-unittest` */
 const val ARTIFACT_JOSM_UNITTEST = "josm-unittest"
+/** Constant containing the artifact name of the JOSM plugin list, namely `plugin-list` */
 const val ARTIFACT_PLUGIN_LIST = "plugin-list"
+/** Constant containing the version number used for snapshot versions of artifacts */
 const val VERSION_SNAPSHOT = "1.0-SNAPSHOT"
 
 /**
