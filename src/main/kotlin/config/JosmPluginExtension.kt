@@ -146,7 +146,7 @@ open class JosmPluginExtension(val project: Project) {
    * The only place where we'll pick one of the following version numbers and not the exact one,
    * is [JosmManifest.minJosmVersion]. The [JosmPluginExtension.josmCompileVersion] is always used as-is.
    *
-   * Say you set [JosmManifest.minJosmVersion]=1234 and [minJosmVersionTolerance]=20 ,
+   * Say you set [JosmManifest.minJosmVersion]=1234 and [josmVersionFuzziness]=20 ,
    * then we use the first version between and including 1234 and 1253 that can be downloaded will be used.
    *
    * **Default value:** 30
@@ -181,7 +181,7 @@ open class JosmPluginExtension(val project: Project) {
 
   /**
    * Repositories to which the artifacts can be published.
-   * GitLab package repositories can be added via [org.openstreetmap.josm.gradle.plugin.gitlab.addGitlabMavenRepository]
+   * GitLab package repositories can be added via [org.openstreetmap.josm.gradle.plugin.gitlab.gitlabRepository]
    *
    * **Default value:** a Maven repository in `$buildDir/maven`
    * @since 0.6.2

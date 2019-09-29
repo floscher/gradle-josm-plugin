@@ -2,7 +2,13 @@ package org.openstreetmap.josm.gradle.plugin.util
 
 import java.net.URL
 
+/**
+ * Central place for URLs, so they can be reused easier.
+ */
 object Urls {
+  /**
+   * URLs for the JOSM website [https://josm.openstreetmap.de]
+   */
   object MainJosmWebsite {
     /**
      * The Base URL of the JOSM website
@@ -39,6 +45,10 @@ object Urls {
      */
     val PATH_PLUGIN_LIST_WITH_ICONS = "pluginicons"
   }
+
+  /**
+   * URLs for [https://github.com]
+   */
   object Github {
     /**
      * the default API URL for the GitHub API

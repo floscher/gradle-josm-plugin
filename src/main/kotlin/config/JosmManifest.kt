@@ -157,6 +157,9 @@ class JosmManifest(private val project: Project) {
    */
   var platform: Platform? = null
 
+  /**
+   * Convenience method to set the platform using a [String] instead of a [Platform] enum value.
+   */
   fun setPlatform(name: String) {
     platform = Platform.valueOf(name)
   }

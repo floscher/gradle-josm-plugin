@@ -16,6 +16,12 @@ const val DEFAULT_GITLAB_URL = "https://gitlab.com"
  * A configuration consisting of one specific project on one specific GitLab instance
  * and a token that can be used to make API requests.
  * Use [Builder.build] to create an instance.
+ *
+ * @property projectId the ID of the project on the GitLab instance
+ * @property gitlabUrl the base URL of the GitLab instance
+ * @property gitlabApiUrl the base URL of the API of the GitLab instance
+ * @property tokenLabel if the token is a CI job token, this is "Job-Token", otherwise this is "Private-Token"
+ * @property token the token to use when authenticating
  */
 class GitlabRepositorySettings private constructor(
   val projectId: Int,
