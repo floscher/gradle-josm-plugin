@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.SourceSet
@@ -16,13 +17,12 @@ import javax.inject.Inject
 @ExperimentalUnsignedTypes
 open class CustomJosmVersionCompile
   @Inject
-  constructor(customVersionProvider: () -> String, findNextVersion: Boolean, sourceSet: SourceSet, additionalClasspath: FileCollection): JavaCompile() {
+  constructor(customVersionProvider: () -> String, findNextVersion: Boolean, sourceSet: SourceSet): JavaCompile() {
 
   private lateinit var customJosm : Dependency
 
   init {
     group = "JOSM"
-    classpath = additionalClasspath
 
     project.afterEvaluate {
       source(sourceSet.java)
@@ -38,13 +38,13 @@ open class CustomJosmVersionCompile
           } else {
             project.dependencies.createJosm(customVersion)
           }
-          val customConfig = project.configurations.detachedConfiguration(*
+          classpath = project.configurations.detachedConfiguration(*
             project.configurations.getByName(sourceSet.compileClasspathConfigurationName).dependencies
               .filterNot { it.isJosm() }
               .plus(customJosm)
+              .plus(setOf("requiredPlugin", "packIntoJar").flatMap { project.configurations.getByName(it).dependencies })
               .toTypedArray()
           )
-          classpath += customConfig
 
           doFirst {
             logger.lifecycle("Compiling against JOSM ${customJosm.version}…")

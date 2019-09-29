@@ -53,10 +53,22 @@ fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
   project.tasks.create("debugJosm", DebugJosm::class.java, writePluginConfig.destinationFile, cleanJosm, updateJosmPlugins)
 
   listOf("latest", "tested").forEach { version ->
-    tasks.create("${mainConfigSetup.mainSourceSet.compileJavaTaskName}_${version}Josm", CustomJosmVersionCompile::class.java, { version }, false, mainConfigSetup.mainSourceSet, mainConfigSetup.requiredPluginConfiguration + mainConfigSetup.packIntoJarConfiguration)
+    tasks.create(
+      "${mainConfigSetup.mainSourceSet.compileJavaTaskName}_${version}Josm",
+      CustomJosmVersionCompile::class.java,
+      { version },
+      false,
+      mainConfigSetup.mainSourceSet
+    )
   }
   project.afterEvaluate {
-    tasks.create("${mainConfigSetup.mainSourceSet.compileJavaTaskName}_minJosm", CustomJosmVersionCompile::class.java, { project.extensions.josm.manifest.minJosmVersion as String }, true, mainConfigSetup.mainSourceSet, mainConfigSetup.requiredPluginConfiguration + mainConfigSetup.packIntoJarConfiguration)
+    tasks.create(
+      "${mainConfigSetup.mainSourceSet.compileJavaTaskName}_minJosm",
+      CustomJosmVersionCompile::class.java,
+      { project.extensions.josm.manifest.minJosmVersion as String },
+      true,
+      mainConfigSetup.mainSourceSet
+    )
 
     tasks.create(
       "releaseToGitlab",
