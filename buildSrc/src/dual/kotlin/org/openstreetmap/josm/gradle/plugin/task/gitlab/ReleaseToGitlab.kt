@@ -30,7 +30,8 @@ import kotlin.math.max
  */
 @UnstableDefault
 open class ReleaseToGitlab @Inject constructor(
-  var version: () -> Any,
+  var gitTagName: () -> String,
+  var artifactVersion: () -> String,
   var names: Set<String>
 ) : DefaultTask(), Runnable {
 
@@ -48,7 +49,8 @@ open class ReleaseToGitlab @Inject constructor(
     }
 
     val gitlabSettings = gitlabSettings.build()
-    val version = this.version.invoke().toString()
+    val gitTagName = this.gitTagName.invoke()
+    val artifactVersion = this.artifactVersion.invoke()
 
     // Determine project path
     val projectPath = System.getenv("CI_PROJECT_PATH")?.apply {
@@ -57,7 +59,7 @@ open class ReleaseToGitlab @Inject constructor(
         .apply { logger.lifecycle("Retrieved project path for project ${gitlabSettings.projectId} from GitLab API: $this") }
 
     logger.lifecycle("""
-      Creating release for version $version:
+      Creating release for version $artifactVersion (git tag $gitTagName):
         Project ${gitlabSettings.gitlabUrl}/$projectPath (ID ${gitlabSettings.projectId})
         Base URL for API calls: ${gitlabSettings.gitlabApiUrl}
         An API token of type ${gitlabSettings.tokenLabel} is used.
@@ -66,9 +68,9 @@ open class ReleaseToGitlab @Inject constructor(
     // Find git release
     val repo = FileRepositoryBuilder.create(File(project.rootProject.projectDir, "/.git"))
     val revTag: RevTag = Git(repo).tagList().call()
-      .filter { it.name == "refs/tags/$version" }
+      .filter { it.name == "refs/tags/$gitTagName" }
       .map { RevWalk(repo).parseTag(it.objectId) }
-      .firstOrNull() ?: throw TaskExecutionException(this, GradleException("No git tag found for version v$version!"))
+      .firstOrNull() ?: throw TaskExecutionException(this, GradleException("No git tag '$gitTagName' found!"))
 
     logger.lifecycle("""
       Found git tag ${revTag.tagName}:
@@ -78,7 +80,7 @@ open class ReleaseToGitlab @Inject constructor(
 
     // Find all matching packages available on GitLab
     val assetLinks = Json.nonstrict.parse(Package.serializer().list, URL("${gitlabSettings.gitlabApiUrl}/projects/${gitlabSettings.projectId}/packages").readText())
-      .filter { version == it.version && names.contains(it.name) }
+      .filter { artifactVersion == it.version && names.contains(it.name) }
       .flatMap { packg ->
         Json.nonstrict.parse(PackageFile.serializer().list, URL("${gitlabSettings.gitlabApiUrl}/projects/${gitlabSettings.projectId}/packages/${packg.id}/package_files").readText())
           .filter { it.fileName.endsWith(".jar") }
@@ -100,7 +102,7 @@ open class ReleaseToGitlab @Inject constructor(
       connection.outputStream.use {
         it.write(Json.stringify(Release.serializer(), Release(
           revTag.shortMessage,
-          version,
+          gitTagName,
           revTag.fullMessage
             .substring(max(0, revTag.fullMessage.indexOf('\n') + 1))
             .replace("-----BEGIN PGP SIGNATURE-----", "\n```\n-----BEGIN PGP SIGNATURE-----")

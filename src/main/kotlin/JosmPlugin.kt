@@ -63,7 +63,7 @@ class JosmPlugin: Plugin<Project> {
         } catch (e: Exception) {
           project.logger.info("Error getting project version for ${project.projectDir.absolutePath} using git!", e)
           try {
-            // Fall back to SVN revision if `git describe` does nor work
+            // Fall back to SVN revision if `git describe` does not work
             SvnDescriber(project.projectDir).describe(dirty = true, trimLeading = project.extensions.josm.versionWithoutLeadingV)
           } catch (e: Exception) {
             project.logger.info("Error getting project version for ${project.projectDir.absolutePath} using SVN!", e)

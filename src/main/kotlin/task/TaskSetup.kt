@@ -8,6 +8,7 @@ import org.gradle.api.plugins.BasePluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
+import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import org.openstreetmap.josm.gradle.plugin.MainConfigurationSetup
 import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
 import org.openstreetmap.josm.gradle.plugin.task.github.PublishToGithubReleaseTask
@@ -73,6 +74,7 @@ fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
     tasks.create(
       "releaseToGitlab",
       ReleaseToGitlab::class.java,
+      { GitDescriber(project.rootProject.projectDir).describe(false) },
       { project.version },
       project.extensions.josm.gitlab.publicationNames
     )

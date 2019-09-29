@@ -202,6 +202,7 @@ publishing.repositories.gitlabRepository("gitlab", project.logger)
 val releaseToGitlab = tasks.create(
   "releaseToGitlab",
   ReleaseToGitlab::class,
+  { GitDescriber(rootProject.projectDir).describe(false) },
   { project.version },
   setOf("org/openstreetmap/josm/gradle-josm-plugin", "org/openstreetmap/josm/langconv")
 )
