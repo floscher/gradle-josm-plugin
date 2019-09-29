@@ -18,7 +18,8 @@ fun TaskExecutionGraph.logTaskDuration() {
   afterTask {
     if (!it.state.skipped) {
       it.logger.lifecycle(String.format(
-        "  🏁 Finished after %.2f seconds.",
+        "  %s after %.2f seconds.",
+        if (it.state.failure == null) "\uD83C\uDFC1 Finished" else "❌ Failed",
         Duration.between(it.extensions.extraProperties.get(startTimePropKey) as Instant, Instant.now()).toMillis() / 1e3
       ))
     }
