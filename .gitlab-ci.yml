@@ -16,15 +16,6 @@ assemble:
     paths:
     - build/
 
-assemble on java10:
-  stage: build
-  image: registry.gitlab.com/josm/docker-library/openjdk-10-git:latest
-  script:
-  - ./gradlew assemble
-  artifacts:
-    paths:
-    - build/
-
 assemble on java11:
   stage: build
   image: registry.gitlab.com/josm/docker-library/openjdk-11-git:latest
@@ -43,6 +34,26 @@ assemble on java12:
     paths:
     - build/
 
+assemble on java13:
+  stage: build
+  image: registry.gitlab.com/josm/docker-library/openjdk-13-git:latest
+  script:
+  - ./gradlew assemble
+  artifacts:
+    paths:
+    - build/
+  allow_failure: true
+
+assemble on java14:
+  stage: build
+  image: registry.gitlab.com/josm/docker-library/openjdk-14-git:latest
+  script:
+    - ./gradlew assemble
+  artifacts:
+    paths:
+      - build/
+  allow_failure: true
+
 test:
   stage: test
   script:
@@ -52,14 +63,6 @@ test:
     - build/
   dependencies:
   - assemble
-
-test on java10:
-  stage: test
-  image: registry.gitlab.com/josm/docker-library/openjdk-10-git:latest
-  script:
-  - ./gradlew build
-  dependencies:
-  - assemble on java10
 
 test on java11:
   stage: test
@@ -76,6 +79,24 @@ test on java12:
   - ./gradlew build
   dependencies:
   - assemble on java12
+
+test on java13:
+  stage: test
+  image: registry.gitlab.com/josm/docker-library/openjdk-13-git:latest
+  script:
+  - ./gradlew build
+  dependencies:
+  - assemble on java13
+  allow_failure: true
+
+test on java14:
+  stage: test
+  image: registry.gitlab.com/josm/docker-library/openjdk-14-git:latest
+  script:
+  - ./gradlew build
+  dependencies:
+  - assemble on java14
+  allow_failure: true
 
 publish to / Gradle Plugin Portal:
   stage: deploy
