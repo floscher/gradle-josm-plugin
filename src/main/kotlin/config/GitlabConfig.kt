@@ -1,31 +1,19 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
 import org.gradle.api.Project
+import org.gradle.api.plugins.BasePluginConvention
 
-private const val DEFAULT_JOB_TOKEN_ENV = "CI_JOB_TOKEN"
-private const val DEFAULT_PAT_ENV = "PERSONAL_ACCESS_TOKEN"
-
-class GitlabConfig() {
+class GitlabConfig(project: Project) {
+  /**
+   * The name of the publication that should be attached to the release.
+   *
+   * @since 0.6.3
+   */
+  val publicationNames: MutableSet<String> = mutableSetOf("org/openstreetmap/josm/plugins/${project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName}")
 
   /**
-   * A map of GitLab domains to the project ID of the repository on each GitLab instance
-   *
-   * @since 0.6.2
+   * Adds an additional publication name to be released with task `releaseToGitlab` to GitLab
+   * @since 0.6.3
    */
-  val repositories: MutableList<GitlabRepository> = mutableListOf()
-
-  data class GitlabRepository(
-    val domain: String,
-    val projectId: Int,
-    val jobTokenEnv: String? = DEFAULT_JOB_TOKEN_ENV,
-    val personalAccessTokenEnv: String? = DEFAULT_PAT_ENV
-  )
-
-  @JvmOverloads
-  fun repository(
-    domain: String,
-    projectId: Int,
-    jobTokenEnv: String? = DEFAULT_JOB_TOKEN_ENV,
-    personalAccessTokenEnv: String? = DEFAULT_PAT_ENV
-  ) = repositories.add(GitlabRepository(domain, projectId, jobTokenEnv, personalAccessTokenEnv))
+  fun publicationName(name: String) = publicationNames.add(name)
 }

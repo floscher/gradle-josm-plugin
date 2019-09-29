@@ -1,15 +1,15 @@
 import groovy.lang.GroovySystem
-import kotlinx.serialization.UnstableDefault
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.openstreetmap.josm.gradle.plugin.task.gitlab.PublishGitlabPackageAsRelease
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import org.openstreetmap.josm.gradle.plugin.Versions
+import org.openstreetmap.josm.gradle.plugin.gitlab.gitlabRepository
 import org.openstreetmap.josm.gradle.plugin.logCoverage
 import org.openstreetmap.josm.gradle.plugin.logSkippedTasks
 import org.openstreetmap.josm.gradle.plugin.logTaskDuration
+import org.openstreetmap.josm.gradle.plugin.task.gitlab.ReleaseToGitlab
 import java.net.URL
 
 plugins {
@@ -154,27 +154,11 @@ val buildDirRepo = publishing.repositories.maven("$buildDir/maven") {
   name = "buildDir"
 }
 
-val ciJobToken: String? = System.getenv("CI_JOB_TOKEN")
-val projectId: String? = System.getenv("CI_PROJECT_ID")
-val gitlabRepo = if (ciJobToken != null && projectId != null) {
-  publishing.repositories.maven("https://gitlab.com/api/v4/projects/$projectId/packages/maven") {
-    name = "gitlab"
-    credentials(HttpHeaderCredentials::class) {
-      name = "Job-Token"
-      value = ciJobToken
-    }
-    authentication {
-      create("auth", HttpHeaderAuthentication::class)
-    }
-    createPublishToTask(this)
-  }
-} else null
-
 val awsAccessKeyId: String? = System.getenv("AWS_ACCESS_KEY_ID")
 val awsSecretAccessKey: String? = System.getenv("AWS_SECRET_ACCESS_KEY")
 val s3Repo = if (awsAccessKeyId == null || awsSecretAccessKey == null) {
   logger.lifecycle(
-    "Note: Set the environment variables AWS_ACCESS_KEY_ID ({} set) and AWS_SECRET_ACCESS_KEY ({} set) to be able to publish the plugin to s3://gradle-josm-plugin .",
+    "Note: If you want to be able to publish the plugin to s3://gradle-josm-plugin , set the environment variables AWS_ACCESS_KEY_ID ({} set) and AWS_SECRET_ACCESS_KEY ({} set).",
     if (awsAccessKeyId == null) { "not" } else { "is" },
     if (awsSecretAccessKey == null) { "not" } else { "is" }
   )
@@ -183,10 +167,9 @@ val s3Repo = if (awsAccessKeyId == null || awsSecretAccessKey == null) {
   publishing.repositories.maven("s3://gradle-josm-plugin") {
     name = "s3"
     credentials(AwsCredentials::class.java) {
-      accessKey = System.getenv("AWS_ACCESS_KEY_ID")
-      secretKey = System.getenv("AWS_SECRET_ACCESS_KEY")
+      accessKey = awsAccessKeyId
+      secretKey = awsSecretAccessKey
     }
-    createPublishToTask(this)
   }
 }
 
@@ -212,23 +195,13 @@ gradle.projectsEvaluated {
   }
 }
 
+// Create GitLab Maven repository to publish to.
+publishing.repositories.gitlabRepository("gitlab", project.logger)
+
+// Create `releaseToGitlab` task that can publish a release based on a Gitlab Maven package for a tag.
 val releaseToGitlab = tasks.create(
   "releaseToGitlab",
-  PublishGitlabPackageAsRelease::class,
+  ReleaseToGitlab::class,
   { project.version },
-  listOf("org/openstreetmap/josm/gradle-josm-plugin", "org/openstreetmap/josm/langconv")
+  setOf("org/openstreetmap/josm/gradle-josm-plugin", "org/openstreetmap/josm/langconv")
 )
-
-fun createPublishToTask(repo: MavenArtifactRepository) {
-  gradle.projectsEvaluated {
-    val publishTask = tasks.create("publishTo${repo.name.capitalize()}") {
-      group = "Publishing"
-      description = "Publishes all Maven publications produced by this project to the '${repo.name}' Maven repository at ${repo.url}"
-      dependsOn(tasks.withType(PublishToMavenRepository::class).filter { it.repository == repo })
-    }
-    if (repo == gitlabRepo) {
-      publishTask.finalizedBy(releaseToGitlab)
-      releaseToGitlab.dependsOn(publishTask)
-    }
-  }
-}

@@ -13,77 +13,94 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
-import org.gradle.execution.commandline.TaskConfigurationException
+import org.openstreetmap.josm.gradle.plugin.gitlab.GitlabRepositorySettings
 import java.io.File
-import java.lang.NullPointerException
 import java.net.URL
 import javax.inject.Inject
 import javax.net.ssl.HttpsURLConnection
 import kotlin.math.max
-
-private const val GITLAB_URL = "https://gitlab.com"
-private const val GITLAB_API_URL = "$GITLAB_URL/api/v4"
 
 /**
  * Creates a Gitlab release from an already existing package in the Gitlab maven repository
  *
  * @param version a function that returns the version number that should be released (e.g. `1.2.3`)
  * @param names a list of package names (e.g. `org/openstreetmap/josm/gradle-josm-plugin`)
+ * @property gitlabSettings the settings defining a specific project on a specific GitLab instance
+ *   where the release will be created
  */
 @UnstableDefault
-open class PublishGitlabPackageAsRelease @Inject constructor(
+open class ReleaseToGitlab @Inject constructor(
   var version: () -> Any,
-  var names: List<String>
+  var names: Set<String>
 ) : DefaultTask(), Runnable {
 
-  var artifactExtension: String = ".jar"
+  val gitlabSettings = GitlabRepositorySettings.Builder()
+
+  init {
+    group = "publishing"
+    description = "Creates a release in GitLab from an already existing publication in a GitLab Maven package repository.\n  If this tasks runs in a GitLab CI job of a project, it is automatically configured to release for that project. Otherwise use the environment variables `GITLAB_PROJECT_ID` and `GITLAB_PERSONAL_ACCESS_TOKEN` to configure it."
+  }
 
   @TaskAction
   override fun run() {
-    val projectId = System.getenv("CI_PROJECT_ID")?.toIntOrNull()
-      ?: throw TaskConfigurationException(path, "Gitlab project ID is not set, use the environment variable CI_PROJECT_ID to set it!", NullPointerException())
+    require(names.isNotEmpty()) {
+      "No package names given that should be included in the release!"
+    }
 
-    val projectPathSlug: String = System.getenv("CI_PROJECT_PATH")
-      ?: throw TaskConfigurationException(path, "Gitlab project path slug not set, use the environment variable CI_PROJECT_PATH to set it!", NullPointerException())
+    val gitlabSettings = gitlabSettings.build()
+    val version = this.version.invoke().toString()
 
-    val version: String = this.version.invoke().toString()
+    // Determine project path
+    val projectPath = System.getenv("CI_PROJECT_PATH")?.apply {
+      logger.lifecycle("Using project path from environment variables: CI_PROJECT_PATH=$this")
+    } ?: Json.nonstrict.parse(ProjectInfo.serializer(), URL("${gitlabSettings.gitlabApiUrl}/projects/${gitlabSettings.projectId}").readText())
+        .apply { logger.lifecycle("Retrieved project path for project ${gitlabSettings.projectId} from GitLab API: $this") }
+
+    logger.lifecycle("""
+      Creating release for version $version:
+        Project ${gitlabSettings.gitlabUrl}/$projectPath (ID ${gitlabSettings.projectId})
+        Base URL for API calls: ${gitlabSettings.gitlabApiUrl}
+        An API token of type ${gitlabSettings.tokenLabel} is used.
+    """.trimIndent())
 
     // Find git release
     val repo = FileRepositoryBuilder.create(File(project.rootProject.projectDir, "/.git"))
     val revTag: RevTag = Git(repo).tagList().call()
-      .filter { it.name == "refs/tags/v$version" }
+      .filter { it.name == "refs/tags/$version" }
       .map { RevWalk(repo).parseTag(it.objectId) }
       .firstOrNull() ?: throw TaskExecutionException(this, GradleException("No git tag found for version v$version!"))
 
-    logger.lifecycle("Found git tag ${revTag.tagName}.")
+    logger.lifecycle("""
+      Found git tag ${revTag.tagName}:
+        ${revTag.shortMessage}
+          ${revTag.fullMessage.lines().joinToString("\n    ")}
+    """.trimIndent())
 
     // Find all matching packages available on GitLab
-    val assetLinks = Json.nonstrict.parse(Package.serializer().list, URL("$GITLAB_API_URL/projects/$projectId/packages").openStream().bufferedReader().readText())
+    val assetLinks = Json.nonstrict.parse(Package.serializer().list, URL("${gitlabSettings.gitlabApiUrl}/projects/${gitlabSettings.projectId}/packages").readText())
       .filter { version == it.version && names.contains(it.name) }
       .flatMap { packg ->
-        Json.nonstrict.parse(PackageFile.serializer().list, URL("$GITLAB_API_URL/projects/$projectId/packages/${packg.id}/package_files").openStream().bufferedReader().readText())
-          .filter { it.fileName.endsWith(artifactExtension) }
-          .map { ReleaseAssetLink(it.fileName, "$GITLAB_URL/$projectPathSlug/-/package_files/${it.id}/download") }
+        Json.nonstrict.parse(PackageFile.serializer().list, URL("${gitlabSettings.gitlabApiUrl}/projects/${gitlabSettings.projectId}/packages/${packg.id}/package_files").readText())
+          .filter { it.fileName.endsWith(".jar") }
+          .map { ReleaseAssetLink(it.fileName, "${gitlabSettings.gitlabUrl}/$projectPath/-/package_files/${it.id}/download") }
       }
-    logger.lifecycle("Found ${assetLinks.size} release assets on GitLab: ${assetLinks.map { it.name }.joinToString()}")
+    logger.lifecycle("""
+      Found ${assetLinks.size} *.jar release assets on GitLab:
+        * ${assetLinks.map { it.name }.joinToString("\n  * ")}
+      """.trimIndent())
 
     // Create GitLab release
-    (URL("$GITLAB_API_URL/projects/$projectId/releases").openConnection() as HttpsURLConnection).also { connection ->
+    (URL("${gitlabSettings.gitlabApiUrl}/projects/${gitlabSettings.projectId}/releases").openConnection() as HttpsURLConnection).also { connection ->
       connection.requestMethod = "POST"
       connection.doOutput = true
       connection.doInput = true
       connection.setRequestProperty("Content-Type", "application/json")
-      System.getenv("CI_JOB_TOKEN")?.also {
-        connection.setRequestProperty("Job-Token", it)
-      }
-      System.getenv("PRIVATE_TOKEN")?.also {
-        connection.setRequestProperty("Private-Token", it)
-      }
+      connection.setRequestProperty(gitlabSettings.tokenLabel, gitlabSettings.token)
 
       connection.outputStream.use {
         it.write(Json.stringify(Release.serializer(), Release(
           revTag.shortMessage,
-          "v$version",
+          version,
           revTag.fullMessage
             .substring(max(0, revTag.fullMessage.indexOf('\n') + 1))
             .replace("-----BEGIN PGP SIGNATURE-----", "\n```\n-----BEGIN PGP SIGNATURE-----")
@@ -97,6 +114,11 @@ open class PublishGitlabPackageAsRelease @Inject constructor(
       }
     }
   }
+
+  @Serializable
+  private data class ProjectInfo(
+    @SerialName("path_with_namespace") val projectPath: String
+  )
 
   @Serializable
   private data class Package(

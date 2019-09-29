@@ -9,7 +9,7 @@ import org.gradle.jvm.tasks.Jar
 import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
-import org.openstreetmap.josm.gradle.plugin.gitlab.addGitlabMavenRepository
+import org.openstreetmap.josm.gradle.plugin.gitlab.gitlabRepository
 import org.openstreetmap.josm.gradle.plugin.task.setupJosmTasks
 import org.openstreetmap.josm.gradle.plugin.util.java
 import org.openstreetmap.josm.gradle.plugin.util.josm
@@ -89,8 +89,10 @@ class JosmPlugin: Plugin<Project> {
 
       // Add the publishing repositories defined in the JOSM configuration
       if (project.plugins.hasPlugin(MavenPublishPlugin::class.java)) {
-        project.extensions.josm.gitlab.repositories.forEachIndexed { i, repo ->
-          project.extensions.josm.addGitlabMavenRepository(repo, "gitlab${i + 1}")
+        val prevPublishRepos = project.extensions.josm.publishRepositories
+        project.extensions.josm.publishRepositories = {
+          it.gitlabRepository("gitlab", project.logger)
+          prevPublishRepos.invoke(it)
         }
         project.extensions.josm.publishRepositories.invoke(project.extensions.getByType(PublishingExtension::class.java).repositories)
       } else {

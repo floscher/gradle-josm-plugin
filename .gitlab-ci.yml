@@ -95,7 +95,8 @@ publish to / GitLab.com Maven:
     name: maven / gitlab.com
     url: https://gitlab.com/floscher/gradle-josm-plugin/-/packages
   script:
-  - ./gradlew publishToGitlab
+  - ./gradlew publishAllPublicationsToGitlabRepository
+  - ./gradlew releaseToGitlab
   dependencies:
   - test
   only:
@@ -118,7 +119,7 @@ publish to / pages branch:
     longVersion=`git describe --always --long --dirty`
     rm -rf build/maven/
     mv public/maven/ build/maven/
-    ./gradlew publish dokka
+    ./gradlew publishAllPublicationsToBuildDirRepository dokka
     mv build/maven/ public/maven/
     mv build/docs/kdoc/ "public/kdoc/$version/"
   - |

@@ -11,6 +11,7 @@ import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.openstreetmap.josm.gradle.plugin.MainConfigurationSetup
 import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
 import org.openstreetmap.josm.gradle.plugin.task.github.PublishToGithubReleaseTask
+import org.openstreetmap.josm.gradle.plugin.task.gitlab.ReleaseToGitlab
 import org.openstreetmap.josm.gradle.plugin.util.VERSION_SNAPSHOT
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
@@ -56,6 +57,13 @@ fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
   }
   project.afterEvaluate {
     tasks.create("${mainConfigSetup.mainSourceSet.compileJavaTaskName}_minJosm", CustomJosmVersionCompile::class.java, { project.extensions.josm.manifest.minJosmVersion as String }, true, mainConfigSetup.mainSourceSet, mainConfigSetup.requiredPluginConfiguration + mainConfigSetup.packIntoJarConfiguration)
+
+    tasks.create(
+      "releaseToGitlab",
+      ReleaseToGitlab::class.java,
+      { project.version },
+      project.extensions.josm.gitlab.publicationNames
+    )
   }
 
   setupI18nTasks(this, mainConfigSetup.mainSourceSet)

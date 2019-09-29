@@ -283,7 +283,7 @@ open class JosmPluginExtension(val project: Project) {
    *
    * @since 0.6.2
    */
-  val gitlab: GitlabConfig = GitlabConfig()
+  val gitlab: GitlabConfig = GitlabConfig(project)
 
   /**
    * Configure the field [JosmPluginExtension.gitlab] using a Groovy [Closure]
