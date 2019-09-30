@@ -1,0 +1,103 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>GitlabRepositorySettings.Builder - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../../index.html">org.openstreetmap.josm.gradle.plugin.gitlab</a>&nbsp;/&nbsp;<a href="../index.html">GitlabRepositorySettings</a>&nbsp;/&nbsp;<a href="./index.html">Builder</a><br/>
+<br/>
+<h1>Builder</h1>
+<code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">Builder</span></code>
+<p>A builder to create a <a href="../index.html">GitlabRepositorySettings</a> object.
+In GitLab CI, the values are automatically set via environment variables.
+Otherwise you can set the following environment variables:</p>
+<ul><li><code>GITLAB_PROJECT_ID</code></li>
+<li><code>GITLAB_PERSONAL_ACCESS_TOKEN</code></li>
+<li><code>GITLAB_URL</code> (if not set, <code>https://gitlab.com</code> is used)</li>
+</ul>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">Builder</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.gitlab.GitlabRepositorySettings.Builder$<init>(kotlin.Int, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/projectId">projectId</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;System.getenv("GITLAB_PROJECT_ID")?.toIntOrNull()
+      ?: System.getenv("CI_PROJECT_ID")?.toIntOrNull()<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.gitlab.GitlabRepositorySettings.Builder$<init>(kotlin.Int, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/gitlabUrl">gitlabUrl</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a>&nbsp;<span class="symbol">=</span>&nbsp;System.getenv("GITLAB_URL")
+      ?: System.getenv("CI_SERVER_HOST")?.let { "https://$it" }
+      ?: DEFAULT_GITLAB_URL<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.gitlab.GitlabRepositorySettings.Builder$<init>(kotlin.Int, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/gitlabApiUrl">gitlabApiUrl</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a>&nbsp;<span class="symbol">=</span>&nbsp;System.getenv("GITLAB_API_URL")
+      ?: System.getenv("CI_API_V4_URL")
+      ?: "$gitlabUrl/api/v4"<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.gitlab.GitlabRepositorySettings.Builder$<init>(kotlin.Int, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/ciJobToken">ciJobToken</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;System.getenv("CI_JOB_TOKEN")<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.gitlab.GitlabRepositorySettings.Builder$<init>(kotlin.Int, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/personalAccessToken">personalAccessToken</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;System.getenv("GITLAB_PERSONAL_ACCESS_TOKEN")<span class="symbol">)</span></code>
+<p>A builder to create a <a href="../index.html">GitlabRepositorySettings</a> object.
+In GitLab CI, the values are automatically set via environment variables.
+Otherwise you can set the following environment variables:</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="ci-job-token.html">ciJobToken</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">ciJobToken</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>the token of the CI job</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="gitlab-api-url.html">gitlabApiUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">gitlabApiUrl</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>the base URL of the GitLab API (e.g. <code>https://gitlab.com/api/v4</code>)</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="gitlab-url.html">gitlabUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">gitlabUrl</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>the base URL (e.g. <code>https://gitlab.com</code>) of the GitLab instance</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="personal-access-token.html">personalAccessToken</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">personalAccessToken</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>a token of a GitLab user that will be</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="project-id.html">projectId</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">projectId</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">?</span></code>
+<p>the ID of the project on the GitLab server</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="build.html">build</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">build</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="../index.html"><span class="identifier">GitlabRepositorySettings</span></a></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
