@@ -76,21 +76,18 @@ class GitlabRepositorySettings private constructor(
     var ciJobToken: String? = System.getenv("CI_JOB_TOKEN"),
     var personalAccessToken: String? = System.getenv("GITLAB_PERSONAL_ACCESS_TOKEN")
   ) {
-    fun build(): GitlabRepositorySettings {
+    fun build(): GitlabRepositorySettings? {
       // Can be null
       val ciJobToken = ciJobToken
       // Check if these are null
       val projectId = projectId
-      val token = ciJobToken ?: personalAccessToken
-      require(projectId != null && token != null) {
-        """
-        Note: If you want to publish to a Gitlab Maven repository or create a release for a Gitlab project, make sure the following environment variables are both not null:
-          current personal access token: $personalAccessToken (use GITLAB_PERSONAL_ACCESS_TOKEN to set it)
-                     current project ID: $projectId (use GITLAB_PROJECT_ID to set it)
-          Alternatively run the tasks `publishAllPublicationsToGitlabRepository` and `releaseToGitlab` in the Gitlab CI of the desired project and these variables will automatically be set correctly.
-      """.trimIndent()
+      val token = personalAccessToken ?: ciJobToken
+
+      return if (projectId != null && token != null) {
+        GitlabRepositorySettings(projectId, gitlabUrl, gitlabApiUrl, if (personalAccessToken != null) "Private-Token" else "Job-Token", token)
+      } else {
+        null
       }
-      return GitlabRepositorySettings(projectId, gitlabUrl, gitlabApiUrl, if (ciJobToken != null) "Job-Token" else "Private-Token", token)
     }
   }
 }
@@ -101,10 +98,9 @@ class GitlabRepositorySettings private constructor(
  * Otherwise you can use environment variables to configure the repository
  * (see [GitlabRepositorySettings.Builder] for the available options).
  */
-@JvmOverloads
-fun RepositoryHandler.gitlabRepository(repoName: String, logger: Logger? = null) {
-  try {
-    val settings = GitlabRepositorySettings.Builder().build()
+fun RepositoryHandler.gitlabRepository(repoName: String, logger: Logger) {
+  val settings = GitlabRepositorySettings.Builder().build()
+  if (settings != null) {
     this.maven {
       it.url = URI("${settings.gitlabApiUrl}/projects/${settings.projectId}/packages/maven")
       it.name = repoName
@@ -117,7 +113,7 @@ fun RepositoryHandler.gitlabRepository(repoName: String, logger: Logger? = null)
         it.create("auth", HttpHeaderAuthentication::class.java)
       }
     }
-  } catch (e: IllegalArgumentException) {
-    logger?.lifecycle(e.message)
+  } else {
+    logger.lifecycle("Note: In order to publish to a Gitlab Maven package repository, set the environment variables GITLAB_PROJECT_ID and GITLAB_PERSONAL_ACCESS_TOKEN and use the task `publishAllPublicationsTo${repoName.capitalize()}Repository`. In GitLab CI you can publish using that task without setting any environment variables.")
   }
 }

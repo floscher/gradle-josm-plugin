@@ -74,8 +74,7 @@ fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
     tasks.create(
       "releaseToGitlab",
       ReleaseToGitlab::class.java,
-      { GitDescriber(project.rootProject.projectDir).describe(false) },
-      { project.version },
+      { project.extensions.josm.versionWithoutLeadingV },
       project.extensions.josm.gitlab.publicationNames
     )
   }

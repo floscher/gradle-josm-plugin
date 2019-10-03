@@ -2,8 +2,10 @@ package org.openstreetmap.josm.gradle.plugin
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.BasePluginConvention
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.jvm.tasks.Jar
 import org.gradle.testing.jacoco.plugins.JacocoPlugin
@@ -11,6 +13,7 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.gitlab.gitlabRepository
 import org.openstreetmap.josm.gradle.plugin.task.setupJosmTasks
+import org.openstreetmap.josm.gradle.plugin.util.GROUP_JOSM_PLUGIN
 import org.openstreetmap.josm.gradle.plugin.util.java
 import org.openstreetmap.josm.gradle.plugin.util.josm
 
@@ -95,6 +98,16 @@ class JosmPlugin: Plugin<Project> {
           prevPublishRepos.invoke(it)
         }
         project.extensions.josm.publishRepositories.invoke(project.extensions.getByType(PublishingExtension::class.java).repositories)
+        project.extensions.getByType(PublishingExtension::class.java).publications { publications ->
+          publications.create("josmPlugin", MavenPublication::class.java) {
+            it.groupId = GROUP_JOSM_PLUGIN
+            it.artifactId = project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName
+            project.afterEvaluate { project ->
+              it.version = project.version.toString()
+            }
+            it.from(project.components.getByName("java"))
+          }
+        }
       } else {
         project.logger.lifecycle("Note: Add the `maven-publishing` Gradle plugin to your Gradle buildscript to publish your project to a Maven repository.")
       }
