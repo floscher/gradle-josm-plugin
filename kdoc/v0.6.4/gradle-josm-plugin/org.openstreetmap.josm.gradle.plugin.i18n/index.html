@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>org.openstreetmap.josm.gradle.plugin.i18n - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="./index.html">org.openstreetmap.josm.gradle.plugin.i18n</a><br/>
+<br/>
+<h2>Package org.openstreetmap.josm.gradle.plugin.i18n</h2>
+<p>The source set definition for the different translation formats (*.lang, *.po and *.mo).</p>
+<h3>Types</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-default-i18n-source-set/index.html">DefaultI18nSourceSet</a></p>
+</td>
+<td>
+<code><span class="keyword">class </span><span class="identifier">DefaultI18nSourceSet</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="-i18n-source-set/index.html"><span class="identifier">I18nSourceSet</span></a></code>
+<p>Implementation for a combination of one <a href="https://docs.gradle.org/5.6.2/javadoc/org/gradle/api/file/SourceDirectorySet.html">SourceDirectorySet</a>s for each of the three supported translation formats.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-i18n-source-set/index.html">I18nSourceSet</a></p>
+</td>
+<td>
+<code><span class="keyword">interface </span><span class="identifier">I18nSourceSet</span></code>
+<p>Interface that defines a container for three <a href="https://docs.gradle.org/5.6.2/javadoc/org/gradle/api/file/SourceDirectorySet.html">SourceDirectorySet</a>s each one containing files for one of these
+translation formats: *.po, *.mo (both from gettext) and *.lang (custom format for JOSM).</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

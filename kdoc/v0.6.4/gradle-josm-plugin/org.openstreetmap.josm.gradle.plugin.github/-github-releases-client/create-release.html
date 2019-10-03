@@ -1,0 +1,31 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>GithubReleasesClient.createRelease - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.github</a>&nbsp;/&nbsp;<a href="index.html">GithubReleasesClient</a>&nbsp;/&nbsp;<a href="./create-release.html">createRelease</a><br/>
+<br/>
+<h1>createRelease</h1>
+<a name="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$createRelease(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)"></a>
+<code><span class="keyword">fun </span><span class="identifier">createRelease</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$createRelease(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/tagName">tagName</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$createRelease(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/targetCommitish">targetCommitish</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$createRelease(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$createRelease(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/body">body</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$createRelease(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/draft">draft</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient$createRelease(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.Boolean, kotlin.Boolean)/prerelease">prerelease</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span class="symbol">)</span><span class="symbol">: </span><span class="identifier">JsonObject</span></code>
+<p>Creates a github release with the tag <code>tagName</code>.</p>
+<p>See <a href="https://developer.github.com/v3/repos/releases/#create-a-release">API documentation</a></p>
+<h3>Parameters</h3>
+<p><a name="tagName"></a>
+<code>tagName</code> - The name of the tag</p>
+<p><a name="targetCommitish"></a>
+<code>targetCommitish</code> - the commitish value that determines where the Git tag is created from</p>
+<p><a name="name"></a>
+<code>name</code> - the title displayed together with the body</p>
+<p><a name="body"></a>
+<code>body</code> - a description of the release</p>
+<p><a name="draft"></a>
+<code>draft</code> - if set to true, the release is only a drafting stage</p>
+<p><a name="prerelease"></a>
+<code>prerelease</code> - if set to true, the release is only in alpha or beta stage, not a final release</p>
+<p><strong>Return</strong><br/>
+the JSON object that should be sent to the GitHub API</p>
+</BODY>
+</HTML>

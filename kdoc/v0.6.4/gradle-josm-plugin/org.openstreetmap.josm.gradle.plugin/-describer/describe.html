@@ -1,0 +1,22 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Describer.describe - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin</a>&nbsp;/&nbsp;<a href="index.html">Describer</a>&nbsp;/&nbsp;<a href="./describe.html">describe</a><br/>
+<br/>
+<h1>describe</h1>
+<a name="org.openstreetmap.josm.gradle.plugin.Describer$describe(kotlin.Boolean, kotlin.Boolean)"></a>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">describe</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.Describer$describe(kotlin.Boolean, kotlin.Boolean)/dirty">dirty</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;true<span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.Describer$describe(kotlin.Boolean, kotlin.Boolean)/trimLeading">trimLeading</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<h3>Parameters</h3>
+<p><a name="dirty"></a>
+<code>dirty</code> - iff set to true, the return value gets appended with "-dirty" if there are changes
+to the repository that are not recorded in the current revision of the VCS.</p>
+<p><a name="trimLeading"></a>
+<code>trimLeading</code> - iff set to true, the leading character (<code>r</code> for SVN, <code>v</code> for git) is not included in the returned version number</p>
+<p><strong>Return</strong><br/>
+an identifier of the current version of the repository</p>
+</BODY>
+</HTML>

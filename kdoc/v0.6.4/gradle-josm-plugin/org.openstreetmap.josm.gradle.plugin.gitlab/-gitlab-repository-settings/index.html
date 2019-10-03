@@ -1,0 +1,82 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>GitlabRepositorySettings - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.gitlab</a>&nbsp;/&nbsp;<a href="./index.html">GitlabRepositorySettings</a><br/>
+<br/>
+<h1>GitlabRepositorySettings</h1>
+<code><span class="keyword">class </span><span class="identifier">GitlabRepositorySettings</span></code>
+<p>A configuration consisting of one specific project on one specific GitLab instance
+and a token that can be used to make API requests.
+Use <a href="-builder/build.html">Builder.build</a> to create an instance.</p>
+<h3>Types</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-builder/index.html">Builder</a></p>
+</td>
+<td>
+<code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">Builder</span></code>
+<p>A builder to create a <a href="./index.html">GitlabRepositorySettings</a> object.
+In GitLab CI, the values are automatically set via environment variables.
+Otherwise you can set the following environment variables:</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="gitlab-api-url.html">gitlabApiUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">gitlabApiUrl</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>the base URL of the API of the GitLab instance</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="gitlab-url.html">gitlabUrl</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">gitlabUrl</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>the base URL of the GitLab instance</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="project-id.html">projectId</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">projectId</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>the ID of the project on the GitLab instance</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="token.html">token</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">token</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>the token to use when authenticating</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="token-label.html">tokenLabel</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">tokenLabel</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
+<p>if the token is a CI job token, this is "Job-Token", otherwise this is "Private-Token"</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
