@@ -6,6 +6,7 @@ package org.openstreetmap.josm.gradle.plugin.util
 
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.GradleException
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
@@ -95,6 +96,7 @@ fun Project.getVirtualPlugins(): Map<String, List<Pair<String, String>>> = try {
  * @return a set of [Dependency] objects, including the requested plugins, plus all plugins required by the requested
  *   plugins
  */
+@ExperimentalUnsignedTypes
 fun Project.getAllRequiredJosmPlugins(directlyRequiredPlugins: Collection<String>): Set<Dependency> =
   if (directlyRequiredPlugins.isNullOrEmpty()) {
     logger.info("No other JOSM plugins required by this plugin.")
@@ -102,15 +104,15 @@ fun Project.getAllRequiredJosmPlugins(directlyRequiredPlugins: Collection<String
     setOf()
   } else {
     logger.lifecycle("Resolving required JOSM plugins…")
-    val result = getAllRequiredJosmPlugins(0, mutableSetOf(), directlyRequiredPlugins.toSet())
+    val result = getAllRequiredJosmPlugins(0.toUShort(), mutableSetOf(), directlyRequiredPlugins.toSet())
     logger.lifecycle(" → {} JOSM {} required: {}", result.size, if (result.size == 1) "plugin is" else "plugins are", result.map { it.name }.sorted().joinToString())
 
     result
   }
 
-private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolvedPlugins: MutableSet<String>, directlyRequiredPlugins: Set<String>): Set<Dependency> {
-  val realRecursionDepth = max(0, recursionDepth)
-  if (realRecursionDepth >= extensions.josm.maxPluginDependencyDepth) {
+@ExperimentalUnsignedTypes
+private fun Project.getAllRequiredJosmPlugins(recursionDepth: UShort, alreadyResolvedPlugins: MutableSet<String>, directlyRequiredPlugins: Set<String>): Set<Dependency> {
+  if (recursionDepth.toInt() >= extensions.josm.maxPluginDependencyDepth) {
     throw GradleException(
       "Dependency tree of required JOSM plugins is too deep (>= %d steps). Aborting resolution of required JOSM plugins."
         .format(extensions.josm.maxPluginDependencyDepth)
@@ -119,11 +121,11 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
 
   val virtualPlugins = getVirtualPlugins()
 
-  val indentation = "  ".repeat(maxOf(0, recursionDepth))
+  val indentation = "  ".repeat(recursionDepth.toInt())
   val result = HashSet<Dependency>()
   for (pluginName in directlyRequiredPlugins) {
     if (alreadyResolvedPlugins.contains(pluginName)) {
-      logger.info("{}* {} (see above for dependencies)", indentation, pluginName)
+      logger.lifecycle("{}* {} (see above for dependencies)", indentation, pluginName)
     } else if (virtualPlugins.containsKey(pluginName)) {
       val suitableImplementation = virtualPlugins.getValue(pluginName).firstOrNull {
         when (it.first.toUpperCase()) {
@@ -138,35 +140,38 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: Int, alreadyResolv
         logger.warn("WARN: No suitable implementation found for virtual JOSM plugin $pluginName!")
       } else {
         alreadyResolvedPlugins.add(pluginName)
-        logger.info("{}* {} (virtual): provided by {}", indentation, pluginName, virtualPlugins.getValue(pluginName).joinToString { "${it.second} for ${it.first}" })
-        result.addAll(getAllRequiredJosmPlugins(realRecursionDepth + 1, alreadyResolvedPlugins, setOf(suitableImplementation.second)))
+        logger.lifecycle("{}* {} (virtual): provides {}", indentation, pluginName, virtualPlugins.getValue(pluginName).joinToString { "${it.second} for ${it.first}" })
+        result.addAll(getAllRequiredJosmPlugins(recursionDepth.inc() , alreadyResolvedPlugins, setOf(suitableImplementation.second)))
       }
     } else {
       val dep = dependencies.createJosmPlugin(pluginName)
       val resolvedFiles = configurations.detachedConfiguration(dep).files
       alreadyResolvedPlugins.add(pluginName)
-      for (file in resolvedFiles) {
-        logger.info("{}* {}", indentation, pluginName)
-        ZipFile(file).use {
-          val entries = it.entries()
-          while (entries.hasMoreElements()) {
-            val zipEntry = entries.nextElement()
-            if ("META-INF/MANIFEST.MF" == zipEntry.name) {
-              val requirements = Manifest(it.getInputStream(zipEntry)).mainAttributes.getValue("Plugin-Requires")
-                ?.split(";")
-                ?.map { it.trim() }
-                ?.toSet()
-                ?: setOf()
-              result.addAll(getAllRequiredJosmPlugins(
-                realRecursionDepth + 1,
-                alreadyResolvedPlugins,
-                requirements
-              ))
-            }
-          }
-        }
+      val resolvedManifests = resolvedFiles.map { Manifest(ZipFile(it).let { it.getInputStream(it.getEntry("META-INF/MANIFEST.MF")) }) }
+
+      val requiredJava = resolvedManifests.mapNotNull { it.mainAttributes.getValue(JosmManifest.ATT_MIN_JAVA_VERSION)?.toString()?.toIntOrNull() }.min()
+      val currentJava = JavaVersion.current().majorVersion.toIntOrNull()
+      if (requiredJava != null && currentJava != null && requiredJava > currentJava) {
+        // if any manifest has a minimum Java version larger than the current java version
+        logger.lifecycle("{}* {} (ignored): requires Java {} instead of {}", indentation, pluginName, requiredJava, currentJava)
+      } else {
+        logger.lifecycle("{}* {}", indentation, pluginName)
+        result.add(dep)
       }
-      result.add(dep)
+
+      resolvedManifests.forEach {
+        result.addAll(
+          getAllRequiredJosmPlugins(
+            recursionDepth.inc(),
+            alreadyResolvedPlugins,
+            it.mainAttributes.getValue(JosmManifest.ATT_PLUGIN_DEPENDENCIES)
+              ?.split(";")
+              ?.map { it.trim() }
+              ?.toSet()
+              ?: setOf()
+          )
+        )
+      }
     }
   }
   return result

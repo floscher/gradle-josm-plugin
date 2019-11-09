@@ -42,6 +42,11 @@ import java.util.GregorianCalendar
  */
 class JosmManifest(private val project: Project) {
 
+  companion object {
+    const val ATT_MIN_JAVA_VERSION = "Plugin-Minimum-Java-Version"
+    const val ATT_PLUGIN_DEPENDENCIES = "Plugin-Requires"
+  }
+
   /**
    * The author of the plugin.
    *
@@ -371,12 +376,12 @@ class JosmManifest(private val project: Project) {
     author?.let { manifestAtts.put("Author", it) }
     iconPath?.let { manifestAtts.put("Plugin-Icon", it) }
     loadPriority?.let { manifestAtts.put("Plugin-Stage", it.toString()) }
-    minJavaVersion?.let { manifestAtts.put("Plugin-Minimum-Java-Version", it.toString()) }
+    minJavaVersion?.let { manifestAtts.put(ATT_MIN_JAVA_VERSION, it.toString()) }
     platform?.let { manifestAtts["Plugin-Platform"] = it.toString() }
     provides?.let { manifestAtts["Plugin-Provides"] = it }
     website?.let { manifestAtts.put("Plugin-Link", it.toString()) }
     if (!pluginDependencies.isEmpty()) {
-      manifestAtts["Plugin-Requires"] = pluginDependencies.joinToString(";")
+      manifestAtts[ATT_PLUGIN_DEPENDENCIES] = pluginDependencies.joinToString(";")
     }
 
     if (project.logger.isInfoEnabled) {
