@@ -1,0 +1,261 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>JosmManifest - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.config</a>&nbsp;/&nbsp;<a href="./index.html">JosmManifest</a><br/>
+<br/>
+<h1>JosmManifest</h1>
+<code><span class="keyword">class </span><span class="identifier">JosmManifest</span></code>
+<p>The info that will be written into the manifest file of the plugin *.jar</p>
+<p>Most of the attributes are corresponding to the ones listed in
+<a href="https://josm.openstreetmap.de/wiki/DevelopersGuide/DevelopingPlugins#ThemanifestfileforaJOSMplugin">the documentation for developing JOSM plugins</a>.
+But note that some of them have been renamed a bit to better express what each attribute is good for.</p>
+<p>The properties used by the Ant build (e.g. <code>plugin.author</code> or <code>plugin.description</code>)
+are automatically picked up by both Ant and Gradle, if you define them in your
+<code>gradle.properties</code> file and load them into your <code>build.xml</code> file using the following snippet:</p>
+<pre><code>&lt;!-- edit the properties of this plugin in the file `gradle.properties` --&gt;
+&lt;property file="${basedir}/gradle.properties"/&gt;
+</code></pre>
+<p>The detailed documentation for each field below tells you, which one corresponds
+to which Ant/Gradle property and to which attribute in the <code>MANIFEST.MF</code> file.</p>
+<p>For a successful build you'll have to at least set the following properties in this class:
+<a href="main-class.html">mainClass</a>, <a href="description.html">description</a>, <a href="min-josm-version.html">minJosmVersion</a>
+Your project also has to set a value for <a href="https://docs.gradle.org/5.6.2/javadoc/org/gradle/api/Project.html#getVersion()">Project.getVersion</a></p>
+<h3>Types</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-platform/index.html">Platform</a></p>
+</td>
+<td>
+<code><span class="keyword">enum</span> <span class="keyword">class </span><span class="identifier">Platform</span></code>
+<p>The three platforms for which JOSM supports virtual plugins.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">JosmManifest</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmManifest$<init>(org.gradle.api.Project)/project">project</span><span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/5.6.2/javadoc/org/gradle/api/Project.html"><span class="identifier">Project</span></a><span class="symbol">)</span></code>
+<p>The info that will be written into the manifest file of the plugin *.jar</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="author.html">author</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">author</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>The author of the plugin.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="can-load-at-runtime.html">canLoadAtRuntime</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">canLoadAtRuntime</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Determines if the plugin needs a restart after installation. <code>true</code> if no restart is required, <code>false</code> otherwise.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="description.html">description</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">description</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>The description of what the plugin does.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="icon-path.html">iconPath</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">iconPath</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>Path to the logo of the plugin. Relative to the root of the released jar-file, so that it can be loaded via <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getResource(java.lang.String)">Class.getResource</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="include-links-to-github-releases.html">includeLinksToGithubReleases</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">includeLinksToGithubReleases</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>If <code>true</code>, load the old version download links from GitHub releases (see <a href="../-github-config/index.html">GithubConfig</a>).
+Values added through <a href="old-version-download-link.html">oldVersionDownloadLink</a> are ignored, if this is set to <code>true</code>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="lang-compile-task.html">langCompileTask</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">langCompileTask</span><span class="symbol">: </span><a href="../../org.openstreetmap.josm.gradle.plugin.task/-lang-compile/index.html"><span class="identifier">LangCompile</span></a><span class="symbol">?</span></code>
+<p>The task that processes the *.lang files for translations. This is set automatically and you normally don't have
+to change it.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="load-early.html">loadEarly</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">loadEarly</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>This can be set to <code>true</code>, when the plugin should load before the GUI classes of JOSM.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="load-priority.html">loadPriority</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">loadPriority</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">?</span></code>
+<p>A number indicating the order in which the plugins should be loaded. Lower numbers first, higher numbers later, then the plugins with this field set to <code>null</code>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="main-class.html">mainClass</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">mainClass</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>The full name of the main class of the plugin.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="min-java-version.html">minJavaVersion</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">minJavaVersion</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">?</span></code>
+<p>The minimum Java version needed to run this plugin.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="min-josm-version.html">minJosmVersion</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">minJosmVersion</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>The minimum JOSM version with which the plugin is compatible.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="platform.html">platform</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">platform</span><span class="symbol">: </span><a href="-platform/index.html"><span class="identifier">JosmManifest.Platform</span></a><span class="symbol">?</span></code>
+<p>The platform for which this native implementation of a virtual plugin is made.
+Must be set in conjunction with <a href="provides.html">provides</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="plugin-dependencies.html">pluginDependencies</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">pluginDependencies</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/index.html"><span class="identifier">MutableSet</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span></code>
+<p>A collection of the names of all JOSM plugins that must be installed for this JOSM plugin to work</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="provides.html">provides</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">provides</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code>
+<p>The name of a virtual plugin for which this plugin is a native implementation.
+Must be set in conjunction with <a href="platform.html">platform</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="website.html">website</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">website</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/net/URL.html"><span class="identifier">URL</span></a><span class="symbol">?</span></code>
+<p>A URL pointing to a web resource describing the plugin.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="create-josm-plugin-jar-manifest.html">createJosmPluginJarManifest</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">createJosmPluginJarManifest</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><span class="identifier">Map</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">,</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span></code>
+<p>Returns a map containing all manifest attributes, which are set.
+This map can then be fed into <a href="https://docs.gradle.org/5.6.2/javadoc/org/gradle/api/java/archives/Manifest.html#attributes(java.util.Map<java.lang.String,?>)">org.gradle.api.java.archives.Manifest.attributes</a>. That's already done automatically by the gradle-josm-plugin, so you normally don't need to call this yourself.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="old-version-download-link.html">oldVersionDownloadLink</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">oldVersionDownloadLink</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmManifest$oldVersionDownloadLink(kotlin.Int, kotlin.String, java.net.URL)/minJosmVersion">minJosmVersion</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmManifest$oldVersionDownloadLink(kotlin.Int, kotlin.String, java.net.URL)/pluginVersion">pluginVersion</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmManifest$oldVersionDownloadLink(kotlin.Int, kotlin.String, java.net.URL)/downloadURL">downloadURL</span><span class="symbol">:</span>&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/net/URL.html"><span class="identifier">URL</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Add a link to an earlier release of the plugin, that is compatible with JOSM versions, with which the current version is no longer compatible.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="set-platform.html">setPlatform</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">setPlatform</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmManifest$setPlatform(kotlin.String)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Convenience method to set the platform using a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a> instead of a <a href="-platform/index.html">Platform</a> enum value.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="translated-description.html">translatedDescription</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">translatedDescription</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmManifest$translatedDescription(kotlin.String, kotlin.String)/language">language</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.config.JosmManifest$translatedDescription(kotlin.String, kotlin.String)/translatedDescription">translatedDescription</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Adds a translation of the plugin description for a certain language.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Companion Object Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-a-t-t_-m-i-n_-j-a-v-a_-v-e-r-s-i-o-n.html">ATT_MIN_JAVA_VERSION</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">ATT_MIN_JAVA_VERSION</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="-a-t-t_-p-l-u-g-i-n_-d-e-p-e-n-d-e-n-c-i-e-s.html">ATT_PLUGIN_DEPENDENCIES</a></p>
+</td>
+<td>
+<code><span class="keyword">const</span> <span class="keyword">val </span><span class="identifier">ATT_PLUGIN_DEPENDENCIES</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
