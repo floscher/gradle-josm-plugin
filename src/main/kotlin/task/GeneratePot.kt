@@ -1,7 +1,12 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
+import org.gradle.api.Task
 import org.gradle.api.plugins.BasePluginConvention
+import org.gradle.api.tasks.AbstractExecTask
 import org.gradle.api.tasks.Exec
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.BufferedReader
@@ -32,73 +37,84 @@ open class GeneratePot
 
   private lateinit var outBaseName: String
 
+  @InputFiles
+  lateinit var inFiles: Set<File>
+
+  @OutputDirectory
+  val outDir = File(project.buildDir, "i18n/pot")
+
   init {
     group = "JOSM-i18n"
     description = "Extracts translatable strings from the source code into a *.pot file. Requires the command line utility xgettext (part of GNU gettext)"
 
-    val outDir = File(project.buildDir, "i18n")
-    outputs.dir(outDir)
+    dependsOn(fileListGenTask)
 
-    workingDir = project.projectDir
-    executable = "xgettext"
-
-    project.afterEvaluate {
-      args(
-        "--from-code=UTF-8", "--language=Java",
-        "--output-dir=" + outDir.absolutePath,
-        "--add-comments",
-        "--sort-output",
-        "-k", "-ktrc:1c,2", "-kmarktrc:1c,2", "-ktr", "-kmarktr", "-ktrn:1,2", "-ktrnc:1c,2,3"
-      )
-
-      dependsOn(fileListGenTask)
-      inputs.files(fileListGenTask.inputs.files)
-
-      outBaseName = "josm-plugin_" + it.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName
-      args(
-        "--files-from=${fileListGenTask.outFile.absolutePath}",
-        "--default-domain=$outBaseName",
-        "--package-name=$outBaseName",
-        "--package-version=${it.version}"
-      )
-      if (it.extensions.josm.i18n.bugReportEmail != null) {
-        args("--msgid-bugs-address=" + it.extensions.josm.i18n.bugReportEmail)
-      }
-      if (it.extensions.josm.i18n.copyrightHolder != null) {
-        args("--copyright-holder=" + it.extensions.josm.i18n.copyrightHolder)
-      }
-
-      doFirst {
-        if (!outDir.exists()) {
-          outDir.mkdirs()
-        }
-        logger.lifecycle(commandLine.joinToString("\n  "))
-      }
+    project.gradle.projectsEvaluated {
+      inFiles = fileListGenTask.inFiles
     }
 
+    executable = "xgettext"
+    args(
+      "--from-code=UTF-8", "--language=Java",
+      "--output-dir=" + outDir.absolutePath,
+      "--add-comments",
+      "--sort-output",
+      "-k", "-ktrc:1c,2", "-kmarktrc:1c,2", "-ktr", "-kmarktr", "-ktrn:1,2", "-ktrnc:1c,2,3"
+    )
+  }
 
-    doLast {
-      val destFile = File(outDir, "$outBaseName.pot")
-      val replacements = mutableMapOf<String, String>()
-      replacements.put("(C) YEAR", "(C) " + Year.now().value)
-      replacements.put("charset=CHARSET", "charset=UTF-8")
-      try {
-        moveFileAndReplaceStrings(
-          File (outDir, "$outBaseName.po"),
-          destFile,
-          { line ->
-            if (line.startsWith("#: ")) {
-              line.substring(0, 3) + project.extensions.josm.i18n.pathTransformer.invoke(line.substring(3))
-            } else line
-          },
-          replacements,
-          "\n#. Plugin description for " + project.name + "\nmsgid \"" + project.extensions.josm.manifest.description + "\"\nmsgstr \"\"\n"
-        )
-      } catch (e: IOException) {
-        throw TaskExecutionException(this, e)
-      }
+  @TaskAction
+  final override fun exec() {
+    workingDir = project.projectDir
+
+    outBaseName = "josm-plugin_" + project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName
+    args(
+      "--files-from=${fileListGenTask.outFile.absolutePath}",
+      "--default-domain=$outBaseName",
+      "--package-name=$outBaseName",
+      "--package-version=${project.version}"
+    )
+
+    project.extensions.josm.i18n.bugReportEmail?.let {
+      args("--msgid-bugs-address=$it")
+    }
+    project.extensions.josm.i18n.copyrightHolder?.let {
+      args("--copyright-holder=$it")
+    }
+
+    if (!outDir.exists()) {
+      outDir.mkdirs()
+    }
+    logger.lifecycle(commandLine.joinToString("\n  "))
+
+    super.exec()
+
+    try {
+      moveFileAndReplaceStrings(
+        File(outDir, "$outBaseName.po"),
+        File(outDir, "$outBaseName.pot"),
+        { line ->
+          if (line.startsWith("#: ")) {
+            line.substring(0, 3) + project.extensions.josm.i18n.pathTransformer.invoke(line.substring(3))
+          } else line
+        },
+        mutableMapOf(
+          Pair("(C) YEAR", "(C) " + Year.now().value),
+          Pair("charset=CHARSET", "charset=UTF-8")
+        ),
+        '\n' + """
+        |#. Plugin description for $project.name
+        |msgid "${project.extensions.josm.manifest.description}"
+        |msgstr ""
+        """.trimMargin() + '\n'
+      )
+    } catch (e: IOException) {
+      throw TaskExecutionException(this, e)
     }
   }
+
+  final override fun args(vararg args: Any): AbstractExecTask<out AbstractExecTask<*>> = super.args(*args)
+  final override fun dependsOn(vararg paths: Any): Task = super.dependsOn(*paths)
 
   @Throws(IOException::class)
   private fun moveFileAndReplaceStrings(src: File, dest: File, lineTransform: (String) -> String, replacements: MutableMap<String,String>, appendix: String?) {

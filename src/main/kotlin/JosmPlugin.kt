@@ -41,6 +41,7 @@ class JosmPlugin: Plugin<Project> {
     project.extensions.create("josm", JosmPluginExtension::class.java, project)
 
     val jarTask = project.tasks.withType(Jar::class.java).getByName("jar")
+    jarTask.outputs.upToDateWhen { false }
     jarTask.doFirst { task ->
       jarTask.manifest.attributes(project.extensions.josm.manifest.createJosmPluginJarManifest())
       jarTask.from(

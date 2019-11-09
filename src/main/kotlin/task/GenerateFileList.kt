@@ -1,7 +1,9 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -18,12 +20,18 @@ open class GenerateFileList
    * The source set for which the file list is generated.
    */
   @Inject
-  constructor(@Internal val outFile: File, private val srcSet: SourceSet): DefaultTask() {
+  constructor(
+    @OutputFile
+    val outFile: File,
+    private val srcSet: SourceSet
+  ): DefaultTask() {
+
+  @InputFiles
+  lateinit var inFiles: Set<File>
 
   init {
-    project.afterEvaluate {
-      outputs.file(outFile)
-      inputs.files(srcSet.java.asFileTree.files)
+    project.gradle.projectsEvaluated {
+      inFiles = srcSet.java.asFileTree.files
     }
   }
 

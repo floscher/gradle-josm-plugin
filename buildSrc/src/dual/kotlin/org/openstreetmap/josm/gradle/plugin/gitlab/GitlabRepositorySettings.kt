@@ -59,7 +59,7 @@ class GitlabRepositorySettings private constructor(
    *
    *   **Default:**
    *   * env-var `CI_JOB_TOKEN` (is present in GitLab CI jobs)
-   * @property personalAccessToken a token of a GitLab user that will be
+   * @property personalAccessToken a token of a GitLab user that will be used to authenticate against the GitLab API, overrides the [ciJobToken] if set
    *
    *   **Default:**
    *   * env-var `GITLAB_PERSONAL_ACCESS_TOKEN` (intended to be set manually by user)
