@@ -59,7 +59,8 @@ fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
       CustomJosmVersionCompile::class.java,
       { version },
       false,
-      mainConfigSetup.mainSourceSet
+      mainConfigSetup.mainSourceSet,
+      setOf(mainConfigSetup.requiredPluginConfiguration, mainConfigSetup.packIntoJarConfiguration)
     )
   }
   project.afterEvaluate {
@@ -68,7 +69,8 @@ fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
       CustomJosmVersionCompile::class.java,
       { project.extensions.josm.manifest.minJosmVersion as String },
       true,
-      mainConfigSetup.mainSourceSet
+      mainConfigSetup.mainSourceSet,
+      setOf(mainConfigSetup.requiredPluginConfiguration, mainConfigSetup.packIntoJarConfiguration)
     )
 
     tasks.create(

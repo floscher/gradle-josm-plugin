@@ -4,12 +4,13 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.openstreetmap.josm.gradle.plugin.testutils.GradleProjectUtil
 import org.openstreetmap.josm.gradle.plugin.util.createJosm
 import org.openstreetmap.josm.gradle.plugin.util.createJosmDependencyFuzzy
+import org.openstreetmap.josm.gradle.plugin.util.excludeJosm
 import org.openstreetmap.josm.gradle.plugin.util.getAllRequiredJosmPlugins
-import org.openstreetmap.josm.gradle.plugin.util.isJosm
 import org.openstreetmap.josm.gradle.plugin.util.josm
 
 @ExperimentalUnsignedTypes
@@ -72,9 +73,11 @@ class ProjectExtensionsTest {
   fun testArbitraryJosmString() {
     val project = createNextJosmTestRepo()
     val josmDep = project.dependencies.createJosm("XYZ")
+    val conf = project.configurations.detachedConfiguration(josmDep)
+    conf.excludeJosm()
+    assertTrue(conf.excludeRules.all { it.group == josmDep.group && it.module == josmDep.name })
     assertEquals("XYZ", josmDep.version)
     assertEquals(false, josmDep.isChanging)
-    assertEquals(true, josmDep.isJosm())
     project.configurations.detachedConfiguration(josmDep).resolve()
   }
 

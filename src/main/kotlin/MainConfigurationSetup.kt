@@ -27,7 +27,9 @@ class MainConfigurationSetup(val project: Project, val mainSourceSet: SourceSet)
   }
 
   // Configuration for libraries on which the project depends and which should be packed into the built *.jar file.
-  val packIntoJarConfiguration = mainConfiguration.extendsFrom(project.configurations.create("packIntoJar"))
+  val packIntoJarConfiguration = project.configurations.create("packIntoJar") {
+    mainConfiguration.extendsFrom(it)
+  }
 
   /**
    * This part is meant to be called inside of an [Project.afterEvaluate] block.

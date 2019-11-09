@@ -2,7 +2,9 @@ package org.openstreetmap.josm.gradle.plugin.util
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.ExcludeRule
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
@@ -66,6 +68,6 @@ fun DependencyHandler.createJosmPlugin(name: String): ExternalModuleDependency =
   (this.create("$GROUP_JOSM_PLUGIN:$name:$VERSION_SNAPSHOT") as ExternalModuleDependency).also { it.isChanging = true }
 
 /**
- * @return true iff the given dependency contains JOSM (the group and name of the dependency are checked to determine this)
+ * Exclude the dependency on JOSM from the given configuration (if present)
  */
-fun Dependency.isJosm(): Boolean = this.group == GROUP_JOSM && this.name == ARTIFACT_JOSM
+fun Configuration.excludeJosm(): Configuration = this.exclude(mapOf(ExcludeRule.GROUP_KEY to GROUP_JOSM, ExcludeRule.MODULE_KEY to ARTIFACT_JOSM))
