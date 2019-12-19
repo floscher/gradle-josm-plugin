@@ -23,7 +23,6 @@ import org.openstreetmap.josm.gradle.plugin.io.JosmPluginListParser
 import java.io.IOException
 import java.util.jar.Manifest
 import java.util.zip.ZipFile
-import kotlin.math.max
 
 /**
  * Configures the [RepositoryHandler] to hold another repository that appends the artifact name to [Urls.MainJosmWebsite.BASE] to get the artifact's URL.
@@ -149,7 +148,7 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: UShort, alreadyRes
       alreadyResolvedPlugins.add(pluginName)
       val resolvedManifests = resolvedFiles.map { Manifest(ZipFile(it).let { it.getInputStream(it.getEntry("META-INF/MANIFEST.MF")) }) }
 
-      val requiredJava = resolvedManifests.mapNotNull { it.mainAttributes.getValue(JosmManifest.ATT_MIN_JAVA_VERSION)?.toString()?.toIntOrNull() }.min()
+      val requiredJava = resolvedManifests.mapNotNull { it.mainAttributes.getValue(JosmManifest.Attribute.PLUGIN_MIN_JAVA_VERSION)?.toString()?.toIntOrNull() }.min()
       val currentJava = JavaVersion.current().majorVersion.toIntOrNull()
       if (requiredJava != null && currentJava != null && requiredJava > currentJava) {
         // if any manifest has a minimum Java version larger than the current java version
@@ -164,7 +163,7 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: UShort, alreadyRes
           getAllRequiredJosmPlugins(
             recursionDepth.inc(),
             alreadyResolvedPlugins,
-            it.mainAttributes.getValue(JosmManifest.ATT_PLUGIN_DEPENDENCIES)
+            it.mainAttributes.getValue(JosmManifest.Attribute.PLUGIN_DEPENDENCIES)
               ?.split(";")
               ?.map { it.trim() }
               ?.toSet()

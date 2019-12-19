@@ -1,4 +1,5 @@
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.GradleSourceRootImpl
 import org.openstreetmap.josm.gradle.plugin.Versions
 
 plugins {
@@ -44,6 +45,6 @@ fun attachToRootProject(rootProj: Project, i18nProj: Project) {
 
   // Include this subproject in Dokka docs of root project
   rootProj.tasks.withType(DokkaTask::class).getByName("dokka") {
-    sourceDirs = sourceDirs.plus(i18nProj.sourceSets.main.get().allSource.srcDirs)
+    configuration.sourceRoots.addAll(i18nProj.sourceSets.main.get().allSource.srcDirs.map { GradleSourceRootImpl().apply { path = it.path } })
   }
 }

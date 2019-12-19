@@ -1,11 +1,12 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import groovy.lang.GroovySystem
-import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.GradleSourceRootImpl
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import org.openstreetmap.josm.gradle.plugin.Versions
-import org.openstreetmap.josm.gradle.plugin.gitlab.gitlabRepository
+import org.openstreetmap.josm.gradle.plugin.api.gitlab.gitlabRepository
 import org.openstreetmap.josm.gradle.plugin.logCoverage
 import org.openstreetmap.josm.gradle.plugin.logSkippedTasks
 import org.openstreetmap.josm.gradle.plugin.logTaskDuration
@@ -14,8 +15,8 @@ import java.net.URL
 
 plugins {
   id("com.gradle.plugin-publish").version("0.10.1")
-  id("com.github.ben-manes.versions").version("0.25.0")
-  id("org.jetbrains.dokka").version("0.9.18")
+  id("com.github.ben-manes.versions").version("0.27.0")
+  id("org.jetbrains.dokka").version("0.10.0")
 
   jacoco
   maven
@@ -76,7 +77,7 @@ project(":buildSrc").afterEvaluate {
 }
 
 project.gradle.projectsEvaluated {
-  val dualJarFiles = project.project(":buildSrc").tasks.named<Jar>("dualJar").get().outputs.files
+  val dualJarFiles = project.project(":buildSrc").tasks.getByName<Jar>("dualJar").outputs.files
   project.sourceSets.main {
     compileClasspath += dualJarFiles
   }
@@ -109,25 +110,33 @@ dependencies {
 }
 
 // Configure "dokka" task
-val dokkaTask = tasks.withType(DokkaTask::class).getByName("dokka") {
+val dokkaTask: DokkaTask = tasks.withType(DokkaTask::class).getByName("dokka") {
   outputFormat = "html"
   outputDirectory = "$buildDir/docs/kdoc"
 }
 
 gradle.projectsEvaluated {
   project(":buildSrc").sourceSets.getByName("dual").withConvention(KotlinSourceSet::class) {
-    dokkaTask.sourceDirs = dokkaTask.sourceDirs.plus(this.kotlin.srcDirs)
+    dokkaTask.configuration.sourceRoots.addAll(this.kotlin.srcDirs.map { GradleSourceRootImpl().apply { path = it.path } })
   }
 }
 
 // Configure all Dokka tasks
 tasks.withType(DokkaTask::class) {
-  includes = listOfNotNull("src/main/kotlin/packages.md")
-  jdkVersion = 8
-  skipEmptyPackages = false
+  configuration {
+    includes = listOf("src/main/kotlin/packages.md")
+    jdkVersion = 8
+    skipEmptyPackages = false
 
-  externalDocumentationLinks.add(DokkaConfiguration.ExternalDocumentationLink.Builder(URL("https://docs.gradle.org/${project.gradle.gradleVersion}/javadoc/")).build())
-  externalDocumentationLinks.add(DokkaConfiguration.ExternalDocumentationLink.Builder(URL("http://docs.groovy-lang.org/${GroovySystem.getVersion()}/html/api/")).build())
+    externalDocumentationLink {
+      url = URL("https://docs.gradle.org/${project.gradle.gradleVersion}/javadoc/")
+      packageListUrl = URL("https://docs.gradle.org/${project.gradle.gradleVersion}/javadoc/package-list")
+    }
+    externalDocumentationLink {
+      url = URL("https://docs.groovy-lang.org/${GroovySystem.getVersion()}/html/api/")
+      packageListUrl = URL("https://docs.groovy-lang.org/${GroovySystem.getVersion()}/html/api/package-list")
+    }
+  }
 }
 
 // for the plugin-publish (publish to plugins.gradle.org)
@@ -205,3 +214,9 @@ val releaseToGitlab = tasks.create(
   { true },
   setOf("org/openstreetmap/josm/gradle-josm-plugin", "org/openstreetmap/josm/langconv")
 )
+
+tasks.withType<DependencyUpdatesTask>() {
+  rejectVersionIf {
+    listOf("release", "final", "ga").none { candidate.version.toLowerCase().contains(it) } && !"^[0-9,.v-]+(-r)?$".toRegex().matches(candidate.version)
+  }
+}

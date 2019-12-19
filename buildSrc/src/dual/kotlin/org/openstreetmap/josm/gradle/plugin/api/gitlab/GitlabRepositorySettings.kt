@@ -1,4 +1,4 @@
-package org.openstreetmap.josm.gradle.plugin.gitlab
+package org.openstreetmap.josm.gradle.plugin.api.gitlab
 
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.credentials.HttpHeaderCredentials

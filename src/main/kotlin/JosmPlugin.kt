@@ -11,7 +11,7 @@ import org.gradle.jvm.tasks.Jar
 import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
-import org.openstreetmap.josm.gradle.plugin.gitlab.gitlabRepository
+import org.openstreetmap.josm.gradle.plugin.api.gitlab.gitlabRepository
 import org.openstreetmap.josm.gradle.plugin.task.setupJosmTasks
 import org.openstreetmap.josm.gradle.plugin.util.GROUP_JOSM_PLUGIN
 import org.openstreetmap.josm.gradle.plugin.util.java

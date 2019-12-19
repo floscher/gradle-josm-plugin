@@ -13,10 +13,10 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
-import org.openstreetmap.josm.gradle.plugin.gitlab.GitlabRepositorySettings
+import org.openstreetmap.josm.gradle.plugin.api.gitlab.GitlabRepositorySettings
+import org.openstreetmap.josm.gradle.plugin.api.gitlab.GitlabRelease
 import java.io.File
 import java.io.FileNotFoundException
-import java.lang.IllegalArgumentException
 import java.net.URL
 import javax.inject.Inject
 import javax.net.ssl.HttpsURLConnection
@@ -101,7 +101,7 @@ open class ReleaseToGitlab @Inject constructor(
       .flatMap { packg ->
         Json.nonstrict.parse(PackageFile.serializer().list, URL("${gitlabSettings.gitlabApiUrl}/projects/${gitlabSettings.projectId}/packages/${packg.id}/package_files?per_page=10000").readText())
           .filter { it.fileName.endsWith(".jar") }
-          .map { ReleaseAssetLink(it.fileName, "${gitlabSettings.gitlabUrl}/$projectPath/-/package_files/${it.id}/download") }
+          .map { GitlabRelease.Assets.Link.New(it.fileName, "${gitlabSettings.gitlabUrl}/$projectPath/-/package_files/${it.id}/download") }
       }
     logger.lifecycle("Found ${assetLinks.size} *.jar release assets on GitLab: ${assetLinks.map { it.name }.joinToString(", ")}")
 
@@ -114,7 +114,7 @@ open class ReleaseToGitlab @Inject constructor(
       connection.setRequestProperty(gitlabSettings.tokenLabel, gitlabSettings.token)
 
       connection.outputStream.use {
-        it.write(Json.stringify(Release.serializer(), Release(
+        it.write(Json.stringify(GitlabRelease.serializer(GitlabRelease.Assets.Link.New.serializer()), GitlabRelease(
           revTag.shortMessage,
           gitTagName,
           revTag.fullMessage
@@ -122,7 +122,7 @@ open class ReleaseToGitlab @Inject constructor(
             .replace("-----BEGIN PGP SIGNATURE-----", "\n```\n-----BEGIN PGP SIGNATURE-----")
             .replace("-----END PGP SIGNATURE-----", "-----END PGP SIGNATURE-----\n```")
             .trim(),
-          ReleaseAssets(assetLinks)
+          GitlabRelease.Assets(assetLinks)
         )).toByteArray())
       }
       require(connection.responseCode == 201) {
@@ -148,22 +148,5 @@ open class ReleaseToGitlab @Inject constructor(
     val id: Int,
     @SerialName("package_id") val packageId: Int,
     @SerialName("file_name") val fileName: String
-  )
-
-  @Serializable
-  private data class ReleaseAssetLink(
-    val name: String,
-    val url: String
-  )
-
-  @Serializable
-  private data class ReleaseAssets(val links: List<ReleaseAssetLink>)
-
-  @Serializable
-  private data class Release(
-    val name: String,
-    @SerialName("tag_name") val tagName: String,
-    val description: String,
-    val assets: ReleaseAssets
   )
 }

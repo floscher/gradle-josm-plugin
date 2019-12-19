@@ -3,6 +3,7 @@ package org.openstreetmap.josm.gradle.plugin.task.github
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.options.Option
+import org.openstreetmap.josm.gradle.plugin.config.JosmManifest
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient
 import org.openstreetmap.josm.gradle.plugin.github.ReleaseSpec
@@ -99,7 +100,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
     val manifest = jarFile.manifest ?: throw GithubReleaseException(
       "The jar file ${this.absolutePath} doesn't include a MANIFEST file"
     )
-    val pluginVersion = manifest.mainAttributes.getValue("Plugin-Version")?.trim()
+    val pluginVersion = manifest.mainAttributes.getValue(JosmManifest.Attribute.PLUGIN_VERSION)?.trim()
     if (pluginVersion.isNullOrEmpty()) {
       throw GithubReleaseException(
         """The jar file '${this.absolutePath}' doesn't include an

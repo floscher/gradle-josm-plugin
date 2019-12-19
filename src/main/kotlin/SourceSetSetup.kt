@@ -19,7 +19,7 @@ import org.openstreetmap.josm.gradle.plugin.util.josm
  */
 fun SourceSet.setup(project: Project) {
   if (name.isNotEmpty()) {
-    // Inspired by https://github.com/gradle/gradle/blob/6e69c16c4b3c788cb9e2babae543829a0e84c33a/subprojects/plugins/src/main/java/org/gradle/api/plugins/GroovyBasePlugin.java#L90-L127
+    // Inspired by https://github.com/gradle/gradle/blob/a6311b0530ca8e0070d85c42c7a44dfa0e872b13/subprojects/plugins/src/main/java/org/gradle/api/plugins/GroovyBasePlugin.java#L96-L143
     val i18nSourceSet: I18nSourceSet = DefaultI18nSourceSet(this, project.objects)
     DslObject(this).convention.plugins["i18n"] = i18nSourceSet
 
@@ -47,11 +47,11 @@ fun SourceSet.setup(project: Project) {
       moCompileTask,
       i18nSourceSet
     )
-    if ("main" == name) {
+    if (SourceSet.MAIN_SOURCE_SET_NAME == name) {
       project.extensions.josm.manifest.langCompileTask = langCompileTask
     }
 
-    project.tasks.withType(ProcessResources::class.java).getByName(processResourcesTaskName).also {
+    project.tasks.withType(ProcessResources::class.java).getByName(processResourcesTaskName) {
       it.from(langCompileTask)
     }
   }

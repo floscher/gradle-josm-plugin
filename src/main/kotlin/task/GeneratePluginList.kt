@@ -62,8 +62,8 @@ open class GeneratePluginList : DefaultTask() {
           .append(key)
           .append(": ")
           .append(when (key) {
-            "Plugin-Icon" -> iconBase64Provider.invoke(value) ?: value
-            "Plugin-Version" -> value + versionSuffix.invoke(name)
+            JosmManifest.Attribute.PLUGIN_ICON -> iconBase64Provider.invoke(value) ?: value
+            JosmManifest.Attribute.PLUGIN_VERSION -> value + versionSuffix.invoke(name)
             else -> value
           })
           .append('\n')
