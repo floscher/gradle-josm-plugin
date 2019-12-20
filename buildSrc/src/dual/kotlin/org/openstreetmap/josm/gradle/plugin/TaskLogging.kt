@@ -2,6 +2,7 @@ package org.openstreetmap.josm.gradle.plugin
 
 import org.gradle.api.Project
 import org.gradle.api.execution.TaskExecutionGraph
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.time.Duration
 import java.time.Instant
@@ -22,6 +23,24 @@ fun TaskExecutionGraph.logTaskDuration() {
         if (it.state.failure == null) "\uD83C\uDFC1 Finished" else "❌ Failed",
         Duration.between(it.extensions.extraProperties.get(startTimePropKey) as Instant, Instant.now()).toMillis() / 1e3
       ))
+    }
+  }
+}
+
+/**
+ * Adds a log message to the end of each task of type [PublishToMavenRepository] that contains which artifact was published and to where
+ */
+fun TaskExecutionGraph.logPublishedMavenArtifacts() {
+  afterTask {
+    if (it is PublishToMavenRepository) {
+      it.logger.lifecycle("""
+      |  📦 Published artifact:
+      |       to URL: ${it.repository.url}
+      |        Group: ${it.publication.groupId}
+      |           ID: ${it.publication.artifactId}
+      |      Version: ${it.publication.version}
+      |
+      """.trimMargin())
     }
   }
 }

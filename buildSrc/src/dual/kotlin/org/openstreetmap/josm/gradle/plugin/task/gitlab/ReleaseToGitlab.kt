@@ -13,8 +13,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
-import org.openstreetmap.josm.gradle.plugin.api.gitlab.GitlabRepositorySettings
 import org.openstreetmap.josm.gradle.plugin.api.gitlab.GitlabRelease
+import org.openstreetmap.josm.gradle.plugin.api.gitlab.GitlabRepositorySettings
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.URL

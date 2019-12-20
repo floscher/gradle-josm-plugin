@@ -23,6 +23,9 @@ class ProjectExtensionsTest {
         repo.patternLayout {
           it.artifact("[artifact].jar")
         }
+        repo.metadataSources {
+          it.artifact()
+        }
       })
     }
 
@@ -44,6 +47,9 @@ class ProjectExtensionsTest {
         repo.url = ProjectExtensionsTest::class.java.getResource("/josmRepo").toURI()
         repo.patternLayout {
           it.artifact("[artifact]-[revision]")
+        }
+        repo.metadataSources {
+          it.artifact()
         }
       })
     }

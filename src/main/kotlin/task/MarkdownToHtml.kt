@@ -3,6 +3,7 @@ package org.openstreetmap.josm.gradle.plugin.task
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import org.gradle.api.GradleException
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
@@ -24,18 +25,11 @@ open class MarkdownToHtml: SourceTask() {
    * All files will be created directly inside the directory (not in subdirectories)
    * using the name of the source file, replacing the ".md" extension with ".html".
    */
-  var destDir: File? = null
-
-  init {
-    project.afterEvaluate {
-      outputs.dir(requireNotNull(destDir))
-    }
-  }
+  @OutputDirectory
+  lateinit var destDir: File
 
   @TaskAction
   fun convert() {
-    val destDir = requireNotNull(destDir)
-
     val parser = Parser.builder().build()
     val renderer = HtmlRenderer.builder().build()
 

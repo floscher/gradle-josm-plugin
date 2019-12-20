@@ -4,6 +4,7 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.credentials.HttpHeaderCredentials
 import org.gradle.api.logging.Logger
 import org.gradle.authentication.http.HttpHeaderAuthentication
+import org.openstreetmap.josm.gradle.plugin.api.gitlab.GitlabRepositorySettings.Builder
 import java.net.URI
 
 /**

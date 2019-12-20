@@ -113,7 +113,7 @@ open class GeneratePot
     }
   }
 
-  final override fun args(vararg args: Any): AbstractExecTask<out AbstractExecTask<*>> = super.args(*args)
+  final override fun args(vararg args: Any): Exec = super.args(*args)
   final override fun dependsOn(vararg paths: Any): Task = super.dependsOn(*paths)
 
   @Throws(IOException::class)

@@ -32,6 +32,9 @@ fun RepositoryHandler.josmPluginList(onlyForConfig: Configuration, dependency: D
   repo.patternLayout {
     it.artifact("[artifact]")
   }
+  repo.metadataSources {
+    it.artifact()
+  }
   repo.content {
     it.onlyForConfigurations(onlyForConfig.name)
     it.includeModule(dependency.group ?: "", dependency.name)

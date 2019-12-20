@@ -4,7 +4,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.api.tasks.incremental.IncrementalTaskInputs
+import org.gradle.work.InputChanges
 import org.openstreetmap.josm.gradle.plugin.util.createJosm
 import org.openstreetmap.josm.gradle.plugin.util.createJosmDependencyFuzzy
 import org.openstreetmap.josm.gradle.plugin.util.excludeJosm
@@ -22,7 +22,7 @@ open class CustomJosmVersionCompile
   private lateinit var customVersion: String
 
   @TaskAction
-  final override fun compile(inputs: IncrementalTaskInputs) {
+  final override fun compile(inputs: InputChanges) {
     classpath += project.configurations.getByName(sourceSet.compileClasspathConfigurationName).copy().excludeJosm()
     additionalClasspath.forEach {
       classpath += it.copy()

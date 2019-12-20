@@ -2,7 +2,9 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
@@ -21,18 +23,18 @@ import javax.inject.Inject
  */
 open class PoCompile @Inject constructor(@Internal val sourceSet: I18nSourceSet): DefaultTask() {
 
+  @InputFiles
+  val poSourceFiles = sourceSet.po
+
   /**
    * The target directory where the MO files will be placed (automatically initialized after the project is evaluated)
    */
+  @OutputDirectory
   lateinit var outDir: File
 
   init {
     project.afterEvaluate {
       outDir = File(project.buildDir, "i18n/po/" + sourceSet.name)
-
-      inputs.files(sourceSet.po)
-      outputs.dir(outDir)
-
       description = "Compile the *.po text files of source set `${sourceSet.name}` to the binary *.mo files"
     }
   }

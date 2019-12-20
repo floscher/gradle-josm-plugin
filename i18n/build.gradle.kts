@@ -15,7 +15,7 @@ dependencies {
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", Versions.junit)
 }
 
-attachToRootProject(rootProject, this)
+attachToRootProject(rootProject, project)
 
 fun attachToRootProject(rootProj: Project, i18nProj: Project) {
   // Tasks of root project that depend on their counterparts in this subproject

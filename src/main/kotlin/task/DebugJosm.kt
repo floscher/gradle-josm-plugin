@@ -13,9 +13,11 @@ import javax.inject.Inject
  * configured at [JosmPluginExtension.debugPort].
  */
 open class DebugJosm @Inject constructor(prefFile: File, cleanTask: CleanJosm, updatePluginsTask: Sync) : RunJosmTask(prefFile, cleanTask, updatePluginsTask) {
-  @Input
   private var debugPort: Int? = null
+
   init {
+    outputs.upToDateWhen { false } // Never consider this up-to-date, this task should always run
+
     project.afterEvaluate {
       debugPort = project.extensions.josm.debugPort
       description = "Runs a JOSM instance like the task `runJosm`, but with JDWP (Java debug wire protocol) active" +

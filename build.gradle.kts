@@ -1,5 +1,4 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import groovy.lang.GroovySystem
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.dokka.gradle.GradleSourceRootImpl
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -10,6 +9,7 @@ import org.openstreetmap.josm.gradle.plugin.api.gitlab.gitlabRepository
 import org.openstreetmap.josm.gradle.plugin.logCoverage
 import org.openstreetmap.josm.gradle.plugin.logSkippedTasks
 import org.openstreetmap.josm.gradle.plugin.logTaskDuration
+import org.openstreetmap.josm.gradle.plugin.logPublishedMavenArtifacts
 import org.openstreetmap.josm.gradle.plugin.task.gitlab.ReleaseToGitlab
 import java.net.URL
 
@@ -19,7 +19,6 @@ plugins {
   id("org.jetbrains.dokka").version("0.10.0")
 
   jacoco
-  maven
   `java-gradle-plugin`
   `maven-publish`
 }
@@ -29,6 +28,7 @@ apply(plugin = "kotlinx-serialization")
 
 
 // Logging
+gradle.taskGraph.logPublishedMavenArtifacts()
 gradle.taskGraph.logTaskDuration()
 logSkippedTasks()
 allprojects {
@@ -67,30 +67,28 @@ afterEvaluate {
   }
 }
 
-// Add dependencies of "buildSrc" sources
-val mainProject = this
-project(":buildSrc").afterEvaluate {
-  this.configurations.getByName(this.sourceSets.getByName("dual").implementationConfigurationName).dependencies.forEach {
-    // Add all `dual` dependencies of the `buildSrc` project to `main` source set of this project
-    mainProject.dependencies.implementation(it)
+val dualSourceSet = sourceSets.create("dual") {
+  java.setSrcDirs(setOf<Any>())
+  withConvention(KotlinSourceSet::class) {
+    kotlin.setSrcDirs(setOf(File(projectDir, "buildSrc/src/${this.name}/kotlin")))
   }
+  resources.setSrcDirs(setOf(File(projectDir, "buildSrc/src/${this.name}/resources")))
 }
 
-project.gradle.projectsEvaluated {
-  val dualJarFiles = project.project(":buildSrc").tasks.getByName<Jar>("dualJar").outputs.files
-  project.sourceSets.main {
-    compileClasspath += dualJarFiles
-  }
-  project.sourceSets.test {
-    compileClasspath += dualJarFiles
-    runtimeClasspath += dualJarFiles
-  }
-  tasks.jar {
-    from(dualJarFiles.map { zipTree(it) })
-  }
+tasks.jar {
+  from(dualSourceSet.output)
 }
 
 dependencies {
+  add(dualSourceSet.implementationConfigurationName, gradleApi())
+  add(dualSourceSet.implementationConfigurationName, "org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}")
+  add(dualSourceSet.implementationConfigurationName, kotlin("stdlib", Versions.kotlin))
+  add(dualSourceSet.implementationConfigurationName, (dependencies.create("org.jetbrains.kotlinx:kotlinx-serialization-runtime:${Versions.kotlinSerialization}") as ModuleDependency).also {
+    //it.exclude("org.jetbrains.kotlinx")
+  })
+  implementation(dualSourceSet.output)
+  testImplementation(configurations.getByName(dualSourceSet.implementationConfigurationName))
+
   implementation(localGroovy())
   implementation(kotlin("stdlib", Versions.kotlin))
   implementation("com.squareup.okhttp3", "okhttp", Versions.okhttp)
@@ -115,15 +113,12 @@ val dokkaTask: DokkaTask = tasks.withType(DokkaTask::class).getByName("dokka") {
   outputDirectory = "$buildDir/docs/kdoc"
 }
 
-gradle.projectsEvaluated {
-  project(":buildSrc").sourceSets.getByName("dual").withConvention(KotlinSourceSet::class) {
-    dokkaTask.configuration.sourceRoots.addAll(this.kotlin.srcDirs.map { GradleSourceRootImpl().apply { path = it.path } })
-  }
-}
-
 // Configure all Dokka tasks
 tasks.withType(DokkaTask::class) {
   configuration {
+    dualSourceSet.withConvention(KotlinSourceSet::class) {
+      sourceRoots.addAll(this.kotlin.srcDirs.map { srcDir -> GradleSourceRootImpl().also { it.path = srcDir.path } })
+    }
     includes = listOf("src/main/kotlin/packages.md")
     jdkVersion = 8
     skipEmptyPackages = false
@@ -133,8 +128,8 @@ tasks.withType(DokkaTask::class) {
       packageListUrl = URL("https://docs.gradle.org/${project.gradle.gradleVersion}/javadoc/package-list")
     }
     externalDocumentationLink {
-      url = URL("https://docs.groovy-lang.org/${GroovySystem.getVersion()}/html/api/")
-      packageListUrl = URL("https://docs.groovy-lang.org/${GroovySystem.getVersion()}/html/api/package-list")
+      url = URL("https://docs.groovy-lang.org/next/html/api/")
+      packageListUrl = URL("http://docs.groovy-lang.org/next/html/api/package-list")
     }
   }
 }
@@ -183,24 +178,8 @@ val s3Repo = if (awsAccessKeyId == null || awsSecretAccessKey == null) {
 }
 
 gradle.projectsEvaluated {
-  tasks.withType(PublishToMavenRepository::class) {
-    if (repository == buildDirRepo) {
-      tasks.withType(Test::class).forEach {
-        it.dependsOn(this)
-      }
-    }
-
-    doLast {
-      logger.lifecycle("""
-        Published artifact:
-
-           to URL: ${repository.url}
-            Group: ${publication.groupId}
-               ID: ${publication.artifactId}
-          Version: ${publication.version}
-
-      """.trimIndent())
-    }
+  tasks.withType(Test::class).forEach {
+    it.dependsOn(tasks.withType(PublishToMavenRepository::class).filter { it.repository == buildDirRepo })
   }
 }
 

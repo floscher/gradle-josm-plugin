@@ -225,6 +225,9 @@ open class JosmPluginExtension(val project: Project) {
         it.artifact("[artifact]-snapshot-[revision].jar")
         it.artifact("Archiv/[artifact]-snapshot-[revision].jar")
       }
+      repo.metadataSources {
+        it.artifact()
+      }
     }
     rh.maven { repo ->
       repo.url = Urls.MainJosmWebsite.NEXUS_REPO_SNAPSHOTS.toURI()
@@ -240,6 +243,9 @@ open class JosmPluginExtension(val project: Project) {
       }
       repo.patternLayout {
         it.artifact("[artifact].jar")
+      }
+      repo.metadataSources {
+        it.artifact()
       }
     }
     rh.maven { repo ->

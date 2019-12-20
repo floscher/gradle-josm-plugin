@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin.task.github
 
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.options.Option
@@ -25,12 +26,14 @@ private const val CMDLINE_OPT_REMOTE_JAR_NAME = "remote-jar-name"
  */
 open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
 
+  @get:Internal
   @Option(
     option = CMDLINE_OPT_LOCAL_JAR_PATH,
     description = "the local path to the jar which should be uploaded.\n"
       + "Default: the path of the jar built in the project")
   var localJarPath: String? = null
 
+  @get:Internal
   @Option(
     option = CMDLINE_OPT_REMOTE_JAR_NAME,
     description = "the name of the jar after uploading.\n"

@@ -1,7 +1,9 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.openstreetmap.josm.gradle.plugin.config.I18nConfig
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
@@ -21,23 +23,22 @@ import javax.inject.Inject
  * @property sourceSet The [I18nSourceSet] for which the *.mo files will be compiled
  */
 open class MoCompile @Inject constructor(
-  @Internal val poCompile: PoCompile,
+  @InputFiles val poCompile: PoCompile,
   @Internal val sourceSet: I18nSourceSet
 ): DefaultTask() {
 
   /**
    * The target directory where the *.lang files will be placed (automatically initialized after the project is evaluated)
    */
+  @OutputDirectory
   lateinit var outDir: File
+
+  @InputFiles
+  val moSources = sourceSet.mo
 
   init {
     project.afterEvaluate {
       outDir = File(project.buildDir, "i18n/mo/" + sourceSet.name)
-
-      inputs.files(poCompile)
-      inputs.files(sourceSet.mo)
-      outputs.dir(outDir)
-
       description = "Compile the *.mo gettext files of source set `${sourceSet.name}` to the *.lang format used by JOSM"
     }
   }

@@ -10,7 +10,6 @@ import java.io.File
 import java.io.FileFilter
 import java.io.IOException
 import java.util.Locale
-import kotlin.math.roundToInt
 
 @ExperimentalUnsignedTypes
 @Throws(IllegalArgumentException::class)
@@ -32,7 +31,7 @@ fun main(vararg args: String) {
   val inputFiles: List<File> = inputFile
     ?.let {
       if (it.isDirectory) {
-        it.listFiles(mode.inputFilter).toList()
+        it.listFiles(mode.inputFilter)?.toList()
       } else {
         listOf(it)
       }
@@ -53,29 +52,16 @@ fun main(vararg args: String) {
   if (!(outputDir.exists() || outputDir.mkdirs())) {
     failWithException(IOException("Can't create the output directory!: ${outputDir.safeCanonicalPath()}"))
   } else if (!outputDir.isDirectory) {
-    failWithException(java.lang.IllegalArgumentException("The argument given as output directory is not a directory!: ${outputDir.safeCanonicalPath()}"))
+    failWithException(IllegalArgumentException("The argument given as output directory is not a directory!: ${outputDir.safeCanonicalPath()}"))
   }
 
   val strings = mode.readFunction.invoke(inputFiles)
-  val baseLang = strings["en"] ?: if (mode.isNeedsBaseLanguage) failWithException(IllegalArgumentException("No strings in base language 'en' found! Note, that at the moment the base language can't be changed for the 'langconv' program.")) else strings.flatMap { it.value.keys }.map { it to it.id }.toMap()
-  val numBaseStrings = baseLang.filter { it.key != MoWriter.EMPTY_MSGID }.size
 
-  println("Base language is 'en' with $numBaseStrings strings\n")
-
-  val maxKeyLength = strings.keys.map { it.length }.max() ?: 0
-  val maxStringNumberLength = strings.values.map { it.size.toString().length }.max() ?: 0
-  println(
-    strings.entries
-      .filter { it.key != "en" }
-      .sortedBy { it.key }
-      .joinToString("\n") { stringEntry ->
-        val numTranslated = stringEntry.value.keys.filter { it != MoWriter.EMPTY_MSGID }.size
-        val percentage = numTranslated / numBaseStrings.toDouble() * 100
-        val endChar = if (numTranslated == numBaseStrings) '▒' else '░'
-
-        "${stringEntry.key.padStart(maxKeyLength + 2)}: ${numTranslated.toString().padStart(maxStringNumberLength)} strings (${String.format("%.2f", percentage).padStart(6)}% translated) $endChar${progressBarString(percentage).padEnd(25)}$endChar"
-      }
-  )
+  try {
+    println(strings.getTranslationStatsString("en", mode.isNeedsBaseLanguage) { it.value.size })
+  } catch (e: IllegalArgumentException) {
+    failWithException(e)
+  }
 
   mode.writeFunction.invoke(strings, outputDir)
   println("\n The files have been written successfully into ${outputDir.safeCanonicalPath()}")
@@ -127,23 +113,11 @@ private fun printUsage() {
   """.trimIndent())
 }
 
-fun progressBarString(percentage: Double): String = "█".repeat(percentage.toInt() / 4) +
-  when (((percentage % 4) * 2).roundToInt()) {
-    0 -> ""
-    1 -> '▏'
-    2 -> '▎'
-    3 -> '▍'
-    4 -> '▌'
-    5 -> '▋'
-    6 -> '▊'
-    7 -> '▉'
-    else -> '█'
-  }
-
 @ExperimentalUnsignedTypes
 private enum class LangconvMode(val inputFilter: FileFilter, val readFunction: (List<File>) -> Map<String, Map<MsgId, MsgStr>>, val writeFunction: (Map<String, Map<MsgId, MsgStr>>, File) -> Unit, val isNeedsBaseLanguage: Boolean) {
   LANG2MO(
     inputFilter = FileFilter {
+      it.isFile &&
       it.extension == "lang"
     },
     readFunction = { inputFiles ->
@@ -163,6 +137,7 @@ private enum class LangconvMode(val inputFilter: FileFilter, val readFunction: (
   ),
   MO2LANG(
     inputFilter = FileFilter {
+      it.isFile &&
       it.inputStream().use {
         val bytes = ByteArray(MoReader.BE_MAGIC.size)
         it.read(bytes)

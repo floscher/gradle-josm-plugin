@@ -4,12 +4,12 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.openstreetmap.josm.gradle.plugin.testutils.GradleProjectUtil
-import java.io.File
+import java.nio.file.Files
 
 class I18nConfigTest {
   @Test
   fun testPathTransformer() {
-    val project = GradleProjectUtil.createEmptyProjectBuilder().withProjectDir(File(".").absoluteFile).build()
+    val project = GradleProjectUtil.createEmptyProjectBuilder().withProjectDir(Files.createTempDirectory(null).toFile()).build()
     val transformer = I18nConfig(project).getPathTransformer("gitlab.com/user/repo/blob")
     assertEquals("/some/path", transformer.invoke("/some/path"))
     assertEquals("/some/path:42", transformer.invoke("/some/path:42"))
