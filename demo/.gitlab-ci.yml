@@ -1,0 +1,24 @@
+image: registry.gitlab.com/josm/docker-library/openjdk-8-josmplugin:latest
+
+assemble:
+  stage: build
+  script:
+  - ./gradlew assemble
+  artifacts:
+    paths:
+    - build/
+
+build:
+  stage: test
+  script:
+  - ./gradlew build
+
+minJosm:
+  stage: test
+  script:
+  - ./gradlew compileJava_minJosm
+
+latestJosm:
+  stage: test
+  script:
+  - ./gradlew compileJava_latestJosm
