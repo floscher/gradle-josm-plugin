@@ -1,4 +1,5 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import kotlinx.serialization.UnstableDefault
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.dokka.gradle.GradleSourceRootImpl
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -7,9 +8,9 @@ import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import org.openstreetmap.josm.gradle.plugin.Versions
 import org.openstreetmap.josm.gradle.plugin.api.gitlab.gitlabRepository
 import org.openstreetmap.josm.gradle.plugin.logCoverage
+import org.openstreetmap.josm.gradle.plugin.logPublishedMavenArtifacts
 import org.openstreetmap.josm.gradle.plugin.logSkippedTasks
 import org.openstreetmap.josm.gradle.plugin.logTaskDuration
-import org.openstreetmap.josm.gradle.plugin.logPublishedMavenArtifacts
 import org.openstreetmap.josm.gradle.plugin.task.gitlab.ReleaseToGitlab
 import java.net.URL
 
@@ -61,7 +62,7 @@ allprojects {
   }
 
   tasks.withType(KotlinCompile::class) {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
 
   val jacocoTask = tasks.withType(JacocoReport::class).findByName("jacocoTestReport")
@@ -203,6 +204,7 @@ gradle.projectsEvaluated {
 publishing.repositories.gitlabRepository("gitlab", project.logger)
 
 // Create `releaseToGitlab` task that can publish a release based on a Gitlab Maven package for a tag.
+@UnstableDefault
 val releaseToGitlab = tasks.create(
   "releaseToGitlab",
   ReleaseToGitlab::class,
@@ -210,7 +212,7 @@ val releaseToGitlab = tasks.create(
   setOf("org/openstreetmap/josm/gradle-josm-plugin", "org/openstreetmap/josm/langconv")
 )
 
-tasks.withType<DependencyUpdatesTask>() {
+tasks.withType<DependencyUpdatesTask> {
   rejectVersionIf {
     listOf("release", "final", "ga").none { candidate.version.toLowerCase().contains(it) } && !"^[0-9,.v-]+(-r)?$".toRegex().matches(candidate.version)
   }

@@ -67,7 +67,7 @@ open class RunJosmTask @Inject constructor(prefFile: File, cleanTask: CleanJosm,
           }
         )
         if (userSuppliedArgs.isEmpty()) {
-          logger.lifecycle("""\nIf you want to pass additional arguments to JOSM add something like the following when starting Gradle from the commandline: --args='--debug --language="es"'""")
+          logger.lifecycle('\n' + """If you want to pass additional arguments to JOSM add something like the following when starting Gradle from the commandline: --args='--debug --language="es"'""")
         }
 
         logger.lifecycle(extraInformation)

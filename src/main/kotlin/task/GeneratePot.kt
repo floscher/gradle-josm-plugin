@@ -2,20 +2,17 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.Task
 import org.gradle.api.plugins.BasePluginConvention
-import org.gradle.api.tasks.AbstractExecTask
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.util.josm
-import java.io.BufferedReader
 import java.io.BufferedWriter
+import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
-import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 import java.time.Year
@@ -119,7 +116,7 @@ open class GeneratePot
   @Throws(IOException::class)
   private fun moveFileAndReplaceStrings(src: File, dest: File, lineTransform: (String) -> String, replacements: MutableMap<String,String>, appendix: String?) {
     val writer = BufferedWriter(OutputStreamWriter(FileOutputStream(dest), StandardCharsets.UTF_8))
-    val reader = BufferedReader(InputStreamReader(FileInputStream(src), StandardCharsets.UTF_8))
+    val reader = if (src.exists()) src.bufferedReader() else ByteArrayInputStream(ByteArray(0)).bufferedReader()
     reader.useLines { lines ->
       writer.use { out ->
         for (line in lines) {

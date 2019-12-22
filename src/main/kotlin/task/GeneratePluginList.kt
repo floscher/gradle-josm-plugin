@@ -6,7 +6,6 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
-import org.gradle.internal.impldep.com.google.common.collect.ImmutableList
 import org.openstreetmap.josm.gradle.plugin.config.JosmManifest
 import org.openstreetmap.josm.gradle.plugin.io.PluginInfo
 import java.io.File
@@ -60,6 +59,7 @@ open class GeneratePluginList : DefaultTask() {
 
   @TaskAction
   fun action() {
+    logger.lifecycle("Writing list of ${plugins.size} plugins to ${outputFile.absolutePath} …")
     val fileBuilder = StringBuilder()
 
     plugins.sortedBy { it.pluginName }.forEach { (name, url, manifestAtts) ->

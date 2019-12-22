@@ -1,6 +1,5 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension

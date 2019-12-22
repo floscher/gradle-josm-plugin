@@ -2,7 +2,6 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
@@ -40,9 +39,11 @@ open class GenerateFileList
     outFile.delete()
     outFile.parentFile.mkdirs()
     outFile.writer().use { writer ->
-      inputs.files.forEach {
-        writer.write("${it.absolutePath}\n")
-      }
+      inputs.files.files
+        .also { logger.lifecycle("Writing list of ${it.size} files to ${outFile.absolutePath}") }
+        .forEach {
+          writer.write("${it.absolutePath}\n")
+        }
     }
   }
 }

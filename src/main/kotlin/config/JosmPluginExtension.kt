@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.IvyArtifactRepository
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.api.plugins.BasePluginConvention
 import org.gradle.api.tasks.util.PatternFilterable
 import org.openstreetmap.josm.gradle.plugin.util.ARTIFACT_JOSM
 import org.openstreetmap.josm.gradle.plugin.util.ARTIFACT_JOSM_UNITTEST
@@ -22,6 +23,12 @@ import java.io.File
  * @constructor instantiates the extension, takes project properties into account
  */
 open class JosmPluginExtension(val project: Project) {
+  var pluginName
+    get() = project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName
+    set(value) {
+      project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName = value
+    }
+
   /**
    * The version number of JOSM against which the plugin should be compiled.
    *
