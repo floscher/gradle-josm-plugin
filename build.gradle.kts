@@ -34,7 +34,7 @@ logSkippedTasks()
 
 // Little hack to disable logging in demo project without including the setting of these properties in that subproject.
 // Since that logging is also enabled for the rootProject, leaving these properties enabled would lead to duplicate log messages.
-project.childProjects["demo"]!!.afterEvaluate {
+project.childProjects["demo"]?.afterEvaluate {
   fun Class<*>.setBooleanField(obj: Any, fieldName: String, value: Boolean) = this.declaredFields.singleOrNull { it.name ==  fieldName}!!.also {
     it.isAccessible = true
     it.setBoolean(obj, value)

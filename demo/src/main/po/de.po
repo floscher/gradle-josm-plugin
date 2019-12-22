@@ -1,0 +1,22 @@
+# Translations for the JOSM plugin 'MyAwesomePlugin' (de)
+# Copyright (C) 2019 John Doe
+# This file is distributed under the same license as the josm-plugin_MyAwesomePlugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: josm-plugin_MyAwesomePlugin 0.1.0\n"
+"Report-Msgid-Bugs-To: me@example.com\n"
+"POT-Creation-Date: 2019-12-22 02:38+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Plugin {0} was loaded successfully!"
+msgstr "Die Erweiterung {0} wurde erfolgreich geladen!"
+
+msgid "The description of my awesome JOSM plugin"
+msgstr "Die Beschreibung von meiner fantastischen JOSM-Erweiterung"

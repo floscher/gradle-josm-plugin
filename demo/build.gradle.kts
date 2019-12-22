@@ -1,7 +1,8 @@
 import java.net.URL
 
 plugins {
-  id("org.openstreetmap.josm").version("0.6.5")
+  java
+  id("org.openstreetmap.josm").version("0.7.0")
 }
 
 base.archivesBaseName = "MyAwesomePlugin"

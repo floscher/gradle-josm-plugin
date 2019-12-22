@@ -1,4 +1,4 @@
-include(":demo")
+//include(":demo")
 include(":i18n")
 include(":langconv")
 
@@ -15,7 +15,7 @@ if (System.getenv("USE_LOCAL_PLUGIN_VERSION") == "true") {
     resolutionStrategy {
       eachPlugin {
         if (requested.id.id == "org.openstreetmap.josm") {
-          this.useVersion(File(rootProject.projectDir, "build/maven/org/openstreetmap/josm/gradle-josm-plugin").listFiles().singleOrNull { it.isDirectory }!!.name)
+          this.useVersion(File(rootProject.projectDir, "build/maven/org/openstreetmap/josm/gradle-josm-plugin").listFiles()!!.singleOrNull { it.isDirectory }!!.name)
         }
       }
     }
