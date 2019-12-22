@@ -31,6 +31,22 @@ apply(plugin = "kotlinx-serialization")
 gradle.taskGraph.logPublishedMavenArtifacts()
 gradle.taskGraph.logTaskDuration()
 logSkippedTasks()
+
+// Little hack to disable logging in demo project without including the setting of these properties in that subproject.
+// Since that logging is also enabled for the rootProject, leaving these properties enabled would lead to duplicate log messages.
+project.childProjects["demo"]!!.afterEvaluate {
+  fun Class<*>.setBooleanField(obj: Any, fieldName: String, value: Boolean) = this.declaredFields.singleOrNull { it.name ==  fieldName}!!.also {
+    it.isAccessible = true
+    it.setBoolean(obj, value)
+  }
+
+  val josmExtensionClass = buildscript.classLoader.loadClass("org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension")
+  this.extensions.getByName("josm").apply {
+    josmExtensionClass.setBooleanField(this, "logSkippedTasks", false)
+    josmExtensionClass.setBooleanField(this, "logTaskDuration", false)
+  }
+}
+
 allprojects {
   afterEvaluate {
     tasks.withType(JacocoReport::class) {

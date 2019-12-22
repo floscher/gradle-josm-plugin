@@ -12,7 +12,7 @@ import java.io.IOException
  *   (typically the parent directory of the `.git` directory)
  */
 class GitDescriber(val workTree: File) : Describer {
-  private val git = Git(FileRepositoryBuilder().setWorkTree(workTree).readEnvironment().findGitDir().build())
+  private val git = Git(FileRepositoryBuilder().findGitDir(workTree).readEnvironment().build())
 
   /**
    * Replicates the `git describe` command. Never null, either returns a [String] or throws an exception

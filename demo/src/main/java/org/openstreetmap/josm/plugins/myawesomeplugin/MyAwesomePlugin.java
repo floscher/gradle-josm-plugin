@@ -1,16 +1,22 @@
 package org.openstreetmap.josm.plugins.myawesomeplugin;
 
+import java.util.List;
+
+import org.openstreetmap.josm.gui.ExtendedDialog;
+import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.download.DownloadSelection;
 import org.openstreetmap.josm.plugins.Plugin;
 import org.openstreetmap.josm.plugins.PluginInformation;
-
-import java.util.List;
+import org.openstreetmap.josm.tools.I18n;
 
 public class MyAwesomePlugin extends Plugin {
   public MyAwesomePlugin(PluginInformation info) {
     super(info);
     // Initialize the plugin here
+    new ExtendedDialog(MainApplication.getMainFrame(), getPluginInformation().name, new String[]{ "OK" }, true)
+      .setContent(I18n.tr("Plugin {0} was loaded successfully!", getPluginInformation().name))
+      .showDialog();
   }
 
   @Override
