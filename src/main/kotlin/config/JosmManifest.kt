@@ -5,6 +5,7 @@ import com.beust.klaxon.JsonObject
 import groovy.lang.GroovySystem
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient
 import org.openstreetmap.josm.gradle.plugin.github.ReleaseSpec
 import org.openstreetmap.josm.gradle.plugin.github.onlyFallbackVersions
@@ -299,8 +300,19 @@ class JosmManifest(private val project: Project) {
     }
 
     val specs = ReleaseSpec.loadListFrom(project.extensions.josm.github.releasesConfig.inputStream())
-    val client = GithubReleasesClient(project.extensions.josm.github, project.extensions.josm.github.apiUrl)
-    val remoteReleases = client.getReleases()
+    val remoteReleases = try {
+      val client = GithubReleasesClient(project.extensions.josm.github, project.extensions.josm.github.apiUrl)
+      client.getReleases()
+    } catch(e: GithubReleaseException) {
+      project.logger.warn("""
+        Failed to retrieve list of remote releases.
+        Reason: ${e.message}
+        List of remote releases not available.
+        Can't create map of download links for remote releases."""
+        .trimIndent()
+      )
+      return emptyMap()
+    }
 
     return specs.onlyFallbackVersions()
       .fold(initial=mutableMapOf()) fold@{links, release ->
