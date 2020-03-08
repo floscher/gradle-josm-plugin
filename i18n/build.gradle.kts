@@ -19,7 +19,7 @@ attachToRootProject(rootProject, project)
 
 fun attachToRootProject(rootProj: Project, i18nProj: Project) {
   // Tasks of root project that depend on their counterparts in this subproject
-  listOf("test", "compileKotlin", "jacocoTestReport").forEach {
+  listOf("check", "compileKotlin").forEach {
     rootProj.tasks.getByName(it).dependsOn(i18nProj.tasks.getByName(it))
   }
 

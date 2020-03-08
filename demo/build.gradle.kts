@@ -2,7 +2,7 @@ import java.net.URL
 
 plugins {
   java
-  id("org.openstreetmap.josm").version("0.7.0")
+  id("org.openstreetmap.josm").version("0.6.5")
 }
 
 base.archivesBaseName = "MyAwesomePlugin"
@@ -35,7 +35,7 @@ josm {
   }
   // The following block is optional, only needed when doing i18n for the plugin
   i18n {
-    pathTransformer = getPathTransformer("gitlab.com/floscher/gradle-josm-plugin/blob/master/demo")
+    pathTransformer = getPathTransformer("gitlab.com/floscher/gradle-josm-plugin/-/blob/master/demo")
     bugReportEmail = "me@example.com"
     copyrightHolder = "John Doe"
   }

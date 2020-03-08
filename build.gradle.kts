@@ -65,10 +65,8 @@ allprojects {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
 
-  val jacocoTask = tasks.withType(JacocoReport::class).findByName("jacocoTestReport")
   tasks.withType(Test::class) {
     useJUnitPlatform()
-    jacocoTask?.also { this.finalizedBy(it) }
   }
 
   this.extensions.findByType(JacocoPluginExtension::class)?.apply {
@@ -97,12 +95,15 @@ tasks.jar {
 }
 
 dependencies {
-  add(dualSourceSet.implementationConfigurationName, gradleApi())
-  add(dualSourceSet.implementationConfigurationName, "org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}")
-  add(dualSourceSet.implementationConfigurationName, kotlin("stdlib", Versions.kotlin))
-  add(dualSourceSet.implementationConfigurationName, (dependencies.create("org.jetbrains.kotlinx:kotlinx-serialization-runtime:${Versions.kotlinSerialization}") as ModuleDependency).also {
-    //it.exclude("org.jetbrains.kotlinx")
-  })
+  setOf(
+    gradleApi(),
+    "org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}",
+    kotlin("stdlib", Versions.kotlin),
+    "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${Versions.kotlinSerialization}"
+  ).forEach {
+    add(dualSourceSet.implementationConfigurationName, it)
+    add(sourceSets.main.get().implementationConfigurationName, it)
+  }
   implementation(dualSourceSet.output)
   testImplementation(configurations.getByName(dualSourceSet.implementationConfigurationName))
 
@@ -118,6 +119,7 @@ dependencies {
   implementation("com.vladsch.flexmark:flexmark:${Versions.flexmark}")
 
   testImplementation("org.junit.jupiter", "junit-jupiter-api", Versions.junit)
+  testImplementation("org.junit.jupiter", "junit-jupiter-params", Versions.junit)
   testImplementation("com.github.tomakehurst","wiremock",Versions.wiremock)
   testImplementation("ru.lanwen.wiremock", "wiremock-junit5", Versions.wiremockJunit5)
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", Versions.junit)
