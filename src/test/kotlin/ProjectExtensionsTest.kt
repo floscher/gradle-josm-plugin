@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 import org.openstreetmap.josm.gradle.plugin.testutils.GradleProjectUtil
 import org.openstreetmap.josm.gradle.plugin.util.createJosm
 import org.openstreetmap.josm.gradle.plugin.util.createJosmDependencyFuzzy
@@ -16,9 +17,9 @@ import org.openstreetmap.josm.gradle.plugin.util.josm
 @ExperimentalUnsignedTypes
 class ProjectExtensionsTest {
 
-  private fun createRequiredPluginsTestRepo(): Project =
-    GradleProjectUtil.createJosmPluginProjectWithCleanRepos { rh ->
-      rh.add(rh.ivy { repo ->
+  private fun createRequiredPluginsTestRepo(testInfo: TestInfo): Project =
+    GradleProjectUtil.createJosmPluginProjectWithCleanRepos(testInfo) {
+      it.ivy { repo ->
         repo.url = ProjectExtensionsTest::class.java.getResource("/josmPluginRepo").toURI()
         repo.patternLayout {
           it.artifact("[artifact].jar")
@@ -26,12 +27,12 @@ class ProjectExtensionsTest {
         repo.metadataSources {
           it.artifact()
         }
-      })
+      }
     }
 
   @Test
-  fun testRequiredPlugins() {
-    val result = createRequiredPluginsTestRepo().getAllRequiredJosmPlugins(setOf("A"))
+  fun testRequiredPlugins(testInfo: TestInfo) {
+    val result = createRequiredPluginsTestRepo(testInfo).getAllRequiredJosmPlugins(setOf("A"))
     assertEquals(6, result.size)
     assertEquals(1, result.count{ it.name == "A" })
     assertEquals(1, result.count{ it.name == "B" })
@@ -41,9 +42,9 @@ class ProjectExtensionsTest {
     assertEquals(1, result.count{ it.name == "F" })
   }
 
-  private fun createNextJosmTestRepo(): Project =
-    GradleProjectUtil.createJosmPluginProjectWithCleanRepos { rh ->
-      rh.add(rh.ivy { repo ->
+  private fun createNextJosmTestRepo(testInfo: TestInfo): Project =
+    GradleProjectUtil.createJosmPluginProjectWithCleanRepos(testInfo) {
+      it.ivy { repo ->
         repo.url = ProjectExtensionsTest::class.java.getResource("/josmRepo").toURI()
         repo.patternLayout {
           it.artifact("[artifact]-[revision]")
@@ -51,33 +52,33 @@ class ProjectExtensionsTest {
         repo.metadataSources {
           it.artifact()
         }
-      })
+      }
     }
 
   @Test
-  fun testNextJosm() {
-    assertEquals("100", createNextJosmTestRepo().createJosmDependencyFuzzy(51.toUInt(), 50.toUInt()).version)
-    assertEquals("100", createNextJosmTestRepo().createJosmDependencyFuzzy(71.toUInt()).version)
+  fun testNextJosm(testInfo: TestInfo) {
+    assertEquals("100", createNextJosmTestRepo(testInfo).createJosmDependencyFuzzy(51.toUInt(), 50.toUInt()).version)
+    assertEquals("100", createNextJosmTestRepo(testInfo).createJosmDependencyFuzzy(71.toUInt()).version)
   }
 
   @Test
-  fun testNextJosmFail() {
+  fun testNextJosmFail(testInfo: TestInfo) {
     assertThrows(GradleException::class.java) {
-      createNextJosmTestRepo().createJosmDependencyFuzzy(50.toUInt(), 50.toUInt())
+      createNextJosmTestRepo(testInfo).createJosmDependencyFuzzy(50.toUInt(), 50.toUInt())
     }
     assertThrows(GradleException::class.java) {
-      createNextJosmTestRepo().createJosmDependencyFuzzy(70.toUInt())
+      createNextJosmTestRepo(testInfo).createJosmDependencyFuzzy(70.toUInt())
     }
   }
 
   @Test
-  fun testNextJosmSame() {
-    assertEquals("100", createNextJosmTestRepo().createJosmDependencyFuzzy(100.toUInt()).version)
+  fun testNextJosmSame(testInfo: TestInfo) {
+    assertEquals("100", createNextJosmTestRepo(testInfo).createJosmDependencyFuzzy(100.toUInt()).version)
   }
 
   @Test
-  fun testArbitraryJosmString() {
-    val project = createNextJosmTestRepo()
+  fun testArbitraryJosmString(testInfo: TestInfo) {
+    val project = createNextJosmTestRepo(testInfo)
     val josmDep = project.dependencies.createJosm("XYZ")
     val conf = project.configurations.detachedConfiguration(josmDep)
     conf.excludeJosm()
@@ -88,16 +89,16 @@ class ProjectExtensionsTest {
   }
 
   @Test
-  fun testNextJosmStringFail() {
+  fun testNextJosmStringFail(testInfo: TestInfo) {
     assertThrows(GradleException::class.java) {
-      val project = createNextJosmTestRepo()
+      val project = createNextJosmTestRepo(testInfo)
       val josmDep = project.dependencies.createJosm("ABC")
       project.configurations.detachedConfiguration(josmDep).resolve()
     }
   }
 
   @Test
-  fun testJosmExtension() {
-    GradleProjectUtil.createJosmPluginProjectWithCleanRepos().extensions.josm
+  fun testJosmExtension(testInfo: TestInfo) {
+    GradleProjectUtil.createJosmPluginProjectWithCleanRepos(testInfo).extensions.josm
   }
 }

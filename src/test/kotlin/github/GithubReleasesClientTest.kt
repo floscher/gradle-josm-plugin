@@ -18,7 +18,9 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
+import org.openstreetmap.josm.gradle.plugin.testutils.GradleProjectUtil
 import org.openstreetmap.josm.gradle.plugin.util.Urls
 import ru.lanwen.wiremock.ext.WiremockResolver
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock
@@ -280,12 +282,15 @@ class GithubReleasesClientTest {
     @Test
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
     fun `uploading a simple text file as release asset should work`(
-        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
+      testInfo: TestInfo,
+      @Wiremock server: WireMockServer,
+      @WiremockUri uri: String
+    ) {
         val client = buildClient(uri)
         val releaseId = 12345
         val path = "/repos/${client.user}/${client.repository}" +
                     "/releases/$releaseId/assets"
-        val asset = createTempFile(suffix="txt")
+        val asset = GradleProjectUtil.createTempFile(testInfo, suffix=".txt")
         val content = "Hello World!"
         asset.writeText(content)
 
@@ -307,10 +312,13 @@ class GithubReleasesClientTest {
     @Test
     @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
     fun `uploading a simple text file + name and label should work`(
-        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
+      testInfo: TestInfo,
+      @Wiremock server: WireMockServer,
+      @WiremockUri uri: String
+    ) {
         val client = buildClient(uri)
         val releaseId = 12345
-        val asset = createTempFile(suffix="txt")
+        val asset = GradleProjectUtil.createTempFile(testInfo, suffix="txt")
         val content = "Hello World!"
         asset.writeText(content)
         val newName = "asset.txt"

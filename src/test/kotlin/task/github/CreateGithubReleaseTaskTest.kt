@@ -31,20 +31,20 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
         val releaseName = "a test release"
         val releaseLabel = "v0.0.2"
 
-        val releaseFileContent = """
+        releaseFile.writeText("""
           releases:
             - label: "$releaseLabel"
               name: "$releaseName"
               minJosmVersion: 5678
               description: a test description
           """.trimIndent()
-        prepareReleasesSpecs(releaseFileContent)
+        )
 
-        val githubConfig = buildGithubConfig(apiUri, "github_user", "repo", "aaaabbbb")
+        val githubConfig = project.buildGithubConfig(apiUri, "github_user", "repo", "aaaabbbb")
 
-        val buildFileContent = """
+        buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
+                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
             }
             project.version="v0.0.1"
             josm {
@@ -59,7 +59,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
               releaseLabel = "$releaseLabel"
             }
             """.trimIndent()
-        prepareBuildFile(buildFileContent)
+        )
 
         val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
@@ -84,7 +84,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
         ))
 
         val result = GradleRunner.create()
-          .withProjectDir(buildDir)
+          .withProjectDir(projectDir)
           .withArguments(
             "-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}",
             "myCreateGithubRelease",
@@ -109,20 +109,20 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
         val releaseName = "a test release"
         val releaseLabel = "v0.0.2"
 
-        val releaseFileContent = """
+        releaseFile.writeText("""
           releases:
             - label: "$releaseLabel"
               name: "$releaseName"
               minJosmVersion: 5678
               description: a test description
           """.trimIndent()
-        prepareReleasesSpecs(releaseFileContent)
+        )
 
-        val githubConfig = buildGithubConfig(apiUri, "JOSM", "some-repo", "abcdefghijklmnopqrstuvwxyz")
+        val githubConfig = project.buildGithubConfig(apiUri, "JOSM", "some-repo", "abcdefghijklmnopqrstuvwxyz")
 
-        val buildFileContent = """
+        buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
+                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
             }
             project.version="v0.0.1"
             josm {
@@ -137,7 +137,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
               releaseLabel = "$releaseLabel"
             }
             """.trimIndent()
-        prepareBuildFile(buildFileContent)
+        )
 
         val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
@@ -162,7 +162,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             ))
 
         val result = GradleRunner.create()
-            .withProjectDir(buildDir)
+            .withProjectDir(projectDir)
             .withArguments(
               "-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}",
               "createGithubRelease",
@@ -188,18 +188,18 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         val releaseLabel = "v0.0.2"
 
-        val releaseFileContent = """
+        releaseFile.writeText("""
           releases:
             - label: "$releaseLabel"
               minJosmVersion: 5678
           """.trimIndent()
-        prepareReleasesSpecs(releaseFileContent)
+        )
 
-        val githubConfig = buildGithubConfig(apiUri, "github_user", "repoName", "aaaabbbb")
+        val githubConfig = project.buildGithubConfig(apiUri, "github_user", "repoName", "aaaabbbb")
 
-        val buildFileContent = """
+        buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
+                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
             }
 
             project.version="v0.0.1"
@@ -216,7 +216,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
               releaseLabel = "$releaseLabel"
             }
             """.trimIndent()
-        prepareBuildFile(buildFileContent)
+        )
 
         val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
@@ -239,7 +239,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
 
         val result = GradleRunner.create()
-            .withProjectDir(buildDir)
+            .withProjectDir(projectDir)
             .withArguments(
               "-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}",
               "createGithubRelease",
@@ -264,20 +264,20 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
         val releaseName = "a test release"
         val releaseLabel = "v0.0.2"
 
-        val releaseFileContent = """
+        releaseFile.writeText("""
           releases:
             - label: "$releaseLabel"
               name: "$releaseName"
               minJosmVersion: 5678
               description: a test description
           """.trimIndent()
-        prepareReleasesSpecs(releaseFileContent)
+        )
 
-        val githubConfig = buildGithubConfig(apiUri, "github_user", "repo", "aaaabbbb")
+        val githubConfig = project.buildGithubConfig(apiUri, "github_user", "repo", "aaaabbbb")
 
-        val buildFileContent = """
+        buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
+                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
             }
             project.version="v0.0.1"
             josm {
@@ -289,7 +289,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 }
             }
             """.trimIndent()
-        prepareBuildFile(buildFileContent)
+        )
 
         val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
@@ -314,7 +314,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             ))
 
         val result = GradleRunner.create()
-            .withProjectDir(buildDir)
+            .withProjectDir(projectDir)
             .withArguments(
               "-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}",
               "createGithubRelease",
@@ -341,20 +341,20 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
         val releaseName = "a test release"
         val releaseLabel = "v0.0.2"
 
-        val releaseFileContent = """
+        releaseFile.writeText("""
           releases:
             - label: "$releaseLabel"
               name: "$releaseName"
               minJosmVersion: 5678
               description: a test description
           """.trimIndent()
-        prepareReleasesSpecs(releaseFileContent)
+        )
 
-        val githubConfig = buildGithubConfig(apiUri, "github_user", "repo", "aaaabbbb")
+        val githubConfig = project.buildGithubConfig(apiUri, "github_user", "repo", "aaaabbbb")
 
-        val buildFileContent = """
+        buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
+                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
             }
             version="$releaseLabel"
             josm {
@@ -366,7 +366,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 }
             }
             """.trimIndent()
-        prepareBuildFile(buildFileContent)
+        )
 
         val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
@@ -391,7 +391,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             ))
 
         val result = GradleRunner.create()
-            .withProjectDir(buildDir)
+            .withProjectDir(projectDir)
             .withArguments(
               "-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}",
               "createGithubRelease",

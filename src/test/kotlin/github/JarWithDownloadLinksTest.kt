@@ -36,7 +36,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         prepareTestPluginSource()
 
         // prepare releases file
-        val releasesContent = """
+        releaseFile.writeText("""
           releases:
             # an former release. A download link for this release
             # should be included in the Manifest
@@ -47,13 +47,13 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
             - label: $currentRelease
               minJosmVersion: $currentMinJosmVersion
           """.trimIndent()
-        prepareReleasesSpecs(releasesContent)
+        )
 
-        val githubConfig = buildGithubConfig(apiUri, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
+        val githubConfig = project.buildGithubConfig(apiUri, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
         // prepare build file
-        val buildFileContent = """
+        buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
+                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
                 id 'java'
             }
             version = "$currentRelease"
@@ -69,7 +69,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
               }
             }
             """
-        prepareBuildFile(buildFileContent)
+        )
 
         // prepare API stub
 
@@ -97,7 +97,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         )
 
         val result = GradleRunner.create()
-            .withProjectDir(buildDir)
+            .withProjectDir(projectDir)
             .withArguments("-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}", "build")
             .build()
 
@@ -106,11 +106,11 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
             result.task(":build")?.outcome
         )
 
-        val jarFile = File(buildDir, "build/libs/test.jar")
+        val jarFile = File(projectDir, "build/libs/test.jar")
         val manifest = JarInputStream(jarFile.inputStream()).manifest
 
     assertTrue(
-      ReleaseSpec.loadListFrom(File(buildDir, "releases.yml").inputStream())
+      ReleaseSpec.loadListFrom(File(projectDir, "releases.yml").inputStream())
       // don't check for the current release. Because we are building it
       // now, there is no download URL available yet
       .filter {it.label != currentRelease}
@@ -140,7 +140,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
     prepareTestPluginSource()
 
     // prepare releases file
-    val releasesContent = """
+    releaseFile.writeText("""
       releases:
         # an former release. A download link for this release
         # should be included in the Manifest
@@ -156,29 +156,30 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         - label: $currentRelease
           minJosmVersion: $currentMinJosmVersion
       """.trimIndent()
-    prepareReleasesSpecs(releasesContent)
+    )
 
-        val githubConfig = buildGithubConfig(apiUri, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
-        // prepare build file
-        val buildFileContent = """
-            plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
-                id 'java'
-            }
-            version = "$currentRelease"
-            jar.archiveName = "test.jar"
-            josm {
-              ${githubConfig.toGradleBuildscript()}
-              josmCompileVersion = "latest"
-              manifest {
-                  includeLinksToGithubReleases = true
-                  description = 'test plugin'
-                  minJosmVersion = $currentMinJosmVersion
-                  mainClass = 'test_plugin.TestPlugin'
-              }
-            }
-            """
-        prepareBuildFile(buildFileContent)
+    val githubConfig = project.buildGithubConfig(apiUri, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
+
+    // prepare build file
+    buildFile.writeText("""
+      plugins {
+          id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
+          id 'java'
+      }
+      version = "$currentRelease"
+      jar.archiveName = "test.jar"
+      josm {
+        ${githubConfig.toGradleBuildscript()}
+        josmCompileVersion = "latest"
+        manifest {
+            includeLinksToGithubReleases = true
+            description = 'test plugin'
+            minJosmVersion = $currentMinJosmVersion
+            mainClass = 'test_plugin.TestPlugin'
+        }
+      }
+      """.trimIndent()
+    )
 
         // prepare API stub
 
@@ -216,7 +217,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         )
 
         val result = GradleRunner.create()
-            .withProjectDir(buildDir)
+            .withProjectDir(projectDir)
             .withArguments("-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}", "build")
             .build()
 
@@ -225,11 +226,11 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
             result.task(":build")?.outcome
         )
 
-        val jarFile = File(buildDir, "build/libs/test.jar")
+        val jarFile = File(projectDir, "build/libs/test.jar")
         val manifest = JarInputStream(jarFile.inputStream()).manifest
 
     assertTrue(
-      ReleaseSpec.loadListFrom(File(buildDir, "releases.yml").inputStream())
+      ReleaseSpec.loadListFrom(File(projectDir, "releases.yml").inputStream())
         // don't check for the current release. Because we are building it
         // now  there is no download URL available yet
         .filter {it.label != currentRelease}
@@ -261,7 +262,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
     prepareTestPluginSource()
 
     // prepare releases file
-    val releasesContent = """
+    releaseFile.writeText("""
       releases:
         - label: v0.0.1
           minJosmVersion: 1000
@@ -276,14 +277,13 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         - label: $currentRelease
           minJosmVersion: $currentMinJosmVersion
       """.trimIndent()
+    )
 
-        prepareReleasesSpecs(releasesContent)
-
-        val githubConfig = buildGithubConfig(apiUri, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
+        val githubConfig = project.buildGithubConfig(apiUri, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
         // prepare build file
-        val buildFileContent = """
+        buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
+                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
                 id 'java'
             }
             version = "$currentRelease"
@@ -299,7 +299,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
               }
             }
             """
-        prepareBuildFile(buildFileContent)
+        )
 
         // prepare API stub
         val path1 = "/repos/$GITHUB_USER/$GITHUB_REPO/releases"
@@ -343,7 +343,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         )
 
         val result = GradleRunner.create()
-            .withProjectDir(buildDir)
+            .withProjectDir(projectDir)
             .withArguments("-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}", "build")
             .build()
 
@@ -353,7 +353,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         )
         println(result.output)
 
-        val jarFile = File(buildDir, "build/libs/test.jar")
+        val jarFile = File(projectDir, "build/libs/test.jar")
         val manifest = JarInputStream(jarFile.inputStream()).manifest
 
         // should include a download URL for release 2000

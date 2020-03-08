@@ -42,14 +42,14 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
     val releaseId = 12345678
     val releaseLabel = "v0.0.1"
 
-    val githubConfig = buildGithubConfig(uri, GITHUB_USER, "repo_xy", "asdfalkasdhf")
+    val githubConfig = project.buildGithubConfig(uri, GITHUB_USER, "repo_xy", "asdfalkasdhf")
 
     val localJarName = "test-$releaseLabel.jar"
     val remoteJarName = "test.jar"
 
-    val buildFileContent = """
+    buildFile.writeText("""
       plugins {
-          id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
+          id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
           id 'java'
       }
       project.version = "$releaseLabel"
@@ -69,14 +69,15 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
         remoteJarName = "$remoteJarName"
       }
       """.trimIndent()
+    )
 
-    val releasesContent = """
+    releaseFile.writeText("""
       releases:
         - label: $releaseLabel
           minJosmVersion: $minJosmVersion
           description: $releaseLabel-description
       """.trimIndent()
-    prepareReleasesSpecs(releasesContent)
+    )
 
     fun prepareAPIStub() {
       // stub for "get releases"
@@ -120,12 +121,11 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
       )
     }
 
-    prepareBuildFile(buildFileContent)
     prepareTestPluginSource()
     prepareAPIStub()
 
     val result = GradleRunner.create()
-      .withProjectDir(buildDir)
+      .withProjectDir(projectDir)
       .withArguments(
         "-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}",
         "--stacktrace",
@@ -158,15 +158,15 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
     val releaseId = 12345678
     val releaseLabel = "v0.0.1"
 
-    val githubConfig = buildGithubConfig(uri, GITHUB_USER, "repo_xy", "asdfalkasdhf")
+    val githubConfig = project.buildGithubConfig(uri, GITHUB_USER, "repo_xy", "asdfalkasdhf")
 
     // the standard pattern for the jar name the gradle-josm-plugin sets
     // for the plugin jar
-    val localJarName = "${buildDir?.name}-$releaseLabel.jar"
+    val localJarName = "${projectDir.name}-$releaseLabel.jar"
 
-    val buildFileContent = """
+    buildFile.writeText("""
       plugins {
-        id 'org.openstreetmap.josm' version '${pluginUnderTestVersion()}'
+        id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
         id 'java'
       }
       project.version = "$releaseLabel"
@@ -181,12 +181,14 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
       }
       // will invoke the standard task 'publishToGithubRelease'
       """.trimIndent()
+    )
 
-    val releasesContent = """
+    releaseFile.writeText("""
       releases:
         - label: $releaseLabel
           minJosmVersion: $minJosmVersion
       """.trimIndent()
+    )
 
 
 
@@ -239,12 +241,10 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
     }
 
     prepareTestPluginSource()
-    prepareBuildFile(buildFileContent)
-    prepareReleasesSpecs(releasesContent)
     prepareAPIStub()
 
     val result = GradleRunner.create()
-      .withProjectDir(buildDir)
+      .withProjectDir(projectDir)
       .withArguments(
         "-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}",
         "--stacktrace",

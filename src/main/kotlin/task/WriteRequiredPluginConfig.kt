@@ -6,6 +6,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskExecutionException
+import org.gradle.internal.impldep.org.junit.Ignore
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 import java.io.IOException
@@ -19,9 +20,10 @@ open class WriteRequiredPluginConfig : DefaultTask() {
     .bufferedReader(Charsets.UTF_8)
     .use { it.readText() }
 
+  @get:Internal // added to inputs in constructor
   val pluginName by lazy { project.extensions.josm.pluginName }
 
-  @Internal
+  @Internal // added to inputs in constructor
   lateinit var requiredPluginConfig: Configuration
 
   init {
