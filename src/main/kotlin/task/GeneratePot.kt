@@ -8,13 +8,9 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.util.josm
-import java.io.BufferedWriter
 import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
-import java.io.OutputStreamWriter
-import java.nio.charset.StandardCharsets
 import java.time.Year
 import javax.inject.Inject
 
@@ -52,8 +48,9 @@ open class GeneratePot
 
     executable = "xgettext"
     args(
-      "--from-code=UTF-8", "--language=Java",
-      "--output-dir=" + outDir.absolutePath,
+      "--from-code=UTF-8",
+      "--language=Java",
+      "--output-dir=${outDir.absolutePath}",
       "--add-comments",
       "--sort-output",
       "-k", "-ktrc:1c,2", "-kmarktrc:1c,2", "-ktr", "-kmarktr", "-ktrn:1,2", "-ktrnc:1c,2,3"
@@ -115,27 +112,15 @@ open class GeneratePot
 
   @Throws(IOException::class)
   private fun moveFileAndReplaceStrings(src: File, dest: File, lineTransform: (String) -> String, replacements: MutableMap<String,String>, appendix: String?) {
-    val writer = BufferedWriter(OutputStreamWriter(FileOutputStream(dest), StandardCharsets.UTF_8))
-    val reader = if (src.exists()) src.bufferedReader() else ByteArrayInputStream(ByteArray(0)).bufferedReader()
-    reader.useLines { lines ->
-      writer.use { out ->
-        for (line in lines) {
-          var varLine = line
-          // Apply the line transformer
-          varLine = lineTransform.invoke(varLine)
-          // Replace all replacements
-          replacements.filter { varLine.contains(it.key) }
-            .forEach { key, value ->
-              varLine = varLine.replace(key, value)
-              replacements.remove(key)
-            }
-          out.write(varLine + "\n")
-        }
-        if (appendix != null) {
-          out.write(appendix)
-        }
-      }
+    val reader = if (src.exists()) src.inputStream() else ByteArrayInputStream(ByteArray(0))
+    var content = reader.bufferedReader().lineSequence().map { lineTransform.invoke(it) }.joinToString("\n")
+    for ((key, value) in replacements) {
+      content = content.replaceFirst(key, value)
     }
+    if (appendix != null) {
+      content += '\n' + appendix
+    }
+    dest.writeText(content)
     src.delete()
   }
 }

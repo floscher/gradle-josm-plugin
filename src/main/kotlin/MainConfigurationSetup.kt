@@ -17,6 +17,7 @@ import org.openstreetmap.josm.gradle.plugin.util.josm
  * @param [configuration] the main configuration
  */
 
+@ExperimentalUnsignedTypes
 class MainConfigurationSetup(val project: Project, val mainSourceSet: SourceSet) {
 
   val mainConfiguration = project.configurations.getByName(mainSourceSet.implementationConfigurationName)

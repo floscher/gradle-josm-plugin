@@ -2,6 +2,7 @@ package org.openstreetmap.josm.gradle.plugin.io
 
 import org.gradle.api.Project
 import org.openstreetmap.josm.gradle.plugin.task.GeneratePluginList
+import org.openstreetmap.josm.gradle.plugin.util.josm
 import org.openstreetmap.josm.gradle.plugin.util.josmPluginList
 import java.net.MalformedURLException
 import java.net.URL
@@ -32,20 +33,18 @@ class JosmPluginListParser(val project: Project, val withIcons: Boolean = false)
     // Resolve plugin list as dependency
     val dependency = project.dependencies.josmPluginList(withIcons)
     val conf = project.configurations.detachedConfiguration(dependency)
-    val repo = project.repositories.josmPluginList(conf, dependency)
+    val repo = project.repositories.josmPluginList(project.extensions.josm, conf, dependency)
     val resolvedFiles = conf.resolve()
     project.repositories.remove(repo)
 
-    require(resolvedFiles.size == 1) { "The plugin list wasn't resolved correctly!" }
-
-    val listLines = resolvedFiles.iterator().next().readLines()
+    require(resolvedFiles.size == 1) { "The plugin list was not resolved correctly!" }
 
     // Temporary variables to collect properties of the next PluginInfo object
     var pluginName: String? = null
     var downloadUrl: URL? = null
     val manifestAtts: MutableMap<String, String> = mutableMapOf()
 
-    listLines.forEachIndexed { i, line ->
+    resolvedFiles.first().readLines().forEachIndexed { i, line ->
       val manifestLineMatch = MANIFEST_LINE_REGEX.matchEntire(line)
       // A line from a Java Manifest (indented by a tab)
       if (manifestLineMatch != null) {

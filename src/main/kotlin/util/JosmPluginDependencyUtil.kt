@@ -11,6 +11,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.IvyArtifactRepository
@@ -20,17 +21,16 @@ import org.gradle.api.plugins.JavaPluginConvention
 import org.openstreetmap.josm.gradle.plugin.config.JosmManifest
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.io.JosmPluginListParser
-import java.io.IOException
 import java.util.jar.Manifest
 import java.util.zip.ZipFile
 
 /**
  * Configures the [RepositoryHandler] to hold another repository that appends the artifact name to [Urls.MainJosmWebsite.BASE] to get the artifact's URL.
  */
-fun RepositoryHandler.josmPluginList(onlyForConfig: Configuration, dependency: Dependency): IvyArtifactRepository = this.ivy { repo ->
+fun RepositoryHandler.josmPluginList(josmExtension: JosmPluginExtension, onlyForConfig: Configuration, dependency: Dependency): IvyArtifactRepository = ivy { repo ->
   repo.url = Urls.MainJosmWebsite.BASE.toURI()
   repo.patternLayout {
-    it.artifact("[artifact]")
+    it.artifact(ARTIFACT_PLUGIN_LIST)
   }
   repo.metadataSources {
     it.artifact()
@@ -49,7 +49,7 @@ fun RepositoryHandler.josmPluginList(onlyForConfig: Configuration, dependency: D
  * @return the plugin list as a [Dependency]
  */
 fun DependencyHandler.josmPluginList(withIcons: Boolean): ExternalModuleDependency =
-  (this.create("$GROUP_METADATA:$ARTIFACT_PLUGIN_LIST:$VERSION_SNAPSHOT") as ExternalModuleDependency)
+  (create("$GROUP_METADATA:$ARTIFACT_PLUGIN_LIST:$VERSION_SNAPSHOT") as ExternalModuleDependency)
     .also { dep ->
       dep.isChanging = true
       dep.artifact {
@@ -68,7 +68,7 @@ fun DependencyHandler.josmPluginList(withIcons: Boolean): ExternalModuleDependen
  */
 fun Project.getVirtualPlugins(): Map<String, List<Pair<String, String>>> = try {
   val parser = JosmPluginListParser(this, true)
-  val result = parser
+  parser
     .plugins
     .mapNotNull {
       it.manifestAtts["Plugin-Platform"]?.let { platform ->
@@ -77,13 +77,13 @@ fun Project.getVirtualPlugins(): Map<String, List<Pair<String, String>>> = try {
         }
       }
     }
-    .groupBy({ it.first }, { Pair(it.second, it.third) })
-  if (parser.errors.isNotEmpty()) {
-    logger.warn("WARN: There were issues parsing the JOSM plugin list:\n * " + parser.errors.joinToString("\n * "))
-  }
-
-  result
-} catch (e: IOException) {
+    .groupBy( { it.first }, { Pair(it.second, it.third) })
+    .also {
+      if (parser.errors.isNotEmpty()) {
+        logger.warn("WARN: There were issues parsing the JOSM plugin list:\n * " + parser.errors.joinToString("\n * "))
+      }
+    }
+} catch (e: ResolveException) {
   logger.warn("WARN: Virtual plugins cannot be resolved, since the plugin list can't be read from the web!")
   mapOf()
 }

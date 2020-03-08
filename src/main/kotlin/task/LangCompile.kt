@@ -65,7 +65,7 @@ open class LangCompile @Inject constructor(
       logger.lifecycle("  from $path : ${langPaths.filter { it.value.contains(path) }.keys.sorted().joinToString(", ")}")
     }
     logger.lifecycle("  into ${destinationDir.absolutePath}/$subdirectory")
-    langPaths.filter { it.value.size >= 2 }.forEach { lang, paths ->
+    langPaths.filter { it.value.size >= 2 }.forEach { (lang, paths) ->
       val warnMsg = "\nWARNING: For language $lang there are multiple *.lang files, of which only the last one in the following list is used:\n  * ${paths.joinToString("\n  * ")}\n"
       logger.warn(warnMsg)
       project.gradle.buildFinished { logger.warn(warnMsg) }

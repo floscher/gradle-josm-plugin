@@ -122,7 +122,7 @@ class JosmManifest(private val project: Project) {
    * The task that processes the *.lang files for translations. This is set automatically and you normally don't have
    * to change it.
    */
-  lateinit var langCompileTask: LangCompile
+  var langCompileTask: LangCompile? = null
 
   /**
    * This can be set to `true`, when the plugin should load before the GUI classes of JOSM.
