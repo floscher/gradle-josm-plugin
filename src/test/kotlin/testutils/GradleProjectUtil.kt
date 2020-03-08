@@ -43,7 +43,7 @@ class GradleProjectUtil private constructor() {
         .withGradleUserHomeDir(gradleUserHome)
     }
 
-    private fun TestInfo.toDirString() = testClass.orElseThrow().simpleName + (testMethod.orElse(null)?.name?.let { "_${it}" } ?: "")
+    private fun TestInfo.toDirString() = testClass.get().simpleName + (testMethod.orElse(null)?.name?.let { "_${it}" } ?: "")
 
     @ExperimentalUnsignedTypes
     fun createJosmPluginProjectWithCleanRepos(testInfo: TestInfo, initGit: Boolean = false, withRepo: (RepositoryHandler) -> Unit = { }): Project =

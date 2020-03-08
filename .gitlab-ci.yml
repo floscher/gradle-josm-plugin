@@ -42,7 +42,6 @@ assemble on java13:
   artifacts:
     paths:
     - build/
-  allow_failure: true
 
 assemble on java14:
   stage: build
@@ -87,7 +86,6 @@ test on java13:
   - ./gradlew build
   dependencies:
   - assemble on java13
-  allow_failure: true
 
 test on java14:
   stage: test

@@ -4,7 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.list
+import kotlinx.serialization.builtins.list
+import kotlinx.serialization.json.JsonConfiguration
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.revwalk.RevTag
 import org.eclipse.jgit.revwalk.RevWalk
@@ -72,7 +73,7 @@ open class ReleaseToGitlab @Inject constructor(
       }
       ?: try {
         logger.lifecycle("Getting the project path from the GitLab API at ${gitlabSettings.gitlabApiUrl} …")
-        Json.nonstrict.parse(ProjectInfo.serializer(), URL("${gitlabSettings.gitlabApiUrl}/projects/${gitlabSettings.projectId}").readText())
+        Json(JsonConfiguration.Nonstrict).parse(ProjectInfo.serializer(), URL("${gitlabSettings.gitlabApiUrl}/projects/${gitlabSettings.projectId}").readText())
           .apply { logger.lifecycle("Retrieved project path for project ${gitlabSettings.projectId} from GitLab API: ${this.projectPath}") }.projectPath
       } catch (e: FileNotFoundException) {
         throw TaskExecutionException(this, IllegalArgumentException("Project ${gitlabSettings.projectId} not found via API ${gitlabSettings.gitlabApiUrl}!"))
@@ -96,10 +97,10 @@ open class ReleaseToGitlab @Inject constructor(
     logger.lifecycle("Found git tag ${revTag.tagName}: ${revTag.shortMessage}")
 
     // Find all matching packages available on GitLab
-    val assetLinks = Json.nonstrict.parse(Package.serializer().list, URL("${gitlabSettings.gitlabApiUrl}/projects/${gitlabSettings.projectId}/packages?per_page=10000").readText())
+    val assetLinks = Json(JsonConfiguration.Nonstrict).parse(Package.serializer().list, URL("${gitlabSettings.gitlabApiUrl}/projects/${gitlabSettings.projectId}/packages?per_page=10000").readText())
       .filter { artifactVersion == it.version && names.contains(it.name) }
       .flatMap { packg ->
-        Json.nonstrict.parse(PackageFile.serializer().list, URL("${gitlabSettings.gitlabApiUrl}/projects/${gitlabSettings.projectId}/packages/${packg.id}/package_files?per_page=10000").readText())
+        Json(JsonConfiguration.Nonstrict).parse(PackageFile.serializer().list, URL("${gitlabSettings.gitlabApiUrl}/projects/${gitlabSettings.projectId}/packages/${packg.id}/package_files?per_page=10000").readText())
           .filter { it.fileName.endsWith(".jar") }
           .map { GitlabRelease.Assets.Link.New(it.fileName, "${gitlabSettings.gitlabUrl}/$projectPath/-/package_files/${it.id}/download") }
       }

@@ -23,7 +23,7 @@ open class CustomJosmVersionCompile
 
   @TaskAction
   final override fun compile(inputs: InputChanges) {
-    classpath += project.configurations.getByName(sourceSet.compileClasspathConfigurationName).copy().excludeJosm()
+    classpath = project.configurations.getByName(sourceSet.compileClasspathConfigurationName).copy().excludeJosm()
     additionalClasspath.forEach {
       classpath += it.copy()
     }
@@ -49,7 +49,6 @@ open class CustomJosmVersionCompile
       description = "Compile the JOSM plugin against ${ if (findNextVersion) "the first available JOSM version since" else "JOSM version" } $customVersion"
       destinationDir =  File(project.buildDir, "classes/java/${sourceSet.name}_$customVersion")
 
-      classpath = project.files() // empty, will be filled later
     }
   }
 }
