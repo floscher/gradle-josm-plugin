@@ -25,16 +25,24 @@ If you want to know how **i18n** works, have a look at [`docs/I18n.md`](docs/I18
 Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/) for this Gradle plugin is available online.
 
 ## Projects using this Gradle plugin
+* [JOSM/**areaselector**](https://www.github.com/JOSM/areaselector)
+* [Jamalek/josm-**batch-downloader**](https://gitlab.com/Jamalek/josm-batch-downloader)
 * [Gubaer/josm-**contourmerge**-plugin](https://github.com/Gubaer/josm-contourmerge-plugin)
 * [fieldpapers/josm-**fieldpapers**](https://github.com/fieldpapers/josm-fieldpapers)
-* [JOSM/**geojson**](https://github.com/JOSM/geojson)
+* ~~[JOSM/**geojson**](https://github.com/JOSM/geojson)~~
+* [gokaart/JOSM_**highwayNameModification**](https://gitlab.com/gokaart/JOSM_highwayNameModification)
 * [osmlab/**josm-atlas**](https://github.com/osmlab/josm-atlas)
+* [gokaart/JOSM_**lane-connectivity**](https://gitlab.com/gokaart/JOSM_lane-connectivity)
 * [qeef/**mapathoner**](https://gitlab.com/qeef/mapathoner)
 * [JOSM/**Mapillary**](https://github.com/JOSM/Mapillary)
+* [gokaart/JOSM_**MapWithAI**](https://gitlab.com/gokaart/JOSM_MapWithAI)
 * [matsim-org/josm-**matsim**-plugin](https://github.com/matsim-org/josm-matsim-plugin)
 * [iandees/josm-**mbtiles**](https://github.com/iandees/josm-mbtiles)
+* [microsoft/**MicrosoftStreetsidePlugin**](https://github.com/microsoft/MicrosoftStreetsidePlugin)
+* [gokaart/JOSM_**OpenQA**](https://gitlab.com/gokaart/JOSM_OpenQA)
 * [Gubaer/josm-**scripting**-plugin](https://github.com/Gubaer/josm-scripting-plugin)
-* [JOSM/**wikipedia**](https://gitlab.com/floscher/JOSM-wikipedia)
+* [JOSM/**pt_assistant**](https://gitlab.com/JOSM/plugin/pt_assistant)
+* [JOSM/**wikipedia**](https://gitlab.com/JOSM/plugin/wikipedia)
 
 ## Deprecated links
 Alternatively to the default Gradle plugin repository, you can download this plugin from a Maven repository at `https://floscher.gitlab.io/gradle-josm-plugin/maven`.
