@@ -15,9 +15,9 @@ import org.openstreetmap.josm.gradle.plugin.task.gitlab.ReleaseToGitlab
 import java.net.URL
 
 plugins {
-  id("com.gradle.plugin-publish").version("0.10.1")
+  id("com.gradle.plugin-publish").version("0.11.0")
   id("com.github.ben-manes.versions").version("0.28.0")
-  id("org.jetbrains.dokka").version("0.10.0")
+  id("org.jetbrains.dokka").version("0.10.1")
 
   jacoco
   `java-gradle-plugin`
@@ -56,6 +56,10 @@ allprojects {
   }
   group = "org.openstreetmap.josm"
   version = GitDescriber(rootProject.projectDir).describe(trimLeading = true)
+
+  pluginManager.withPlugin("java") {
+    java.sourceCompatibility = JavaVersion.VERSION_1_8
+  }
 
   repositories {
     jcenter()
@@ -109,6 +113,7 @@ dependencies {
 
   implementation(localGroovy())
   implementation(kotlin("stdlib", Versions.kotlin))
+  implementation(gradleKotlinDsl())
   implementation("com.squareup.okhttp3", "okhttp", Versions.okhttp)
   implementation("com.beust","klaxon", Versions.klaxon)
   constraints {
@@ -124,6 +129,8 @@ dependencies {
   testImplementation("ru.lanwen.wiremock", "wiremock-junit5", Versions.wiremockJunit5)
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", Versions.junit)
   testImplementation(kotlin("reflect"))
+
+  api(project(":i18n"))
 }
 
 // Configure "dokka" task

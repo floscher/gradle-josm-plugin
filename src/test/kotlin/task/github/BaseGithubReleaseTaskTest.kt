@@ -5,7 +5,6 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
-import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import org.openstreetmap.josm.gradle.plugin.testutils.GradleProjectUtil
 import java.io.File
 
@@ -26,23 +25,7 @@ open class BaseGithubReleaseTaskTest() {
       .also { projectDir ->
         this.projectDir = projectDir
         println("build dir: $projectDir")
-        File(projectDir, "settings.gradle").writeText("""
-          pluginManagement {
-            repositories {
-                maven {
-                  url "${File(".").canonicalPath}/build/maven"
-                }
-                gradlePluginPortal()
-            }
-          }
-          """.trimIndent()
-        )
       }
-  }
-
-  // copy/paste of the code in build.gradle.kts which assembles the plugin version
-  val  pluginUnderTestVersion by lazy {
-    GitDescriber(File(".")).describe(trimLeading = true)
   }
 
 

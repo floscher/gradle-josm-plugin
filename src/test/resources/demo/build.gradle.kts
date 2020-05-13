@@ -2,7 +2,7 @@ import java.net.URL
 
 plugins {
   java
-  id("org.openstreetmap.josm").version("0.6.5")
+  id("org.openstreetmap.josm") // append `.version("‹current version number›")` to this line when using in a real project
 }
 
 base.archivesBaseName = "MyAwesomePlugin"

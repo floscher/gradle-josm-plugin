@@ -49,8 +49,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
     buildFile.writeText("""
       plugins {
-          id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
-          id 'java'
+          id("org.openstreetmap.josm")
+          id("java")
       }
       project.version = "$releaseLabel"
       jar.archiveName = "$localJarName"
@@ -132,6 +132,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
         "build",
         "myPublishToGithubRelease"
       )
+      .withPluginClasspath()
       .build()
     result.dumpOutputOnError("myPublishToGithubRelease")
     assertEquals(
@@ -166,8 +167,8 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
     buildFile.writeText("""
       plugins {
-        id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
-        id 'java'
+        id("org.openstreetmap.josm")
+        id("java")
       }
       project.version = "$releaseLabel"
       josm {
@@ -252,6 +253,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
         "publishToGithubRelease",
         "--release-label", releaseLabel
       )
+      .withPluginClasspath()
       .build()
 
     result.dumpOutputOnError("publishToGithubRelease")

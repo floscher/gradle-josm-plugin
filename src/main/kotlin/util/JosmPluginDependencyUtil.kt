@@ -27,10 +27,10 @@ import java.util.zip.ZipFile
 /**
  * Configures the [RepositoryHandler] to hold another repository that appends the artifact name to [Urls.MainJosmWebsite.BASE] to get the artifact's URL.
  */
-fun RepositoryHandler.josmPluginList(josmExtension: JosmPluginExtension, onlyForConfig: Configuration, dependency: Dependency): IvyArtifactRepository = ivy { repo ->
+fun RepositoryHandler.josmPluginList(onlyForConfig: Configuration, dependency: Dependency): IvyArtifactRepository = ivy { repo ->
   repo.url = Urls.MainJosmWebsite.BASE.toURI()
   repo.patternLayout {
-    it.artifact(ARTIFACT_PLUGIN_LIST)
+    it.artifact("[artifact]")
   }
   repo.metadataSources {
     it.artifact()

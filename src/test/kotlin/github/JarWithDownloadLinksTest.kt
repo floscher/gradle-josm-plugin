@@ -53,8 +53,8 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         // prepare build file
         buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
-                id 'java'
+                id("org.openstreetmap.josm")
+                id("java")
             }
             version = "$currentRelease"
             jar.archiveName = "test.jar"
@@ -99,6 +99,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         val result = GradleRunner.create()
             .withProjectDir(projectDir)
             .withArguments("-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}", "build")
+            .withPluginClasspath()
             .build()
 
         Assertions.assertEquals(
@@ -163,8 +164,8 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
     // prepare build file
     buildFile.writeText("""
       plugins {
-          id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
-          id 'java'
+          id("org.openstreetmap.josm")
+          id("java")
       }
       version = "$currentRelease"
       jar.archiveName = "test.jar"
@@ -219,6 +220,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         val result = GradleRunner.create()
             .withProjectDir(projectDir)
             .withArguments("-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}", "build")
+            .withPluginClasspath()
             .build()
 
         assertEquals(
@@ -283,8 +285,8 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         // prepare build file
         buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
-                id 'java'
+              id("org.openstreetmap.josm")
+              id("java")
             }
             version = "$currentRelease"
             jar.archiveName = "test.jar"
@@ -345,6 +347,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         val result = GradleRunner.create()
             .withProjectDir(projectDir)
             .withArguments("-P${GithubConfig.PROPERTY_ACCESS_TOKEN}=${githubConfig.accessToken}", "build")
+            .withPluginClasspath()
             .build()
 
         Assertions.assertEquals(

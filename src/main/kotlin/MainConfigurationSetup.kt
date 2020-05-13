@@ -7,6 +7,7 @@ import org.gradle.api.tasks.SourceSet
 import org.openstreetmap.josm.gradle.plugin.util.createJosm
 import org.openstreetmap.josm.gradle.plugin.util.getAllRequiredJosmPlugins
 import org.openstreetmap.josm.gradle.plugin.util.josm
+import java.io.File
 
 /**
  * Configure the given [Configuration] as the main one:
@@ -48,6 +49,12 @@ class MainConfigurationSetup(val project: Project, val mainSourceSet: SourceSet)
         )
       }
     )
+
+    System.getenv("OPENJFX_CLASSPATH")?.let {
+      project.logger.lifecycle("Added content of environment variable OPENJFX_CLASSPATH to classpath:\n * ${it.split(File.pathSeparatorChar).joinToString("\n * ")}")
+      mainSourceSet.compileClasspath += project.files(it.split(File.pathSeparatorChar))
+      mainSourceSet.runtimeClasspath += project.files(it.split(File.pathSeparatorChar))
+    }
 
     // Add dependencies on all required plugins to the `requiredPlugin` configuration
     project

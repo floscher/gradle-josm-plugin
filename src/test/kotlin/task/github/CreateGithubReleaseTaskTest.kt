@@ -44,7 +44,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
+                id("org.openstreetmap.josm")
             }
             project.version="v0.0.1"
             josm {
@@ -90,6 +90,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             "myCreateGithubRelease",
             "--stacktrace"
           )
+          .withPluginClasspath()
           .build()
         result.dumpOutputOnError("myCreateGithubRelease")
         assertEquals(SUCCESS, result.task(":myCreateGithubRelease")?.outcome)
@@ -122,7 +123,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
+                id("org.openstreetmap.josm")
             }
             project.version="v0.0.1"
             josm {
@@ -168,6 +169,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
               "createGithubRelease",
               "--stacktrace"
             )
+            .withPluginClasspath()
             .build()
 
         result.dumpOutputOnError("createGithubRelease")
@@ -199,7 +201,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
+                id("org.openstreetmap.josm")
             }
 
             project.version="v0.0.1"
@@ -245,6 +247,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
               "createGithubRelease",
               "--stacktrace"
             )
+            .withPluginClasspath()
             .build()
         result.dumpOutputOnError("createGithubRelease")
         assertEquals(SUCCESS, result.task(":createGithubRelease")?.outcome)
@@ -277,7 +280,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
+                id("org.openstreetmap.josm")
             }
             project.version="v0.0.1"
             josm {
@@ -321,6 +324,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
               "--release-label", releaseLabel,
               "--stacktrace"
             )
+            .withPluginClasspath()
             .build()
 
         result.dumpOutputOnError("createGithubRelease")
@@ -354,7 +358,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         buildFile.writeText("""
             plugins {
-                id 'org.openstreetmap.josm' version '${pluginUnderTestVersion}'
+                id("org.openstreetmap.josm")
             }
             version="$releaseLabel"
             josm {
@@ -397,6 +401,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
               "createGithubRelease",
               "--stacktrace"
             )
+            .withPluginClasspath()
             .build()
 
         result.dumpOutputOnError("createGithubRelease")

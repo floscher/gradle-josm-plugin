@@ -33,7 +33,7 @@ class JosmPluginListParser(val project: Project, val withIcons: Boolean = false)
     // Resolve plugin list as dependency
     val dependency = project.dependencies.josmPluginList(withIcons)
     val conf = project.configurations.detachedConfiguration(dependency)
-    val repo = project.repositories.josmPluginList(project.extensions.josm, conf, dependency)
+    val repo = project.repositories.josmPluginList(conf, dependency)
     val resolvedFiles = conf.resolve()
     project.repositories.remove(repo)
 

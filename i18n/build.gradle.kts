@@ -23,28 +23,25 @@ fun attachToRootProject(rootProj: Project, i18nProj: Project) {
     rootProj.tasks.getByName(it).dependsOn(i18nProj.tasks.getByName(it))
   }
 
-  // Add to binary JAR of root project
-  rootProj.tasks.withType(Jar::class).getByName(rootProj.sourceSets.main.get().jarTaskName) {
-    dependsOn(i18nProj.tasks[i18nProj.sourceSets.main.get().compileJavaTaskName])
-    doFirst {
-      from(i18nProj.sourceSets.main.get().output)
-    }
-  }
-  rootProj.sourceSets.main.get().compileClasspath += i18nProj.sourceSets.main.get().output
-
   // Add to sources JAR of root project
-  rootProj.tasks.withType(Jar::class).getByName("publishPluginJar") {
+  rootProj.tasks.getByName("publishPluginJar", Jar::class) {
     from(i18nProj.sourceSets.main.get().allSource)
   }
 
   // Include this subproject in JaCoCo report of root project
-  rootProj.tasks.withType(JacocoReport::class).getByName("jacocoTestReport") {
+  rootProj.tasks.getByName("jacocoTestReport", JacocoReport::class) {
     sourceSets(i18nProj.sourceSets.main.get())
-    executionData(i18nProj.tasks.withType(JacocoReport::class)["jacocoTestReport"].executionData)
+    executionData(i18nProj.tasks.getByName("jacocoTestReport", JacocoReport::class).executionData)
   }
 
   // Include this subproject in Dokka docs of root project
-  rootProj.tasks.withType(DokkaTask::class).getByName("dokka") {
-    configuration.sourceRoots.addAll(i18nProj.sourceSets.main.get().allSource.srcDirs.map { GradleSourceRootImpl().apply { path = it.path } })
+  rootProj.tasks.withType(DokkaTask::class).getByName("dokka").configuration {
+    i18nProj.sourceSets.main.get().allSource.srcDirs
+      .filter { it.exists() }
+      .forEach {
+        sourceRoot {
+          path = it.path
+        }
+      }
   }
 }
