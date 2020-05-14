@@ -1,11 +1,7 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import kotlinx.serialization.UnstableDefault
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.dokka.gradle.GradleSourceRootImpl
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
-import org.openstreetmap.josm.gradle.plugin.Versions
 import org.openstreetmap.josm.gradle.plugin.api.gitlab.gitlabRepository
 import org.openstreetmap.josm.gradle.plugin.logCoverage
 import org.openstreetmap.josm.gradle.plugin.logPublishedMavenArtifacts
@@ -17,36 +13,19 @@ import java.net.URL
 plugins {
   id("com.gradle.plugin-publish").version("0.11.0")
   id("com.github.ben-manes.versions").version("0.28.0")
-  id("org.jetbrains.dokka").version("0.10.1")
+  id("org.jetbrains.dokka").version(Versions.dokka)
+  kotlin("jvm").version(Versions.kotlin)
+  kotlin("plugin.serialization").version(Versions.kotlin)
 
   jacoco
   `java-gradle-plugin`
   `maven-publish`
 }
 
-apply(plugin = "kotlin")
-apply(plugin = "kotlinx-serialization")
-
-
 // Logging
 gradle.taskGraph.logPublishedMavenArtifacts()
 gradle.taskGraph.logTaskDuration()
 logSkippedTasks()
-
-// Little hack to disable logging in demo project without including the setting of these properties in that subproject.
-// Since that logging is also enabled for the rootProject, leaving these properties enabled would lead to duplicate log messages.
-project.childProjects["demo"]?.afterEvaluate {
-  fun Class<*>.setBooleanField(obj: Any, fieldName: String, value: Boolean) = this.declaredFields.singleOrNull { it.name ==  fieldName}!!.also {
-    it.isAccessible = true
-    it.setBoolean(obj, value)
-  }
-
-  val josmExtensionClass = buildscript.classLoader.loadClass("org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension")
-  this.extensions.getByName("josm").apply {
-    josmExtensionClass.setBooleanField(this, "logSkippedTasks", false)
-    josmExtensionClass.setBooleanField(this, "logTaskDuration", false)
-  }
-}
 
 allprojects {
   afterEvaluate {
@@ -86,39 +65,20 @@ afterEvaluate {
   }
 }
 
-val dualSourceSet = sourceSets.create("dual") {
-  java.setSrcDirs(setOf<Any>())
-  withConvention(KotlinSourceSet::class) {
-    kotlin.setSrcDirs(setOf(File(projectDir, "buildSrc/src/${this.name}/kotlin")))
-  }
-  resources.setSrcDirs(setOf(File(projectDir, "buildSrc/src/${this.name}/resources")))
-}
-
-tasks.jar {
-  from(dualSourceSet.output)
-}
+val dogfood by sourceSets.registering
 
 dependencies {
-  setOf(
-    gradleApi(),
-    "org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}",
-    kotlin("stdlib", Versions.kotlin),
-    "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${Versions.kotlinSerialization}"
-  ).forEach {
-    add(dualSourceSet.implementationConfigurationName, it)
-    add(sourceSets.main.get().implementationConfigurationName, it)
+  dogfood.configure {
+    implementationConfigurationName.apply {
+      add(this, "org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}")
+      add(this, "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${Versions.kotlinSerialization}")
+      add(this, gradleApi())
+      add(this, kotlin("stdlib"))
+    }
   }
-  implementation(dualSourceSet.output)
-  testImplementation(configurations.getByName(dualSourceSet.implementationConfigurationName))
 
-  implementation(localGroovy())
-  implementation(kotlin("stdlib", Versions.kotlin))
-  implementation(gradleKotlinDsl())
   implementation("com.squareup.okhttp3", "okhttp", Versions.okhttp)
   implementation("com.beust","klaxon", Versions.klaxon)
-  constraints {
-    implementation(kotlin("reflect", Versions.kotlin)) { because("Align Kotlin version used by Klaxon dependencies with the one used by gradle-josm-plugin.") }
-  }
   implementation("com.fasterxml.jackson.module", "jackson-module-kotlin", Versions.jackson)
   implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", Versions.jackson)
   implementation("com.vladsch.flexmark:flexmark:${Versions.flexmark}")
@@ -128,9 +88,10 @@ dependencies {
   testImplementation("com.github.tomakehurst","wiremock",Versions.wiremock)
   testImplementation("ru.lanwen.wiremock", "wiremock-junit5", Versions.wiremockJunit5)
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", Versions.junit)
-  testImplementation(kotlin("reflect"))
 
   api(project(":i18n"))
+  api(dogfood.get().output)
+  implementation(dogfood.get().runtimeClasspath)
 }
 
 // Configure "dokka" task
@@ -142,8 +103,8 @@ val dokkaTask: DokkaTask = tasks.withType(DokkaTask::class).getByName("dokka") {
 // Configure all Dokka tasks
 tasks.withType(DokkaTask::class) {
   configuration {
-    dualSourceSet.withConvention(KotlinSourceSet::class) {
-      sourceRoots.addAll(this.kotlin.srcDirs.map { srcDir -> GradleSourceRootImpl().also { it.path = srcDir.path } })
+    kotlin.sourceSets.named(dogfood.name) {
+      //sourceRoots.addAll(this.kotlin.srcDirs.map { srcDir -> GradleSourceRootImpl().also { it.path = srcDir.path } })
     }
     includes = listOf("src/main/kotlin/packages.md")
     jdkVersion = 8
@@ -213,7 +174,6 @@ gradle.projectsEvaluated {
 publishing.repositories.gitlabRepository("gitlab", project.logger)
 
 // Create `releaseToGitlab` task that can publish a release based on a Gitlab Maven package for a tag.
-@UnstableDefault
 val releaseToGitlab = tasks.create(
   "releaseToGitlab",
   ReleaseToGitlab::class,

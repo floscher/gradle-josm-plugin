@@ -1,5 +1,4 @@
 import org.gradle.api.publish.maven.internal.artifact.FileBasedMavenArtifact
-import org.openstreetmap.josm.gradle.plugin.Versions
 
 import proguard.gradle.ProGuardTask
 

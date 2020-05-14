@@ -2,7 +2,6 @@ package org.openstreetmap.josm.gradle.plugin.io
 
 import org.gradle.api.Project
 import org.openstreetmap.josm.gradle.plugin.task.GeneratePluginList
-import org.openstreetmap.josm.gradle.plugin.util.josm
 import org.openstreetmap.josm.gradle.plugin.util.josmPluginList
 import java.net.MalformedURLException
 import java.net.URL

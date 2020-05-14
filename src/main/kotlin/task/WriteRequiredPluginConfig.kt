@@ -6,7 +6,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskExecutionException
-import org.gradle.internal.impldep.org.junit.Ignore
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 import java.io.IOException

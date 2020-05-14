@@ -1,6 +1,4 @@
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.dokka.gradle.GradleSourceRootImpl
-import org.openstreetmap.josm.gradle.plugin.Versions
 
 plugins {
   `java-library`
