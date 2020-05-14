@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin
 
+import kotlinx.serialization.UnstableDefault
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.BasePluginConvention
@@ -29,6 +30,7 @@ class JosmPlugin: Plugin<Project> {
    * Creates the tasks this plugin provides, defines the <code>josm</code> extension, adds the repositories where JOSM specific dependencies can be found.
    * Overrides <a href="https://docs.gradle.org/current/javadoc/org/gradle/api/Plugin.html#apply-T-">Plugin.apply()</a>.
    */
+  @UnstableDefault
   @ExperimentalUnsignedTypes
   override fun apply(project: Project) {
 

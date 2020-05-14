@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
+import kotlinx.serialization.UnstableDefault
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
@@ -25,6 +26,7 @@ import java.util.Base64
 /**
  * This method sets up all the [Task]s (and [Configuration]s) for a given project that should be there by default.
  */
+@UnstableDefault
 @ExperimentalUnsignedTypes
 fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
 
