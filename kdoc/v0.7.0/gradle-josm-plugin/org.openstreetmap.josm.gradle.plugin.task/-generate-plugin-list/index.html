@@ -1,0 +1,100 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>GeneratePluginList - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.task</a>&nbsp;/&nbsp;<a href="./index.html">GeneratePluginList</a><br/>
+<br/>
+<h1>GeneratePluginList</h1>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">GeneratePluginList</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a></code>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="-init-.html">&lt;init&gt;</a></h4>
+</td>
+<td>
+<code><span class="identifier">GeneratePluginList</span><span class="symbol">(</span><span class="symbol">)</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="icon-base64-provider.html">iconBase64Provider</a></h4>
+</td>
+<td>
+<p>Optional parameter, converts a relative icon path (you decide relative to what,
+this class does not make assumptions about that) to a Base64 representation.
+This parameter is optional, by default or if it returns <code>null</code>, the icon path is added as-is to the list.</p>
+<code><span class="keyword">var </span><span class="identifier">iconBase64Provider</span><span class="symbol">: </span><span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="immutable-plugins.html">immutablePlugins</a></h4>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">immutablePlugins</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../../org.openstreetmap.josm.gradle.plugin.io/-plugin-info/index.html"><span class="identifier">PluginInfo</span></a><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="output-file.html">outputFile</a></h4>
+</td>
+<td>
+<p>The file to which this task writes the plugin list, will be overwritten if it exists.
+This parameter is required.</p>
+<code><span class="keyword">lateinit</span> <span class="keyword">var </span><span class="identifier">outputFile</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/io/File.html"><span class="identifier">File</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="serializable-icon-provider.html">serializableIconProvider</a></h4>
+</td>
+<td>
+<p>This field is only here, so Gradle can serialize <a href="icon-base64-provider.html">iconBase64Provider</a> for up-to-date-checking/caching</p>
+<code><span class="keyword">val </span><span class="identifier">serializableIconProvider</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html"><span class="identifier">Serializable</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="serializable-version-suffix.html">serializableVersionSuffix</a></h4>
+</td>
+<td>
+<p>This field is only here, so Gradle can serialize <a href="version-suffix.html">versionSuffix</a> for up-to-date-checking/caching</p>
+<code><span class="keyword">val </span><span class="identifier">serializableVersionSuffix</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html"><span class="identifier">Serializable</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="version-suffix.html">versionSuffix</a></h4>
+</td>
+<td>
+<p>A function that gives you a suffix that's appended to the plugin version. It takes the plugin name as an argument.</p>
+<code><span class="keyword">var </span><span class="identifier">versionSuffix</span><span class="symbol">: </span><span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="action.html">action</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">action</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="add-plugin.html">addPlugin</a></h4>
+</td>
+<td>
+<p>Add a plugin that should appear in the list</p>
+<code><span class="keyword">fun </span><span class="identifier">addPlugin</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.task.GeneratePluginList$addPlugin(kotlin.String, kotlin.collections.Map((kotlin.String, )), java.net.URL)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.task.GeneratePluginList$addPlugin(kotlin.String, kotlin.collections.Map((kotlin.String, )), java.net.URL)/atts">atts</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><span class="identifier">Map</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">,</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.task.GeneratePluginList$addPlugin(kotlin.String, kotlin.collections.Map((kotlin.String, )), java.net.URL)/downloadUrl">downloadUrl</span><span class="symbol">:</span>&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/net/URL.html"><span class="identifier">URL</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

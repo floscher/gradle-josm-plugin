@@ -1,0 +1,162 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>org.openstreetmap.josm.gradle.plugin.task - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="./index.html">org.openstreetmap.josm.gradle.plugin.task</a><br/>
+<br/>
+<h2>Package org.openstreetmap.josm.gradle.plugin.task</h2>
+<p>Reusable Gradle tasks.</p>
+<h3>Types</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="-clean-josm/index.html">CleanJosm</a></h4>
+</td>
+<td>
+<p>Virtual task that coordinates deletion of the temporary JOSM preferences.</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">CleanJosm</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-custom-josm-version-compile/index.html">CustomJosmVersionCompile</a></h4>
+</td>
+<td>
+<p>This task compiles the given source set against a specific JOSM version.</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">CustomJosmVersionCompile</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/tasks/compile/JavaCompile.html"><span class="identifier">JavaCompile</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-debug-josm/index.html">DebugJosm</a></h4>
+</td>
+<td>
+<p>The same as <a href="-run-josm-task/index.html">RunJosmTask</a>, but the JOSM instance is debuggable via JDWP (Java debug wire protocol) on the port
+configured at <a href="../org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/debug-port.html">JosmPluginExtension.debugPort</a>.</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">DebugJosm</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="-run-josm-task/index.html"><span class="identifier">RunJosmTask</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-generate-file-list/index.html">GenerateFileList</a></h4>
+</td>
+<td>
+<p>Outputs a file containing the absolute paths of all Java source files</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">GenerateFileList</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-generate-plugin-list/index.html">GeneratePluginList</a></h4>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">GeneratePluginList</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-generate-pot/index.html">GeneratePot</a></h4>
+</td>
+<td>
+<p>Create *.pot file (gettext file format), which contains all translatable strings.
+This file can then be handed to the translators to translate into other languages.</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">GeneratePot</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/tasks/Exec.html"><span class="identifier">Exec</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-init-josm-prefs/index.html">InitJosmPrefs</a></h4>
+</td>
+<td>
+<p>A simple copy task that copies a <code>preferences.xml</code> file from <a href="../org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/josm-config-dir.html">JosmPluginExtension.josmConfigDir</a> to
+<a href="../org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/tmp-josm-pref-dir.html">JosmPluginExtension.tmpJosmPrefDir</a> if there is not already one in the destination.</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">InitJosmPrefs</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-lang-compile/index.html">LangCompile</a></h4>
+</td>
+<td>
+<p>This is not really a compilation task, it's only named like that analogous to <a href="-mo-compile/index.html">MoCompile</a> and <a href="-po-compile/index.html">PoCompile</a>.</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">LangCompile</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/tasks/Sync.html"><span class="identifier">Sync</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-list-josm-versions/index.html">ListJosmVersions</a></h4>
+</td>
+<td>
+<p>Task for showing the current <code>latest</code> and <code>tested</code> JOSM versions</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">ListJosmVersions</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-markdown-to-html/index.html">MarkdownToHtml</a></h4>
+</td>
+<td>
+<p>Convert all <code>*.md</code> files found among the source files of this task to *.html files.</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">MarkdownToHtml</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/tasks/SourceTask.html"><span class="identifier">SourceTask</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-mo-compile/index.html">MoCompile</a></h4>
+</td>
+<td>
+<p>This task "compiles" several *.mo files to *.lang files.
+For the language specified in <a href="../org.openstreetmap.josm.gradle.plugin.config/-i18n-config/main-language.html">I18nConfig.mainLanguage</a>, only the "msgid" is used (the text which will be translated).
+For the other languages, the "msgstr" is used (the text which is already translated to this language).</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">MoCompile</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-po-compile/index.html">PoCompile</a></h4>
+</td>
+<td>
+<p>Compile *.po files (textual gettext files) to *.mo files (binary gettext files).</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">PoCompile</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-run-josm-task/index.html">RunJosmTask</a></h4>
+</td>
+<td>
+<p>A task that can execute a JOSM instance. There's also the class <a href="-debug-josm/index.html">DebugJosm</a>, which extends this class and allows to
+remote debug via JDWP (Java debug wire protocol).</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">RunJosmTask</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/tasks/JavaExec.html"><span class="identifier">JavaExec</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-shorten-po-files/index.html">ShortenPoFiles</a></h4>
+</td>
+<td>
+<p>Shortens the *.po files in the given source set.</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">ShortenPoFiles</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-transifex-download/index.html">TransifexDownload</a></h4>
+</td>
+<td>
+<p>Task for downloading the current state of the translations from transifex.com</p>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">TransifexDownload</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/tasks/Exec.html"><span class="identifier">Exec</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="-write-required-plugin-config/index.html">WriteRequiredPluginConfig</a></h4>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">WriteRequiredPluginConfig</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Extensions for External Classes</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="org.gradle.api.-project/index.html">org.gradle.api.Project</a></h4>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

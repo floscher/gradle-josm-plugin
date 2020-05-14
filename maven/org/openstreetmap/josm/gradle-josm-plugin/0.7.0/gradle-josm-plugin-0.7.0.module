@@ -1,0 +1,132 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.openstreetmap.josm",
+    "module": "gradle-josm-plugin",
+    "version": "0.7.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.4",
+      "buildId": "3xthxoq2zzg4ldpm2agw7lgzwy"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.eclipse.jgit",
+          "module": "org.eclipse.jgit",
+          "version": {
+            "requires": "5.7.0.202003110725-r"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "gradle-josm-plugin-0.7.0.jar",
+          "url": "gradle-josm-plugin-0.7.0.jar",
+          "size": 491663,
+          "sha512": "2db8857ce70051d02ddee8bc5a0e8ee8401040c8e6ce387d4fdaba5cfa1a11301dfa3087a6ef3c25811c43d7fb83985da70e660092b1cd5fa183017f28af5192",
+          "sha256": "3d796c69e051be638dd9daf7634cf1b003db00f350d2804ee1ec5cef861aa071",
+          "sha1": "8cc29009b975b0a3b936b08e0507fb723d64cdbf",
+          "md5": "0f8cb51b80f22ade7382307b56eb0553"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.squareup.okhttp3",
+          "module": "okhttp",
+          "version": {
+            "requires": "4.6.0"
+          }
+        },
+        {
+          "group": "com.beust",
+          "module": "klaxon",
+          "version": {
+            "requires": "5.2"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.module",
+          "module": "jackson-module-kotlin",
+          "version": {
+            "requires": "2.11.0"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.dataformat",
+          "module": "jackson-dataformat-yaml",
+          "version": {
+            "requires": "2.11.0"
+          }
+        },
+        {
+          "group": "com.vladsch.flexmark",
+          "module": "flexmark",
+          "version": {
+            "requires": "0.61.26"
+          }
+        },
+        {
+          "group": "org.eclipse.jgit",
+          "module": "org.eclipse.jgit",
+          "version": {
+            "requires": "5.7.0.202003110725-r"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-serialization-runtime",
+          "version": {
+            "requires": "0.20.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.3.72"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "gradle-josm-plugin-0.7.0.jar",
+          "url": "gradle-josm-plugin-0.7.0.jar",
+          "size": 491663,
+          "sha512": "2db8857ce70051d02ddee8bc5a0e8ee8401040c8e6ce387d4fdaba5cfa1a11301dfa3087a6ef3c25811c43d7fb83985da70e660092b1cd5fa183017f28af5192",
+          "sha256": "3d796c69e051be638dd9daf7634cf1b003db00f350d2804ee1ec5cef861aa071",
+          "sha1": "8cc29009b975b0a3b936b08e0507fb723d64cdbf",
+          "md5": "0f8cb51b80f22ade7382307b56eb0553"
+        }
+      ]
+    }
+  ]
+}

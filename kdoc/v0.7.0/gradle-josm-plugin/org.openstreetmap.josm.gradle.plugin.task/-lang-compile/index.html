@@ -1,0 +1,70 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>LangCompile - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.task</a>&nbsp;/&nbsp;<a href="./index.html">LangCompile</a><br/>
+<br/>
+<h1>LangCompile</h1>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">LangCompile</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/tasks/Sync.html"><span class="identifier">Sync</span></a></code>
+<p>This is not really a compilation task, it's only named like that analogous to <a href="../-mo-compile/index.html">MoCompile</a> and <a href="../-po-compile/index.html">PoCompile</a>.</p>
+<p>It copies (more precisely it <a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/tasks/Sync.html">Sync</a>s) the *.lang files to <code>$buildDir/i18n/lang/$sourceSetName/data</code></p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="-init-.html">&lt;init&gt;</a></h4>
+</td>
+<td>
+<p>This is not really a compilation task, it's only named like that analogous to <a href="../-mo-compile/index.html">MoCompile</a> and <a href="../-po-compile/index.html">PoCompile</a>.</p>
+<code><span class="identifier">LangCompile</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.task.LangCompile$<init>(org.openstreetmap.josm.gradle.plugin.task.MoCompile, org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet)/moCompile">moCompile</span><span class="symbol">:</span>&nbsp;<a href="../-mo-compile/index.html"><span class="identifier">MoCompile</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.task.LangCompile$<init>(org.openstreetmap.josm.gradle.plugin.task.MoCompile, org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet)/sourceSet">sourceSet</span><span class="symbol">:</span>&nbsp;<a href="../../org.openstreetmap.josm.gradle.plugin.i18n/-i18n-source-set/index.html"><span class="identifier">I18nSourceSet</span></a><span class="symbol">)</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="mo-compile.html">moCompile</a></h4>
+</td>
+<td>
+<p>The task for compiling *.mo files to *.lang files. These outputs are then used as inputs for this task.</p>
+<code><span class="keyword">val </span><span class="identifier">moCompile</span><span class="symbol">: </span><a href="../-mo-compile/index.html"><span class="identifier">MoCompile</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="source-set.html">sourceSet</a></h4>
+</td>
+<td>
+<p>The source set from which all *.lang files are synced to the destination</p>
+<code><span class="keyword">val </span><span class="identifier">sourceSet</span><span class="symbol">: </span><a href="../../org.openstreetmap.josm.gradle.plugin.i18n/-i18n-source-set/index.html"><span class="identifier">I18nSourceSet</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="subdirectory.html">subdirectory</a></h4>
+</td>
+<td>
+<p>The subdirectory of the <a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/tasks/Sync.html#getDestinationDir()">LangCompile.getDestinationDir</a> to which the files will be written</p>
+<code><span class="keyword">val </span><span class="identifier">subdirectory</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="action.html">action</a></h4>
+</td>
+<td>
+<p>The main task action, copies the *.lang files to the target directory.</p>
+<code><span class="keyword">fun </span><span class="identifier">action</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

@@ -1,0 +1,91 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>MainConfigurationSetup - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin</a>&nbsp;/&nbsp;<a href="./index.html">MainConfigurationSetup</a><br/>
+<br/>
+<h1>MainConfigurationSetup</h1>
+<code><span class="identifier">@ExperimentalUnsignedTypes</span> <span class="keyword">class </span><span class="identifier">MainConfigurationSetup</span></code>
+<p>Configure the given <a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/artifacts/Configuration.html">Configuration</a> as the main one:</p>
+<ul><li>derive <code>packIntoJar</code> and <code>requiredPlugin</code> configurations from this one</li>
+<li>add the JOSM dependency</li>
+<li>add the required plugins as dependencies</li>
+</ul>
+<h3>Parameters</h3>
+<p><a name="project"></a>
+<code>project</code> - the project to which the configuration belongs</p>
+<p><a name="configuration"></a>
+<code>configuration</code> - the main configuration</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="-init-.html">&lt;init&gt;</a></h4>
+</td>
+<td>
+<p>Configure the given <a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/artifacts/Configuration.html">Configuration</a> as the main one:</p>
+<code><span class="identifier">MainConfigurationSetup</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.MainConfigurationSetup$<init>(org.gradle.api.Project, org.gradle.api.tasks.SourceSet)/project">project</span><span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/Project.html"><span class="identifier">Project</span></a><span class="symbol">, </span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.MainConfigurationSetup$<init>(org.gradle.api.Project, org.gradle.api.tasks.SourceSet)/mainSourceSet">mainSourceSet</span><span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/tasks/SourceSet.html"><span class="identifier">SourceSet</span></a><span class="symbol">)</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="main-configuration.html">mainConfiguration</a></h4>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">mainConfiguration</span><span class="symbol">: </span><a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/artifacts/Configuration.html"><span class="identifier">Configuration</span></a><span class="symbol">!</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="main-source-set.html">mainSourceSet</a></h4>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">mainSourceSet</span><span class="symbol">: </span><a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/tasks/SourceSet.html"><span class="identifier">SourceSet</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="pack-into-jar-configuration.html">packIntoJarConfiguration</a></h4>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">packIntoJarConfiguration</span><span class="symbol">: </span><a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/artifacts/Configuration.html"><span class="identifier">Configuration</span></a><span class="symbol">!</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="project.html">project</a></h4>
+</td>
+<td>
+<p>the project to which the configuration belongs</p>
+<code><span class="keyword">val </span><span class="identifier">project</span><span class="symbol">: </span><a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/Project.html"><span class="identifier">Project</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="required-plugin-configuration.html">requiredPluginConfiguration</a></h4>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">requiredPluginConfiguration</span><span class="symbol">: </span><a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/artifacts/Configuration.html"><span class="identifier">Configuration</span></a><span class="symbol">!</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="after-evaluate.html">afterEvaluate</a></h4>
+</td>
+<td>
+<p>This part is meant to be called inside of an <a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/Project.html#afterEvaluate(org.gradle.api.Action<? super org.gradle.api.Project>)">Project.afterEvaluate</a> block.
+It adds the dependencies to JOSM and required JOSM plugins to the correct configurations</p>
+<code><span class="keyword">fun </span><span class="identifier">afterEvaluate</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

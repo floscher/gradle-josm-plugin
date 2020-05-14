@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>ShortenPoFiles - gradle-josm-plugin</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">gradle-josm-plugin</a>&nbsp;/&nbsp;<a href="../index.html">org.openstreetmap.josm.gradle.plugin.task</a>&nbsp;/&nbsp;<a href="./index.html">ShortenPoFiles</a><br/>
+<br/>
+<h1>ShortenPoFiles</h1>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">ShortenPoFiles</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://docs.gradle.org/6.4/javadoc/org/gradle/api/DefaultTask.html"><span class="identifier">DefaultTask</span></a></code>
+<p>Shortens the *.po files in the given source set.</p>
+<p>This means all occurences of the source code locations of the translated strings are stripped, as well as the
+last translator of the *.po file.
+Also some fields in the file header are filled out (package name, copyright holder and a descriptive title).</p>
+<p>This task should be run after downloading fresh translations from Transifex (e.g. with <a href="../-transifex-download/index.html">TransifexDownload</a>).</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="-init-.html">&lt;init&gt;</a></h4>
+</td>
+<td>
+<p>Shortens the *.po files in the given source set.</p>
+<code><span class="identifier">ShortenPoFiles</span><span class="symbol">(</span><span class="identifier" id="org.openstreetmap.josm.gradle.plugin.task.ShortenPoFiles$<init>(org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet)/sourceSet">sourceSet</span><span class="symbol">:</span>&nbsp;<a href="../../org.openstreetmap.josm.gradle.plugin.i18n/-i18n-source-set/index.html"><span class="identifier">I18nSourceSet</span></a><span class="symbol">)</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="action.html">action</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">action</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

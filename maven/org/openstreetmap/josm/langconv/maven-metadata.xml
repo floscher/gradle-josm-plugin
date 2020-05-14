@@ -3,8 +3,8 @@
   <groupId>org.openstreetmap.josm</groupId>
   <artifactId>langconv</artifactId>
   <versioning>
-    <latest>0.6.5</latest>
-    <release>0.6.5</release>
+    <latest>0.7.0</latest>
+    <release>0.7.0</release>
     <versions>
       <version>0.6.0</version>
       <version>0.6.1</version>
@@ -12,7 +12,8 @@
       <version>0.6.3</version>
       <version>0.6.4</version>
       <version>0.6.5</version>
+      <version>0.7.0</version>
     </versions>
-    <lastUpdated>20191109234242</lastUpdated>
+    <lastUpdated>20200514195529</lastUpdated>
   </versioning>
 </metadata>
