@@ -2,6 +2,8 @@ package org.openstreetmap.josm.gradle.plugin
 
 import org.gradle.api.Project
 import org.gradle.api.execution.TaskExecutionGraph
+import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
+import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.time.Duration
@@ -32,15 +34,23 @@ fun TaskExecutionGraph.logTaskDuration() {
  */
 fun TaskExecutionGraph.logPublishedMavenArtifacts() {
   afterTask {
-    if (it is PublishToMavenRepository) {
-      it.logger.lifecycle("""
-      |  📦 Published artifact:
-      |       to URL: ${it.repository.url}
-      |        Group: ${it.publication.groupId}
-      |           ID: ${it.publication.artifactId}
-      |      Version: ${it.publication.version}
-      |
-      """.trimMargin())
+    if (it is AbstractPublishToMaven) {
+      val url = if (it is PublishToMavenRepository) {
+        it.repository.url
+      } else if (it is PublishToMavenLocal) {
+        "Maven local (normally `~/.m2/repository` )"
+      } else null
+
+      if (url != null) {
+        it.logger.lifecycle("""
+        |  📦 Published artifact:
+        |       to URL: ${url}
+        |        Group: ${it.publication.groupId}
+        |           ID: ${it.publication.artifactId}
+        |      Version: ${it.publication.version}
+        |
+        """.trimMargin())
+      }
     }
   }
 }

@@ -188,7 +188,7 @@ open class JosmPluginExtension(val project: Project) {
 
   /**
    * Repositories to which the artifacts can be published.
-   * GitLab package repositories can be added via [org.openstreetmap.josm.gradle.plugin.gitlab.gitlabRepository]
+   * GitLab package repositories can be added via [org.openstreetmap.josm.gradle.plugin.api.gitlab.gitlabRepository]
    *
    * **Default value:** a Maven repository in `$buildDir/maven`
    * @since 0.6.2
