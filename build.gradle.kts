@@ -111,8 +111,14 @@ val dokkaTask: DokkaTask = tasks.withType(DokkaTask::class).getByName("dokka") {
 // Configure all Dokka tasks
 tasks.withType(DokkaTask::class) {
   configuration {
-    kotlin.sourceSets.named(dogfood.name) {
-      //sourceRoots.addAll(this.kotlin.srcDirs.map { srcDir -> GradleSourceRootImpl().also { it.path = srcDir.path } })
+    project.kotlin.sourceSets.named(dogfood.name) {
+      kotlin.srcDirs
+        .filter { it.exists() }
+        .forEach { srcDir ->
+          sourceRoot {
+            path = srcDir.absolutePath
+          }
+        }
     }
     includes = listOf("src/main/kotlin/packages.md")
     jdkVersion = 8
