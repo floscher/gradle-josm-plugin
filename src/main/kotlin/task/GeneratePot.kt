@@ -1,10 +1,16 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.Task
-import org.gradle.api.plugins.BasePluginConvention
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFile
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Exec
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.util.josm
@@ -26,31 +32,44 @@ open class GeneratePot
    * The task that generates a list of all source files. That file is needed to tell xgettext, which files it should examine.
    */
   @Inject
-  constructor(private val fileListGenTask: GenerateFileList): Exec() {
+  constructor(
+    objectFactory: ObjectFactory,
+    @get:InputFiles
+    val inFiles: Provider<out Set<File>>
+  ): Exec() {
 
-  private lateinit var outBaseName: String
+  @get:Input
+  val baseName: Property<String> = objectFactory.property(String::class.java).value(
+    project.provider {
+      "josm-plugin_" + project.extensions.josm.pluginName
+    }
+  )
 
-  @InputFiles
-  lateinit var inFiles: Set<File>
+  @get:Internal("The files inside the directory are individually added as output files")
+  val outDir: DirectoryProperty = objectFactory.directoryProperty().value(
+    project.layout.buildDirectory.dir("i18n/pot")
+  )
 
-  @OutputDirectory
-  val outDir = File(project.buildDir, "i18n/pot")
+  @get:Internal("Only a temporary file that is generated and renamed")
+  val poFile: Provider<out RegularFile> = outDir.file(baseName.map { "$it.po" })
+
+  @get:OutputFile
+  val potFile: Provider<out RegularFile> = outDir.file(baseName.map { "$it.pot" })
+
+  @get:OutputFile
+  val srcFileListFile: Provider<out RegularFile> = outDir.file(baseName.map { "${it}_srcFileList.txt" })
 
   init {
     group = "JOSM-i18n"
     description = "Extracts translatable strings from the source code into a *.pot file. Requires the command line utility xgettext (part of GNU gettext)"
 
-    dependsOn(fileListGenTask)
-
-    project.gradle.projectsEvaluated {
-      inFiles = fileListGenTask.inFiles
-    }
+    workingDir = project.projectDir
 
     executable = "xgettext"
+    // static arguments
     args(
       "--from-code=UTF-8",
       "--language=Java",
-      "--output-dir=${outDir.absolutePath}",
       "--add-comments",
       "--sort-output",
       "-k", "-ktrc:1c,2", "-kmarktrc:1c,2", "-ktr", "-kmarktr", "-ktrn:1,2", "-ktrnc:1c,2,3"
@@ -59,13 +78,24 @@ open class GeneratePot
 
   @TaskAction
   final override fun exec() {
-    workingDir = project.projectDir
+    // Finalize properties and make available as types that are easier to work with
+    val baseName: String = baseName.apply { finalizeValue() }.get()
+    val outDir: File = outDir.apply { finalizeValue() }.get().asFile
 
-    outBaseName = "josm-plugin_" + project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName
+    // Make the providers accessible as `File` objects
+    val poFile = poFile.get().asFile
+    val potFile = potFile.get().asFile
+    val srcFileListFile = srcFileListFile.get().asFile
+
+    logger.lifecycle("Writing list of ${inFiles.get().size} files to ${srcFileListFile.absolutePath} …")
+    srcFileListFile.writeText(inFiles.get().joinToString("\n", postfix = "\n") { it.absolutePath })
+
+    // dynamic arguments
     args(
-      "--files-from=${fileListGenTask.outFile.absolutePath}",
-      "--default-domain=$outBaseName",
-      "--package-name=$outBaseName",
+      "--files-from=${srcFileListFile.absolutePath}",
+      "--output-dir=${outDir.absolutePath}",
+      "--default-domain=$baseName",
+      "--package-name=$baseName",
       "--package-version=${project.version}"
     )
 
@@ -76,17 +106,14 @@ open class GeneratePot
       args("--copyright-holder=$it")
     }
 
-    if (!outDir.exists()) {
-      outDir.mkdirs()
-    }
     logger.lifecycle(commandLine.joinToString("\n  "))
 
     super.exec()
 
     try {
       moveFileAndReplaceStrings(
-        File(outDir, "$outBaseName.po"),
-        File(outDir, "$outBaseName.pot"),
+        poFile,
+        potFile,
         { line ->
           if (line.startsWith("#: ")) {
             line.substring(0, 3) + project.extensions.josm.i18n.pathTransformer.invoke(line.substring(3))

@@ -178,18 +178,11 @@ private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSe
 
 private fun setupI18nTasks(project: Project, sourceSetJosmPlugin: SourceSet) {
 
-  // Generate a list of all files in the main Java source set
-  val genSrcFileList = project.tasks.create(
-    "generateSrcFileList",
-    GenerateFileList::class.java,
-    File(project.buildDir, "srcFileList.txt"),
-    sourceSetJosmPlugin
-  )
-
+  // Generates a *.pot file out of all *.java source files
   project.tasks.create(
     "generatePot",
     GeneratePot::class.java,
-    genSrcFileList
+    project.provider { sourceSetJosmPlugin.java.asFileTree.files }
   )
 
   project.tasks.create("transifexDownload", TransifexDownload::class.java)
