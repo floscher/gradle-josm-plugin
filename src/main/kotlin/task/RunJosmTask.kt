@@ -1,11 +1,12 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.JavaExec
-import org.gradle.api.tasks.Sync
+import org.gradle.api.tasks.TaskAction
 import org.openstreetmap.josm.gradle.plugin.util.josm
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -17,7 +18,7 @@ import javax.inject.Inject
  *
  * By default the source set `main` is added to the classpath.
  */
-open class RunJosmTask @Inject constructor(prefFile: File, cleanTask: CleanJosm, updatePluginsTask: Sync) : JavaExec() {
+open class RunJosmTask @Inject constructor(cleanTask: Provider<out CleanJosm>, @get:InputFiles val initPrefTask: Provider<out InitJosmPreferences>) : JavaExec() {
 
   /**
    * Text that should be displayed in the console output right before JOSM is started up. Defaults to the empty string.
@@ -27,52 +28,58 @@ open class RunJosmTask @Inject constructor(prefFile: File, cleanTask: CleanJosm,
   @Internal
   var extraInformation: String = ""
 
+  override fun getDescription() = "Run an independent clean JOSM instance (v${project.extensions.josm.josmCompileVersion}) with temporary JOSM home directories (by default inside `build/.josm/`) and the freshly compiled plugin active."
+  override fun setDescription(description: String?) = throw UnsupportedOperationException("Description must not be modified!")
+
   init {
     group = "JOSM"
     main = "org.openstreetmap.josm.gui.MainApplication"
     super.mustRunAfter(cleanTask)
-    super.dependsOn(updatePluginsTask)
+  }
 
-    project.afterEvaluate{ project ->
-      description = "Runs an independent clean JOSM instance (v${project.extensions.josm.josmCompileVersion}) with temporary JOSM home directories (by default inside `build/.josm/`) and the freshly compiled plugin active."
-      // doFirst has to be added after the project initialized, otherwise it won't be executed before the main part of the JavaExec task is run.
-      doFirst{
-        val userSuppliedArgs = args ?: listOf()
-        this.args = userSuppliedArgs.plus("""--load-preferences=${prefFile.toURI().toURL()}""")
+  @TaskAction
+  override fun exec() {
+    val userSuppliedArgs = args ?: listOf()
+    val allArgs = userSuppliedArgs.plus("--load-preferences=${initPrefTask.get().preferencesInitFile.get().asFile.toURI().toURL()}")
+    this.args = allArgs
 
-        if (project.extensions.josm.useSeparateTmpJosmDirs()) {
-          systemProperty("josm.cache", project.extensions.josm.tmpJosmCacheDir)
-          systemProperty("josm.pref", project.extensions.josm.tmpJosmPrefDir)
-          systemProperty("josm.userdata", project.extensions.josm.tmpJosmUserdataDir)
-        } else {
-          systemProperty("josm.home", project.extensions.josm.tmpJosmPrefDir)
-        }
-        classpath = project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.getByName("main").runtimeClasspath
-
-        logger.lifecycle("Running version {} of {}", project.version, project.name)
-        logger.lifecycle("\nUsing JOSM version {}", project.extensions.josm.josmCompileVersion)
-
-        logger.lifecycle("\nThese system properties are set:")
-        for ((key, value) in systemProperties) {
-          logger.lifecycle("  {} = {}", key, value)
-        }
-
-        logger.lifecycle(
-          (args ?: listOf()).let {
-            if (it.isEmpty()) {
-              "\nNo command line arguments are passed to JOSM."
-            } else {
-              "\nPassing these ${it.size} arguments to JOSM:\n  ${it.joinToString("\n  ")}"
-            }
-          }
-        )
-        if (userSuppliedArgs.isEmpty()) {
-          logger.lifecycle('\n' + """If you want to pass additional arguments to JOSM add something like the following when starting Gradle from the commandline: --args='--debug --language="es"'""")
-        }
-
-        logger.lifecycle(extraInformation)
-        logger.lifecycle("\nOutput of JOSM starts with the line below the three equality signs\n===")
-      }
+    if (project.extensions.josm.useSeparateTmpJosmDirs()) {
+      systemProperty("josm.cache", project.extensions.josm.tmpJosmCacheDir)
+      systemProperty("josm.pref", project.extensions.josm.tmpJosmPrefDir)
+      systemProperty("josm.userdata", project.extensions.josm.tmpJosmUserdataDir)
+    } else {
+      systemProperty("josm.home", project.extensions.josm.tmpJosmPrefDir)
     }
+    classpath = project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.getByName("main").runtimeClasspath
+
+    logger.lifecycle("Running version ${project.extensions.josm.josmCompileVersion} of JOSM with version ${project.version} of plugin '${project.name}' …")
+
+    logger.lifecycle(
+      "These system properties are set:" + (
+        systemProperties
+          .takeIf { it.isNotEmpty() }
+          ?.map { (key, value) -> "  $key = $value" }
+          ?.joinToString("\n", prefix = "\n")
+          ?: " no system properties set"
+      )
+    )
+
+    logger.lifecycle("")
+
+    logger.lifecycle(
+      if (allArgs.isEmpty()) {
+        "No command line arguments are passed to JOSM."
+      } else {
+        "Passing ${if (allArgs.size <= 1) "this argument" else "these ${allArgs.size} arguments"} to JOSM:\n  ${allArgs.joinToString("\n  ")}"
+      }
+    )
+    if (userSuppliedArgs.isEmpty()) {
+      logger.lifecycle("""If you want to pass additional arguments to JOSM add something like the following when starting Gradle from the commandline: --args='--debug --language="es"'""")
+    }
+
+    logger.lifecycle(extraInformation)
+    logger.lifecycle("\nOutput of JOSM starts with the line below the three equality signs\n===")
+
+    super.exec()
   }
 }

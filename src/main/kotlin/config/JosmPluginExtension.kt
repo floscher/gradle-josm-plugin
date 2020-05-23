@@ -7,6 +7,7 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.IvyArtifactRepository
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.plugins.BasePluginConvention
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.util.PatternFilterable
 import org.openstreetmap.josm.gradle.plugin.util.ARTIFACT_JOSM
 import org.openstreetmap.josm.gradle.plugin.util.ARTIFACT_JOSM_UNITTEST
@@ -23,7 +24,7 @@ import java.io.File
  * @constructor instantiates the extension, takes project properties into account
  */
 open class JosmPluginExtension(val project: Project) {
-  var pluginName
+  var pluginName: String
     get() = project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName
     set(value) {
       project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName = value
@@ -132,7 +133,22 @@ open class JosmPluginExtension(val project: Project) {
    *
    * **Default value:** `$projectDir/config/josm`
    */
+  @Deprecated("use initialPreferences property instead")
   var josmConfigDir: File = File("${project.projectDir}/config/josm")
+
+  /**
+   * These preferences are set as the initial `preferences.xml` when running JOSM.
+   * You can use any `preferences.xml` fragment, e.g.:
+   * ```
+   * initialPreferences.set("""
+   *   <tag key="my.custom.property" value="true"/>
+   *   <list key="my.custom.list">
+   *     <entry value="42"/>
+   *   </list>
+   * """)
+   * ```
+   */
+  val initialPreferences: Property<String> = project.objects.property(String::class.java).convention("")
 
   /**
    * When determining on which JOSM plugins this project depends, dependency chains are followed this number of steps.
@@ -150,7 +166,7 @@ open class JosmPluginExtension(val project: Project) {
    * This determines how many JOSM versions are tried out before giving up when a JOSM version is specified that can't
    * be downloaded through [the download page](https://josm.openstreetmap.de/download).
    *
-   * The only place where we'll pick one of the following version numbers and not the exact one,
+   * The only place where we'll pick one of the following version numbers and not necessarily the exact one,
    * is [JosmManifest.minJosmVersion]. The [JosmPluginExtension.josmCompileVersion] is always used as-is.
    *
    * Say you set [JosmManifest.minJosmVersion]=1234 and [josmVersionFuzziness]=20 ,
@@ -173,7 +189,7 @@ open class JosmPluginExtension(val project: Project) {
    * your release, you can modify this.
    * By default the `/META-INF/` directory of dependencies is discarded.
    *
-   * **Default value:** `{ it.exclude("META-INF/&#42;&#42;/&#42;") }`
+   * **Default value:** `{ it.exclude("META-INF/**/*") }`
    * @see org.gradle.api.file.FileTree.matching(groovy.lang.Closure)
    * @see PatternFilterable
    */

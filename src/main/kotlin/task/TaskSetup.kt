@@ -13,7 +13,6 @@ import org.openstreetmap.josm.gradle.plugin.MainConfigurationSetup
 import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
 import org.openstreetmap.josm.gradle.plugin.task.github.PublishToGithubReleaseTask
 import org.openstreetmap.josm.gradle.plugin.task.gitlab.ReleaseToGitlab
-import org.openstreetmap.josm.gradle.plugin.util.VERSION_SNAPSHOT
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 import java.io.FileInputStream
@@ -32,27 +31,12 @@ fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
 
   tasks.create("listJosmVersions", ListJosmVersions::class.java)
 
-  val initJosmPrefs = tasks.create("initJosmPrefs", InitJosmPrefs::class.java)
+  val initJosmPrefs = tasks.register("initJosmPrefs", InitJosmPreferences::class.java)
 
-  val writePluginConfig = tasks.create("writePluginConfig", WriteRequiredPluginConfig::class.java)
-
-  // Copy all needed JOSM plugin *.jar files into the directory in {@code $JOSM_HOME}
-  val updateJosmPlugins = tasks.create("updateJosmPlugins", Sync::class.java) {
-    it.description = "Put all needed plugin *.jar files into the plugins directory. This task copies files into the temporary JOSM home directory."
-    it.dependsOn(initJosmPrefs)
-    it.dependsOn(writePluginConfig)
-    it.rename("(.*)-(${VERSION_SNAPSHOT})?\\.jar", "$1.jar")
-  }
-  afterEvaluate {
-    updateJosmPlugins.from(it.tasks.getByName("dist"))
-    updateJosmPlugins.from(mainConfigSetup.requiredPluginConfiguration)
-    updateJosmPlugins.into(File(extensions.josm.tmpJosmUserdataDir, "plugins"))
-  }
-
-  val cleanJosm = project.tasks.create("cleanJosm", CleanJosm::class.java)
+  val cleanJosm = project.tasks.register("cleanJosm", CleanJosm::class.java)
   // Standard run-tasks
-  project.tasks.create("runJosm", RunJosmTask::class.java, writePluginConfig.destinationFile, cleanJosm, updateJosmPlugins)
-  project.tasks.create("debugJosm", DebugJosm::class.java, writePluginConfig.destinationFile, cleanJosm, updateJosmPlugins)
+  project.tasks.register("runJosm", RunJosmTask::class.java, cleanJosm, initJosmPrefs)
+  project.tasks.register("debugJosm", DebugJosm::class.java, cleanJosm, initJosmPrefs)
 
   listOf("latest", "tested").forEach { version ->
     tasks.create(
