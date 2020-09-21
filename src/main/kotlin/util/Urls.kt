@@ -67,5 +67,5 @@ object Urls {
   /**
    * The directory in the JOSM SVN where the latest releases of JOSM plugins are stored
    */
-  val JOSM_PLUGIN_DIST = URL("https://svn.openstreetmap.org/applications/editors/josm/dist")
+  val JOSM_PLUGIN_DIST = URL("https://josm.openstreetmap.de/export/latest/osm/applications/editors/josm/dist")
 }
