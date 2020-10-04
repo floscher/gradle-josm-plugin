@@ -10,6 +10,6 @@
     <list key="plugins">
       {{{PLUGIN_LIST_ENTRIES}}}
     </list>
-{{{APPENDED_PREFERENCES}}}
+{{{INITIAL_PREFERENCES}}}
   </preferences>
 </config>

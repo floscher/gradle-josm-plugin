@@ -1,6 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.util.josm
@@ -20,20 +21,19 @@ import java.util.Locale
 open class CleanJosm : DefaultTask() {
   init {
     group = "JOSM"
-    project.afterEvaluate {
-      addDependentTask("Cache", project.extensions.josm.tmpJosmCacheDir)
-      addDependentTask("Pref", project.extensions.josm.tmpJosmPrefDir)
-      addDependentTask("Userdata", project.extensions.josm.tmpJosmUserdataDir)
-      description = "Delete temporary JOSM directories used for the `runJosm` and `debugJosm` tasks (for preferences, cache and userdata). Run `cleanJosmCache`, `cleanJosmPref` or `cleanJosmUserdata` to delete only one of them."
-    }
+    val subtasks = setOf(
+      addDependentTask("Cache", project.provider { project.extensions.josm.tmpJosmCacheDir }),
+      addDependentTask("Pref", project.provider { project.extensions.josm.tmpJosmPrefDir }),
+      addDependentTask("Userdata", project.provider { project.extensions.josm.tmpJosmUserdataDir })
+    )
+    super.setDependsOn(subtasks)
+    description = "Delete temporary JOSM directories used for the `runJosm` and `debugJosm` tasks (for preferences, cache and userdata). Run `${subtasks.joinToString("` or `") { it.name } }` to delete only one of them."
   }
-  private fun addDependentTask(taskSuffix: String, dir: File) {
-    val task = project.tasks.create("$name$taskSuffix", Delete::class.java)
-    task.description = "Delete ${taskSuffix.toLowerCase(Locale.UK)} directory (${dir.absolutePath})"
+  private fun addDependentTask(taskSuffix: String, dir: Provider<out File>) = project.tasks.register("$name$taskSuffix", Delete::class.java) { task ->
+    task.description = "Delete ${taskSuffix.toLowerCase(Locale.UK)} directory used when running JOSM"
     task.delete(dir)
     task.doFirst {
-      logger.lifecycle("Delete [{}]", task.targetFiles.files.joinToString(", ") { it.absolutePath })
+      logger.lifecycle("Delete ${task.targetFiles.asFileTree.files.size} files in ${dir.get().absolutePath}")
     }
-    dependsOn(task)
   }
 }

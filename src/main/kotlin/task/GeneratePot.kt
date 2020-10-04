@@ -13,6 +13,8 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
+import org.openstreetmap.josm.gradle.plugin.config.I18nConfig
+import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -45,19 +47,28 @@ open class GeneratePot
     }
   )
 
-  @get:Internal("The files inside the directory are individually added as output files")
-  val outDir: DirectoryProperty = objectFactory.directoryProperty().value(
-    project.layout.buildDirectory.dir("i18n/pot")
+  @get:Input
+  val i18nConfig: Property<I18nConfig> = project.objects.property(I18nConfig::class.java).convention(
+    project.provider{
+      project.extensions.josm.i18n
+    }
+  )
+
+  @get:Input
+  val versionNumber: Property<String> = project.objects.property(String::class.java).convention(
+    project.provider {
+      project.version.toString()
+    }
   )
 
   @get:Internal("Only a temporary file that is generated and renamed")
-  val poFile: Provider<out RegularFile> = outDir.file(baseName.map { "$it.po" })
+  val poFile: Provider<out RegularFile> = project.layout.buildDirectory.file(baseName.map { "i18n/pot/$it.po" })
 
   @get:OutputFile
-  val potFile: Provider<out RegularFile> = outDir.file(baseName.map { "$it.pot" })
+  val potFile: Provider<out RegularFile> = project.layout.buildDirectory.file(baseName.map { "i18n/pot/$it.pot" })
 
   @get:OutputFile
-  val srcFileListFile: Provider<out RegularFile> = outDir.file(baseName.map { "${it}_srcFileList.txt" })
+  val srcFileListFile: Provider<out RegularFile> = project.layout.buildDirectory.file(baseName.map { "i18n/srcFileList/${it}.txt" })
 
   init {
     group = "JOSM-i18n"
@@ -80,7 +91,6 @@ open class GeneratePot
   final override fun exec() {
     // Finalize properties and make available as types that are easier to work with
     val baseName: String = baseName.apply { finalizeValue() }.get()
-    val outDir: File = outDir.apply { finalizeValue() }.get().asFile
 
     // Make the providers accessible as `File` objects
     val poFile = poFile.get().asFile
@@ -93,16 +103,16 @@ open class GeneratePot
     // dynamic arguments
     args(
       "--files-from=${srcFileListFile.absolutePath}",
-      "--output-dir=${outDir.absolutePath}",
+      "--output-dir=${poFile.parentFile.absolutePath}",
       "--default-domain=$baseName",
       "--package-name=$baseName",
-      "--package-version=${project.version}"
+      "--package-version=${versionNumber.get()}"
     )
 
-    project.extensions.josm.i18n.bugReportEmail?.let {
+    i18nConfig.get().bugReportEmail?.let {
       args("--msgid-bugs-address=$it")
     }
-    project.extensions.josm.i18n.copyrightHolder?.let {
+    i18nConfig.get().copyrightHolder?.let {
       args("--copyright-holder=$it")
     }
 
@@ -116,18 +126,22 @@ open class GeneratePot
         potFile,
         { line ->
           if (line.startsWith("#: ")) {
-            line.substring(0, 3) + project.extensions.josm.i18n.pathTransformer.invoke(line.substring(3))
+            line.substring(0, 3) + i18nConfig.get().pathTransformer(line.substring(3))
           } else line
         },
         mutableMapOf(
           Pair("(C) YEAR", "(C) " + Year.now().value),
           Pair("charset=CHARSET", "charset=UTF-8")
         ),
-        '\n' + """
-        |#. Plugin description for $project.name
-        |msgid "${project.extensions.josm.manifest.description}"
-        |msgstr ""
-        """.trimMargin() + '\n'
+        project.extensions.findByType(JosmPluginExtension::class.java)?.let {
+          """
+          |
+          |#. Plugin description for $project.name
+          |msgid "${it.manifest.description}"
+          |msgstr ""
+          |
+          """.trimMargin()
+        } ?: ""
       )
     } catch (e: IOException) {
       throw TaskExecutionException(this, e)

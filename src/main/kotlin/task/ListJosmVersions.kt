@@ -1,35 +1,38 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.TaskAction
 import org.openstreetmap.josm.gradle.plugin.util.Urls
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import java.io.IOException
 import java.net.URL
-import java.nio.charset.StandardCharsets
 
 /**
  * Task for showing the current `latest` and `tested` JOSM versions
  */
 open class ListJosmVersions : DefaultTask() {
 
+  companion object {
+    const val ERROR_CODE_CONNECTION = -1
+    const val ERROR_CODE_WRONG_FORMAT = -2
+  }
+
   init {
     group = "JOSM"
     description = "Shows the current 'latest' and 'tested' JOSM versions"
-    doFirst {
-      logger.lifecycle("# Available JOSM versions")
-      logger.lifecycle("tested=${readTestedVersion()}")
-      logger.lifecycle("latest=${readLatestVersion()}")
-      logger.info("(There might be even later versions available, 'latest' refers to the latest nightly build)")
-    }
   }
 
-  private fun readTestedVersion() = readNumericVersion(Urls.MainJosmWebsite.VERSION_NUMBER_TESTED)
-  private fun readLatestVersion() = readNumericVersion(Urls.MainJosmWebsite.VERSION_NUMBER_LATEST)
+  @TaskAction
+  fun action() {
+    logger.lifecycle("# Available JOSM versions ($ERROR_CODE_CONNECTION means connection error, $ERROR_CODE_WRONG_FORMAT means something that was not a positive integer was read)")
+    logger.lifecycle("tested=${ readNumericVersion(Urls.MainJosmWebsite.VERSION_NUMBER_TESTED) }")
+    logger.lifecycle("latest=${ readNumericVersion(Urls.MainJosmWebsite.VERSION_NUMBER_LATEST) }")
+    logger.info("(There might be even later versions available, 'latest' refers to the latest nightly build)")
+  }
 
-  private fun readNumericVersion(url: URL): Int {
-    url.openStream().use {
-      return BufferedReader(InputStreamReader(it, StandardCharsets.UTF_8)).readLine().toInt()
-    }
+  private fun readNumericVersion(url: URL): Int = try {
+    url.readText().toIntOrNull()?.takeIf { it > 0 } ?: ERROR_CODE_WRONG_FORMAT
+  } catch (e: IOException) {
+    ERROR_CODE_CONNECTION
   }
 }
 

@@ -2,10 +2,8 @@ package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -18,16 +16,13 @@ import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.util.VERSION_SNAPSHOT
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
-import javax.inject.Inject
 
 /**
  * Copies the plugin and all required plugins to JOSM_HOME.
  * Creates a `preferences-init.xml` file that will initialize the settings of the JOSM instance that is started by [RunJosmTask]s.
  * Custom settings can be provided by setting [JosmPluginExtension.initialPreferences].
  */
-open class InitJosmPreferences @Inject constructor(
-  objectFactory: ObjectFactory
-): DefaultTask() {
+open class InitJosmPreferences: DefaultTask() {
   @get:InputFiles
   val pluginDistTask: TaskProvider<out Sync> = project.tasks.named("dist", Sync::class.java)
 
@@ -41,13 +36,7 @@ open class InitJosmPreferences @Inject constructor(
   val requiredPluginsTemplate = InitJosmPreferences::class.java.getResource("/requiredPluginConfigTemplate.xml").readText()
 
   @get:Input
-  val josmPrefsToAppend = project.extensions.josm.initialPreferences
-
-  val josmUserdataDir: Provider<Directory> = objectFactory.directoryProperty().fileProvider(
-    project.provider {
-      project.extensions.josm.tmpJosmUserdataDir
-    }
-  )
+  val initialJosmPrefs = project.extensions.josm.initialPreferences
 
   @OutputFile
   val preferencesInitFile: Provider<RegularFile> = project.layout.buildDirectory.file(".josm/preferences-init.xml")
@@ -106,7 +95,7 @@ open class InitJosmPreferences @Inject constructor(
     logger.lifecycle("Write required plugin config to ${preferencesInitFile.get().asFile.absolutePath} …")
     preferencesInitFile.get().asFile.writeText(
       requiredPluginsTemplate
-        .replace("{{{APPENDED_PREFERENCES}}}", ((prefFragment ?: "") + josmPrefsToAppend.get()).replaceIndent(" ".repeat(4)))
+        .replace("{{{INITIAL_PREFERENCES}}}", ((prefFragment ?: "") + initialJosmPrefs.get()).replaceIndent(" ".repeat(4)))
         .replace(
           "{{{PLUGIN_LIST_ENTRIES}}}",
           requiredPluginConfig.get()

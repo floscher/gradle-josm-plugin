@@ -331,7 +331,7 @@ open class JosmPluginExtension(val project: Project) {
   /**
    * Configuration options for i18n
    */
-  val i18n: I18nConfig = I18nConfig(project)
+  val i18n: I18nConfig = I18nConfig()
 
   /**
    * Configure the field [JosmPluginExtension.i18n] using a Groovy [Closure].
@@ -372,6 +372,7 @@ open class JosmPluginExtension(val project: Project) {
    * **Default value:** `true` (before `0.6.0` this was `false` by default)
    * @since 0.5.2
    */
+  @Deprecated("This option will be removed, the leading v will always be removed")
   var versionWithoutLeadingV = true
 
   /**

@@ -3,12 +3,14 @@ package org.openstreetmap.josm.gradle.plugin.config
 import groovy.lang.Closure
 import org.gradle.api.Project
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
+import java.io.File
+import java.io.Serializable
 import java.util.regex.Pattern
 
 /**
  * Holds configuration options regarding internationalization.
  */
-class I18nConfig(private val project: Project) {
+class I18nConfig: Serializable {
 
   companion object {
     private val LINE_NUMBER_PATTERN = Pattern.compile(".*:([1-9][0-9]*)")
@@ -67,6 +69,9 @@ class I18nConfig(private val project: Project) {
     pathTransformer = { closure.call(it) }
   }
 
+  @Deprecated("This method now expects the project root directory (`project.projectDir`) as first parameter!", replaceWith = ReplaceWith("getPathTransformer(project.projectDir, repoUrl)"))
+  fun getPathTransformer(repoUrl: String): (String) -> String = throw IllegalAccessException("The API changed! Add the project root directory as first method parameter!")
+
   /**
    * Creates a path transformer that replaces an absolute file path of the *.pot file with a URL
    * to a hosted instance of the project.
@@ -74,12 +79,13 @@ class I18nConfig(private val project: Project) {
    *
    * `$repoUrl/$gitCommitHash/$filePathRelativeToProjectRoot#L$lineNumber`
    *
-   * Good values would be e.g. `gitlab.com/myself/MyAwesomeProject/blob` or `github.com/myself/MyAwesomeProject/blob`
+   * Good values would be e.g. `gitlab.com/myself/MyAwesomeProject/-/blob` or `github.com/myself/MyAwesomeProject/blob`
    *
+   * @param projectDir the project directory that will be replaced, also the git hash is calculated for that directory
    * @param repoUrl the supplied base URL
-   * @since 0.4.7
+   * @since 0.4.7 (parameter [projectDir] added in 0.7.1)
    */
-  fun getPathTransformer(repoUrl: String) = { path: String ->
+  fun getPathTransformer(projectDir: File, repoUrl: String) = { path: String ->
     val sourceFileMatcher = LINE_NUMBER_PATTERN.matcher(path)
     val (sourceFilePath, lineNumber) = if (sourceFileMatcher.matches()) {
       val lineNumber = sourceFileMatcher.group(1)
@@ -87,9 +93,9 @@ class I18nConfig(private val project: Project) {
     } else {
       path to null
     }
-    if (sourceFilePath.startsWith(project.projectDir.absolutePath)) {
-      val relativePath = sourceFilePath.substring(project.projectDir.absolutePath.length).trim('/')
-      "$repoUrl/${GitDescriber(project.projectDir).commitHash()}/$relativePath" + if (lineNumber == null) { "" } else { "#L$lineNumber"}
+    if (sourceFilePath.startsWith(projectDir.absolutePath)) {
+      val relativePath = sourceFilePath.substring(projectDir.absolutePath.length).trim('/')
+      "$repoUrl/${GitDescriber(projectDir).commitHash()}/$relativePath" + if (lineNumber == null) { "" } else { "#L$lineNumber"}
     } else {
       path
     }

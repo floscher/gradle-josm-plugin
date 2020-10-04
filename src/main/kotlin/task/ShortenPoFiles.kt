@@ -40,11 +40,12 @@ open class ShortenPoFiles @Inject constructor(private val sourceSet: I18nSourceS
         var modifiedLine = line
         if (isHeader) {
           // Rewrite the generic parts of the file header
-          if (modifiedLine.startsWith("# ")) { // TODO: Rewrite translators part of the header comment
+          if (modifiedLine.startsWith("# ")) {
             val projectName = project.extensions.josm.pluginName
             modifiedLine = modifiedLine.replace("SOME DESCRIPTIVE TITLE.", "Translations for the JOSM plugin '$projectName' (${file.nameWithoutExtension})")
             modifiedLine = modifiedLine.replace("THE PACKAGE'S COPYRIGHT HOLDER", project.extensions.josm.i18n.copyrightHolder ?: "")
             modifiedLine = modifiedLine.replace("PACKAGE package", "josm-plugin_$projectName package")
+            modifiedLine = modifiedLine.replace(" *<.+@.+>".toRegex(), "")
           } else {
             isHeader = false
           }
