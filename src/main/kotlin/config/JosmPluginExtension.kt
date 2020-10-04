@@ -223,7 +223,7 @@ open class JosmPluginExtension(val project: Project) {
    * 1. Nexus repo for JOSM releases: [https://josm.openstreetmap.de/nexus/content/repositories/releases/](https://josm.openstreetmap.de/nexus/content/repositories/releases/) (as [MavenArtifactRepository])
    * 2. Download page for JOSM releases and snapshots: [https://josm.openstreetmap.de/download/](https://josm.openstreetmap.de/download/) (as custom [IvyArtifactRepository], the `Archiv` subdirectory is also included)
    * 3. Nexus repo for JOSM snapshots: [https://josm.openstreetmap.de/nexus/content/repositories/snapshots/](https://josm.openstreetmap.de/nexus/content/repositories/snapshots/) (as [MavenArtifactRepository])
-   * 4. Directory in SVN repo where JOSM plugins are published: [https://svn.openstreetmap.org/applications/editors/josm/dist/](https://svn.openstreetmap.org/applications/editors/josm/dist/) (as custom [IvyArtifactRepository])
+   * 4. Directory in SVN repo where JOSM plugins are published: [https://josm.openstreetmap.de/osmsvn/applications/editors/josm/dist](https://josm.openstreetmap.de/osmsvn/applications/editors/josm/dist) (as custom [IvyArtifactRepository])
    * 5. GitLab Maven repository containing some plugins that are neither in SVN nor in the Nexus repository: [https://gitlab.com/api/v4/groups/JOSM/-/packages/maven](https://gitlab.com/api/v4/groups/JOSM/-/packages/maven) (as [MavenArtifactRepository])
    *
    * @see RepositoryHandler
@@ -260,7 +260,7 @@ open class JosmPluginExtension(val project: Project) {
       }
     }
     rh.ivy { repo ->
-      repo.url = Urls.JOSM_PLUGIN_DIST.toURI()
+      repo.url = Urls.MainJosmWebsite.PLUGIN_DIST_DIR.toURI()
       repo.content {
         it.includeGroup(GROUP_JOSM_PLUGIN)
       }

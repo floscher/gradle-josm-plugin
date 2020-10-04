@@ -34,6 +34,10 @@ object Urls {
      * The URL of the JOSM  Nexus repo for snapshots
      */
     val NEXUS_REPO_SNAPSHOTS = URL("$BASE/nexus/content/repositories/snapshots")
+    /**
+     * The directory in the JOSM SVN where the latest releases of JOSM plugins are stored
+     */
+    val PLUGIN_DIST_DIR = URL("$BASE/osmsvn/applications/editors/josm/dist")
 
     /**
      * The path portion of the URL https://josm.openstreetmap.de/plugin where a list of JOSM plugins can be downloaded.
@@ -64,8 +68,4 @@ object Urls {
    * The gitlab.com Maven repository containing all packages released by the `JOSM` group on gitlab.com
    */
   val GITLAB_JOSM_PLUGINS_REPO = URL("https://gitlab.com/api/v4/groups/JOSM/-/packages/maven")
-  /**
-   * The directory in the JOSM SVN where the latest releases of JOSM plugins are stored
-   */
-  val JOSM_PLUGIN_DIST = URL("https://svn.openstreetmap.org/applications/editors/josm/dist")
 }
