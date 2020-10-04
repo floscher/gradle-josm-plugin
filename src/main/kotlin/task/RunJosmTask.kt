@@ -28,6 +28,7 @@ open class RunJosmTask @Inject constructor(cleanTask: Provider<out CleanJosm>, @
   @Internal
   var extraInformation: String = ""
 
+  @Internal
   override fun getDescription() = "Run an independent clean JOSM instance (v${project.extensions.josm.josmCompileVersion}) with temporary JOSM home directories (by default inside `build/.josm/`) and the freshly compiled plugin active."
   override fun setDescription(description: String?) = throw UnsupportedOperationException("Description must not be modified!")
 

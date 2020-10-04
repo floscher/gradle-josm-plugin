@@ -1,6 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
@@ -16,6 +17,7 @@ open class DebugJosm @Inject constructor(cleanTask: Provider<out CleanJosm>, ini
     outputs.upToDateWhen { false } // Never consider this up-to-date, this task should always run
   }
 
+  @Internal
   override fun getDescription(): String = "Runs a JOSM instance like the task `runJosm`, but with JDWP (Java debug wire protocol) active" + (
     project.extensions.josm.debugPort?.let {
       " on port $it."

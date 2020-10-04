@@ -7,6 +7,7 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.Sync
@@ -48,6 +49,7 @@ open class InitJosmPreferences: DefaultTask() {
     }
   )
 
+  @Internal
   override fun getDescription(): String = "Sync the required plugin *.jar files (including the one produced by the task ${pluginDistTask.get().path}) to ${pluginDir.get().asFile.absolutePath} .\n" +
     "Also create the file with the initial preferences for the tasks that run a JOSM instance: ${preferencesInitFile.get().asFile.absolutePath}"
   override fun setDescription(description: String?) = throw UnsupportedOperationException("Description can't be modified for ${InitJosmPreferences::class.simpleName}!")
