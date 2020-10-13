@@ -19,9 +19,9 @@ class LangReader {
   fun readLangFiles(langFileDir: File, baseLang: String): Map<String, Map<MsgId, MsgStr>> {
     val langFiles = langFileDir
       .listFiles { file -> file.isFile && file.extension == "lang" }
-      .partition { it.name == "$baseLang.lang" }
+      ?.partition { it.name == "$baseLang.lang" }
 
-    require(langFiles.first.isNotEmpty()) {
+    require(langFiles != null && langFiles.first.isNotEmpty()) {
       "The base language '$baseLang' is not present among the language files in '${langFileDir.absolutePath}'!"
     }
 

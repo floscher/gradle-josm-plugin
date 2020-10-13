@@ -5,23 +5,23 @@ plugins {
 }
 
 repositories {
+  gradlePluginPortal()
   jcenter()
 }
 
-val dogfood by sourceSets.registering
-
-kotlin.sourceSets.named(dogfood.name) {
-  kotlin.setSrcDirs(setOf(File(projectDir, "../src/dogfood/kotlin/")))
+kotlin.sourceSets.main {
+  kotlin.srcDir(projectDir.resolve("../dogfood/src/main/kotlin/"))
 }
 
 dependencies {
-  implementation(dogfood.get().output)
-  runtimeOnly(dogfood.get().runtimeClasspath)
+  implementation(gradleApi())
+  implementation("org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinSerialization}")
 
-  add(dogfood.get().implementationConfigurationName, gradleApi())
-  add(dogfood.get().implementationConfigurationName, "org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}")
-  add(dogfood.get().implementationConfigurationName, kotlin("stdlib", Versions.kotlin))
-  add(dogfood.get().implementationConfigurationName, (dependencies.create("org.jetbrains.kotlinx:kotlinx-serialization-runtime:${Versions.kotlinSerialization}") as ModuleDependency).also {
-    it.exclude("org.jetbrains.kotlinx")
-  })
+  // Version management for plugins used in subprojects
+  implementation("com.gradle.publish:plugin-publish-plugin:${Versions.pluginPublish}")
+  implementation(kotlin("gradle-plugin", Versions.kotlin))
+  implementation("net.sf.proguard:proguard-gradle:${Versions.proguardGradle}")
+  implementation("org.jetbrains.dokka:dokka-gradle-plugin:${Versions.dokka}")
+  implementation("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
 }

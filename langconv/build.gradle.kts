@@ -1,84 +1,59 @@
-import org.gradle.api.publish.maven.internal.artifact.FileBasedMavenArtifact
-
 import proguard.gradle.ProGuardTask
 
-buildscript {
-  dependencies {
-    classpath("net.sf.proguard:proguard-gradle:6.2.2")
-  }
-}
 plugins {
-  java
   application
+  java
+  kotlin("jvm")
+  `maven-publish`
+  id("org.jetbrains.dokka")
 }
-apply(plugin = "kotlin")
 
 dependencies {
-  implementation(kotlin("stdlib-jdk8", Versions.kotlin))
-  implementation(project(":i18n"))
+  api(project(":i18n"))
 }
 
 application.mainClassName = "org.openstreetmap.josm.gradle.plugin.langconv.MainKt"
 
-tasks.withType(JavaExec::class).getByName("run") {
+val run by tasks.getting(JavaExec::class) {
   doFirst {
-    if (args?.isEmpty() ?: true) {
+    if ((args ?: listOf()).isEmpty()) {
       project.logger.warn("Note: Arguments for langconv can be supplied via the Gradle command line argument `--args=\"…\"`\n")
     }
   }
 }
 
-val jarTask: Jar = tasks.getByName<Jar>(sourceSets.main.get().jarTaskName) {
-  description = "Build a runnable \"fat\" *.jar file with all dependencies."
+val standaloneJar by tasks.registering(ProGuardTask::class) {
+  description = "Builds a standalone runnable *.jar file"
+  group = "Build"
 
-  val i18nProj = project(":i18n")
-  dependsOn(i18nProj.tasks[i18nProj.sourceSets.main.get().jarTaskName])
-
-  manifest {
-    attributes["Main-Class"] = application.mainClassName
-  }
-  doFirst {
-    from(
-      sourceSets.main.get().runtimeClasspath
-        .filter { it.exists() }
-        .mapNotNull { if (it.isDirectory) null else zipTree(it) }
-    )
-  }
-}
-
-val standaloneJar = tasks.register<ProGuardTask>("standaloneJar") {
-  dependsOn(jarTask)
-
-  injars(jarTask.archiveFile.get().asFile)
+  injars(mapOf("filter" to "!META-INF/**"), sourceSets.main.map { it.compileClasspath })
+  injars(tasks.named(sourceSets.main.get().jarTaskName))
   outjars(File(buildDir, "/dist/${project.name}.jar"))
 
-  jarTask.finalizedBy(this)
   if (JavaVersion.current().isJava9Compatible) { // >= JDK9
     libraryjars("${System.getProperty("java.home")}/jmods")
   } else { // < JDK9
     libraryjars("${System.getProperty("java.home")}/lib/rt.jar")
   }
 
-
   dontobfuscate()
   keep("public class org.openstreetmap.josm.gradle.plugin.langconv.** { *; }")
   keep("public class org.openstreetmap.josm.gradle.plugin.i18n.** { *; }")
-  keepnames("class kotlin.** { *; }")
 }
 
-rootProject.extensions.getByType(PublishingExtension::class).apply {
+tasks.sourcesJar {
+  from(project(":i18n").tasks.sourcesJar.map { it.outputs.files.map { zipTree(it) } })
+}
+
+publishing {
   publications {
-    val langconvPub = create<MavenPublication>("langconv") {
-      groupId = "org.openstreetmap.josm"
-      artifactId = "langconv"
-      version = project.version.toString()
-
-      standaloneJar.get().outputs.files.map { this.artifact(FileBasedMavenArtifact(it)) }
-    }
-
-    rootProject.tasks.withType(PublishToMavenRepository::class) {
-      if (publication == langconvPub) {
-        this.dependsOn(standaloneJar)
+    create<MavenPublication>("langconv") {
+      artifact(standaloneJar.map { it.outJarFiles.first() as File })
+      artifact(tasks.javadocJar.flatMap { it.archiveFile }) {
+        classifier = "javadoc"
+      }
+      artifact(tasks.sourcesJar.flatMap { it.archiveFile }) {
+        classifier = "sources"
       }
     }
   }

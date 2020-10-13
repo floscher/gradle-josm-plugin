@@ -29,7 +29,7 @@ class MoWriter {
       .toSortedMap(Comparator { o1, o2 -> String(o1.toByteArray()).compareTo(String(o2.toByteArray())) })
 
     val numStrings = sortedOriginalMsgIds.size.toUInt()
-    val stringsOffset = MoReader.HEADER_SIZE_IN_BYTES
+    val stringsOffset = MoReader.HEADER_SIZE_IN_BYTES.toUInt()
     val translationStringsOffset = stringsOffset + numStrings * 8u
     val hashTableOffset = translationStringsOffset + numStrings * 8u
 

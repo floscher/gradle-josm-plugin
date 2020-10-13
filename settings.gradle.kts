@@ -1,2 +1,1 @@
-include(":i18n")
-include(":langconv")
+include(":dogfood", ":i18n", ":langconv", ":plugin")

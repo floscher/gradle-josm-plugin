@@ -4,6 +4,6 @@ plugins {
 
 sourceSets.main {
   java {
-    this.setSrcDirs(setOf(projectDir, "../src/main/java"))
+    setSrcDirs(setOf(projectDir.parentFile.resolve("src/main/java")))
   }
 }

@@ -13,7 +13,7 @@ import java.net.URL
  * @property stream1 reads the indices of the strings
  * @property stream2 reads the actual strings
  */
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 class MoReader private constructor(private val stream1: InputStream, private val stream2: InputStream) {
 
   /**
@@ -34,7 +34,7 @@ class MoReader private constructor(private val stream1: InputStream, private val
     /**
      * 28 bytes = 7 × 4 bytes (≙ 7 32bit numbers)
      */
-    const val HEADER_SIZE_IN_BYTES: kotlin.UInt = 28u
+    const val HEADER_SIZE_IN_BYTES: Int = 28
   }
 
   /**
@@ -51,7 +51,7 @@ class MoReader private constructor(private val stream1: InputStream, private val
    * @property offsetHashingTable the offset of the hashing table (currently always ignored)
    * @param uints list of exactly 6 header values (32bit unsigned integers)
    */
-  class HeaderValues(val isBigEndian: Boolean, uints: List<kotlin.UInt>) {
+  private class HeaderValues(val isBigEndian: Boolean, uints: List<kotlin.UInt>) {
     init {
       require(uints.size == 6)
     }
@@ -80,7 +80,7 @@ class MoReader private constructor(private val stream1: InputStream, private val
     stream1.use { s1 ->
       // Read the header (sets the header fields)
       val header: HeaderValues = readHeader(s1)
-      var stream1Pos: UInt = HEADER_SIZE_IN_BYTES
+      var stream1Pos: UInt = HEADER_SIZE_IN_BYTES.toUInt()
       stream2.use { s2 ->
         var stream2Pos: UInt = 0u
 
@@ -130,7 +130,7 @@ class MoReader private constructor(private val stream1: InputStream, private val
    */
   @Throws(IOException::class)
   private fun readHeader(stream: InputStream): HeaderValues {
-    val header = ByteArray(HEADER_SIZE_IN_BYTES.toInt()) { 0 }
+    val header = ByteArray(HEADER_SIZE_IN_BYTES) { 0 }
     val actualHeaderSize = stream.read(header)
     if (actualHeaderSize != header.size) {
       throw IOException(

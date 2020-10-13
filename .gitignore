@@ -3,9 +3,12 @@
 /.settings/
 /bin/
 /build/
+/*/build/
 /out/
 /.classpath
 /.project
 /*.iml
 /github.env
 /aws-credentials.env
+local.properties
+/*.hprof

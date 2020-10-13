@@ -47,11 +47,15 @@ test:
   stage: test
   image: registry.gitlab.com/josm/docker-library/openjdk-8-josmplugin
   script:
-  - ./gradlew build dokka
+  - ./gradlew build dokkaHtmlMultimodule
   artifacts:
     paths:
     - build/
-  dependencies:
+    reports:
+      junit:
+      - i18n/build/test-results/test/**/TEST-*.xml
+      - plugin/build/test-results/test/**/TEST-*.xml
+  needs:
   - assemble
 
 test on java11:
@@ -59,7 +63,7 @@ test on java11:
   image: registry.gitlab.com/josm/docker-library/openjdk-11-josmplugin:latest
   script:
   - ./gradlew build
-  dependencies:
+  needs:
   - assemble on java11
 
 test on java12:
@@ -67,7 +71,7 @@ test on java12:
   image: registry.gitlab.com/josm/docker-library/openjdk-12-josmplugin:latest
   script:
   - ./gradlew build
-  dependencies:
+  needs:
   - assemble on java12
 
 test on java13:
@@ -75,7 +79,7 @@ test on java13:
   image: registry.gitlab.com/josm/docker-library/openjdk-13-josmplugin:latest
   script:
   - ./gradlew build
-  dependencies:
+  needs:
   - assemble on java13
 
 publish to / Gradle Plugin Portal:
@@ -85,8 +89,7 @@ publish to / Gradle Plugin Portal:
     url: https://plugins.gradle.org/plugin/org.openstreetmap.josm
   script:
   - ./gradlew -Pgradle.publish.secret="$GRADLE_PUBLISH_SECRET" -Pgradle.publish.key="$GRADLE_PUBLISH_KEY" publishPlugins
-  dependencies:
-  - test
+  needs: [ "test", "test on java11", "test on java12", "test on java13" ]
   only:
   - tags@floscher/gradle-josm-plugin
 
@@ -98,8 +101,7 @@ publish to / GitLab.com Maven:
   script:
   - ./gradlew publishAllPublicationsToGitlabRepository
   - ./gradlew releaseToGitlab
-  dependencies:
-  - test
+  needs: [ "test", "test on java11", "test on java12", "test on java13" ]
   only:
   - tags@floscher/gradle-josm-plugin
 
@@ -133,7 +135,6 @@ publish to / pages branch:
     git config user.email "incoming+floscher/gradle-josm-plugin@incoming.gitlab.com"
     git commit -a -m "Update Maven repository and KDoc documentation to $longVersion"
     git push origin pages
-  dependencies:
-  - test
+  needs: [ "test", "test on java11", "test on java12", "test on java13" ]
   only:
   - tags@floscher/gradle-josm-plugin
