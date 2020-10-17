@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin
 
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
@@ -80,32 +81,39 @@ fun Project.logSkippedTasks() {
  * decimal point (never decimal comma) and four decimal places.
  */
 fun JacocoReport.logCoverage() {
-  reports {
-    it.csv.isEnabled = true
+  doFirst {
+    reports {
+      it.csv.isEnabled = true
+    }
   }
-  doLast {
-    val allLines = reports.csv.destination.readLines()
-    val headerLine = allLines[0].split(',')
-    val colNames = arrayOf(
-      "INSTRUCTION_COVERED", "INSTRUCTION_MISSED",
-      "BRANCH_COVERED", "BRANCH_MISSED",
-      "LINE_COVERED", "LINE_MISSED"
-    )
-    val colValues = IntArray(colNames.size) { 0 }
-    val colIndices = IntArray(colNames.size) { headerLine.indexOf(colNames[it]) }
-    allLines.subList(1, allLines.size)
-      .map{ it.split(',') }
-      .forEach { lineCells ->
-        require(lineCells.size == headerLine.size)
-        for (i in 0 until colNames.size) {
-          colValues[i] += lineCells[colIndices[i]].toInt()
-        }
-      }
+  val logTask = project.task("${name}Log") {
+    it.actions = listOf(
+      Action {
+        val allLines = reports.csv.destination.readLines()
+        val headerLine = allLines[0].split(',')
+        val colNames = arrayOf(
+          "INSTRUCTION_COVERED", "INSTRUCTION_MISSED",
+          "BRANCH_COVERED", "BRANCH_MISSED",
+          "LINE_COVERED", "LINE_MISSED"
+        )
+        val colValues = IntArray(colNames.size) { 0 }
+        val colIndices = IntArray(colNames.size) { headerLine.indexOf(colNames[it]) }
+        allLines.subList(1, allLines.size)
+          .map{ line -> line.split(',') }
+          .forEach { lineCells ->
+            require(lineCells.size == headerLine.size)
+            for (i in colNames.indices) {
+              colValues[i] += lineCells[colIndices[i]].toInt()
+            }
+          }
 
-    logger.lifecycle("Instruction coverage${coverageLogMessage(it.project, colValues[0], colValues[1])}")
-    logger.lifecycle("     Branch coverage${coverageLogMessage(it.project, colValues[2], colValues[3])}")
-    logger.lifecycle("       Line coverage${coverageLogMessage(it.project, colValues[4], colValues[5])}")
+        logger.lifecycle("Instruction coverage${coverageLogMessage(it.project, colValues[0], colValues[1])}")
+        logger.lifecycle("     Branch coverage${coverageLogMessage(it.project, colValues[2], colValues[3])}")
+        logger.lifecycle("       Line coverage${coverageLogMessage(it.project, colValues[4], colValues[5])}")
+      }
+    )
   }
+  finalizedBy(logTask)
 }
 
 /**

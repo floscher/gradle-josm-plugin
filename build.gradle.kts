@@ -3,13 +3,37 @@ import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import org.openstreetmap.josm.gradle.plugin.api.gitlab.gitlabRepository
+import org.openstreetmap.josm.gradle.plugin.logCoverage
 import org.openstreetmap.josm.gradle.plugin.logPublishedMavenArtifacts
 import org.openstreetmap.josm.gradle.plugin.logSkippedTasks
 import org.openstreetmap.josm.gradle.plugin.logTaskDuration
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import java.net.URL
 
 plugins {
   id("org.jetbrains.dokka")
+  jacoco
+}
+
+gradle.projectsEvaluated {
+  allprojects {
+    extensions.findByType(JacocoPluginExtension::class)?.toolVersion = Versions.jacoco
+  }
+  val jacocoTestReport by tasks.registering(JacocoReport::class) {
+    group = "Verification"
+    val testTasks = setOf(":i18n", ":plugin")
+      .map { project(it).tasks.getByName<Test>("test") }
+
+    executionData(* testTasks.toTypedArray())
+    dependsOn(testTasks)
+
+    sourceSets(*
+      setOf(":dogfood", ":i18n", ":langconv", ":plugin")
+        .map { project(it).extensions.getByName<SourceSetContainer>("sourceSets").getByName("main") }
+        .toTypedArray()
+    )
+  }
 }
 
 val javaVersion = JavaVersion.VERSION_1_8
@@ -25,13 +49,23 @@ allprojects {
 
   repositories.jcenter()
 
+  tasks.withType(JacocoReport::class).all {
+    tasks.findByName("test")?.let { dependsOn(it) }
+    logCoverage()
+  }
+
   tasks.withType(Test::class).all {
     useJUnitPlatform()
+    testLogging {
+      lifecycle {
+        events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.STANDARD_ERROR)
+      }
+    }
   }
   tasks.withType(KotlinCompile::class).all {
     kotlinOptions {
       jvmTarget = javaVersion.toString()
-      freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+      freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
     }
   }
   tasks.withType(DokkaTask::class) {
@@ -57,10 +91,6 @@ allprojects {
       withJavadocJar()
       withSourcesJar()
     }
-  }
-
-  pluginManager.withPlugin("test") {
-    pluginManager.apply(JacocoPlugin::class)
   }
 
   pluginManager.withPlugin("publishing") {

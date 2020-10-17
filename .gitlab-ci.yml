@@ -11,7 +11,7 @@ cache:
 assemble:
   stage: build
   script:
-  - ./gradlew assemble
+  - ./gradlew jar
   artifacts:
     paths:
     - build/
@@ -20,7 +20,7 @@ assemble on java11:
   stage: build
   image: registry.gitlab.com/josm/docker-library/openjdk-11-git:latest
   script:
-  - ./gradlew assemble
+  - ./gradlew jar
   artifacts:
     paths:
     - build/
@@ -29,7 +29,7 @@ assemble on java12:
   stage: build
   image: registry.gitlab.com/josm/docker-library/openjdk-12-git:latest
   script:
-  - ./gradlew assemble
+  - ./gradlew jar
   artifacts:
     paths:
     - build/
@@ -38,7 +38,7 @@ assemble on java13:
   stage: build
   image: registry.gitlab.com/josm/docker-library/openjdk-13-git:latest
   script:
-  - ./gradlew assemble
+  - ./gradlew jar
   artifacts:
     paths:
     - build/
@@ -47,7 +47,7 @@ test:
   stage: test
   image: registry.gitlab.com/josm/docker-library/openjdk-8-josmplugin
   script:
-  - ./gradlew build dokkaHtmlMultimodule
+  - ./gradlew build :dokkaHtmlMultimodule :jacocoTestReport
   artifacts:
     paths:
     - build/

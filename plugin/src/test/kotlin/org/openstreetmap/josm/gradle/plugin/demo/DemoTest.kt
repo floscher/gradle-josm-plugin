@@ -14,13 +14,7 @@ class DemoTest {
   enum class GradleVersion(val expectingSuccess: Boolean) {
     GRADLE_5_6_4(false),
     GRADLE_6_0(true),
-    GRADLE_6_0_1(true),
-    GRADLE_6_1_1(true),
-    GRADLE_6_2_2(true),
-    GRADLE_6_3(true),
-    GRADLE_6_4(true),
-    GRADLE_6_5_1(true),
-    GRADLE_6_6_1(true);
+    GRADLE_6_7(true);
 
     val version = name.substring(name.indexOf('_') + 1).replace('_', '.')
   }
