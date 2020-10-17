@@ -29,5 +29,5 @@ data class MsgStr(val strings: List<String>) {
    * @returns this [MsgStr] represented as a [ByteArray] (strings separated by [GRAMMATICAL_NUMBER_SEPARATOR])
    */
   fun toByteArray(): ByteArray =
-    strings.joinToString(GRAMMATICAL_NUMBER_SEPARATOR.toString()).toByteArray()
+    strings.joinToString(GRAMMATICAL_NUMBER_SEPARATOR.toString()).encodeToByteArray()
 }

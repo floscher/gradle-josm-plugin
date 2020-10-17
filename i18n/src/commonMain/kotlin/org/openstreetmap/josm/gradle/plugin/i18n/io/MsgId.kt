@@ -20,16 +20,16 @@ data class MsgId(val id: MsgStr, val context: String? = null) {
    * The [id] is converted according to [MsgStr.toByteArray], it is separated from the context by [CONTEXT_SEPARATOR].
    */
   fun toByteArray(): ByteArray =
-    String(id.toByteArray())
+    id.toByteArray().decodeToString()
       .let { if (context == null) it else "$context$CONTEXT_SEPARATOR$it" }
-      .toByteArray(Charsets.UTF_8)
+      .encodeToByteArray()
 }
 
 /**
  * Returns a MsgId for a string as it is saved in a *.mo file (context and EOT byte, then the string)
  */
 internal fun ByteArray.toMsgId(): MsgId {
-  val string = this.toString(Charsets.UTF_8)
+  val string = this.decodeToString()
   val csIndex = string.indexOf(MsgId.CONTEXT_SEPARATOR)
   return if (csIndex >= 0) {
     MsgId(

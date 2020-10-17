@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.dokka.Platform
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -7,9 +8,8 @@ import org.openstreetmap.josm.gradle.plugin.logCoverage
 import org.openstreetmap.josm.gradle.plugin.logPublishedMavenArtifacts
 import org.openstreetmap.josm.gradle.plugin.logSkippedTasks
 import org.openstreetmap.josm.gradle.plugin.logTaskDuration
-import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import java.net.URL
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 plugins {
   id("org.jetbrains.dokka")
@@ -22,14 +22,20 @@ gradle.projectsEvaluated {
   }
   val jacocoTestReport by tasks.registering(JacocoReport::class) {
     group = "Verification"
-    val testTasks = setOf(":i18n", ":plugin")
-      .map { project(it).tasks.getByName<Test>("test") }
+    val testTasks = setOf(
+      project(":i18n").tasks.getByName<Test>("jvmTest"),
+      project(":plugin").tasks.getByName<Test>("test")
+    )
 
     executionData(* testTasks.toTypedArray())
     dependsOn(testTasks)
 
+    additionalClassDirs(project(":i18n").tasks.getByName<KotlinCompile>("compileKotlinJvm").destinationDir)
+    additionalSourceDirs(project(":i18n").extensions.getByType(KotlinMultiplatformExtension::class).sourceSets.getByName("commonMain").kotlin.sourceDirectories)
+    additionalSourceDirs(project(":i18n").extensions.getByType(KotlinMultiplatformExtension::class).sourceSets.getByName("jvmMain").kotlin.sourceDirectories)
+
     sourceSets(*
-      setOf(":dogfood", ":i18n", ":langconv", ":plugin")
+      setOf(":dogfood", ":langconv", ":plugin")
         .map { project(it).extensions.getByName<SourceSetContainer>("sourceSets").getByName("main") }
         .toTypedArray()
     )
@@ -94,8 +100,10 @@ allprojects {
   }
 
   pluginManager.withPlugin("publishing") {
-    tasks.named<Jar>("javadocJar").configure {
-      from(tasks.named<DokkaTask>("dokkaHtml").map { it.outputDirectory })
+    afterEvaluate {
+      tasks.withType(Jar::class).findByName("javadocJar")?.apply {
+        from(tasks.named<DokkaTask>("dokkaHtml").map { it.outputDirectory })
+      }
     }
 
     extensions.findByType(PublishingExtension::class)?.repositories?.apply {

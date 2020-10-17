@@ -63,7 +63,7 @@ data class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) {
  * Converts a list of [FourBytes] values to one single [ByteArray].
  * @return the [ByteArray] representation of the [FourBytes] list
  */
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 fun List<FourBytes>.toByteArray() = ByteArray(this.size * 4) { i ->
   this[i / 4].let {
     when (i % 4) {

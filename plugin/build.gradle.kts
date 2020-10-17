@@ -28,17 +28,6 @@ dependencies {
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", Versions.junit)
 }
 
-tasks.sourcesJar {
-  from(project.provider { project(":dogfood").sourceSets.main.map { it.allSource } })
-  from(project.provider { project(":i18n").sourceSets.main.map { it.allSource } })
-  exclude("packages.md")
-}
-
-tasks.javadocJar {
-  from(tasks.named<DokkaTask>("dokkaHtml").map { it.outputDirectory })
-  //from(provider { rootProject.tasks.getByName<DokkaMultiModuleTask>("dokkaHtmlMultiModule").outputDirectory })
-}
-
 // for the plugin-publish (publish to plugins.gradle.org)
 pluginBundle {
   website = "https://gitlab.com/floscher/gradle-josm-plugin#readme"

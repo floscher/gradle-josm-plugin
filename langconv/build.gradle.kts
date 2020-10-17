@@ -1,4 +1,5 @@
 import proguard.gradle.ProGuardTask
+import org.gradle.jvm.tasks.Jar
 
 plugins {
   application
@@ -42,7 +43,7 @@ val standaloneJar by tasks.registering(ProGuardTask::class) {
 }
 
 tasks.sourcesJar {
-  from(project(":i18n").tasks.sourcesJar.map { it.outputs.files.map { zipTree(it) } })
+  from(project(":i18n").tasks.named<Jar>("jvmSourcesJar").map { it.outputs.files.map { zipTree(it) } })
 }
 
 publishing {
