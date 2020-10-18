@@ -30,7 +30,7 @@ data class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) {
    * @param uintValue the 32 bit unsigned integer value
    * @param bigEndian if true, the number is encoded in big-endian byte order, otherwise in little-endian
    */
-  constructor(uintValue: kotlin.UInt, bigEndian: Boolean): this(
+  constructor(uintValue: UInt, bigEndian: Boolean): this(
     uintValue.shr(24).and(0xFFu).toUByte().toByte(),
     uintValue.shr(16).and(0xFFu).toUByte().toByte(),
     uintValue.shr(8).and(0xFFu).toUByte().toByte(),
@@ -45,7 +45,7 @@ data class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) {
    * @return the [kotlin.UInt] value (unsigned 32 bit) represented by the four bytes [a], [b], [c] and [d], respecting the given byte order.
    */
   @ExperimentalUnsignedTypes
-  fun getUIntValue(bigEndian: Boolean): kotlin.UInt =
+  fun getUIntValue(bigEndian: Boolean): UInt =
     if (bigEndian) {
       // Big endian: "Beginning at the big end", first byte is most significant
       FourBytes(d, c, b, a).getUIntValue(!bigEndian)

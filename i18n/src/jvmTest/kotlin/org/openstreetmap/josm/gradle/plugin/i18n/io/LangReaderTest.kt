@@ -51,8 +51,8 @@ val DUMMY_TRANSLATIONS: Map<String?, List<Map<String, MsgStr>>> = mapOf(
       "ru" to MsgStr("en-ru-trans"),
       "en" to MsgStr("en-ru-orig")
     ),
-    listOf("de", "en", "en_US", "fr", "ru").associate { it to MsgStr("Always the same") },
-    listOf("de", "en", "en_US", "fr", "ru").associate { it to MsgStr("Always the same", "plural") }
+    listOf("de", "en", "en_US", "fr", "ru").associateWith { MsgStr("Always the same") },
+    listOf("de", "en", "en_US", "fr", "ru").associateWith { MsgStr("Always the same (Singular)", "Always the same (Plural)") }
   ),
   "context" to listOf(
     mapOf(
@@ -61,7 +61,7 @@ val DUMMY_TRANSLATIONS: Map<String?, List<Map<String, MsgStr>>> = mapOf(
       "fr" to MsgStr("Texte avec contexte"),
       "ru" to MsgStr("Текст с контекстом")
     ),
-    listOf("de", "en", "en_US", "fr", "ru").associate { it to MsgStr("Always the same", "plural") }
+    listOf("de", "en", "en_US", "fr", "ru").associateWith { MsgStr("Always the same", "plural") }
   )
 )
 
@@ -221,13 +221,13 @@ class LangReaderTest {
     return ByteArrayInputStream(langToBytes.invoke(baseLang)) to languages.associate { it to ByteArrayInputStream(langToBytes.invoke(it)) }
   }
 
-  private fun getDummyTranslatableStrings(baseLang: String) = DUMMY_TRANSLATIONS.flatMap { contextEntry ->
-    contextEntry.value
+  internal fun getDummyTranslatableStrings(baseLang: String): List<MsgId> = DUMMY_TRANSLATIONS.flatMap { (context, translations) ->
+    translations
       .mapNotNull { it[baseLang] }
-      .map { MsgId(it, contextEntry.key) }
+      .map { MsgId(it, context) }
   }
 
-  private fun getDummyTranslations(baseLang: String) = DUMMY_TRANSLATIONS.flatMap { it.value.flatMap { it.keys } }.toSet()
+  internal fun getDummyTranslations(baseLang: String) = DUMMY_TRANSLATIONS.flatMap { it.value.flatMap { it.keys } }.toSet()
     .associate { lang ->
       Pair(
         lang,

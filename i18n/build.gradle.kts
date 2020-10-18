@@ -8,6 +8,7 @@ plugins {
 }
 
 kotlin {
+  explicitApiWarning()
   js().browser()
   jvm()
 }

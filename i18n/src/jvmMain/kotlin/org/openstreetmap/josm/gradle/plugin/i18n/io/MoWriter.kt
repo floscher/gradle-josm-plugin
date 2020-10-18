@@ -1,12 +1,11 @@
 package org.openstreetmap.josm.gradle.plugin.i18n.io
 
 import java.io.OutputStream
-import java.util.Comparator
 
 /**
  * Writes a MO file for given base strings and associated translated strings.
  */
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 class MoWriter {
   companion object {
     /**
@@ -23,10 +22,7 @@ class MoWriter {
     // offset 0: magic number
     val magicBytes = MoReader.BE_MAGIC.let { if (isBigEndian) it else it.reversedArray() }
 
-    val sortedOriginalMsgIds = translations
-      .minus(EMPTY_MSGID)
-      .plus(EMPTY_MSGID to MsgStr((translations[EMPTY_MSGID]?.strings?.map { it.lines().filter { !it.startsWith("Content-Type:") } } ?: listOf(listOf())).map { it.plus("Content-Type: text/plain; charset=UTF-8").joinToString("\n") } ))
-      .toSortedMap(Comparator { o1, o2 -> String(o1.toByteArray()).compareTo(String(o2.toByteArray())) })
+    val sortedOriginalMsgIds = translations.ensureUtf8EncodingInHeaderEntry().sortedBy { it.first.toByteArray().decodeToString() }
 
     val numStrings = sortedOriginalMsgIds.size.toUInt()
     val stringsOffset = MoReader.HEADER_SIZE_IN_BYTES.toUInt()
@@ -55,30 +51,30 @@ class MoWriter {
     var offset = hashTableOffset
 
     // Write offsets of original strings
-    sortedOriginalMsgIds.forEach {
-      val numBytes = it.key.toByteArray().size.toUInt()
+    sortedOriginalMsgIds.forEach { (msgid, _) ->
+      val numBytes = msgid.toByteArray().size.toUInt()
       stream.write(listOf(FourBytes(numBytes, isBigEndian)).toByteArray())
       stream.write(listOf(FourBytes(offset, isBigEndian)).toByteArray())
       offset += numBytes + 1u
     }
 
     // Write offsets of translated strings
-    sortedOriginalMsgIds.forEach {
-      val numBytes = it.value.toByteArray().size.toUInt()
+    sortedOriginalMsgIds.forEach { (_, msgstr) ->
+      val numBytes = msgstr.toByteArray().size.toUInt()
       stream.write(listOf(FourBytes(numBytes, isBigEndian)).toByteArray())
       stream.write(listOf(FourBytes(offset, isBigEndian)).toByteArray())
       offset += numBytes + 1u
     }
 
     // Write original strings
-    sortedOriginalMsgIds.forEach {
-      stream.write(it.key.toByteArray())
+    sortedOriginalMsgIds.forEach { (msgid, _) ->
+      stream.write(msgid.toByteArray())
       stream.write(0x00)
     }
 
     // Write translated strings
-    sortedOriginalMsgIds.forEach {
-      stream.write(it.value.toByteArray())
+    sortedOriginalMsgIds.forEach { (_, msgstr) ->
+      stream.write(msgstr.toByteArray())
       stream.write(0x00)
     }
   }

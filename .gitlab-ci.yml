@@ -1,4 +1,4 @@
-image: registry.gitlab.com/josm/docker-library/openjdk-8-git:latest
+image: registry.gitlab.com/josm/docker-library/openjdk-11-git:latest
 
 before_script:
 - export GRADLE_USER_HOME=`pwd`/.gradle
@@ -19,36 +19,9 @@ assemble:
     paths:
     - build/
 
-assemble on java11:
-  stage: build
-  image: registry.gitlab.com/josm/docker-library/openjdk-11-git:latest
-  script:
-  - ./gradlew --stacktrace jar
-  artifacts:
-    paths:
-    - build/
-
-assemble on java12:
-  stage: build
-  image: registry.gitlab.com/josm/docker-library/openjdk-12-git:latest
-  script:
-  - ./gradlew --stacktrace jar
-  artifacts:
-    paths:
-    - build/
-
-assemble on java13:
-  stage: build
-  image: registry.gitlab.com/josm/docker-library/openjdk-13-git:latest
-  script:
-  - ./gradlew --stacktrace jar
-  artifacts:
-    paths:
-    - build/
-
 test:
   stage: test
-  image: registry.gitlab.com/josm/docker-library/openjdk-8-josmplugin
+  image: registry.gitlab.com/josm/docker-library/openjdk-11-josmplugin
   script:
   - ./gradlew --stacktrace --info build :dokkaHtmlMultimodule :jacocoTestReport
   artifacts:
@@ -61,30 +34,6 @@ test:
   needs:
   - assemble
 
-test on java11:
-  stage: test
-  image: registry.gitlab.com/josm/docker-library/openjdk-11-josmplugin:latest
-  script:
-  - ./gradlew --stacktrace --info build
-  needs:
-  - assemble on java11
-
-test on java12:
-  stage: test
-  image: registry.gitlab.com/josm/docker-library/openjdk-12-josmplugin:latest
-  script:
-  - ./gradlew --stacktrace --info build
-  needs:
-  - assemble on java12
-
-test on java13:
-  stage: test
-  image: registry.gitlab.com/josm/docker-library/openjdk-13-josmplugin:latest
-  script:
-  - ./gradlew --stacktrace --info build
-  needs:
-  - assemble on java13
-
 publish to / Gradle Plugin Portal:
   stage: deploy
   environment:
@@ -92,7 +41,8 @@ publish to / Gradle Plugin Portal:
     url: https://plugins.gradle.org/plugin/org.openstreetmap.josm
   script:
   - ./gradlew -Pgradle.publish.secret="$GRADLE_PUBLISH_SECRET" -Pgradle.publish.key="$GRADLE_PUBLISH_KEY" publishPlugins
-  needs: [ "test", "test on java11", "test on java12", "test on java13" ]
+  needs:
+  - test
   only:
   - tags@floscher/gradle-josm-plugin
 
@@ -104,7 +54,8 @@ publish to / GitLab.com Maven:
   script:
   - ./gradlew publishAllPublicationsToGitlabRepository
   - ./gradlew releaseToGitlab
-  needs: [ "test", "test on java11", "test on java12", "test on java13" ]
+  needs:
+  - test
   only:
   - tags@floscher/gradle-josm-plugin
 
@@ -138,6 +89,7 @@ publish to / pages branch:
     git config user.email "incoming+floscher/gradle-josm-plugin@incoming.gitlab.com"
     git commit -a -m "Update Maven repository and KDoc documentation to $longVersion"
     git push origin pages
-  needs: [ "test", "test on java11", "test on java12", "test on java13" ]
+  needs:
+  - test
   only:
   - tags@floscher/gradle-josm-plugin

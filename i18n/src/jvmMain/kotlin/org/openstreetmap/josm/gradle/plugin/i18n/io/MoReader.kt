@@ -55,12 +55,12 @@ class MoReader private constructor(private val stream1: InputStream, private val
     init {
       require(uints.size == 6)
     }
-    val formatRev: kotlin.UInt = uints[0]
+    val formatRev: UInt = uints[0]
     val numStrings: Int = uints[1].toInt()
-    val offsetOrigStrings: kotlin.UInt = uints[2]
-    val offsetTranslatedStrings: kotlin.UInt = uints[3]
-    val sizeHashingTable: kotlin.UInt = uints[4]
-    val offsetHashingTable: kotlin.UInt = uints[5]
+    val offsetOrigStrings: UInt = uints[2]
+    val offsetTranslatedStrings: UInt = uints[3]
+    val sizeHashingTable: UInt = uints[4]
+    val offsetHashingTable: UInt = uints[5]
     init {
       if (this.numStrings < 0) {
         throw NotImplementedError("Reading MO files containing more than ${Int.MAX_VALUE} strings is not implemented (this file claims to contain $numStrings strings)!")

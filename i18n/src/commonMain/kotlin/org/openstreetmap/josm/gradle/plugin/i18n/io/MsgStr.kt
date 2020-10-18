@@ -18,7 +18,7 @@ data class MsgStr(val strings: List<String>) {
    * @param singularString the singular version of the translatable string
    * @param pluralStrings the plural versions of the translatable string
    */
-  constructor(singularString: String, vararg pluralStrings: String): this(listOf(singularString, *pluralStrings))
+  constructor(singularString: String, vararg pluralStrings: String): this(listOf(singularString).plus(pluralStrings))
   init {
     require(strings.isNotEmpty()){"A MsgStr has to consist of at least one string!"}
   }

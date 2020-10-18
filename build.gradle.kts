@@ -1,6 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.dokka.Platform
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import org.openstreetmap.josm.gradle.plugin.api.gitlab.gitlabRepository
@@ -9,7 +10,6 @@ import org.openstreetmap.josm.gradle.plugin.logPublishedMavenArtifacts
 import org.openstreetmap.josm.gradle.plugin.logSkippedTasks
 import org.openstreetmap.josm.gradle.plugin.logTaskDuration
 import java.net.URL
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 plugins {
   id("org.jetbrains.dokka")
@@ -31,8 +31,8 @@ gradle.projectsEvaluated {
     dependsOn(testTasks)
 
     additionalClassDirs(project(":i18n").tasks.getByName<KotlinCompile>("compileKotlinJvm").destinationDir)
-    additionalSourceDirs(project(":i18n").extensions.getByType(KotlinMultiplatformExtension::class).sourceSets.getByName("commonMain").kotlin.sourceDirectories)
-    additionalSourceDirs(project(":i18n").extensions.getByType(KotlinMultiplatformExtension::class).sourceSets.getByName("jvmMain").kotlin.sourceDirectories)
+    additionalSourceDirs(project(":i18n").extensions.getByType(KotlinProjectExtension::class).sourceSets.getByName("commonMain").kotlin.sourceDirectories)
+    additionalSourceDirs(project(":i18n").extensions.getByType(KotlinProjectExtension::class).sourceSets.getByName("jvmMain").kotlin.sourceDirectories)
 
     sourceSets(*
       setOf(":dogfood", ":langconv", ":plugin")
@@ -50,7 +50,7 @@ gradle.taskGraph.logTaskDuration()
 logSkippedTasks()
 
 allprojects {
-  group = "org.openstreetmap.josm"
+  group = "org.openstreetmap.josm" + if (name != "plugin") ".gradle-josm-plugin" else ""
   version = GitDescriber(rootProject.projectDir).describe(trimLeading = true)
 
   repositories.jcenter()
