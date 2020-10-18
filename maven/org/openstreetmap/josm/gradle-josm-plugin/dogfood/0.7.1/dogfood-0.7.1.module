@@ -1,0 +1,144 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.openstreetmap.josm.gradle-josm-plugin",
+    "module": "dogfood",
+    "version": "0.7.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.4",
+      "buildId": "6hz2l3qg2fcglfc23adtzktuai"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.eclipse.jgit",
+          "module": "org.eclipse.jgit",
+          "version": {
+            "requires": "5.9.0.202009080501-r"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.4.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "dogfood-0.7.1.jar",
+          "url": "dogfood-0.7.1.jar",
+          "size": 113766,
+          "sha512": "d73e8ee02cf9de1c2908ea0ce2638ac7e6f8cb9084b4167ad1e34baf602a212550ab1e16ab2022feff7a2e9ce216fe687ae6129f5cf80cbc963955b7f9755b64",
+          "sha256": "c901625b836e268068d08755f003c63ad822f5051f2c0511cb8f95e033452a0c",
+          "sha1": "52f16feaeea35b0f8fd5d583693340c42032241b",
+          "md5": "8f07eb56e9caf5d3fbe1011c0567df3f"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-serialization-json",
+          "version": {
+            "requires": "1.0.0"
+          }
+        },
+        {
+          "group": "org.eclipse.jgit",
+          "module": "org.eclipse.jgit",
+          "version": {
+            "requires": "5.9.0.202009080501-r"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.4.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "dogfood-0.7.1.jar",
+          "url": "dogfood-0.7.1.jar",
+          "size": 113766,
+          "sha512": "d73e8ee02cf9de1c2908ea0ce2638ac7e6f8cb9084b4167ad1e34baf602a212550ab1e16ab2022feff7a2e9ce216fe687ae6129f5cf80cbc963955b7f9755b64",
+          "sha256": "c901625b836e268068d08755f003c63ad822f5051f2c0511cb8f95e033452a0c",
+          "sha1": "52f16feaeea35b0f8fd5d583693340c42032241b",
+          "md5": "8f07eb56e9caf5d3fbe1011c0567df3f"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "dogfood-0.7.1-javadoc.jar",
+          "url": "dogfood-0.7.1-javadoc.jar",
+          "size": 977977,
+          "sha512": "67e87982fd432bb833c481e19b9afddf1b622c3bd73cf9e0dd90fe48307cfef9b6d96c2d7309bcb3ea7823b6ee88fc0749a5da9f58e07d52880a8dca4c9cc7ac",
+          "sha256": "29f1527015dceb612b7eea379cb2b8a23b7ebf294df930276e2dd1ac87738133",
+          "sha1": "4cc9e26a83c3046a41c4da52e5fce50055d32dfe",
+          "md5": "c9d47676a6b845a8b3788cea26b6d818"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "dogfood-0.7.1-sources.jar",
+          "url": "dogfood-0.7.1-sources.jar",
+          "size": 13876,
+          "sha512": "2f6fb0466563213ac324a696a8297a232109dc7642c672ce391bb8a4f34b7abdf9f00202814b36bb3478fb645882206029e64035c7e1077baffd3436d500afb6",
+          "sha256": "e14dac45b62fbdc9f358ae5841af6e85fa713eca090c81828a577539d56adcea",
+          "sha1": "1662aa2cdb349f642ccffd3a2e99c4e385b23113",
+          "md5": "1b6d00d01f908f0f9bf0ac1c65bded33"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+
+org.openstreetmap.josm.gradle.plugin.i18n.io
+

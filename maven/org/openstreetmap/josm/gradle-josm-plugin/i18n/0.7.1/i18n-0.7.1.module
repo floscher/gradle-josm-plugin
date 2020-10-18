@@ -1,0 +1,88 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.openstreetmap.josm.gradle-josm-plugin",
+    "module": "i18n",
+    "version": "0.7.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.4",
+      "buildId": "6hz2l3qg2fcglfc23adtzktuai"
+    }
+  },
+  "variants": [
+    {
+      "name": "js-api",
+      "attributes": {
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.js.compiler": "legacy",
+        "org.jetbrains.kotlin.platform.type": "js"
+      },
+      "available-at": {
+        "url": "../../i18n-js/0.7.1/i18n-js-0.7.1.module",
+        "group": "org.openstreetmap.josm.gradle-josm-plugin",
+        "module": "i18n-js",
+        "version": "0.7.1"
+      }
+    },
+    {
+      "name": "js-runtime",
+      "attributes": {
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.js.compiler": "legacy",
+        "org.jetbrains.kotlin.platform.type": "js"
+      },
+      "available-at": {
+        "url": "../../i18n-js/0.7.1/i18n-js-0.7.1.module",
+        "group": "org.openstreetmap.josm.gradle-josm-plugin",
+        "module": "i18n-js",
+        "version": "0.7.1"
+      }
+    },
+    {
+      "name": "jvm-api",
+      "attributes": {
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "available-at": {
+        "url": "../../i18n-jvm/0.7.1/i18n-jvm-0.7.1.module",
+        "group": "org.openstreetmap.josm.gradle-josm-plugin",
+        "module": "i18n-jvm",
+        "version": "0.7.1"
+      }
+    },
+    {
+      "name": "jvm-runtime",
+      "attributes": {
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "available-at": {
+        "url": "../../i18n-jvm/0.7.1/i18n-jvm-0.7.1.module",
+        "group": "org.openstreetmap.josm.gradle-josm-plugin",
+        "module": "i18n-jvm",
+        "version": "0.7.1"
+      }
+    },
+    {
+      "name": "metadata-api",
+      "attributes": {
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.platform.type": "common"
+      },
+      "available-at": {
+        "url": "../../i18n-metadata/0.7.1/i18n-metadata-0.7.1.module",
+        "group": "org.openstreetmap.josm.gradle-josm-plugin",
+        "module": "i18n-metadata",
+        "version": "0.7.1"
+      }
+    }
+  ]
+}

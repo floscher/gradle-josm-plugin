@@ -1,0 +1,9 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+
+org.openstreetmap.josm.gradle.plugin
+org.openstreetmap.josm.gradle.plugin.api
+org.openstreetmap.josm.gradle.plugin.api.github
+org.openstreetmap.josm.gradle.plugin.api.gitlab
+org.openstreetmap.josm.gradle.plugin.task.gitlab
+

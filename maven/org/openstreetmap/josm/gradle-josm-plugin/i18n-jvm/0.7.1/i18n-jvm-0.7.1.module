@@ -1,0 +1,103 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "url": "../../i18n/0.7.1/i18n-0.7.1.module",
+    "group": "org.openstreetmap.josm.gradle-josm-plugin",
+    "module": "i18n",
+    "version": "0.7.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.4",
+      "buildId": "6hz2l3qg2fcglfc23adtzktuai"
+    }
+  },
+  "variants": [
+    {
+      "name": "jvm-api",
+      "attributes": {
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.4.10"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-common",
+          "version": {
+            "requires": "1.4.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "i18n-jvm-0.7.1.jar",
+          "url": "i18n-jvm-0.7.1.jar",
+          "size": 66222,
+          "sha512": "d08a8f06cefe1f1eb54657495130fbdf45146bdb79d808ad2d2073e53f4e3d1e94694fa1e0c8ed5af1a37efc2e5a9cbe27e7ab1557cc2f61200c51dad6bdc287",
+          "sha256": "0df11fd935259ed3587037388f79281c1b0b0590efe5435edd519437fb282b8e",
+          "sha1": "620086705fdaff22972606f2b89582f63f5cc741",
+          "md5": "9bccaa86ed3eafe347179a0aa57a26ff"
+        }
+      ]
+    },
+    {
+      "name": "jvm-runtime",
+      "attributes": {
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.4.10"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-common",
+          "version": {
+            "requires": "1.4.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "i18n-jvm-0.7.1.jar",
+          "url": "i18n-jvm-0.7.1.jar",
+          "size": 66222,
+          "sha512": "d08a8f06cefe1f1eb54657495130fbdf45146bdb79d808ad2d2073e53f4e3d1e94694fa1e0c8ed5af1a37efc2e5a9cbe27e7ab1557cc2f61200c51dad6bdc287",
+          "sha256": "0df11fd935259ed3587037388f79281c1b0b0590efe5435edd519437fb282b8e",
+          "sha1": "620086705fdaff22972606f2b89582f63f5cc741",
+          "md5": "9bccaa86ed3eafe347179a0aa57a26ff"
+        }
+      ]
+    },
+    {
+      "name": "metadata-api",
+      "attributes": {
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.platform.type": "common"
+      },
+      "available-at": {
+        "url": "../../i18n-metadata/0.7.1/i18n-metadata-0.7.1.module",
+        "group": "org.openstreetmap.josm.gradle-josm-plugin",
+        "module": "i18n-metadata",
+        "version": "0.7.1"
+      }
+    }
+  ]
+}

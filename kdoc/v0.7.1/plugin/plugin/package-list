@@ -1,0 +1,12 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+
+org.openstreetmap.josm.gradle.plugin
+org.openstreetmap.josm.gradle.plugin.config
+org.openstreetmap.josm.gradle.plugin.github
+org.openstreetmap.josm.gradle.plugin.i18n
+org.openstreetmap.josm.gradle.plugin.io
+org.openstreetmap.josm.gradle.plugin.task
+org.openstreetmap.josm.gradle.plugin.task.github
+org.openstreetmap.josm.gradle.plugin.util
+

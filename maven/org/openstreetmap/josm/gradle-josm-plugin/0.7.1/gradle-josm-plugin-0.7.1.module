@@ -1,0 +1,179 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.openstreetmap.josm",
+    "module": "gradle-josm-plugin",
+    "version": "0.7.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.4",
+      "buildId": "6hz2l3qg2fcglfc23adtzktuai"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.openstreetmap.josm.gradle-josm-plugin",
+          "module": "dogfood",
+          "version": {
+            "requires": "0.7.1"
+          }
+        },
+        {
+          "group": "org.openstreetmap.josm.gradle-josm-plugin",
+          "module": "i18n",
+          "version": {
+            "requires": "0.7.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.4.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "gradle-josm-plugin-0.7.1.jar",
+          "url": "gradle-josm-plugin-0.7.1.jar",
+          "size": 331472,
+          "sha512": "886d5481ce74f3c7e509ca97118819b1d0b5af835e06dc7f200c65f48d3ebba88b4db51a55205ceb5d3d3b2dac6dc61a78f2b442bd459b02f89e953d5e32b57a",
+          "sha256": "631b7831f748154ed0d222bd6d2b35796af0082c27470fa5d7e6a5f09cf0abe8",
+          "sha1": "545f95d798d17f0f28ffa8f4d3ae171924e698db",
+          "md5": "5a0775b5bee04074c233c78ba3ec0b6b"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.squareup.okhttp3",
+          "module": "okhttp",
+          "version": {
+            "requires": "4.9.0"
+          }
+        },
+        {
+          "group": "com.beust",
+          "module": "klaxon",
+          "version": {
+            "requires": "5.4"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.dataformat",
+          "module": "jackson-dataformat-yaml",
+          "version": {
+            "requires": "2.11.3"
+          }
+        },
+        {
+          "group": "com.vladsch.flexmark",
+          "module": "flexmark",
+          "version": {
+            "requires": "0.62.2"
+          }
+        },
+        {
+          "group": "org.openstreetmap.josm.gradle-josm-plugin",
+          "module": "dogfood",
+          "version": {
+            "requires": "0.7.1"
+          }
+        },
+        {
+          "group": "org.openstreetmap.josm.gradle-josm-plugin",
+          "module": "i18n",
+          "version": {
+            "requires": "0.7.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.4.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "gradle-josm-plugin-0.7.1.jar",
+          "url": "gradle-josm-plugin-0.7.1.jar",
+          "size": 331472,
+          "sha512": "886d5481ce74f3c7e509ca97118819b1d0b5af835e06dc7f200c65f48d3ebba88b4db51a55205ceb5d3d3b2dac6dc61a78f2b442bd459b02f89e953d5e32b57a",
+          "sha256": "631b7831f748154ed0d222bd6d2b35796af0082c27470fa5d7e6a5f09cf0abe8",
+          "sha1": "545f95d798d17f0f28ffa8f4d3ae171924e698db",
+          "md5": "5a0775b5bee04074c233c78ba3ec0b6b"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "gradle-josm-plugin-0.7.1-javadoc.jar",
+          "url": "gradle-josm-plugin-0.7.1-javadoc.jar",
+          "size": 1321124,
+          "sha512": "81e74003316cb62cce2cb3cbcc8675af2dc0aa03a912f838cbd7b8280bc26dc292bef1c7ab010678fc46eab27c96ed5873b1fabe37b7b1f2fb76e2d7eb45961c",
+          "sha256": "8589b9b2d492457ce302be0bdc23fd633da73c9458efd7351919c76d1d0aefb7",
+          "sha1": "ce33e9caaf5a439afd31a7a1aa97ea8ab64da364",
+          "md5": "689fb78ed5394ed6cabe88f0c3a3f4a6"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "gradle-josm-plugin-0.7.1-sources.jar",
+          "url": "gradle-josm-plugin-0.7.1-sources.jar",
+          "size": 61885,
+          "sha512": "bfc6f358abe29fe4a15b5b699919a05243f8982c2c9fe686988833ef9afb8a1b959c19ba8f77d307136b43aab392971eb30e8b39d4883e19f444fdc2a9db4ceb",
+          "sha256": "2b292715e9e80113ecf445c8ed2e33c4c7fdd23661b9f1738aa025130af4ae21",
+          "sha1": "f72851ee81a557c19a7298adb14ec3e4559e5f2b",
+          "md5": "c7300ef62fa9034143505a43c46f139b"
+        }
+      ]
+    }
+  ]
+}
