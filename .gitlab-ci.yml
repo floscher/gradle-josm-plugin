@@ -34,6 +34,18 @@ test:
   needs:
   - assemble
 
+publish to / Bintray:
+  stage: deploy
+  environment:
+    name: maven / Bintray
+    url: https://bintray.com/bintray/jcenter
+  script:
+  - ./gradlew bintrayUpload
+  needs:
+  - test
+  only:
+  - tags@floscher/gradle-josm-plugin
+
 publish to / Gradle Plugin Portal:
   stage: deploy
   environment:
@@ -76,9 +88,10 @@ publish to / pages branch:
     longVersion=`git describe --always --long --dirty`
     rm -rf build/maven/
     mv public/maven/ build/maven/
-    ./gradlew publishAllPublicationsToBuildDirRepository dokka
+    ./gradlew publishAllPublicationsToBuildDirRepository dokkaHtmlMultimodule
     mv build/maven/ public/maven/
     mv build/docs/kdoc/ "public/kdoc/$version/"
+    ln -s "./-modules.html" "public/kdoc/$version/index.html"
   - |
     cd public/
     git rm --ignore-unmatch kdoc/current kdoc/latest

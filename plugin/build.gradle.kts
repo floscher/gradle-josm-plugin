@@ -1,8 +1,7 @@
-import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.openstreetmap.josm.gradle.plugin.task.gitlab.ReleaseToGitlab
-import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
+  id("com.jfrog.bintray")
   kotlin("jvm")
   id("com.gradle.plugin-publish")
   id("org.jetbrains.dokka")
@@ -47,7 +46,6 @@ gradlePlugin {
     implementationClass = "org.openstreetmap.josm.gradle.plugin.JosmPlugin"
   }
 }
-
 
 publishing {
   publications.withType(MavenPublication::class).all {

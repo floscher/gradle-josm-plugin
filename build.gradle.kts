@@ -1,15 +1,18 @@
+import Build_gradle.IKotlinCompile
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.dokka.Platform
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.openstreetmap.josm.gradle.plugin.GitDescriber
-import org.openstreetmap.josm.gradle.plugin.api.gitlab.gitlabRepository
+import org.openstreetmap.josm.gradle.plugin.api.gitlab.setupGitlabPublishingForAllProjects
 import org.openstreetmap.josm.gradle.plugin.logCoverage
 import org.openstreetmap.josm.gradle.plugin.logPublishedMavenArtifacts
 import org.openstreetmap.josm.gradle.plugin.logSkippedTasks
 import org.openstreetmap.josm.gradle.plugin.logTaskDuration
+import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import java.net.URL
+
+typealias IKotlinCompile<T> = org.jetbrains.kotlin.gradle.dsl.KotlinCompile<T>
 
 plugins {
   id("org.jetbrains.dokka")
@@ -68,10 +71,12 @@ allprojects {
       }
     }
   }
-  tasks.withType(KotlinCompile::class).all {
+  tasks.withType(IKotlinCompile::class).all {
+    if (this is KotlinCompile) {
+      kotlinOptions.jvmTarget = javaVersion.toString()
+    }
     kotlinOptions {
-      jvmTarget = javaVersion.toString()
-      freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
+      freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     }
   }
   tasks.withType(DokkaTask::class) {
@@ -81,7 +86,7 @@ allprojects {
       if (platform.get() == Platform.jvm) {
         jdkVersion.set(javaVersion.ordinal + 1)
         externalDocumentationLink(URL("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/"))
-        externalDocumentationLink(URL("https://docs.groovy-lang.org/next/html/api/"))
+        externalDocumentationLink(URL("http://docs.groovy-lang.org/next/html/api/"))
       }
 
       project.projectDir.resolve("packages.md")
@@ -91,6 +96,7 @@ allprojects {
         }
     }
   }
+
   pluginManager.withPlugin("java") {
     extensions.findByType(JavaPluginExtension::class)?.apply {
       sourceCompatibility = javaVersion
@@ -105,37 +111,14 @@ allprojects {
         from(tasks.named<DokkaTask>("dokkaHtml").map { it.outputDirectory })
       }
     }
-
-    extensions.findByType(PublishingExtension::class)?.repositories?.apply {
-      maven(rootProject.buildDir.resolve("maven")) {
-        name = "buildDir"
-      }
-
-      // Create GitLab Maven repository to publish to.
-      gitlabRepository("gitlab", logger)
-
-      // Set up AWS
-      val awsAccessKeyId: String? = System.getenv("AWS_ACCESS_KEY_ID")
-      val awsSecretAccessKey: String? = System.getenv("AWS_SECRET_ACCESS_KEY")
-      if (awsAccessKeyId == null || awsSecretAccessKey == null) {
-        logger.lifecycle(
-          "Note: If you want to be able to publish the plugin to s3://gradle-josm-plugin , set the environment variables AWS_ACCESS_KEY_ID ({} set) and AWS_SECRET_ACCESS_KEY ({} set).",
-          if (awsAccessKeyId == null) { "not" } else { "is" },
-          if (awsSecretAccessKey == null) { "not" } else { "is" }
-        )
-      } else {
-        maven("s3://gradle-josm-plugin") {
-          name = "s3"
-          credentials(AwsCredentials::class.java) {
-            accessKey = awsAccessKeyId
-            secretKey = awsSecretAccessKey
-          }
-        }
-      }
-    }
   }
 }
 
 tasks.dokkaHtmlMultiModule {
   outputDirectory.set(buildDir.resolve("docs/kdoc"))
 }
+
+setupAwsPublishingForAllProjects()
+setupBintrayPublishing()
+setupBuildDirPublishingForAllProjects()
+setupGitlabPublishingForAllProjects("gitlab")

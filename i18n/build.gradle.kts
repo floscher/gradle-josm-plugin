@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+  id("com.jfrog.bintray")
   kotlin("multiplatform")
   id("org.jetbrains.dokka")
   jacoco
@@ -11,6 +12,12 @@ kotlin {
   explicitApiWarning()
   js().browser()
   jvm()
+
+  val jsMain by sourceSets.getting {
+    dependencies {
+      implementation("org.jetbrains.kotlinx:kotlinx-html:${Versions.kotlinxHtml}")
+    }
+  }
 }
 
 dependencies {

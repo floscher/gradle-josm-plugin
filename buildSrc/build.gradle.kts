@@ -15,6 +15,7 @@ kotlin.sourceSets.main {
 
 dependencies {
   implementation(gradleApi())
+  implementation(gradleKotlinDsl())
   implementation("org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinSerialization}")
 
@@ -24,4 +25,5 @@ dependencies {
   implementation("net.sf.proguard:proguard-gradle:${Versions.proguardGradle}")
   implementation("org.jetbrains.dokka:dokka-gradle-plugin:${Versions.dokka}")
   implementation("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
+  implementation("com.jfrog.bintray.gradle:gradle-bintray-plugin:${Versions.bintray}")
 }

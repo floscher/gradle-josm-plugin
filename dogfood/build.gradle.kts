@@ -1,4 +1,5 @@
 plugins {
+  id("com.jfrog.bintray")
   kotlin("jvm")
   kotlin("plugin.serialization")
   id("org.jetbrains.dokka")

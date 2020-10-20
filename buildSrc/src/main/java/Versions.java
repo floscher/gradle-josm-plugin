@@ -1,13 +1,15 @@
 // No package to avoid having to use the fully qualified name in `buildscript{}` block (see https://github.com/gradle/gradle/issues/9270#issuecomment-400363045 )
 
 public final class Versions {
+  public static final String bintray = "1.8.5";
   public static final String flexmark = "0.62.2";
   public static final String klaxon = "5.4";
   public static final String kotlin = "1.4.10";
+  public static final String kotlinxHtml = "0.7.2";
   public static final String dokka = kotlin;
   public static final String kotlinSerialization = "1.0.0";
   public static final String jackson = "2.11.3";
-  public static final String jacoco = "0.8.4";
+  public static final String jacoco = "0.8.6";
   public static final String jgit = "5.9.0.202009080501-r";
   public static final String junit = "5.7.0";
   public static final String okhttp = "4.9.0";

@@ -1,8 +1,12 @@
 package org.openstreetmap.josm.gradle.plugin.api.gitlab
 
+import org.gradle.api.Action
+import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.credentials.HttpHeaderCredentials
 import org.gradle.api.logging.Logger
+import org.gradle.api.publish.PublishingExtension
 import org.gradle.authentication.http.HttpHeaderAuthentication
 import org.openstreetmap.josm.gradle.plugin.api.gitlab.GitlabRepositorySettings.Builder
 import java.net.URI
@@ -100,9 +104,15 @@ class GitlabRepositorySettings private constructor(
  * (see [GitlabRepositorySettings.Builder] for the available options).
  */
 fun RepositoryHandler.gitlabRepository(repoName: String, logger: Logger) {
-  val settings = GitlabRepositorySettings.Builder().build()
-  if (settings != null) {
-    this.maven {
+  gitlabRepositoryConfiguration(repoName)?.let {
+    maven(it)
+  } ?: logger.lifecycle(gitlabEnvVarHint(repoName))
+
+}
+
+private fun gitlabRepositoryConfiguration(repoName: String): Action<in MavenArtifactRepository>? =
+  Builder().build()?.let { settings ->
+    Action<MavenArtifactRepository> {
       it.url = URI("${settings.gitlabApiUrl}/projects/${settings.projectId}/packages/maven")
       it.name = repoName
       it.credentials(HttpHeaderCredentials::class.java) {
@@ -114,7 +124,19 @@ fun RepositoryHandler.gitlabRepository(repoName: String, logger: Logger) {
         it.create("auth", HttpHeaderAuthentication::class.java)
       }
     }
-  } else {
-    logger.lifecycle("Note: In order to publish to a Gitlab Maven package repository, set the environment variables GITLAB_PROJECT_ID and GITLAB_PERSONAL_ACCESS_TOKEN and use the task `publishAllPublicationsTo${repoName.capitalize()}Repository`. In GitLab CI you can publish using that task without setting any environment variables.")
   }
+
+fun Project.setupGitlabPublishingForAllProjects(repoName: String) {
+  gitlabRepositoryConfiguration(repoName)?.let { gitlabRepoConf ->
+    allprojects { p ->
+      p.pluginManager.withPlugin("publishing") {
+        p.extensions.getByType(PublishingExtension::class.java).repositories { r ->
+          // Create GitLab Maven repository to publish to.
+          r.maven(gitlabRepoConf)
+        }
+      }
+    }
+  } ?: logger.lifecycle(gitlabEnvVarHint(repoName))
 }
+
+private fun gitlabEnvVarHint(repoName: String): String = "Note: If you want to publish to a Gitlab Maven package repository, set the environment variables GITLAB_PROJECT_ID and GITLAB_PERSONAL_ACCESS_TOKEN . Then you can use the task `publishAllPublicationsTo${repoName.capitalize()}Repository`. In GitLab CI these environment variables are set automatically."
