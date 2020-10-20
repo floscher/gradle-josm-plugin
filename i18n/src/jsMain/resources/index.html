@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+  <title>i18n tool of gradle-josm-plugin</title>
+  <script type="text/javascript" src="i18n.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    pre {
+      background:#f5eeee;
+      color:#644;
+      width:100%;
+      padding:1rem;
+      margin: 0;
+      overflow-x: scroll;
+    }
+    .error {
+      background:#f00;
+      color:#fff;
+      font-weight:bold;
+    }
+    .warning {
+      background:#ff0;
+    }
+    td, th {
+      border: 1px solid #000;
+      padding: .5em;
+    }
+    table {
+      border-collapse: collapse;
+    }
+  </style>
+</head>
+<body>
+
+<noscript>
+  <div class="alert alert-danger">Please enable JavaScript for this page to work properly!</div>
+</noscript>
+<div class="error" id="javascript-error">
+  There was an error loading the JavaScript file needed for this page!
+</div>
+
+
+<h1>*.po file decoder</h1>
+<div>Select a *.po file to decode:</div>
+<input type="file" id="po-input-file" multiple="multiple" accept=".po,.pot,text/x-gettext-translation" />
+<h2>Decoded strings:</h2>
+<div id="po-warnings"></div>
+<div id="po-errors"></div>
+<table id="po-output"></table>
+
+
+</body>
