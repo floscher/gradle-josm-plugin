@@ -94,44 +94,39 @@ class I18nReadWriteTest {
     testLangSerializationPersistence(translations1, "translations1")
     testLangSerializationPersistence(asciiTranslations, "ascii")
 
-    val originalMsgIdsEn = requireNotNull(dummyTranslationsEn["en"]?.map { it.key })
-
+    val langFileEncoderEn = LangFileEncoder(dummyTranslationsEn["en"]?.map { it.key }!!)
     val dummyEnLangBytes = dummyTranslationsEn.map { (language, translations) ->
-      val stream = ByteArrayOutputStream()
-      LangWriter().writeLangStream(stream, originalMsgIdsEn, translations, language == "en")
-      assertEquals(I18nReadWriteTest::class.java.getResource("lang/dummy-baseEn-$language.lang")?.readBytes()?.toList(), stream.toByteArray().toList())
+      val bytes = if (language == "en") langFileEncoderEn.encodeToBaseLanguageByteArray() else langFileEncoderEn.encodeToByteArray(translations)
+      assertEquals(I18nReadWriteTest::class.java.getResource("lang/dummy-baseEn-$language.lang")?.readBytes()?.toList(), bytes.toList()) {
+        "lang/dummy-baseEn-$language.lang"
+      }
 
-      language to ByteArrayInputStream(stream.toByteArray())
+      language to ByteArrayInputStream(bytes)
     }.toMap()
     assertEquals(dummyTranslationsEn, LangReader().readLangStreams("en", dummyEnLangBytes["en"]!!, dummyEnLangBytes.minus("en")))
 
-
-    val originalMsgIdsRu = requireNotNull(dummyTranslationsRu["ru"]?.map { it.key })
+    val langFileEncoderRu = LangFileEncoder(dummyTranslationsRu["ru"]?.map { it.key }!!)
     val dummyRuLangBytes = dummyTranslationsRu.map { (language, translations) ->
-      val stream = ByteArrayOutputStream()
-      LangWriter().writeLangStream(stream, originalMsgIdsRu, translations, language == "ru")
-      assertEquals(I18nReadWriteTest::class.java.getResource("lang/dummy-baseRu-$language.lang")?.readBytes()?.toList(), stream.toByteArray().toList())
+      val bytes = if (language == "ru") langFileEncoderRu.encodeToBaseLanguageByteArray() else langFileEncoderRu.encodeToByteArray(translations)
+      assertEquals(I18nReadWriteTest::class.java.getResource("lang/dummy-baseRu-$language.lang")?.readBytes()?.toList(), bytes.toList())
 
-      language to ByteArrayInputStream(stream.toByteArray())
+      language to ByteArrayInputStream(bytes)
     }.toMap()
     assertEquals(dummyTranslationsRu, LangReader().readLangStreams("ru", dummyRuLangBytes["ru"]!!, dummyRuLangBytes.minus("ru")))
   }
 
   fun testLangSerializationPersistence(translations: Map<MsgId, MsgStr>, name: String) {
-    val langBaseStream = ByteArrayOutputStream()
-    val langStream = ByteArrayOutputStream()
-    LangWriter().writeLangStream(langBaseStream, translations.map { it.key }.filter { it.id.strings.first().isNotEmpty() }, translations.mapValues { it.key.id }, true)
-    LangWriter().writeLangStream(langStream, translations.entries.map { it.key }.filter { it.id.strings.first().isNotEmpty() }, translations, false)
-    val langBaseBytes = langBaseStream.toByteArray()
-    val langBytes = langStream.toByteArray()
+    val encoder = LangFileEncoder(translations.map { it.key })
+    val langBaseBytes = encoder.encodeToBaseLanguageByteArray()
+    val langBytes = encoder.encodeToByteArray(translations)
+
+    assertEquals(I18nReadWriteTest::class.java.getResource("lang/$name-en.lang")?.readBytes()?.toList(), langBaseBytes.toList())
+    assertEquals(I18nReadWriteTest::class.java.getResource("lang/$name-xy.lang")?.readBytes()?.toList(), langBytes.toList())
 
     assertEquals(
       translations.filter { it.key.id.strings.any { it.isNotEmpty() } },
       LangReader().readLangStreams("en", ByteArrayInputStream(langBaseBytes), mapOf("xy" to ByteArrayInputStream(langBytes)))["xy"]
     )
-
-    assertEquals(I18nReadWriteTest::class.java.getResource("lang/$name-en.lang")?.readBytes()?.toList(), langBaseBytes.toList())
-    assertEquals(I18nReadWriteTest::class.java.getResource("lang/$name-xy.lang")?.readBytes()?.toList(), langBytes.toList())
   }
 
   @Test
@@ -150,12 +145,11 @@ class I18nReadWriteTest {
     val emptyElement = moReadResult1.keys.firstOrNull { it.toByteArray().isEmpty() }
     assertEquals(translations, moReadResult1)
 
-    val langStreamOrig = ByteArrayOutputStream()
-    LangWriter().writeLangStream(langStreamOrig, moReadResult1.minus(listOfNotNull(emptyElement).toTypedArray()).keys.toList(), mapOf(), true)
-    val langStreamTrans = ByteArrayOutputStream()
-    LangWriter().writeLangStream(langStreamTrans, moReadResult1.minus(listOfNotNull(emptyElement).toTypedArray()).keys.toList(), moReadResult1)
+    val encoder = LangFileEncoder(moReadResult1.keys.toList())
+    val baseLanguageBytes = encoder.encodeToBaseLanguageByteArray()
+    val otherLanguageBytes = encoder.encodeToByteArray(moReadResult1)
 
-    val langReadResult = LangReader().readLangStreams("en", ByteArrayInputStream(langStreamOrig.toByteArray()), mapOf("es" to ByteArrayInputStream(langStreamTrans.toByteArray()))).get("es")
+    val langReadResult = LangReader().readLangStreams("en", ByteArrayInputStream(baseLanguageBytes), mapOf("es" to ByteArrayInputStream(otherLanguageBytes)))["es"]
       // putting the empty element back into the result (if present)
       ?.plus(listOfNotNull(emptyElement).map { it to moReadResult1.get(it) })
 

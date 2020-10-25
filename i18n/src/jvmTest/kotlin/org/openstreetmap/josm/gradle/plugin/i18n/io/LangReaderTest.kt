@@ -167,12 +167,11 @@ class LangReaderTest {
     println("Test writing and then reading the following MsgIds to the *.lang file format:")
     msgids.forEach { println(it) }
 
-    val outStream = ByteArrayOutputStream()
-    LangWriter().writeLangStream(outStream, msgids, mapOf(* msgids.map { Pair(it, it.id) }.toTypedArray()), true)
+    val outBytes = LangFileEncoder(msgids).encodeToBaseLanguageByteArray()
 
-    printBytesAsHex(outStream.toByteArray())
+    printBytesAsHex(outBytes)
 
-    assertEquals(msgids.toSet(), LangReader().readBaseLangStream(ByteArrayInputStream(outStream.toByteArray())).toSet())
+    assertEquals(msgids.toSet(), LangReader().readBaseLangStream(ByteArrayInputStream(outBytes)).toSet())
   }
 
   @Test
@@ -182,21 +181,26 @@ class LangReaderTest {
 
     val translatableStrings = getDummyTranslatableStrings(baseLang)
     val translationsByLang = getDummyTranslations(baseLang)
-    val langStreams = translationsByLang.keys.associate { it to ByteArrayOutputStream() }
-    val writer = LangWriter()
-    langStreams.forEach {
-      println("Writing language ${it.key}…")
+    val encoder = LangFileEncoder(translatableStrings)
+    val langFileBytes = translationsByLang.keys.associateWith { language ->
+      println("Writing language $language…")
       println("Translatable: " + translatableStrings.joinToString("\n"))
-      println("Translated: " + translationsByLang.getValue(it.key).values.joinToString("\n"))
-      writer.writeLangStream(it.value, translatableStrings, translationsByLang.getValue(it.key), it.key == baseLang)
-      println("Language is ${it.key}")
-      printBytesAsHex(it.value.toByteArray())
+      println("Translated: " + translationsByLang.getValue(language).values.joinToString("\n"))
+      val bytes = if (language == baseLang) {
+        encoder.encodeToBaseLanguageByteArray()
+      } else {
+        encoder.encodeToByteArray(translationsByLang.getValue(language))
+      }
+      println("Language is $language")
+      printBytesAsHex(bytes)
+
+      bytes
     }
 
     val translationsByLang2 = LangReader().readLangStreams(
       baseLang,
-      ByteArrayInputStream(langStreams.getValue(baseLang).toByteArray()),
-      langStreams.filterNot { it.key == baseLang }.map { it.key to ByteArrayInputStream(it.value.toByteArray()) }.toMap())
+      ByteArrayInputStream(langFileBytes.get(baseLang)),
+      langFileBytes.filterNot { it.key == baseLang }.map { it.key to ByteArrayInputStream(it.value) }.toMap())
 
 
     assertEquals(translationsByLang, translationsByLang2)

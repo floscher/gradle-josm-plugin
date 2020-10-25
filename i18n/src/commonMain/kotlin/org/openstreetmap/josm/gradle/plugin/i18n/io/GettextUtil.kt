@@ -2,8 +2,9 @@ package org.openstreetmap.josm.gradle.plugin.i18n.io
 
 
 internal val GETTEXT_CONTENT_TYPE_UTF8: String = "Content-Type: text/plain; charset=UTF-8"
-internal val GETTEXT_EMPTY_HEADER: Pair<MsgId, MsgStr> = MsgId(MsgStr("")) to MsgStr("")
-internal val GETTEXT_DEFAULT_HEADER: Pair<MsgId, MsgStr> = MsgId(MsgStr("")) to MsgStr("$GETTEXT_CONTENT_TYPE_UTF8\n")
+internal val GETTEXT_HEADER_MSGID: MsgId = MsgId(MsgStr(""))
+internal val GETTEXT_EMPTY_HEADER: Pair<MsgId, MsgStr> = GETTEXT_HEADER_MSGID to MsgStr("")
+internal val GETTEXT_DEFAULT_HEADER: Pair<MsgId, MsgStr> = GETTEXT_HEADER_MSGID to MsgStr("$GETTEXT_CONTENT_TYPE_UTF8\n")
 
 /**
  * If the [msgid] is just the empty string, returns a modified [msgstr] that contains the UTF-8 content type.

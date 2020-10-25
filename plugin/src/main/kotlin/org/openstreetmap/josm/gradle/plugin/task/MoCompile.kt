@@ -7,10 +7,11 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.openstreetmap.josm.gradle.plugin.config.I18nConfig
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
-import org.openstreetmap.josm.gradle.plugin.i18n.io.LangWriter
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MoReader
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
+import org.openstreetmap.josm.gradle.plugin.i18n.io.encodeToLangBytes
+import org.openstreetmap.josm.gradle.plugin.i18n.io.encodeToLangFiles
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 import javax.inject.Inject
@@ -59,19 +60,20 @@ open class MoCompile @Inject constructor(
         .filter { it.isFile && it.name.endsWith(".lang") }
         .forEach { it.delete() }
 
-      inputFiles.groupBy { it.parentFile.absolutePath }.forEach { dir, files ->
-        logger.lifecycle("  from $dir : ${files.map { it.nameWithoutExtension }.sorted().joinToString(", ")}")
-      }
-
-      val langMap = mutableMapOf<String, Map<MsgId, MsgStr>>()
-      inputFiles.forEach {
-        langMap[it.nameWithoutExtension] = MoReader(it.toURI().toURL()).readFile()
+      inputFiles.groupBy { it.parentFile.absolutePath }.forEach { (parentDir, files) ->
+        logger.lifecycle("  from $parentDir : ${files.map { it.nameWithoutExtension }.sorted().joinToString(", ")}")
       }
 
       logger.lifecycle("Writing the *.lang files into ${outDir.absolutePath} …")
-      LangWriter().writeLangFile(outDir, langMap, project.extensions.josm.i18n.mainLanguage)
+      encodeToLangFiles(
+        outDir,
+        inputFiles.map {
+          it.nameWithoutExtension to MoReader(it.toURI().toURL()).readFile()
+        }.toMap(),
+        project.extensions.josm.i18n.mainLanguage
+      )
 
-      inputFiles.groupBy { it.nameWithoutExtension }.filter { it.value.size >= 2 }.forEach { lang, paths ->
+      inputFiles.groupBy { it.nameWithoutExtension }.filter { it.value.size >= 2 }.forEach { (lang, paths) ->
         val warnMsg = "\nWARNING: For language $lang there are multiple *.mo files, of which only the last one in the following list is used:\n  * ${paths.joinToString("\n  * ")}\n"
         logger.warn(warnMsg)
         project.gradle.buildFinished { logger.warn(warnMsg) }

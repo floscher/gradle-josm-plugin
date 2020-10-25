@@ -16,13 +16,13 @@
       margin: 0;
       overflow-x: scroll;
     }
-    .error {
-      background:#f00;
+    tr.error td, td.error {
+      background:#a00;
       color:#fff;
       font-weight:bold;
     }
-    .warning {
-      background:#ff0;
+    tr.warning td, td.warning {
+      background:#fc0;
     }
     td, th {
       border: 1px solid #000;
@@ -30,6 +30,31 @@
     }
     table {
       border-collapse: collapse;
+    }
+
+    #loader div {
+      background: #aaa;
+      display: inline-block;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 1rem;
+      padding: 0;
+      margin: 0 1em;
+      animation: loader 2s ease infinite;
+    }
+    #loader div+div {
+      animation-delay: .5s;
+    }
+    #loader div+div+div {
+      animation-delay: 1s;
+    }
+    @keyframes loader {
+      0% { opacity: .25; }
+      50% { opacity: 1; }
+      100% { opacity: .25; }
+    }
+    .display-none {
+      display:none !important;
     }
   </style>
 </head>
@@ -47,9 +72,8 @@
 <div>Select a *.po file to decode:</div>
 <input type="file" id="po-input-file" multiple="multiple" accept=".po,.pot,text/x-gettext-translation" />
 <h2>Decoded strings:</h2>
-<div id="po-warnings"></div>
-<div id="po-errors"></div>
-<table id="po-output"></table>
+<div id="loader" class="display-none"><div></div><div></div><div></div></div>
+<table id="output-table"></table>
 
 
 </body>
