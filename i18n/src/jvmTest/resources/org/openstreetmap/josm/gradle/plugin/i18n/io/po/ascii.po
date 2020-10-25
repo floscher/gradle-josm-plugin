@@ -1,0 +1,39 @@
+msgid ""
+msgstr ""
+  "Content-Type: text/plain; charset=UTF-8\n"
+  ""
+
+msgid "A"
+msgstr "A+"
+
+msgid "XYZ42"
+msgstr "XYZ42+"
+
+msgctxt "context*"
+msgid "context"
+msgstr "context+"
+
+msgid "plural"
+msgid_plural "plural~"
+msgstr[0] "plural+"
+
+msgctxt "pluralContext*"
+msgid "pluralContext"
+msgid_plural "pluralContext~"
+msgstr[0] "pluralContext+"
+msgstr[1] "pluralContext2+"
+
+msgid "ABC"
+msgstr "ABC"
+
+msgid "ABC"
+msgid_plural "ABC"
+msgstr[0] "ABC"
+msgstr[1] "ABC"
+
+msgctxt "ABC"
+msgid "ABC"
+msgid_plural "ABC"
+msgstr[0] "ABC"
+msgstr[1] "ABC"
+msgstr[2] "ABC"

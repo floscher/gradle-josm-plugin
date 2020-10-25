@@ -5,7 +5,7 @@ package org.openstreetmap.josm.gradle.plugin.i18n.io
  *
  * This implementation completely disregards metadata
  */
-public class PoFormat: I18nFileFormat {
+public class PoFormat: I18nFileDecoder, I18nFileEncoder {
   private companion object {
     val REGEX_MSGCTXT = Regex("^msgctxt \"(.*)\"$")
     val REGEX_MSGID = Regex("^msgid \"(.*)\"$")
@@ -37,7 +37,7 @@ public class PoFormat: I18nFileFormat {
   override fun encodeToByteArray(translations: Map<MsgId, MsgStr>): ByteArray =
     translations
       .ensureUtf8EncodingInHeaderEntry()
-      .joinToString("\n\n") { (msgid, msgstr) ->
+      .joinToString("\n\n", "", "\n") { (msgid, msgstr) ->
         listOfNotNull(
           msgid.context?.let { """msgctxt "${it.escapeCharacters()}"""" },
           encodeMsgIdLines(msgid.id.strings),

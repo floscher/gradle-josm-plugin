@@ -1,0 +1,24 @@
+msgid ""
+msgstr ""
+  "Content-Type: text/plain; charset=UTF-8\n"
+  ""
+
+msgid "🇬🇧"
+msgstr "🇺🇸"
+
+msgid "English"
+msgstr "American English"
+
+msgid "Always the same"
+msgstr "Always the same"
+
+msgid "Always the same (Singular)"
+msgid_plural "Always the same (Plural)"
+msgstr[0] "Always the same (Singular)"
+msgstr[1] "Always the same (Plural)"
+
+msgctxt "context"
+msgid "Always the same"
+msgid_plural "plural"
+msgstr[0] "Always the same"
+msgstr[1] "plural"

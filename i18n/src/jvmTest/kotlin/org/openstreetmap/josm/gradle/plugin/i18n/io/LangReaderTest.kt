@@ -13,27 +13,29 @@ val DUMMY_TRANSLATIONS: Map<String?, List<Map<String, MsgStr>>> = mapOf(
     mapOf(
       "de" to MsgStr("\uD83C\uDDE9\uD83C\uDDEA"),
       "en" to MsgStr("\uD83C\uDDEC\uD83C\uDDE7"),
+      "en_US" to MsgStr("\uD83C\uDDFA\uD83C\uDDF8"),
+      "en_AU" to MsgStr("\uD83C\uDDE6\uD83C\uDDFA"),
       "fr" to MsgStr("\uD83C\uDDEB\uD83C\uDDF7"),
-      "ru" to MsgStr("\uD83C\uDDF7\uD83C\uDDFA")
+      "ru" to MsgStr("\uD83C\uDDF7\uD83C\uDDFA"),
     ),
     mapOf(
       "de" to MsgStr("Deutsch"),
       "en" to MsgStr("English"),
       "en_US" to MsgStr("American English"),
       "fr" to MsgStr("Français"),
-      "ru" to MsgStr("Русский")
+      "ru" to MsgStr("Русский"),
     ),
     mapOf(
       "de" to MsgStr("Text ohne Kontext"),
       "en" to MsgStr("String without context"),
       "fr" to MsgStr("Texte sans contexte"),
-      "ru" to MsgStr("Текст без контекста")
+      "ru" to MsgStr("Текст без контекста"),
     ),
     mapOf(
       "de" to MsgStr("de1", "de2"),
       "en" to MsgStr("en1", "en2"),
       "fr" to MsgStr("fr1", "fr2", "fr3"),
-      "ru" to MsgStr("ru1", "ru2", "ru3", "ru4")
+      "ru" to MsgStr("ru1", "ru2", "ru3", "ru4"),
     ),
     mapOf("de" to MsgStr("nur Deutsch")),
     mapOf("en" to MsgStr("only English")),
@@ -41,27 +43,27 @@ val DUMMY_TRANSLATIONS: Map<String?, List<Map<String, MsgStr>>> = mapOf(
     mapOf("ru" to MsgStr("только русский")),
     mapOf(
       "de" to MsgStr("en-de-trans"),
-      "en" to MsgStr("en-de-orig")
+      "en" to MsgStr("en-de-orig"),
     ),
     mapOf(
       "fr" to MsgStr("en-fr-trans"),
-      "en" to MsgStr("en-fr-orig")
+      "en" to MsgStr("en-fr-orig"),
     ),
     mapOf(
       "ru" to MsgStr("en-ru-trans"),
-      "en" to MsgStr("en-ru-orig")
+      "en" to MsgStr("en-ru-orig"),
     ),
     listOf("de", "en", "en_US", "fr", "ru").associateWith { MsgStr("Always the same") },
-    listOf("de", "en", "en_US", "fr", "ru").associateWith { MsgStr("Always the same (Singular)", "Always the same (Plural)") }
+    listOf("de", "en", "en_US", "fr", "ru").associateWith { MsgStr("Always the same (Singular)", "Always the same (Plural)") },
   ),
   "context" to listOf(
     mapOf(
       "de" to MsgStr("Text mit Kontext"),
       "en" to MsgStr("Text with context"),
       "fr" to MsgStr("Texte avec contexte"),
-      "ru" to MsgStr("Текст с контекстом")
+      "ru" to MsgStr("Текст с контекстом"),
     ),
-    listOf("de", "en", "en_US", "fr", "ru").associateWith { MsgStr("Always the same", "plural") }
+    listOf("de", "en", "en_US", "fr", "ru").associateWith { MsgStr("Always the same", "plural") },
   )
 )
 
