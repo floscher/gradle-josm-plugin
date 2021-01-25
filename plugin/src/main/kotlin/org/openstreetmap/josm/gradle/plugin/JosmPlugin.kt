@@ -62,12 +62,12 @@ class JosmPlugin: Plugin<Project> {
     project.afterEvaluate {
       if (project.version == Project.DEFAULT_VERSION) {
         try {
-          GitDescriber(project.projectDir).describe(dirty = true, trimLeading = project.extensions.josm.versionWithoutLeadingV)
+          GitDescriber(project.projectDir).describe(markSnapshots = true, trimLeading = true)
         } catch (e: Exception) {
           project.logger.info("Error getting project version for ${project.projectDir.absolutePath} using git!", e)
           try {
             // Fall back to SVN revision if `git describe` does not work
-            SvnDescriber(project.projectDir).describe(dirty = true, trimLeading = project.extensions.josm.versionWithoutLeadingV)
+            SvnDescriber(project.projectDir).describe(markSnapshots = true, trimLeading = true)
           } catch (e: Exception) {
             project.logger.info("Error getting project version for ${project.projectDir.absolutePath} using SVN!", e)
             // Don't set the project version

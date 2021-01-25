@@ -66,10 +66,10 @@ open class MoCompile @Inject constructor(
 
       logger.lifecycle("Writing the *.lang files into ${outDir.absolutePath} …")
       encodeToLangFiles(
-        outDir,
         inputFiles.map {
           it.nameWithoutExtension to MoReader(it.toURI().toURL()).readFile()
         }.toMap(),
+        outDir,
         project.extensions.josm.i18n.mainLanguage
       )
 

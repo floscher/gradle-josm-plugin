@@ -11,15 +11,15 @@ import java.util.concurrent.TimeUnit
 class SvnDescriber(val workTree: File): Describer {
 
   /**
-   * @param [dirty] if this is true, the revision number is appended with "-dirty",
+   * @param [markSnapshots] if this is true, the revision number is appended with [Describer.SNAPSHOT_SUFFIX],
    *   when there are uncommitted changes in the repository.
-   * @param [trimLeading] true, if the version number has the leading `r` stripped
+   * @param [trimLeading] by default strips the leading `r` of the version number, set to `false` to keep it
    * @return the SVN revision in the format "r123"
    * @throws [IOException] if the process of `svn info` is not executed successfully within 2 minutes,
    *   or if the result does not contain a revision.
    */
   @Throws(IOException::class)
-  override fun describe(dirty: Boolean, trimLeading: Boolean): String {
+  override fun describe(markSnapshots: Boolean, trimLeading: Boolean): String {
     val process = ProcessBuilder("svn", "info").directory(workTree).start()
     if (process.waitFor(2, TimeUnit.MINUTES) && process.exitValue() == 0) {
       val prefix = "Revision: "
@@ -28,13 +28,9 @@ class SvnDescriber(val workTree: File): Describer {
         .map { it.substring(prefix.length) }
         .findFirst()
         .orElseThrow {
-          IOException("`svn info` did not respond with a line starting with $prefix")
+          IOException("`svn info` did not respond with a line starting with `$prefix`")
         }
-      return (if (trimLeading) "" else "r") + if (dirty && isDirty()) {
-        "$description-dirty"
-      } else {
-        description
-      }
+      return "${if (trimLeading) "" else "r"}$description${if (markSnapshots && isDirty()) Describer.SNAPSHOT_SUFFIX else ""}"
     }
     throw IOException("Could not determine SVN revision of ${workTree.absolutePath}")
   }

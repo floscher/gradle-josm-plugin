@@ -367,15 +367,6 @@ open class JosmPluginExtension(val project: Project) {
   }
 
   /**
-   * Determines if the leading 'v' character is trimmed from the beginning of [Project.getVersion]
-   *
-   * **Default value:** `true` (before `0.6.0` this was `false` by default)
-   * @since 0.5.2
-   */
-  @Deprecated("This option will be removed, the leading v will always be removed")
-  var versionWithoutLeadingV = true
-
-  /**
    * @return true if a JOSM version of 7841 or later is used that can be configured to use separate directories for cache, preferences and userdata
    */
   fun useSeparateTmpJosmDirs(): Boolean = josmCompileVersion?.toIntOrNull()?.let { it >= 7841 } ?: true

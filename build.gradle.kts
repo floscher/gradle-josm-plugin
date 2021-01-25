@@ -39,7 +39,7 @@ gradle.projectsEvaluated {
 
     sourceSets(*
       setOf(":dogfood", ":langconv", ":plugin")
-        .map { project(it).extensions.getByName<SourceSetContainer>("sourceSets").getByName("main") }
+        .map { project(it).extensions.getByType(SourceSetContainer::class).getByName(SourceSet.MAIN_SOURCE_SET_NAME) }
         .toTypedArray()
     )
   }
@@ -54,7 +54,7 @@ logSkippedTasks()
 
 allprojects {
   group = "org.openstreetmap.josm" + if (name != "plugin") ".gradle-josm-plugin" else ""
-  version = GitDescriber(rootProject.projectDir).describe(trimLeading = true)
+  version = GitDescriber(rootProject.projectDir).describe()
 
   repositories.jcenter()
 
@@ -76,7 +76,7 @@ allprojects {
       kotlinOptions.jvmTarget = javaVersion.toString()
     }
     kotlinOptions {
-      freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+      freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
     }
   }
   tasks.withType(DokkaTask::class) {
