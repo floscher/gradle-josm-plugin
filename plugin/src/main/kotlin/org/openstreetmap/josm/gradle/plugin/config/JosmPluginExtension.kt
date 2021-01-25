@@ -243,10 +243,10 @@ open class JosmPluginExtension(val project: Project) {
         it.includeModule(GROUP_JOSM, ARTIFACT_JOSM_UNITTEST)
       }
       repo.patternLayout {
-        it.artifact("[artifact].jar")
-        it.artifact("[artifact]-[revision].jar")
-        it.artifact("[artifact]-snapshot-[revision].jar")
-        it.artifact("Archiv/[artifact]-snapshot-[revision].jar")
+        it.artifact("[artifact](-[classifier]).jar")
+        it.artifact("[artifact]-[revision](-[classifier]).jar")
+        it.artifact("[artifact]-snapshot-[revision](-[classifier]).jar")
+        it.artifact("Archiv/[artifact]-snapshot-[revision](-[classifier]).jar")
       }
       repo.metadataSources {
         it.artifact()
