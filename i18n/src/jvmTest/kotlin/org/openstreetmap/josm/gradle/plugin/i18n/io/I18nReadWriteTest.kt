@@ -11,7 +11,7 @@ class I18nReadWriteTest {
 
   val emptyTranslations: Map<MsgId, MsgStr> = mapOf(GETTEXT_DEFAULT_HEADER)
   val translations1: Map<MsgId, MsgStr> = mapOf(
-    MsgId(MsgStr("")) to MsgStr("Sing\nSing2\n$GETTEXT_CONTENT_TYPE_UTF8\n"),
+    GETTEXT_HEADER_MSGID to MsgStr("Sing\nSing2\n$GETTEXT_CONTENT_TYPE_UTF8\n"),
     MsgId(MsgStr("1", "2")) to MsgStr("Sing"),
     MsgId(MsgStr("1", "2"), "context") to MsgStr("Singular", "Plural"),
     MsgId(MsgStr("Many plurals (253 is maximum of *.lang)", "2")) to MsgStr("1", *(2..253).map { it.toString() }.toTypedArray()),
@@ -79,8 +79,8 @@ class I18nReadWriteTest {
   }
 
   private fun testPoSerializationPersistence(translations: Map<MsgId, MsgStr>, name: String) {
-    val bytes = PoFormat().encodeToByteArray(translations)
-    assertEquals(translations, PoFormat().decodeToTranslations(bytes)) {
+    val bytes = PoFileEncoder.encodeToByteArray(translations)
+    assertEquals(translations, PoFileDecoder.decodeToTranslations(bytes)) {
       "Contents of po/$name.po are not parsed as expected!"
     }
     assertEquals(I18nReadWriteTest::class.java.getResource("po/$name.po")?.readBytes()?.decodeToString(), bytes.decodeToString()) {

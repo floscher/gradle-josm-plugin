@@ -25,9 +25,9 @@ class DefaultI18nSourceSet(sourceSet: SourceSet, objFactory: ObjectFactory) : I1
     po.filter{ it.isFile }
     mo.filter{ it.isFile }
     lang.filter{ it.isFile }
-    po.include("**/*.po")
-    mo.include("**/*.mo")
-    lang.include("**/*.lang")
+    po.include("*.po")
+    mo.include("*.mo")
+    lang.include("*.lang")
     po.setSrcDirs(listOf("src/${sourceSet.name}/po"))
     mo.setSrcDirs(listOf("src/${sourceSet.name}/mo"))
     lang.setSrcDirs(listOf("src/${sourceSet.name}/lang"))

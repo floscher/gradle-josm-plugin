@@ -15,7 +15,7 @@ import org.openstreetmap.josm.gradle.i18n.MimeType.LANG
 import org.openstreetmap.josm.gradle.i18n.MimeType.PO
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
-import org.openstreetmap.josm.gradle.plugin.i18n.io.PoFormat
+import org.openstreetmap.josm.gradle.plugin.i18n.io.PoFileEncoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.encodeToLangBytes
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLDivElement
@@ -31,6 +31,7 @@ import org.w3c.files.FileReader
 import org.w3c.files.get
 import kotlin.js.Promise
 import kotlin.math.roundToInt
+import org.openstreetmap.josm.gradle.plugin.i18n.io.PoFileDecoder
 
 private val jsErrorMessage get() = document.getElementById("javascript-error") as HTMLDivElement
 private val inputFile get() = document.getElementById("po-input-file") as HTMLInputElement
@@ -57,7 +58,7 @@ public fun main() {
                 try {
                   val language = REGEX_FILENAME_TO_LANGUAGE.matchEntire(file.name)?.let { matchResult -> matchResult.groupValues[1] } ?: file.name
                   val bytes = (reader.result as ArrayBuffer).takeIf { it.byteLength <= 20 * 1024 * 1024 }?.toByteArray() ?: throw IllegalArgumentException("This file is bigger than 20 MiB!")
-                  resolve(language to PoFormat().decodeToTranslations(bytes))
+                  resolve(language to PoFileDecoder.decodeToTranslations(bytes))
                 } catch (t: Throwable) {
                   reject(Exception("File ${file.name}: ${t.message}", t))
                 }
@@ -88,7 +89,7 @@ public fun main() {
 }
 
 private fun HTMLTableElement.fillTableWith(translations: Map<String, Map<MsgId, MsgStr>>) {
-  val poFiles: Map<String, ByteArray> = translations.entries.map { it.key to PoFormat().encodeToByteArray(it.value) }.toMap()
+  val poFiles: Map<String, ByteArray> = translations.entries.map { it.key to PoFileEncoder.encodeToByteArray(it.value) }.toMap()
   val langFiles: Map<String, ByteArray> = encodeToLangBytes(translations)
 
   append {

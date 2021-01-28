@@ -3,7 +3,7 @@ package org.openstreetmap.josm.gradle.plugin.langconv
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MoWriter
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
-import kotlin.math.roundToInt
+import org.openstreetmap.josm.gradle.plugin.i18n.util.formatAsProgressBar
 
 @ExperimentalUnsignedTypes
 fun <R : Comparable<R>> Map<String, Map<MsgId, MsgStr>>.getTranslationStatsString(
@@ -25,22 +25,7 @@ fun <R : Comparable<R>> Map<String, Map<MsgId, MsgStr>>.getTranslationStatsStrin
       .sortedWith( if (ascending) compareBy(sortBy) else compareByDescending(sortBy))
       .joinToString("\n") { stringEntry ->
         val numTranslated = stringEntry.value.keys.filter { it != MoWriter.EMPTY_MSGID }.size
-        val percentage = numTranslated / numBaseStrings.toDouble() * 100
-        val endChar = if (numTranslated == numBaseStrings) '▒' else '░'
 
-        "${stringEntry.key.padStart(maxKeyLength + 2)}: ${numTranslated.toString().padStart(maxStringNumberLength)} strings (${String.format("%.2f", percentage).padStart(6)}% translated) $endChar${progressBarString(percentage).padEnd(25)}$endChar"
+        "${stringEntry.key.padStart(maxKeyLength + 2)}: ${numTranslated.toString().padStart(maxStringNumberLength)} strings ${formatAsProgressBar(numTranslated.toUInt(), numBaseStrings.toUInt())} translated"
       }
 }
-
-private fun progressBarString(percentage: Double): String = "█".repeat(percentage.toInt() / 4) +
-  when (((percentage % 4) * 2).roundToInt()) {
-    0 -> ""
-    1 -> '▏'
-    2 -> '▎'
-    3 -> '▍'
-    4 -> '▌'
-    5 -> '▋'
-    6 -> '▊'
-    7 -> '▉'
-    else -> '█'
-  }

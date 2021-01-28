@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
   id("com.jfrog.bintray")
@@ -8,14 +9,43 @@ plugins {
   `maven-publish`
 }
 
+tasks.withType(DokkaTask::class) {
+  this.dokkaSourceSets.forEach {
+    it.samples.from("src/commonTest/kotlin")
+  }
+}
+
 kotlin {
   explicitApiWarning()
-  js().browser()
+  js().browser {
+    testTask {
+      useKarma {
+        useFirefox()
+      }
+    }
+  }
   jvm()
 
   val jsMain by sourceSets.getting {
     dependencies {
       implementation("org.jetbrains.kotlinx:kotlinx-html:${Versions.kotlinxHtml}")
+    }
+  }
+  val commonTest by sourceSets.getting {
+    dependencies {
+      implementation(kotlin("test-common"))
+      implementation(kotlin("test-annotations-common"))
+    }
+  }
+  val jsTest by sourceSets.getting {
+    dependencies {
+      implementation(kotlin("test-js"))
+    }
+  }
+  val jvmTest by sourceSets.getting {
+    dependencies {
+      implementation(kotlin("test"))
+      implementation(kotlin("test-junit5"))
     }
   }
 }

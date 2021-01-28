@@ -7,8 +7,7 @@ package org.openstreetmap.josm.gradle.plugin.i18n.io
  * @property c third byte
  * @property d fourth byte
  */
-@ExperimentalUnsignedTypes
-data class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) {
+public data class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) {
 
   /**
    * @param [big] most significant byte
@@ -18,7 +17,7 @@ data class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) {
    * @param [bigEndian] `true` if the bytes should come in the order from most significant first
    *  to least significant last, `false` if the order should be exactly in reverse
    */
-  constructor(big: Byte, bigish: Byte, lowish: Byte, low: Byte, bigEndian: Boolean) : this(
+  public constructor(big: Byte, bigish: Byte, lowish: Byte, low: Byte, bigEndian: Boolean) : this(
     if (bigEndian) big else low,
     if (bigEndian) bigish else lowish,
     if (bigEndian) lowish else bigish,
@@ -30,7 +29,8 @@ data class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) {
    * @param uintValue the 32 bit unsigned integer value
    * @param bigEndian if true, the number is encoded in big-endian byte order, otherwise in little-endian
    */
-  constructor(uintValue: UInt, bigEndian: Boolean): this(
+  @ExperimentalUnsignedTypes
+  public constructor(uintValue: UInt, bigEndian: Boolean): this(
     uintValue.shr(24).and(0xFFu).toUByte().toByte(),
     uintValue.shr(16).and(0xFFu).toUByte().toByte(),
     uintValue.shr(8).and(0xFFu).toUByte().toByte(),
@@ -45,7 +45,7 @@ data class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) {
    * @return the [kotlin.UInt] value (unsigned 32 bit) represented by the four bytes [a], [b], [c] and [d], respecting the given byte order.
    */
   @ExperimentalUnsignedTypes
-  fun getUIntValue(bigEndian: Boolean): UInt =
+  public fun getUIntValue(bigEndian: Boolean): UInt =
     if (bigEndian) {
       // Big endian: "Beginning at the big end", first byte is most significant
       FourBytes(d, c, b, a).getUIntValue(!bigEndian)
@@ -63,8 +63,7 @@ data class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) {
  * Converts a list of [FourBytes] values to one single [ByteArray].
  * @return the [ByteArray] representation of the [FourBytes] list
  */
-@OptIn(ExperimentalUnsignedTypes::class)
-fun List<FourBytes>.toByteArray() = ByteArray(this.size * 4) { i ->
+public fun List<FourBytes>.toByteArray(): ByteArray = ByteArray(this.size * 4) { i ->
   this[i / 4].let {
     when (i % 4) {
       0 -> it.a

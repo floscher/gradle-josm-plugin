@@ -1,0 +1,60 @@
+package org.openstreetmap.josm.gradle.plugin.i18n.util
+
+import kotlin.math.roundToInt
+
+/**
+ * Takes two numbers and returns a Unicode progress bar of length 36:
+ *   * 1 character: if [numCompleted] == [numTotal] then ▒ else ░
+ *   * 25 characters: the progress bar itself (see [toRawProgressBar])
+ *   * 1 character: if [numCompleted] == [numTotal] then ▒ else ░
+ *   * 9 characters: percentage with 2 decimal places and percent sign
+ *
+ * @sample org.openstreetmap.josm.gradle.plugin.i18n.util.TextUtilsTest.testFormatAsProgressBar
+ *
+ * @throws IllegalArgumentException if [numCompleted] > [numTotal]
+ */
+@ExperimentalUnsignedTypes
+public fun formatAsProgressBar(numCompleted: UInt, numTotal: UInt): String {
+  require(numCompleted <= numTotal)
+  val proportion = if (numTotal == 0u) 1.0 else numCompleted.toDouble() / numTotal.toDouble()
+  return proportion.toRawProgressBar(25u)
+    .run { if (numCompleted == numTotal) "▒$this▒" else "░$this░" } // highlight when fully completed
+    .run {
+      "$this ${
+        (proportion * 10000).roundToInt().toString() // format to number with always 2 decimal places
+          .padStart(3, '0')
+          .padStart(5, ' ')
+          .run { substring(0..2) + '.' + substring(3) }
+      } %"
+    }
+}
+
+/**
+ * Converts a number in the range from `0.0` to `1.0` into a unicode progress bar of length between
+ * 0 and [maxLength] characters.
+ * The progressbar uses characters `U+2588` to `U+258F` from the
+ * [block elements Unicode block](https://en.wikipedia.org/wiki/Block_Elements), so 8 * [maxLength] different lengths
+ * are possible.
+ * Numbers below `0.0` will produce an empty bar, numbers above `1.0` a full bar (no longer than [maxLength] characters).
+ *
+ * @return A simple unicode progress bar, padded with spaces at the end, so always 25 characters long
+ */
+@ExperimentalUnsignedTypes
+private fun Double.toRawProgressBar(maxLength: UShort = 25u): String = this
+  .coerceIn(0.0, 1.0)
+  .run {
+    (
+      "█".repeat((this * maxLength.toInt()).toInt()) +
+      when ((this * maxLength.toInt() * 8 % 8).roundToInt()) {
+        0 -> ""
+        1 -> '▏'
+        2 -> '▎'
+        3 -> '▍'
+        4 -> '▌'
+        5 -> '▋'
+        6 -> '▊'
+        7 -> '▉'
+        else -> '█'
+      }
+    ).padEnd(maxLength.toInt(), ' ')
+  }
