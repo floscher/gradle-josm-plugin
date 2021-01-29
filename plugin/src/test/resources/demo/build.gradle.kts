@@ -28,7 +28,7 @@ josm {
     iconPath = "path/to/my/icon.svg"
     loadEarly = false
     loadPriority = 50
-    pluginDependencies.addAll(setOf("apache-commons", "apache-http"))
+    pluginDependencies += setOf("apache-commons", "apache-http")
     website = URL("https://example.org")
     oldVersionDownloadLink(123, "1.2.0", URL("https://example.org/download/v1.2.0/MyAwesomePlugin.jar"))
     oldVersionDownloadLink( 42, "1.0.0", URL("https://example.org/download/v1.0.0/MyAwesomePlugin.jar"))
