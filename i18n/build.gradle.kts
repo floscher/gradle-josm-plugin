@@ -20,7 +20,12 @@ kotlin {
   js().browser {
     testTask {
       useKarma {
-        useFirefox()
+        if (System.getenv("CI") != null) {
+          useChromiumHeadless()
+          useConfigDirectory(projectDir.resolve("config/karma"))
+        } else {
+          useFirefox()
+        }
       }
     }
   }

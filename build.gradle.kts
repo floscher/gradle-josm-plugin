@@ -1,16 +1,18 @@
+import java.net.URL
 import Build_gradle.IKotlinCompile
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.dokka.Platform
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import org.openstreetmap.josm.gradle.plugin.api.gitlab.setupGitlabPublishingForAllProjects
 import org.openstreetmap.josm.gradle.plugin.logCoverage
 import org.openstreetmap.josm.gradle.plugin.logPublishedMavenArtifacts
 import org.openstreetmap.josm.gradle.plugin.logSkippedTasks
 import org.openstreetmap.josm.gradle.plugin.logTaskDuration
-import org.openstreetmap.josm.gradle.plugin.GitDescriber
-import java.net.URL
 
 typealias IKotlinCompile<T> = org.jetbrains.kotlin.gradle.dsl.KotlinCompile<T>
 
@@ -110,6 +112,13 @@ allprojects {
       tasks.withType(Jar::class).findByName("javadocJar")?.apply {
         from(tasks.named<DokkaTask>("dokkaHtml").map { it.outputDirectory })
       }
+    }
+  }
+
+  if (System.getenv("CI") != null) {
+    // Disable Node download in CI (No download for Alpine available)
+    plugins.withType(NodeJsRootPlugin::class) {
+      the<NodeJsRootExtension>().download = false
     }
   }
 }

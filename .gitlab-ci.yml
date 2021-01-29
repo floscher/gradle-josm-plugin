@@ -1,4 +1,4 @@
-image: registry.gitlab.com/josm/docker-library/openjdk-11-git:latest
+image: registry.gitlab.com/josm/docker-library/openjdk-15-git:latest
 
 before_script:
 - export GRADLE_USER_HOME=`pwd`/.gradle
@@ -21,7 +21,9 @@ assemble:
 
 test:
   stage: test
-  image: registry.gitlab.com/josm/docker-library/openjdk-11-josmplugin
+  image: registry.gitlab.com/josm/docker-library/openjdk-15-josmplugin
+  before_script:
+    - apk add --no-cache nodejs chromium
   script:
   - ./gradlew --stacktrace --info build :dokkaHtmlMultimodule :jacocoTestReport
   artifacts:
