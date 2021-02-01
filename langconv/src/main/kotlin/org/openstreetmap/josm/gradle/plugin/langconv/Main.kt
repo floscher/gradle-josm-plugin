@@ -1,6 +1,5 @@
 package org.openstreetmap.josm.gradle.plugin.langconv
 
-import org.openstreetmap.josm.gradle.plugin.i18n.io.LangReader
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MoReader
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MoWriter
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
@@ -11,6 +10,7 @@ import java.io.IOException
 import java.util.Locale
 import kotlin.system.exitProcess
 import org.openstreetmap.josm.gradle.plugin.i18n.io.encodeToLangFiles
+import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileDecoder
 
 @ExperimentalUnsignedTypes
 @Throws(IllegalArgumentException::class)
@@ -126,7 +126,8 @@ private enum class LangconvMode(val inputFilter: FileFilter, val readFunction: (
       if (separateInputFiles.first.isEmpty()) {
         failWithException(IllegalArgumentException("No en.lang file is given, currently the base language is always 'en', so such a file is needed!"))
       }
-      LangReader().readLangStreams("en", separateInputFiles.first.first().inputStream(), separateInputFiles.second.map { it.nameWithoutExtension to it.inputStream() }.toMap())
+
+      LangFileDecoder.decodeMultipleLanguages("en", separateInputFiles.first.first().readBytes(), separateInputFiles.second.map { it.nameWithoutExtension to it.readBytes() }.toMap())
     },
     writeFunction = { langMap, outputDir ->
       val writer = MoWriter()

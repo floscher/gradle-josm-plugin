@@ -22,23 +22,27 @@ class MoReaderTest {
   @Test
   fun testByteListToLong() {
     for (i in 0..20) {
-      assertEquals(i / 4, ByteArray(i) { 0 }.toUIntList(true).size)
-      assertEquals(i / 4, ByteArray(i) { 0 }.toUIntList(false).size)
+      assertEquals(i / 4, ByteArray(i) { 0 }.toFourByteList().map { it.getUIntValue(true) }.size)
+      assertEquals(i / 4, ByteArray(i) { 0 }.toFourByteList().map { it.getUIntValue(false) }.size)
     }
 
     val bytes0000 = ByteArray(4) { 0.toByte() }
-    assertEquals(listOf(0u), bytes0000.toUIntList(true))
-    assertEquals(listOf(0u), bytes0000.toUIntList(false))
+    assertEquals(listOf(0u), bytes0000.toFourByteList().map { it.getUIntValue(true) })
+    assertEquals(listOf(0u), bytes0000.toFourByteList().map { it.getUIntValue(false) })
 
+    val BE_1234 = 16909060u
+    val LE_1234 = 67305985u
     val bytes1234 = ByteArray(4) { (it + 1).toByte() }
-    assertEquals(listOf(16909060u), bytes1234.toUIntList(true))
-    assertEquals(listOf(67305985u), bytes1234.toUIntList(false))
+    assertEquals(listOf(BE_1234), bytes1234.toFourByteList().map { it.getUIntValue(true) })
+    assertEquals(listOf(LE_1234), bytes1234.toFourByteList().map { it.getUIntValue(false) })
 
+    val BE_FFFEFDFC = 4294901244u
+    val LE_FFFEFDFC = 4244504319u
     val bytesFFFEFDFC = ByteArray(4) { (- it - 1).toByte() }
-    assertEquals(listOf(4294901244u), bytesFFFEFDFC.toUIntList(true))
-    assertEquals(listOf(4244504319u), bytesFFFEFDFC.toUIntList(false))
+    assertEquals(listOf(BE_FFFEFDFC), bytesFFFEFDFC.toFourByteList().map { it.getUIntValue(true) })
+    assertEquals(listOf(LE_FFFEFDFC), bytesFFFEFDFC.toFourByteList().map { it.getUIntValue(false) })
 
-    assertEquals(listOf(0u, 16909060u, 4294901244u), bytes0000.plus(bytes1234).plus(bytesFFFEFDFC).toUIntList(true))
-    assertEquals(listOf(0u, 67305985u, 4244504319u), bytes0000.plus(bytes1234).plus(bytesFFFEFDFC).toUIntList(false))
+    assertEquals(listOf(0u, BE_1234, BE_FFFEFDFC), bytes0000.plus(bytes1234).plus(bytesFFFEFDFC).toFourByteList().map { it.getUIntValue(true) })
+    assertEquals(listOf(0u, LE_1234, LE_FFFEFDFC), bytes0000.plus(bytes1234).plus(bytesFFFEFDFC).toFourByteList().map { it.getUIntValue(false) })
   }
 }

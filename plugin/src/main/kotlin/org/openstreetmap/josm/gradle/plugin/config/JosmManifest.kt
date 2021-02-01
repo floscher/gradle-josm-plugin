@@ -15,8 +15,11 @@ import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
 import org.openstreetmap.josm.gradle.plugin.task.LangCompile
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
+import java.io.IOException
 import java.net.URL
 import java.util.GregorianCalendar
+import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileDecoder
+import org.openstreetmap.josm.gradle.plugin.i18n.io.decodeLangFiles
 
 /**
  * The info that will be written into the manifest file of the plugin *.jar
@@ -428,7 +431,8 @@ class JosmManifest(private val project: Project) {
     if (langCompileTask != null) {
       val langDir = File(langCompileTask.destinationDir, langCompileTask.subdirectory)
       if (langDir.exists() && langDir.canRead()) {
-        val translations = LangReader().readLangFiles(langDir, project.extensions.josm.i18n.mainLanguage)
+
+        val translations = langDir.decodeLangFiles(project.extensions.josm.i18n.mainLanguage)
         val baseDescription = project.extensions.josm.manifest.description
         if (baseDescription != null) {
           translations.forEach {

@@ -3,10 +3,6 @@ package org.openstreetmap.josm.gradle.plugin.i18n.io
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.InputStream
 
 val DUMMY_TRANSLATIONS: Map<String?, List<Map<String, MsgStr>>> = mapOf(
   null to listOf(
@@ -97,11 +93,6 @@ class LangReaderTest {
     testLangStreams(baseLang, languages, { ByteArray(2) { 0xFF.toSignedByte() } }) {
       assertEquals(emptyResult, it.invoke())
     }
-
-    // 0xFFFFFF
-    testLangStreams(baseLang, languages, { ByteArray(3) { 0xFF.toSignedByte() } }) {
-      assertEquals(emptyResult, it.invoke())
-    }
   }
 
   @Test
@@ -110,7 +101,7 @@ class LangReaderTest {
       "en",
       listOf("en"),
       { byteArrayOf(0xFF.toSignedByte()) },
-      { assertThrows(IOException::class.java) { it.invoke() } }
+      { assertThrows(IllegalArgumentException::class.java) { it.invoke() } }
     )
   }
 
@@ -131,7 +122,7 @@ class LangReaderTest {
       },
       {
         assertEquals(
-          languages.associate { it to mapOf(MsgId(MsgStr("a".repeat(65533))) to MsgStr("a".repeat(65533))) },
+          languages.associateWith { mapOf(MsgId(MsgStr("a".repeat(65533))) to MsgStr("a".repeat(65533))) },
           it.invoke()
         )
       }
@@ -147,7 +138,7 @@ class LangReaderTest {
           }
         }
       },
-      { assertThrows(IOException::class.java) { it.invoke() } }
+      { assertThrows(IllegalArgumentException::class.java) { it.invoke() } }
     )
   }
 
@@ -171,7 +162,7 @@ class LangReaderTest {
 
     printBytesAsHex(outBytes)
 
-    assertEquals(msgids.toSet(), LangReader().readBaseLangStream(ByteArrayInputStream(outBytes)).toSet())
+    assertEquals(msgids.toSet(), LangFileDecoder(outBytes).baseMessages.toSet())
   }
 
   @Test
@@ -197,10 +188,11 @@ class LangReaderTest {
       bytes
     }
 
-    val translationsByLang2 = LangReader().readLangStreams(
+    val translationsByLang2 = LangFileDecoder.decodeMultipleLanguages(
       baseLang,
-      ByteArrayInputStream(langFileBytes.get(baseLang)),
-      langFileBytes.filterNot { it.key == baseLang }.map { it.key to ByteArrayInputStream(it.value) }.toMap())
+      langFileBytes[baseLang]!!,
+      langFileBytes.minus(baseLang)
+    )
 
 
     assertEquals(translationsByLang, translationsByLang2)
@@ -220,11 +212,9 @@ class LangReaderTest {
   }
 
   private fun testLangStreams(baseLang: String, languages: List<String>, inputBytes: (String) -> ByteArray, test: (() -> Map<String, Map<MsgId, MsgStr>>) -> Unit) {
-    test.invoke {  LangReader().readLangStreams(baseLang, ByteArrayInputStream(inputBytes.invoke(baseLang)), languages.associate { it to ByteArrayInputStream(inputBytes.invoke(it)) }) }
-  }
-
-  private fun getDummyLangStreamsWithBytes(baseLang: String, languages: List<String>, langToBytes: (String) -> ByteArray): Pair<InputStream, Map<String, InputStream>> {
-    return ByteArrayInputStream(langToBytes.invoke(baseLang)) to languages.associate { it to ByteArrayInputStream(langToBytes.invoke(it)) }
+    test {
+      LangFileDecoder.decodeMultipleLanguages(baseLang, inputBytes(baseLang), languages.associate { it to inputBytes(it) })
+    }
   }
 
   internal fun getDummyTranslatableStrings(baseLang: String): List<MsgId> = DUMMY_TRANSLATIONS.flatMap { (context, translations) ->

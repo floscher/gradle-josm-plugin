@@ -39,7 +39,7 @@ public data class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) 
   )
 
   /**
-   * Convert the four byte values to one unsigned Int value.
+   * Convert the four (signed) byte values to one unsigned [UInt] value.
    * @param bigEndian determines byte order. If `true`, byte order is big-endian.
    *   Otherwise the byte order is little-endian.
    * @return the [kotlin.UInt] value (unsigned 32 bit) represented by the four bytes [a], [b], [c] and [d], respecting the given byte order.
@@ -57,19 +57,4 @@ public data class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) 
         ).shl(8) + b.toUByte().toUInt()
       ).shl(8) + a.toUByte().toUInt()
     }
-}
-
-/**
- * Converts a list of [FourBytes] values to one single [ByteArray].
- * @return the [ByteArray] representation of the [FourBytes] list
- */
-public fun List<FourBytes>.toByteArray(): ByteArray = ByteArray(this.size * 4) { i ->
-  this[i / 4].let {
-    when (i % 4) {
-      0 -> it.a
-      1 -> it.b
-      2 -> it.c
-      else -> it.d
-    }
-  }
 }

@@ -14,7 +14,16 @@ import java.io.IOException
  * @throws IllegalArgumentException if the given translations can't be represented as a *.lang file (too long strings, too many grammatical numbers, …)
  * @see encodeToLangBytes
  */
-public fun encodeToLangFiles(translations: Map<String, Map<MsgId, MsgStr>>, outputDir: File, baseLanguage: String = LangFileEncoder.DEFAULT_BASE_LANGUAGE): Unit =
-  encodeToLangBytes(translations, baseLanguage).forEach { (language, bytes) ->
-    File(outputDir, "$language.lang").writeBytes(bytes)
-  }
+public fun encodeToLangFiles(
+  translations: Map<String, Map<MsgId, MsgStr>>,
+  outputDir: File,
+  baseLanguage: String = LangFileEncoder.DEFAULT_BASE_LANGUAGE
+): Set<File> =
+  I18nTranslationData(
+    baseLanguage,
+    translations[baseLanguage]?.map { it.key } ?: throw IOException("No messages for the base language found!"),
+    translations.minus(baseLanguage)
+  )
+    .encodeToMultipleLangFiles()
+    .map { (language, bytes) -> File(outputDir, "$language.lang").apply { writeBytes(bytes) } }
+    .toSet()

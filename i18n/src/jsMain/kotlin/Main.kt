@@ -16,7 +16,6 @@ import org.openstreetmap.josm.gradle.i18n.MimeType.PO
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
 import org.openstreetmap.josm.gradle.plugin.i18n.io.PoFileEncoder
-import org.openstreetmap.josm.gradle.plugin.i18n.io.encodeToLangBytes
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -31,6 +30,8 @@ import org.w3c.files.FileReader
 import org.w3c.files.get
 import kotlin.js.Promise
 import kotlin.math.roundToInt
+import org.openstreetmap.josm.gradle.plugin.i18n.io.I18nTranslationData
+import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileEncoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.PoFileDecoder
 
 private val jsErrorMessage get() = document.getElementById("javascript-error") as HTMLDivElement
@@ -89,8 +90,14 @@ public fun main() {
 }
 
 private fun HTMLTableElement.fillTableWith(translations: Map<String, Map<MsgId, MsgStr>>) {
+  val baseLanguage = LangFileEncoder.DEFAULT_BASE_LANGUAGE
   val poFiles: Map<String, ByteArray> = translations.entries.map { it.key to PoFileEncoder.encodeToByteArray(it.value) }.toMap()
-  val langFiles: Map<String, ByteArray> = encodeToLangBytes(translations)
+  val langFiles: Map<String, ByteArray> = I18nTranslationData(
+    baseLanguage,
+    translations[baseLanguage]?.map { it.key } ?: throw IllegalArgumentException("No translations for base language found!"),
+    translations.minus(baseLanguage)
+  )
+    .encodeToMultipleLangFiles()
 
   append {
     th {

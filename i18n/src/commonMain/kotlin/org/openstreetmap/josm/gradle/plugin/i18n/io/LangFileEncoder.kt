@@ -1,23 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin.i18n.io
 
 /**
- * Takes translations for multiple languages and converts them into the *.lang file format used by JOSM.
- *
- * If [translations] contains a mapping for [baseLanguage], only translations for the [MsgId]s from that [Map.Entry] will be encoded.
- *
- * But if [translations] does not contain a mapping for [baseLanguage], all [MsgId]s from all entries of [translations] will be encoded.
- * @param translations a Map that maps language codes to Maps that contain the translations for the language code
- * @param baseLanguage the base language, from which all the strings were translated to other languages
- */
-public fun encodeToLangBytes(translations: Map<String, Map<MsgId, MsgStr>>, baseLanguage: String = LangFileEncoder.DEFAULT_BASE_LANGUAGE): Map<String, ByteArray> =
-  LangFileEncoder(translations[baseLanguage]?.keys?.toList() ?: translations.values.flatMap { it.keys })
-    .let { encoder ->
-      translations.minus(baseLanguage).entries.associate {
-        it.key to encoder.encodeToByteArray(it.value)
-      }.plus(baseLanguage to encoder.encodeToBaseLanguageByteArray())
-    }
-
-/**
  * Encoder for the *.lang file format used by JOSM.
  * @param baseMsgIds the [MsgId]s in the base language for which translations will be encoded
  */
@@ -89,8 +72,7 @@ public class LangFileEncoder(baseMsgIds: List<MsgId>): I18nFileEncoder {
    */
   override fun encodeToByteArray(translations: Map<MsgId, MsgStr>): ByteArray =
     singularMsgIds.flatMap { msgid ->
-      val msgstr = translations[msgid]
-      when (msgstr) {
+      when (val msgstr = translations[msgid]) {
         null -> listOf(0.toByte(), 0.toByte())
         msgid.id -> listOf(0xFF.toByte(), 0xFE.toByte())
         else -> msgstr.strings.encodeWithLength()
@@ -99,8 +81,7 @@ public class LangFileEncoder(baseMsgIds: List<MsgId>): I18nFileEncoder {
       .plus(SINGULAR_PLURAL_SEPARATOR)
       .plus(
         pluralMsgIds.flatMap { msgid ->
-          val msgstr = translations[msgid]
-          when (msgstr) {
+          when (val msgstr = translations[msgid]) {
             null -> listOf(0.toByte())
             msgid.id -> listOf(0xFE.toByte())
             else -> msgstr.encodePluralSize().plus(msgstr.strings.encodeWithLength())

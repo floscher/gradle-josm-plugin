@@ -91,7 +91,7 @@ class MoReader private constructor(private val stream1: InputStream, private val
         val msgIds: MutableList<MsgId> = mutableListOf()
         for (i in 0 until header.numStrings) {
           stream1Pos += s1.readAllOrException(stringLengthOffset).toUInt()
-          val stringDescriptor = stringLengthOffset.toUIntList(header.isBigEndian)
+          val stringDescriptor = stringLengthOffset.toFourByteList().map { it.getUIntValue(header.isBigEndian) }
           val stringLength = stringDescriptor[0].toInt()
           if (stringLength < 0) {
             TODO("Reading strings longer than ${Int.MAX_VALUE} is not implemented! You are trying to read one of length ${stringLength.toUInt()}!")
@@ -109,7 +109,7 @@ class MoReader private constructor(private val stream1: InputStream, private val
         // Read msgstr strings
         for (i in 0 until header.numStrings) {
           stream1Pos += s1.readAllOrException(stringLengthOffset).toUInt()
-          val stringDescriptor = stringLengthOffset.toUIntList(header.isBigEndian)
+          val stringDescriptor = stringLengthOffset.toFourByteList().map { it.getUIntValue(header.isBigEndian) }
 
           stream2Pos += s2.skipAllOrException(stringDescriptor[1] - stream2Pos)
           val stringBytes = ByteArray(stringDescriptor[0].toInt()) {0}
@@ -144,21 +144,8 @@ class MoReader private constructor(private val stream1: InputStream, private val
       BE_MAGIC.reversedArray().contentEquals(magic) -> false
       else -> throw IOException("Not a MO file, magic bytes are incorrect!")
     }
-    val headerInts = header.sliceArray(magic.size until header.size).toUIntList(isBigEndian)
+    val headerInts = header.sliceArray(magic.size until header.size).toFourByteList().map { it.getUIntValue(isBigEndian) }
 
     return HeaderValues(isBigEndian, headerInts)
   }
 }
-
-/**
- * Converts a list of bytes to a list of long values.
- *
- * Four [Byte] values are combined to form one [kotlin.UInt] value (either as little endian or as big endian).
- * If the size of the [ByteArray] is not a multiple of 4, the last remainder bytes after
- * dividing the bytes into groups of four are ignored.
- *
- * See [FourBytes] for details on how the byte values are combined.
- */
-@ExperimentalUnsignedTypes
-internal fun ByteArray.toUIntList(bigEndian: Boolean): List<kotlin.UInt> = (0 until size - 3 step 4)
-  .map{ FourBytes(get(it), get(it + 1), get(it + 2), get(it + 3)).getUIntValue(bigEndian) }
