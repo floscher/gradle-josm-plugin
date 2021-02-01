@@ -56,37 +56,6 @@ open class InitJosmPreferences: DefaultTask() {
 
   @TaskAction
   fun action() {
-    // TODO: The following lines are for backwards compatibility with the `josmConfigDir` setting in the `JosmPluginExtension`. Remove when no longer needed
-    val deprecatedPreferencesFile = File(project.extensions.josm.josmConfigDir, "preferences.xml")
-    val prefFragment = if (deprecatedPreferencesFile.exists()) {
-      "^.*<preferences[^>]+>(.+)</preferences>.*$".toRegex(setOf(RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL))
-        .matchEntire(deprecatedPreferencesFile.readText())
-        ?.groupValues
-        ?.get(1)
-    } else {
-      null
-    }
-    if (prefFragment != null) {
-      val logDeprecationWarning = {
-        logger.error("""
-            |Deprecation warning:
-            |====================
-            |Please set default JOSM preferences by setting the following in your `build.gradle(.kts)`
-            |josm {
-            |  initialPreferences.set(
-            |    "${prefFragment.trimIndent().lines().joinToString("\\n\" +\n    \"") { it.replace("\"", "\\\"") }}"
-            |  )
-            |}
-            |instead of using ${deprecatedPreferencesFile.absolutePath} !
-            |This change will become mandatory soon with one of the next releases of the gradle-josm-plugin.
-            |""".trimMargin()
-        )
-      }
-      logDeprecationWarning()
-      project.gradle.buildFinished { logDeprecationWarning() }
-    }
-    // TODO: Remove until here, when no longer needed.
-
     project.sync {
       it.from(pluginDistTask)
       it.from(requiredPluginConfig)
@@ -97,7 +66,7 @@ open class InitJosmPreferences: DefaultTask() {
     logger.lifecycle("Write required plugin config to ${preferencesInitFile.get().asFile.absolutePath} …")
     preferencesInitFile.get().asFile.writeText(
       requiredPluginsTemplate
-        .replace("{{{INITIAL_PREFERENCES}}}", ((prefFragment ?: "") + initialJosmPrefs.get()).replaceIndent(" ".repeat(4)))
+        .replace("{{{INITIAL_PREFERENCES}}}", initialJosmPrefs.get().replaceIndent(" ".repeat(4)))
         .replace(
           "{{{PLUGIN_LIST_ENTRIES}}}",
           requiredPluginConfig.get()
