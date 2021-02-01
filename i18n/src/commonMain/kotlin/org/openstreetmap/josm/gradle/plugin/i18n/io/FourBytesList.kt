@@ -4,7 +4,7 @@ package org.openstreetmap.josm.gradle.plugin.i18n.io
  * Converts a list of [FourBytes] values to one single [ByteArray].
  * @return the [ByteArray] representation of the [FourBytes] list
  */
-public fun List<FourBytes>.toByteArray(): ByteArray = ByteArray(this.size * 4) { i ->
+public fun List<FourBytes>.toBytes(): List<Byte> = (0 until size * 4).map { i ->
   this[i / 4].let {
     when (i % 4) {
       0 -> it.a

@@ -3,8 +3,7 @@ package org.openstreetmap.josm.gradle.plugin.i18n.io
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
+import org.openstreetmap.josm.gradle.plugin.i18n.io.MoFileEncoder.Companion.toBytes
 
 @ExperimentalUnsignedTypes
 class I18nReadWriteTest {
@@ -32,8 +31,8 @@ class I18nReadWriteTest {
     MsgId(MsgStr("ABC", "ABC"), "ABC") to MsgStr("ABC", "ABC", "ABC"),
   )
 
-  val dummyTranslationsEn: Map<String, Map<MsgId, MsgStr>> = LangReaderTest().getDummyTranslations("en")
-  val dummyTranslationsRu: Map<String, Map<MsgId, MsgStr>> = LangReaderTest().getDummyTranslations("ru")
+  val dummyTranslationsEn: Map<String, Map<MsgId, MsgStr>> = LangFileDecoderTest().getDummyTranslations("en")
+  val dummyTranslationsRu: Map<String, Map<MsgId, MsgStr>> = LangFileDecoderTest().getDummyTranslations("ru")
 
   @Test
   fun testMoSerializationPersistence() {
@@ -51,19 +50,17 @@ class I18nReadWriteTest {
   }
 
   private fun testMoSerializationPersistence(translations: Map<MsgId, MsgStr>, isBigEndian: Boolean, name: String) {
-    val writeResult1 = ByteArrayOutputStream()
-    MoWriter().writeStream(writeResult1, translations, isBigEndian)
+    val writeResult1 = MoFileEncoder.getInstance(isBigEndian).encodeToByteArray(translations)
 
-    val readResult1 = MoReader(writeResult1.toByteArray()).readFile()
-    val writeResult2 = ByteArrayOutputStream()
-    MoWriter().writeStream(writeResult2, readResult1, isBigEndian)
-    val readResult2 = MoReader(writeResult2.toByteArray()).readFile()
+    val readResult1 = MoReader(writeResult1).readFile()
+    val writeResult2 = MoFileEncoder.getInstance(isBigEndian).encodeToByteArray(readResult1)
+    val readResult2 = MoReader(writeResult2).readFile()
 
     assertEquals(translations, readResult1)
     assertEquals(readResult1, readResult2)
-    assertEquals(writeResult1.toByteArray().toList(), writeResult2.toByteArray().toList())
+    assertEquals(writeResult1.toList(), writeResult2.toList())
 
-    assertEquals(I18nReadWriteTest::class.java.getResource("mo/$name-${if (isBigEndian) "BE" else "LE"}.mo")?.readBytes()?.toList(), writeResult1.toByteArray().toList()) {
+    assertEquals(I18nReadWriteTest::class.java.getResource("mo/$name-${if (isBigEndian) "BE" else "LE"}.mo")?.readBytes()?.toList(), writeResult1.toList()) {
       "Contents of mo/$name-${if (isBigEndian) "BE" else "LE"}.mo are not generated as expected!"
     }
   }
@@ -138,12 +135,11 @@ class I18nReadWriteTest {
   }
 
   fun testMoToLangAndBack(translations: Map<MsgId, MsgStr>) {
-    val moWriteResult1 = ByteArrayOutputStream()
-    MoWriter().writeStream(moWriteResult1, translations, true)
+    val moWriteResult1 = MoFileEncoder.BIG_ENDIAN.encodeToByteArray(translations)
 
-    val moReadResult1 = MoReader(moWriteResult1.toByteArray()).readFile()
+    val moReadResult1 = MoReader(moWriteResult1).readFile()
     // The empty string is not envisaged in the *.lang file format, so it is extracted here and put back into the result later
-    val emptyElement = moReadResult1.keys.firstOrNull { it.toByteArray().isEmpty() }
+    val emptyElement = moReadResult1.keys.firstOrNull { it.toBytes().isEmpty() }
     assertEquals(translations, moReadResult1)
 
     val encoder = LangFileEncoder(moReadResult1.keys.toList())
@@ -157,10 +153,9 @@ class I18nReadWriteTest {
     assertEquals(moReadResult1, langReadResult)
     assertNotNull(langReadResult)
 
-    val moWriteResult2 = ByteArrayOutputStream()
-    MoWriter().writeStream(moWriteResult2, langReadResult.mapNotNull{ val value = it.value; if (value != null) it.key to value else null }.toMap(), false)
+    val moWriteResult2 = MoFileEncoder.LITTLE_ENDIAN.encodeToByteArray(langReadResult.mapNotNull{ val value = it.value; if (value != null) it.key to value else null }.toMap())
 
-    val moReadResult2 = MoReader(moWriteResult2.toByteArray()).readFile()
+    val moReadResult2 = MoReader(moWriteResult2).readFile()
     assertEquals(langReadResult, moReadResult2)
   }
 }

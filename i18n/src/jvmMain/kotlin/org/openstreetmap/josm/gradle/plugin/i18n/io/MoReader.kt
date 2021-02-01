@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.URL
+import org.openstreetmap.josm.gradle.plugin.i18n.io.MoFileDecoder.Companion.toMsgId
+import org.openstreetmap.josm.gradle.plugin.i18n.io.MoFileFormat.HEADER_SIZE_IN_BYTES
 
 /**
  * Reads the strings contained inside a *.mo file.
@@ -21,21 +23,6 @@ class MoReader private constructor(private val stream1: InputStream, private val
    */
   constructor(moFileURL: URL): this(moFileURL.openStream(), moFileURL.openStream())
   internal constructor(bytes: ByteArray): this(ByteArrayInputStream(bytes), ByteArrayInputStream(bytes))
-
-  companion object {
-    /**
-     * The big-endian magic bytes of *.mo files (little-endian would be reversed)
-     *
-     * Value: `0x950412de`
-     */
-    @JvmStatic
-    val BE_MAGIC: ByteArray = listOf(0x95, 0x04, 0x12, 0xde).map { it.toUByte().toByte() }.toByteArray()
-
-    /**
-     * 28 bytes = 7 × 4 bytes (≙ 7 32bit numbers)
-     */
-    const val HEADER_SIZE_IN_BYTES: Int = 28
-  }
 
   /**
    * Groups the header values to one object.
@@ -80,7 +67,7 @@ class MoReader private constructor(private val stream1: InputStream, private val
     stream1.use { s1 ->
       // Read the header (sets the header fields)
       val header: HeaderValues = readHeader(s1)
-      var stream1Pos: UInt = HEADER_SIZE_IN_BYTES.toUInt()
+      var stream1Pos: UInt = MoFileFormat.HEADER_SIZE_IN_BYTES.toUInt()
       stream2.use { s2 ->
         var stream2Pos: UInt = 0u
 
@@ -115,7 +102,7 @@ class MoReader private constructor(private val stream1: InputStream, private val
           val stringBytes = ByteArray(stringDescriptor[0].toInt()) {0}
           stream2Pos += s2.readAllOrException(stringBytes).toUInt()
 
-          stringMap[msgIds[i]] = MsgStr(String(stringBytes, Charsets.UTF_8).split(MsgStr.GRAMMATICAL_NUMBER_SEPARATOR))
+          stringMap[msgIds[i]] = MsgStr(String(stringBytes, Charsets.UTF_8).split(MoFileFormat.NULL_CHAR))
         }
       }
     }
@@ -138,10 +125,10 @@ class MoReader private constructor(private val stream1: InputStream, private val
         if (actualHeaderSize < header.size) "\nThe input stream ended before header was complete!" else ""
       )
     }
-    val magic = header.sliceArray(0 until BE_MAGIC.size)
+    val magic = header.sliceArray(MoFileFormat.BE_MAGIC.indices)
     val isBigEndian = when {
-      BE_MAGIC.contentEquals(magic) -> true
-      BE_MAGIC.reversedArray().contentEquals(magic) -> false
+      MoFileFormat.BE_MAGIC.toByteArray().contentEquals(magic) -> true
+      MoFileFormat.BE_MAGIC.reversed().toByteArray().contentEquals(magic) -> false
       else -> throw IOException("Not a MO file, magic bytes are incorrect!")
     }
     val headerInts = header.sliceArray(magic.size until header.size).toFourByteList().map { it.getUIntValue(isBigEndian) }

@@ -1,7 +1,9 @@
 package org.openstreetmap.josm.gradle.plugin.i18n.io
 
+import kotlin.test.assertTrue
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.openstreetmap.josm.gradle.plugin.i18n.io.MoFileDecoder.Companion.toMsgId
 
 @ExperimentalUnsignedTypes
 class MoReaderTest {
@@ -13,10 +15,10 @@ class MoReaderTest {
     val context = "someContext"
 
     assertEquals(MsgId(MsgStr(singularString)), singularString.toByteArray().toMsgId())
-    assertEquals(MsgId(MsgStr(singularString, pluralString1, pluralString2)), "$singularString${MsgStr.GRAMMATICAL_NUMBER_SEPARATOR}$pluralString1${MsgStr.GRAMMATICAL_NUMBER_SEPARATOR}$pluralString2".toByteArray().toMsgId())
+    assertEquals(MsgId(MsgStr(singularString, pluralString1, pluralString2)), "$singularString${MoFileFormat.NULL_CHAR}$pluralString1${MoFileFormat.NULL_CHAR}$pluralString2".toByteArray().toMsgId())
 
-    assertEquals(MsgId(MsgStr(singularString), context), "$context${MsgId.CONTEXT_SEPARATOR}$singularString".toByteArray().toMsgId())
-    assertEquals(MsgId(MsgStr(singularString, pluralString1), context), "$context${MsgId.CONTEXT_SEPARATOR}$singularString${MsgStr.GRAMMATICAL_NUMBER_SEPARATOR}$pluralString1".toByteArray().toMsgId())
+    assertEquals(MsgId(MsgStr(singularString), context), "$context${MoFileFormat.CONTEXT_SEPARATOR}$singularString".toByteArray().toMsgId())
+    assertEquals(MsgId(MsgStr(singularString, pluralString1), context), "$context${MoFileFormat.CONTEXT_SEPARATOR}$singularString${MoFileFormat.NULL_CHAR}$pluralString1".toByteArray().toMsgId())
   }
 
   @Test

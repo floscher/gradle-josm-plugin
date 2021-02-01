@@ -1,7 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.i18n.io
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @ExperimentalUnsignedTypes
 class FourBytesTest {
@@ -14,7 +14,7 @@ class FourBytesTest {
   // Long value of 0x78563412 (unsigned)
   val uint78563412 = (0x78 shl 8 xor 0x56 shl 8 xor 0x34 shl 8 xor 0x12).toUInt()
 
-  val bytes00000000 = FourBytes(0,0,0, 0)
+  val bytes00000000 = FourBytes(0, 0, 0, 0)
   val bytesFFFFFFFF = FourBytes(-1, -1, -1, -1)
   val bytesFFFF0000 = FourBytes(-1, -1, 0, 0)
   val bytes0000FFFF = FourBytes(0, 0, -1, -1)

@@ -63,7 +63,7 @@ val DUMMY_TRANSLATIONS: Map<String?, List<Map<String, MsgStr>>> = mapOf(
   )
 )
 
-class LangReaderTest {
+class LangFileDecoderTest {
 
   @Test
   fun testEmptyFiles() {
@@ -71,9 +71,9 @@ class LangReaderTest {
     val languages = listOf("de", "fr").plus(baseLang)
     val emptyResult = languages.associate { it to mapOf<MsgId, MsgStr>() }
 
-    // Empty
+    // 0 Bytes
     testLangStreams(baseLang, languages, { ByteArray(0) }) {
-      assertEquals(emptyResult, it.invoke())
+      assertEquals(emptyResult, it())
     }
 
     testLangStreams(
@@ -82,16 +82,16 @@ class LangReaderTest {
       {
         when(it) {
           "en" -> ByteArray(0)
-          else -> ByteArray(4) { 0.toSignedByte() }
+          else -> ByteArray(4) { 0.toByte() }
         }
       }
     ) {
-      assertEquals(emptyResult, it.invoke())
+      assertEquals(emptyResult, it())
     }
 
     // 0xFFFF
-    testLangStreams(baseLang, languages, { ByteArray(2) { 0xFF.toSignedByte() } }) {
-      assertEquals(emptyResult, it.invoke())
+    testLangStreams(baseLang, languages, { ByteArray(2) { 0xFF.toUByte().toByte() } }) {
+      assertEquals(emptyResult, it())
     }
   }
 
@@ -100,7 +100,7 @@ class LangReaderTest {
     testLangStreams(
       "en",
       listOf("en"),
-      { byteArrayOf(0xFF.toSignedByte()) },
+      { byteArrayOf(0xFF.toUByte().toByte()) },
       { assertThrows(IllegalArgumentException::class.java) { it.invoke() } }
     )
   }
@@ -114,8 +114,8 @@ class LangReaderTest {
       {
         ByteArray(65535) {
           when (it) {
-            0 -> 0xFF.toSignedByte()
-            1 -> 0xFD.toSignedByte()
+            0 -> 0xFF.toUByte().toByte()
+            1 -> 0xFD.toUByte().toByte()
             else -> 'a'.toByte()
           }
         }
@@ -132,8 +132,8 @@ class LangReaderTest {
       {
         ByteArray(65536) {
           when (it) {
-            0 -> 0xFF.toSignedByte()
-            1 -> 0xFE.toSignedByte()
+            0 -> 0xFF.toUByte().toByte()
+            1 -> 0xFE.toUByte().toByte()
             else -> 'a'.toByte()
           }
         }
@@ -200,11 +200,11 @@ class LangReaderTest {
 
   private fun printBytesAsHex(bytes: ByteArray) {
     val byteString = StringBuilder()
-    for (i in 0 until bytes.size) {
+    for (i in bytes.indices) {
       if (i % 50 == 0) {
         byteString.append("\n${i/50}")
       }
-      byteString.append(bytes[i].toUnsignedInt().toString(16).padStart(2, '0')).append(' ')
+      byteString.append(bytes[i].toUByte().toString(16).padStart(2, '0')).append(' ')
     }
 
     println("\nBytes as Hex (50 per line):\n$byteString")
@@ -213,20 +213,22 @@ class LangReaderTest {
 
   private fun testLangStreams(baseLang: String, languages: List<String>, inputBytes: (String) -> ByteArray, test: (() -> Map<String, Map<MsgId, MsgStr>>) -> Unit) {
     test {
-      LangFileDecoder.decodeMultipleLanguages(baseLang, inputBytes(baseLang), languages.associate { it to inputBytes(it) })
+      LangFileDecoder.decodeMultipleLanguages(baseLang, inputBytes(baseLang),
+        languages.associateWith { inputBytes(it) })
     }
   }
 
-  internal fun getDummyTranslatableStrings(baseLang: String): List<MsgId> = DUMMY_TRANSLATIONS.flatMap { (context, translations) ->
+  private fun getDummyTranslatableStrings(baseLang: String): List<MsgId> = DUMMY_TRANSLATIONS.flatMap { (context, translations) ->
     translations
       .mapNotNull { it[baseLang] }
       .map { MsgId(it, context) }
   }
 
-  internal fun getDummyTranslations(baseLang: String) = DUMMY_TRANSLATIONS.flatMap { it.value.flatMap { it.keys } }.toSet()
-    .associate { lang ->
-      Pair(
-        lang,
+  internal fun getDummyTranslations(baseLang: String) =
+    DUMMY_TRANSLATIONS
+      .flatMap { it.value.flatMap { it.keys } }
+      .toSet()
+      .associateWith { lang ->
         DUMMY_TRANSLATIONS.flatMap { contextEntry ->
           contextEntry.value
             .mapNotNull {
@@ -239,14 +241,5 @@ class LangReaderTest {
               }
             }
         }.toMap()
-      )
-    }
-
-  private fun Int.toSignedByte(): Byte {
-    return (if (this > 127) this - 256 else this).toByte()
-  }
-
-  private fun Byte.toUnsignedInt(): Int {
-    return if (this < 0) this + 256 else this.toInt()
-  }
+      }
 }
