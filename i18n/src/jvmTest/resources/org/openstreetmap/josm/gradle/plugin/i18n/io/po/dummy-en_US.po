@@ -3,14 +3,14 @@ msgstr ""
   "Content-Type: text/plain; charset=UTF-8\n"
   ""
 
-msgid "🇬🇧"
-msgstr "🇺🇸"
+msgid "Always the same"
+msgstr "Always the same"
 
 msgid "English"
 msgstr "American English"
 
-msgid "Always the same"
-msgstr "Always the same"
+msgid "🇬🇧"
+msgstr "🇺🇸"
 
 msgid "Always the same (Singular)"
 msgid_plural "Always the same (Plural)"

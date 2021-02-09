@@ -3,8 +3,8 @@ msgstr ""
   "Content-Type: text/plain; charset=UTF-8\n"
   ""
 
-msgid "🇬🇧"
-msgstr "🇩🇪"
+msgid "Always the same"
+msgstr "Always the same"
 
 msgid "English"
 msgstr "Deutsch"
@@ -12,25 +12,25 @@ msgstr "Deutsch"
 msgid "String without context"
 msgstr "Text ohne Kontext"
 
-msgid "en1"
-msgid_plural "en2"
-msgstr[0] "de1"
-msgstr[1] "de2"
-
 msgid "en-de-orig"
 msgstr "en-de-trans"
 
-msgid "Always the same"
-msgstr "Always the same"
+msgid "🇬🇧"
+msgstr "🇩🇪"
+
+msgctxt "context"
+msgid "Text with context"
+msgstr "Text mit Kontext"
 
 msgid "Always the same (Singular)"
 msgid_plural "Always the same (Plural)"
 msgstr[0] "Always the same (Singular)"
 msgstr[1] "Always the same (Plural)"
 
-msgctxt "context"
-msgid "Text with context"
-msgstr "Text mit Kontext"
+msgid "en1"
+msgid_plural "en2"
+msgstr[0] "de1"
+msgstr[1] "de2"
 
 msgctxt "context"
 msgid "Always the same"

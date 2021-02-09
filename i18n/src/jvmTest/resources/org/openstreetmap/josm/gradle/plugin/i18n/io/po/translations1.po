@@ -5,15 +5,17 @@ msgstr ""
   "Content-Type: text/plain; charset=UTF-8\n"
   ""
 
+msgid "Special escape chars"
+msgstr ""
+  "\a\b\f\n"
+  "\r\t\v\\\""
+
+msgid "Umlaut äöüÄÖÜ"
+msgstr "ẞß"
+
 msgid "1"
 msgid_plural "2"
 msgstr[0] "Sing"
-
-msgctxt "context"
-msgid "1"
-msgid_plural "2"
-msgstr[0] "Singular"
-msgstr[1] "Plural"
 
 msgid "Many plurals (253 is maximum of *.lang)"
 msgid_plural "2"
@@ -271,17 +273,15 @@ msgstr[250] "251"
 msgstr[251] "252"
 msgstr[252] "253"
 
+msgctxt "context"
+msgid "1"
+msgid_plural "2"
+msgstr[0] "Singular"
+msgstr[1] "Plural"
+
 msgctxt "😹"
 msgid "Emoji 😍"
 msgid_plural "🇱🇻"
 msgstr[0] "🦸🏿‍♂️"
 msgstr[1] "🏳️‍🌈"
 msgstr[2] ""
-
-msgid "Umlaut äöüÄÖÜ"
-msgstr "ẞß"
-
-msgid "Special escape chars"
-msgstr ""
-  "\a\b\f\n"
-  "\r\t\v\\\""
