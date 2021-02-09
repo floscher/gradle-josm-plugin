@@ -103,7 +103,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
     val manifest = jarFile.manifest ?: throw GithubReleaseException(
       "The jar file ${this.absolutePath} doesn't include a MANIFEST file"
     )
-    val pluginVersion = manifest.mainAttributes.getValue(JosmManifest.Attribute.PLUGIN_VERSION)?.trim()
+    val pluginVersion = manifest.mainAttributes.getValue(JosmManifest.Attribute.PLUGIN_VERSION.manifestKey)?.trim()
     if (pluginVersion.isNullOrEmpty()) {
       throw GithubReleaseException(
         """The jar file '${this.absolutePath}' doesn't include an

@@ -166,7 +166,7 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: UShort, alreadyRes
           getAllRequiredJosmPlugins(
             recursionDepth.inc(),
             alreadyResolvedPlugins,
-            it.mainAttributes.getValue(JosmManifest.Attribute.PLUGIN_DEPENDENCIES)
+            it.mainAttributes.getValue(JosmManifest.Attribute.PLUGIN_DEPENDENCIES.manifestKey)
               ?.split(";")
               ?.map { it.trim() }
               ?.toSet()

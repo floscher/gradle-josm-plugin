@@ -57,7 +57,7 @@ class MainConfigurationSetup(val project: Project, val mainSourceSet: SourceSet)
 
     // Add dependencies on all required plugins to the `requiredPlugin` configuration
     project
-      .getAllRequiredJosmPlugins(project.extensions.josm.manifest.pluginDependencies)
+      .getAllRequiredJosmPlugins(project.extensions.josm.manifest.pluginDependencies.getOrElse(emptySet()))
       .forEach {
         requiredPluginConfiguration.dependencies.add(it)
       }

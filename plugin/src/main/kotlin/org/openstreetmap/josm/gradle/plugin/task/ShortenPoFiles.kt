@@ -40,12 +40,12 @@ open class ShortenPoFiles @Inject constructor(private val sourceSet: I18nSourceS
         var modifiedLine = line
         if (isHeader) {
           // Rewrite the generic parts of the file header
-          if (modifiedLine.startsWith("# ")) {
+          if (modifiedLine.startsWith("# ") || modifiedLine == "#") {
             val projectName = project.extensions.josm.pluginName
             modifiedLine = modifiedLine.replace("SOME DESCRIPTIVE TITLE.", "Translations for the JOSM plugin '$projectName' (${file.nameWithoutExtension})")
             modifiedLine = modifiedLine.replace("THE PACKAGE'S COPYRIGHT HOLDER", project.extensions.josm.i18n.copyrightHolder ?: "")
             modifiedLine = modifiedLine.replace("PACKAGE package", "josm-plugin_$projectName package")
-            modifiedLine = modifiedLine.replace(" *<.+@.+>".toRegex(), "")
+            modifiedLine = modifiedLine.replace(Regex("<[^<]+@[^>]+>"), "")
           } else {
             isHeader = false
           }
@@ -53,7 +53,6 @@ open class ShortenPoFiles @Inject constructor(private val sourceSet: I18nSourceS
         // Write all lines to the temporary file except the ones containing pointers to the source code or the last translator
         if (
           !modifiedLine.startsWith("#, ")
-          && !modifiedLine.startsWith("#. ")
           && !modifiedLine.startsWith("#: ")
           && !modifiedLine.startsWith("\"Last-Translator:")
         ) {

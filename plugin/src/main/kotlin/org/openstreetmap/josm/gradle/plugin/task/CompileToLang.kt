@@ -50,8 +50,11 @@ public abstract class CompileToLang(
   @OutputDirectory
   val outputDirectory: Provider<File> = project.provider { project.buildDir.resolve("i18n/${sourceSet.name}/$fileExtension") }
 
-  override fun getDescription(): String = "Compile the *.$fileExtension files of source set `${sourceSet.name}` to the *.lang format used by JOSM"
-  override fun setDescription(description: String?) = throw IllegalArgumentException("Changing description of a ${CompileToLang::class.java.name} task is not allowed!")
+  override fun getDescription(): String = "Compile the *.$fileExtension files of source set `${sourceSet.name}` to the *.lang format used by JOSM (${extractSources(sourceSet).files.size} files available)"
+  override fun setDescription(description: String?) = throw IllegalArgumentException("Changing description of a ${this::class.simpleName} task is not allowed!")
+
+  override fun getGroup(): String = "JOSM-i18n"
+  override fun setGroup(group: String?) = throw IllegalArgumentException("Changing group of a ${this::class.simpleName} task is not allowed!")
 
   @TaskAction
   fun action() {

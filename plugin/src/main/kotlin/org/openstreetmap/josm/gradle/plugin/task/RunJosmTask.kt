@@ -8,6 +8,8 @@ import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import javax.inject.Inject
+import org.gradle.api.tasks.SourceSet
+import org.openstreetmap.josm.gradle.plugin.util.java
 
 /**
  * A task that can execute a JOSM instance. There's also the class [DebugJosm], which extends this class and allows to
@@ -51,7 +53,7 @@ open class RunJosmTask @Inject constructor(cleanTask: Provider<out CleanJosm>, @
     } else {
       systemProperty("josm.home", project.extensions.josm.tmpJosmPrefDir)
     }
-    classpath = project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.getByName("main").runtimeClasspath
+    classpath = project.convention.java.sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME).runtimeClasspath
 
     logger.lifecycle("Running version ${project.extensions.josm.josmCompileVersion} of JOSM with version ${project.version} of plugin '${project.name}' …")
 

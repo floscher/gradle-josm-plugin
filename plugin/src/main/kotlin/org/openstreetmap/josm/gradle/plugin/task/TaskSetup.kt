@@ -20,6 +20,7 @@ import java.net.URLConnection
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.Base64
+import org.gradle.jvm.tasks.Jar
 
 /**
  * This method sets up all the [Task]s (and [Configuration]s) for a given project that should be there by default.
@@ -70,7 +71,7 @@ fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
 }
 
 private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSet) {
-  val archiverTask = project.tasks.withType(AbstractArchiveTask::class.java).getByName(sourceSetJosmPlugin.jarTaskName)
+  val archiverTask = project.tasks.withType(Jar::class.java).getByName(sourceSetJosmPlugin.jarTaskName)
   val distDir = File(project.buildDir, "dist")
   val localDistDir = File(project.buildDir, "localDist")
 
@@ -97,7 +98,7 @@ private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSe
         }
         genListTask.addPlugin(
           localDistReleaseFile.nameWithoutExtension,
-          project.extensions.josm.manifest.createJosmPluginJarManifest(),
+          archiverTask.manifest.attributes.map { it.key to it.value.toString() }.toMap(),
           localDistReleaseFile.toURI().toURL()
         )
       }

@@ -7,6 +7,7 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
+import org.gradle.api.tasks.SourceSet
 import org.gradle.jvm.tasks.Jar
 import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.tasks.JacocoReport
@@ -42,7 +43,6 @@ class JosmPlugin: Plugin<Project> {
     val jarTask = project.tasks.withType(Jar::class.java).getByName("jar")
     jarTask.outputs.upToDateWhen { false }
     jarTask.doFirst { task ->
-      jarTask.manifest.attributes(project.extensions.josm.manifest.createJosmPluginJarManifest())
       jarTask.from(
         task.project.configurations.getByName("packIntoJar").files.map { file ->
           if (file.isDirectory) {
@@ -56,8 +56,12 @@ class JosmPlugin: Plugin<Project> {
       )
     }
 
-    val mainConfigurationSetup = MainConfigurationSetup(project, project.convention.java.sourceSets.getByName("main"))
+    val mainConfigurationSetup = MainConfigurationSetup(project, project.convention.java.sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME))
     project.setupJosmTasks(mainConfigurationSetup)
+
+    project.convention.java.sourceSets.all {
+      it.setup(project)
+    }
 
     project.afterEvaluate {
       if (project.version == Project.DEFAULT_VERSION) {
@@ -126,10 +130,6 @@ class JosmPlugin: Plugin<Project> {
       if (project.plugins.hasPlugin(JacocoPlugin::class.java) && project.extensions.josm.logJacocoCoverage) {
         project.tasks.withType(JacocoReport::class.java) { it.logCoverage() }
       }
-    }
-
-    project.convention.java.sourceSets.all {
-      it.setup(project)
     }
   }
 }
