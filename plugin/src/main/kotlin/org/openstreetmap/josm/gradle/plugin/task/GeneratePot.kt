@@ -1,7 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.Task
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property

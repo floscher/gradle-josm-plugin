@@ -24,6 +24,7 @@ public object PoFileEncoder: I18nFileEncoder {
   override fun encodeToByteArray(translations: Map<MsgId, MsgStr>): ByteArray =
     translations
       .ensureUtf8EncodingInHeaderEntry()
+      .sortedBy { it.first }
       .joinToString("\n\n", "", "\n") { (msgid, msgstr) ->
         listOfNotNull(
           msgid.context?.let { """msgctxt "${it.escapeCharacters()}"""" },

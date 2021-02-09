@@ -51,7 +51,7 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    fun `pagination with a url of type rel="next" should work`() {
+    fun `pagination with a url of type rel=next should work`() {
         val pagination = Pagination(
           "<${Urls.Github.API}/search/code?q=addClass+user%3Amozilla&page=15>; rel=\"next\"")
         assertEquals(

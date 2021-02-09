@@ -1,7 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
 import groovy.lang.Closure
-import org.gradle.api.Project
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import java.io.File
 import java.io.Serializable

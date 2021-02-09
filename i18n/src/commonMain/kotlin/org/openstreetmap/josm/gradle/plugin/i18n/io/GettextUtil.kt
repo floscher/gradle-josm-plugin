@@ -8,7 +8,7 @@ internal val GETTEXT_CONTENT_TYPE_UTF8: String = "Content-Type: text/plain; char
 /**
  * The empty key. This is used in gettext formats to hold meta information
  */
-internal val GETTEXT_HEADER_MSGID: MsgId = MsgId(MsgStr(""))
+public val GETTEXT_HEADER_MSGID: MsgId = MsgId(MsgStr(""))
 /**
  * An empty header (empty key and empty value).
  * Normally it's better to use [GETTEXT_DEFAULT_HEADER] to avoid encoding issues.

@@ -1,7 +1,5 @@
 package org.openstreetmap.josm.gradle.plugin.i18n.io
 
-import org.openstreetmap.josm.gradle.plugin.i18n.io.MoFileEncoder.Companion.toBytes
-
 /**
  * Can encode a MO file for given base strings and associated translated strings.
  */
@@ -36,7 +34,7 @@ public class MoFileEncoder private constructor(public val isBigEndian: Boolean):
     // offset 0: magic number
     val magicBytes = if (isBigEndian) MoFileFormat.BE_MAGIC else MoFileFormat.BE_MAGIC.reversed()
 
-    val sortedOriginalMsgIds = translations.ensureUtf8EncodingInHeaderEntry().sortedBy { it.first.toBytes().toByteArray().decodeToString() }
+    val sortedOriginalMsgIds = translations.ensureUtf8EncodingInHeaderEntry().sortedBy { it.first }
 
     val numStrings = sortedOriginalMsgIds.size.toUInt()
     val stringsOffset = MoFileFormat.HEADER_SIZE_IN_BYTES.toUInt()
@@ -65,10 +63,10 @@ public class MoFileEncoder private constructor(public val isBigEndian: Boolean):
      * In the header [stringsOffset] and [translationStringsOffset] determine where the halves start and end,
      * so the entries can be put together in one list.
      */
-    val hashTableEntries = sortedOriginalMsgIds.map { it.first.toBytes() }
+    val stringListEntries = sortedOriginalMsgIds.map { it.first.toBytes() }
       .plus(sortedOriginalMsgIds.map { it.second.toBytes() })
-      .fold(listOf<HashTableEntry>()) { list, bytes ->
-        list + HashTableEntry(
+      .fold(listOf<StringListEntry>()) { list, bytes ->
+        list + StringListEntry(
           list.lastOrNull()?.nextOffset ?: hashTableOffset,
           bytes + MoFileFormat.NULL_CHAR.toByte()
         )
@@ -78,17 +76,17 @@ public class MoFileEncoder private constructor(public val isBigEndian: Boolean):
       magicBytes,
       header,
 
-      hashTableEntries.flatMap { listOf(
+      stringListEntries.flatMap { listOf(
         FourBytes(it.bytes.size.toUInt() - 1u, isBigEndian), // string length
         FourBytes(it.offset, isBigEndian)) // string offset
       }.toBytes(),
 
-      hashTableEntries.flatMap { it.bytes } // the strings themselves
+      stringListEntries.flatMap { it.bytes } // the strings themselves
 
     ).flatten().toByteArray()
   }
 
-  private data class HashTableEntry(val offset: UInt, val bytes: List<Byte>) {
+  private data class StringListEntry(val offset: UInt, val bytes: List<Byte>) {
     val nextOffset: UInt = offset + bytes.size.toUInt()
   }
 }

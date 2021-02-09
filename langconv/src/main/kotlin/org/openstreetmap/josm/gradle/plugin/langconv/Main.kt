@@ -1,7 +1,8 @@
 package org.openstreetmap.josm.gradle.plugin.langconv
 
-import org.openstreetmap.josm.gradle.plugin.i18n.io.MoReader
-import org.openstreetmap.josm.gradle.plugin.i18n.io.MoWriter
+import org.openstreetmap.josm.gradle.plugin.i18n.io.MoFileFormat
+import org.openstreetmap.josm.gradle.plugin.i18n.io.MoFileDecoder
+import org.openstreetmap.josm.gradle.plugin.i18n.io.MoFileEncoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
 import java.io.File
@@ -110,7 +111,7 @@ private fun printUsage() {
 
       If a directory is given as ‹input› argument, all files in this directory (not in subdirectories) that are suitable for the conversion mode, are converted:
         * for `lang2mo` mode: all files with the file extension `*.lang`
-        * for `mo2lang` mode: all files that start with the ${MoReader.BE_MAGIC.size} magic bytes of MO files (0x${MoReader.BE_MAGIC.joinToString("") { it.toUByte().toString(16).padStart(2, '0') }} or 0x${MoReader.BE_MAGIC.reversedArray().joinToString("") { it.toUByte().toString(16).padStart(2, '0') }})
+        * for `mo2lang` mode: all files that start with the ${MoFileFormat.BE_MAGIC.size} magic bytes of MO files (0x${MoFileFormat.BE_MAGIC.joinToString("") { it.toUByte().toString(16).padStart(2, '0') }} or 0x${MoFileFormat.BE_MAGIC.reversed().joinToString("") { it.toUByte().toString(16).padStart(2, '0') }})
   """.trimIndent())
 }
 
@@ -130,9 +131,8 @@ private enum class LangconvMode(val inputFilter: FileFilter, val readFunction: (
       LangFileDecoder.decodeMultipleLanguages("en", separateInputFiles.first.first().readBytes(), separateInputFiles.second.map { it.nameWithoutExtension to it.readBytes() }.toMap())
     },
     writeFunction = { langMap, outputDir ->
-      val writer = MoWriter()
       langMap.map { File(outputDir, "${it.key}.mo").outputStream() to it.value }.forEach {
-        writer.writeStream(it.first, it.second, false)
+        it.first.write(MoFileEncoder.LITTLE_ENDIAN.encodeToByteArray(it.second))
       }
     },
     isNeedsBaseLanguage = true
@@ -141,14 +141,14 @@ private enum class LangconvMode(val inputFilter: FileFilter, val readFunction: (
     inputFilter = FileFilter {
       it.isFile &&
       it.inputStream().use {
-        val bytes = ByteArray(MoReader.BE_MAGIC.size)
+        val bytes = ByteArray(MoFileFormat.BE_MAGIC.size)
         it.read(bytes)
 
-        MoReader.BE_MAGIC.reversedArray().contentEquals(bytes) || MoReader.BE_MAGIC.contentEquals(bytes)
+        MoFileFormat.BE_MAGIC.reversed() == bytes.toList() || MoFileFormat.BE_MAGIC == bytes.toList()
       }
     },
     readFunction = { inputFiles ->
-      inputFiles.map { it.nameWithoutExtension to MoReader(it.toURI().toURL()).readFile() }.toMap()
+      inputFiles.map { it.nameWithoutExtension to MoFileDecoder.decodeToTranslations(it.readBytes()) }.toMap()
     },
     writeFunction = ::encodeToLangFiles,
     isNeedsBaseLanguage = false

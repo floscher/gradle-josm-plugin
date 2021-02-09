@@ -19,7 +19,7 @@ public class LangFileEncoder(baseMsgIds: List<MsgId>): I18nFileEncoder {
   private val pluralMsgIds: List<MsgId>
 
   init {
-    val baseMsgIdPartitions = baseMsgIds.distinct().minus(GETTEXT_HEADER_MSGID).partition { it.id.strings.size <= 1 }
+    val baseMsgIdPartitions = baseMsgIds.distinct().minus(GETTEXT_HEADER_MSGID).sorted().partition { it.id.strings.size <= 1 }
     singularMsgIds = baseMsgIdPartitions.first
     pluralMsgIds = baseMsgIdPartitions.second
   }

@@ -3,6 +3,7 @@ package org.openstreetmap.josm.gradle.plugin
 import org.gradle.api.Project
 import org.gradle.api.internal.plugins.DslObject
 import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.openstreetmap.josm.gradle.plugin.i18n.DefaultI18nSourceSet
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
@@ -25,34 +26,24 @@ fun SourceSet.setup(project: Project) {
 
     // Create "shortenPoFiles" task for the current i18n source set
     project.tasks.create(
-      if (name=="main") "shortenPoFiles" else "shorten${name.capitalize()}PoFiles",
+      if (name==SourceSet.MAIN_SOURCE_SET_NAME) "shortenPoFiles" else "shorten${name.capitalize()}PoFiles",
       ShortenPoFiles::class.java,
       i18nSourceSet
     )
 
-    val poCompileTask = project.tasks.create(
-      getCompileTaskName("po"),
-      PoCompile::class.java,
-      i18nSourceSet
-    )
-    val moCompileTask = project.tasks.create(
-      getCompileTaskName("mo"),
-      MoCompile::class.java,
-      poCompileTask,
-      i18nSourceSet
-    )
-    val langCompileTask = project.tasks.create(
-      getCompileTaskName("lang"),
-      LangCompile::class.java,
-      moCompileTask,
-      i18nSourceSet
-    )
-    if (SourceSet.MAIN_SOURCE_SET_NAME == name) {
-      project.extensions.josm.manifest.langCompileTask = langCompileTask
+    val poTaskProvider: () -> TaskProvider<PoCompile> = {
+      project.tasks.register(getCompileTaskName("po"), PoCompile::class.java, i18nSourceSet)
+    }
+
+    val i18nCompileTask = when {
+      !i18nSourceSet.po.isEmpty -> poTaskProvider()
+      !i18nSourceSet.mo.isEmpty -> project.tasks.register(getCompileTaskName("mo"), MoCompile::class.java, i18nSourceSet)
+      !i18nSourceSet.lang.isEmpty -> project.tasks.register(getCompileTaskName("lang"), LangCompile::class.java, i18nSourceSet)
+      else -> poTaskProvider()
     }
 
     project.tasks.withType(ProcessResources::class.java).getByName(processResourcesTaskName) {
-      it.from(langCompileTask)
+      it.from(i18nCompileTask)
     }
   }
 }

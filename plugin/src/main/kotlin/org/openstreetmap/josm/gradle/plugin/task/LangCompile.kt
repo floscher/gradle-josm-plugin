@@ -1,74 +1,29 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
-import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Sync
-import org.gradle.api.tasks.TaskAction
-import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 import java.io.File
 import javax.inject.Inject
+import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
+import org.openstreetmap.josm.gradle.plugin.i18n.io.I18nFileDecoder
+import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileDecoder
+import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileEncoder
 
 /**
- * This is not really a compilation task, it's only named like that analogous to [MoCompile] and [PoCompile].
+ * This "compiles" the *.lang files in [sourceSet] into `$buildDir/i18n/${sourceSet.name}/lang/data`.
  *
- * It copies (more precisely it [Sync]s) the *.lang files to `$buildDir/i18n/lang/$sourceSetName/data`
+ * In the process they are decoded using [LangFileDecoder] and re-encoded using [LangFileEncoder] to ensure they are
+ * valid *.lang files and in order to show statistics on the command line.
  *
- * @property sourceSet
- * The source set from which all *.lang files are synced to the destination
- * @property moCompile
- * The task for compiling *.mo files to *.lang files. These outputs are then used as inputs for this task.
+ * @property sourceSet The source set from which all *.lang files are put into the destination
  */
-open class LangCompile @Inject constructor(
-  @Internal val moCompile: MoCompile,
-  @Internal val sourceSet: I18nSourceSet
-): Sync() {
+open class LangCompile @Inject constructor(sourceSet: I18nSourceSet): CompileToLang(sourceSet, { lang }, "lang") {
 
-  /**
-   * The subdirectory of the [LangCompile.getDestinationDir] to which the files will be written
-   */
-  @Input
-  val subdirectory = "data"
-
-  init {
-    includeEmptyDirs = false
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    eachFile {
-      /* Flatten directory tree, the other compile tasks do the same. Put everything in `data/`,
-         because JOSM expects the files there. */
-      it.path = "$subdirectory/${it.sourceName}"
-    }
-
-    destinationDir = File(project.buildDir, "i18n/lang/")
-
-    project.afterEvaluate {
-      from(moCompile)
-      from(sourceSet.lang)
-    }
+  override val decoder: I18nFileDecoder by lazy {
+    this.extractSources(sourceSet).srcDirs
+      .flatMap { project.fileTree(it).files }
+      .singleOrNull(this::filterIsExcludedBaseFile)
+      ?.let { LangFileDecoder(it.readBytes()) }
+      ?: throw IllegalArgumentException("No base language file `$baseLanguage.lang` found, or more than one with this same name.")
   }
 
-  /**
-   * The main task action, copies the *.lang files to the target directory.
-   */
-  @TaskAction
-  fun action() {
-    logger.lifecycle("Copy *.lang files …")
-    val langPaths = mutableMapOf<String, MutableList<String>>()
-    source.files.forEach {
-      if (!langPaths.containsKey(it.nameWithoutExtension)) {
-        langPaths.put(it.nameWithoutExtension, mutableListOf())
-      }
-      langPaths[it.nameWithoutExtension]?.add(it.parentFile.absolutePath)
-    }
-    langPaths.flatMap { it.value }.distinct().forEach { path ->
-      logger.lifecycle("  from $path : ${langPaths.filter { it.value.contains(path) }.keys.sorted().joinToString(", ")}")
-    }
-    logger.lifecycle("  into ${destinationDir.absolutePath}/$subdirectory")
-    langPaths.filter { it.value.size >= 2 }.forEach { (lang, paths) ->
-      val warnMsg = "\nWARNING: For language $lang there are multiple *.lang files, of which only the last one in the following list is used:\n  * ${paths.joinToString("\n  * ")}\n"
-      logger.warn(warnMsg)
-      project.gradle.buildFinished { logger.warn(warnMsg) }
-    }
-  }
+  override fun filterIsExcludedBaseFile(file: File): Boolean = file.name == "${baseLanguage.get()}.$fileExtension"
 }

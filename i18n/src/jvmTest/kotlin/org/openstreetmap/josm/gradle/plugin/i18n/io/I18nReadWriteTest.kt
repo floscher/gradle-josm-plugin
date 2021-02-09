@@ -52,9 +52,9 @@ class I18nReadWriteTest {
   private fun testMoSerializationPersistence(translations: Map<MsgId, MsgStr>, isBigEndian: Boolean, name: String) {
     val writeResult1 = MoFileEncoder.getInstance(isBigEndian).encodeToByteArray(translations)
 
-    val readResult1 = MoReader(writeResult1).readFile()
+    val readResult1 = MoFileDecoder.decodeToTranslations(writeResult1)
     val writeResult2 = MoFileEncoder.getInstance(isBigEndian).encodeToByteArray(readResult1)
-    val readResult2 = MoReader(writeResult2).readFile()
+    val readResult2 = MoFileDecoder.decodeToTranslations(writeResult2)
 
     assertEquals(translations, readResult1)
     assertEquals(readResult1, readResult2)
@@ -95,7 +95,7 @@ class I18nReadWriteTest {
     val dummyEnLangBytes = dummyTranslationsEn.map { (language, translations) ->
       val bytes = if (language == "en") langFileEncoderEn.encodeToBaseLanguageByteArray() else langFileEncoderEn.encodeToByteArray(translations)
       assertEquals(I18nReadWriteTest::class.java.getResource("lang/dummy-baseEn-$language.lang")?.readBytes()?.toList(), bytes.toList()) {
-        "lang/dummy-baseEn-$language.lang"
+        "lang/dummy-baseEn-$language.lang not generated as expected!"
       }
 
       language to bytes
@@ -106,20 +106,26 @@ class I18nReadWriteTest {
     val langFileEncoderRu = LangFileEncoder(dummyTranslationsRu["ru"]?.map { it.key }!!)
     val dummyRuLangBytes = dummyTranslationsRu.map { (language, translations) ->
       val bytes = if (language == "ru") langFileEncoderRu.encodeToBaseLanguageByteArray() else langFileEncoderRu.encodeToByteArray(translations)
-      assertEquals(I18nReadWriteTest::class.java.getResource("lang/dummy-baseRu-$language.lang")?.readBytes()?.toList(), bytes.toList())
+      assertEquals(I18nReadWriteTest::class.java.getResource("lang/dummy-baseRu-$language.lang")?.readBytes()?.toList(), bytes.toList()) {
+        "lang/dummy-baseRu-$language.lang not generated as expected!"
+      }
 
       language to bytes
     }.toMap()
     assertEquals(dummyTranslationsRu, LangFileDecoder.decodeMultipleLanguages("ru", dummyRuLangBytes["ru"]!!, dummyRuLangBytes.minus("ru")))
   }
 
-  fun testLangSerializationPersistence(translations: Map<MsgId, MsgStr>, name: String) {
+  private fun testLangSerializationPersistence(translations: Map<MsgId, MsgStr>, name: String) {
     val encoder = LangFileEncoder(translations.map { it.key })
     val langBaseBytes = encoder.encodeToBaseLanguageByteArray()
     val langBytes = encoder.encodeToByteArray(translations)
 
-    assertEquals(I18nReadWriteTest::class.java.getResource("lang/$name-en.lang")?.readBytes()?.toList(), langBaseBytes.toList())
-    assertEquals(I18nReadWriteTest::class.java.getResource("lang/$name-xy.lang")?.readBytes()?.toList(), langBytes.toList())
+    assertEquals(I18nReadWriteTest::class.java.getResource("lang/$name-en.lang")?.readBytes()?.toList(), langBaseBytes.toList()) {
+      "lang/$name-en.lang not generated as expected!"
+    }
+    assertEquals(I18nReadWriteTest::class.java.getResource("lang/$name-xy.lang")?.readBytes()?.toList(), langBytes.toList()) {
+      "lang/$name-xy.lang not generated as expected!"
+    }
 
     assertEquals(
       translations.filter { it.key.id.strings.any { it.isNotEmpty() } },
@@ -137,7 +143,7 @@ class I18nReadWriteTest {
   fun testMoToLangAndBack(translations: Map<MsgId, MsgStr>) {
     val moWriteResult1 = MoFileEncoder.BIG_ENDIAN.encodeToByteArray(translations)
 
-    val moReadResult1 = MoReader(moWriteResult1).readFile()
+    val moReadResult1 = MoFileDecoder.decodeToTranslations(moWriteResult1)
     // The empty string is not envisaged in the *.lang file format, so it is extracted here and put back into the result later
     val emptyElement = moReadResult1.keys.firstOrNull { it.toBytes().isEmpty() }
     assertEquals(translations, moReadResult1)
@@ -155,7 +161,7 @@ class I18nReadWriteTest {
 
     val moWriteResult2 = MoFileEncoder.LITTLE_ENDIAN.encodeToByteArray(langReadResult.mapNotNull{ val value = it.value; if (value != null) it.key to value else null }.toMap())
 
-    val moReadResult2 = MoReader(moWriteResult2).readFile()
+    val moReadResult2 = MoFileDecoder.decodeToTranslations(moWriteResult2)
     assertEquals(langReadResult, moReadResult2)
   }
 }

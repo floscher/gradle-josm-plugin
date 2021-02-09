@@ -88,11 +88,6 @@ private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSe
         localDistReleaseFile.nameWithoutExtension
       )
 
-      // Make sure translations are available as *.lang files (if there are any)
-      project.extensions.josm.manifest.langCompileTask?.let {
-        genListTask.dependsOn(it)
-      }
-
       genListTask.doFirst {
         project.copy {
           it.from(archiverTask)

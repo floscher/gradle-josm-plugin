@@ -9,17 +9,14 @@ import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
 import org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient
 import org.openstreetmap.josm.gradle.plugin.github.ReleaseSpec
 import org.openstreetmap.josm.gradle.plugin.github.onlyFallbackVersions
-import org.openstreetmap.josm.gradle.plugin.i18n.io.LangReader
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
+import org.openstreetmap.josm.gradle.plugin.i18n.io.decodeLangFiles
 import org.openstreetmap.josm.gradle.plugin.task.LangCompile
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
-import java.io.IOException
 import java.net.URL
 import java.util.GregorianCalendar
-import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileDecoder
-import org.openstreetmap.josm.gradle.plugin.i18n.io.decodeLangFiles
 
 /**
  * The info that will be written into the manifest file of the plugin *.jar
@@ -120,12 +117,6 @@ class JosmManifest(private val project: Project) {
    * **Influenced MANIFEST.MF attribute:** [Attribute.PLUGIN_ICON] (`Plugin-Icon`)
    */
   var iconPath: String? = project.findProperty("plugin.icon")?.toString()
-
-  /**
-   * The task that processes the *.lang files for translations. This is set automatically and you normally don't have
-   * to change it.
-   */
-  var langCompileTask: LangCompile? = null
 
   /**
    * This can be set to `true`, when the plugin should load before the GUI classes of JOSM.
@@ -426,24 +417,8 @@ class JosmManifest(private val project: Project) {
       manifestAtts[Attribute.pluginDownloadLink(value.minJosmVersion)] = "${value.pluginVersion};${value.downloadURL}"
     }
 
-    // Add translated versions of the project description
-    val langCompileTask = langCompileTask
-    if (langCompileTask != null) {
-      val langDir = File(langCompileTask.destinationDir, langCompileTask.subdirectory)
-      if (langDir.exists() && langDir.canRead()) {
+    // TODO: Add translated descriptions from i18n sources
 
-        val translations = langDir.decodeLangFiles(project.extensions.josm.i18n.mainLanguage)
-        val baseDescription = project.extensions.josm.manifest.description
-        if (baseDescription != null) {
-          translations.forEach {
-            val translatedDescription = it.value[MsgId(MsgStr(baseDescription))]
-            if (translatedDescription != null && translatedDescription.strings.isNotEmpty()) {
-              manifestAtts[Attribute.pluginDescription(it.key)] = translatedDescription.strings.first()
-            }
-          }
-        }
-      }
-    }
     // Add the manually added translations of the plugin description
     for(entry in translatedDescriptions) {
       manifestAtts[Attribute.pluginDescription(entry.key)] = entry.value

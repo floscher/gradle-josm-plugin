@@ -9,6 +9,10 @@ package org.openstreetmap.josm.gradle.plugin.i18n.io
  */
 public data class FourBytes(val a: Byte, val b: Byte, val c: Byte, val d: Byte) {
 
+  public companion object {
+    public fun ByteArray.getFourBytesAt(index: Int): FourBytes = FourBytes(get(index), get(index + 1), get(index + 2), get(index + 3))
+  }
+
   /**
    * @param [big] most significant byte
    * @param [bigish] secondmost significant byte

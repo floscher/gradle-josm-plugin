@@ -3,6 +3,7 @@ package org.openstreetmap.josm.gradle.plugin.i18n.util
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@ExperimentalUnsignedTypes
 class TextUtilTest {
   @Test
   fun testFormatAsProgressBar() {
