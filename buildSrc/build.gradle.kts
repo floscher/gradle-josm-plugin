@@ -7,6 +7,7 @@ plugins {
 repositories {
   gradlePluginPortal()
   jcenter()
+  mavenCentral()
 }
 
 kotlin.sourceSets.main {

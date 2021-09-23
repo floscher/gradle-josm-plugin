@@ -12,9 +12,10 @@ class DemoTest {
 
   @Suppress("unused")
   enum class GradleVersion(val expectingSuccess: Boolean) {
-    GRADLE_5_6_4(false),
-    GRADLE_6_0(true),
-    GRADLE_6_9_1(true);
+    // Gradle <= 6.7 uses Kotlin 1.3.x. We can only support versions with Kotlin 1.4+ (minOrNull is required, as 1.5 prohibits min)
+    GRADLE_6_7(false),
+    GRADLE_6_8(true),
+    GRADLE_7_2(true);
 
     val version = name.substring(name.indexOf('_') + 1).replace('_', '.')
   }
