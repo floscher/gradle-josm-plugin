@@ -14,7 +14,7 @@ public final class Versions {
   public static final String junit = "5.8.1";
   public static final String okhttp = "4.9.1";
   public static final String pluginPublish = "0.12.0";
-  public static final String proguardGradle = "6.2.2";
+  public static final String proguardGradle = "7.1.1";
   public static final String wiremock = "2.27.2";
   public static final String wiremockJunit5 = "1.3.1";
 }
