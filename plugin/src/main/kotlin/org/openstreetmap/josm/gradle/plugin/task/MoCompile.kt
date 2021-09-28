@@ -14,6 +14,7 @@ import org.openstreetmap.josm.gradle.plugin.i18n.io.encodeToLangBytes
 import org.openstreetmap.josm.gradle.plugin.i18n.io.encodeToLangFiles
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 /**
@@ -66,8 +67,13 @@ open class MoCompile @Inject constructor(
 
       logger.lifecycle("Writing the *.lang files into ${outDir.absolutePath} …")
       encodeToLangFiles(
-        inputFiles.map {
-          it.nameWithoutExtension to MoReader(it.toURI().toURL()).readFile()
+        inputFiles.mapNotNull {
+          try {
+            it.nameWithoutExtension to MoReader(it.toURI().toURL()).readFile()
+          } catch (e: IOException) {
+            logger.lifecycle("Not a mo file: " + it.name, e);
+          }
+          null
         }.toMap(),
         outDir,
         project.extensions.josm.i18n.mainLanguage
