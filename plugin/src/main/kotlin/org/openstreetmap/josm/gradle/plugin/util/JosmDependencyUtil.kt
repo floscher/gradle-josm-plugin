@@ -50,6 +50,11 @@ fun Project.createJosmDependencyFuzzy(version: UInt, versionFuzziness: UInt = th
     } catch (e: GradleException) {
       logger.info("JOSM version $version can not be found in the available repositories.")
       cause = e
+    } catch (e: IllegalStateException) {
+      // This exception is thrown in unit tests, as ProjectBuilder does not instantiate settings.
+      // See https://github.com/gradle/gradle/issues/18475 for bug report. FIXME remove when #18475 is fixed.
+      logger.info("JOSM version $version can not be found in the available repositories.", e)
+      cause = e
     }
   }
   throw GradleException("Could not determine the minimum required JOSM version from the given version number '$version'", cause)
