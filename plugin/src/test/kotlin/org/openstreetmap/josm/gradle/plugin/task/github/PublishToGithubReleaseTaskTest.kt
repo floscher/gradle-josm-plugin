@@ -1,24 +1,23 @@
 package org.openstreetmap.josm.gradle.plugin.task.github
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
+import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
 import org.openstreetmap.josm.gradle.plugin.testutils.buildGithubConfig
 import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
-import ru.lanwen.wiremock.ext.WiremockResolver
-import ru.lanwen.wiremock.ext.WiremockUriResolver
 
+@WireMockTest
 class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
   private fun BuildResult.assertMessageInOutput(message: String) {
@@ -32,17 +31,13 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
    *  - for a custom remote jar name
    */
   @Test
-  @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-  fun testCustomPublishTask(
-      @WiremockResolver.Wiremock server: WireMockServer,
-      @WiremockUriResolver.WiremockUri uri: String
-  ) {
+  fun testCustomPublishTask(wmRuntimeInfo: WireMockRuntimeInfo) {
 
     val minJosmVersion = 1111
     val releaseId = 12345678
     val releaseLabel = "v0.0.1"
 
-    val githubConfig = project.buildGithubConfig(uri, GITHUB_USER, "repo_xy", "asdfalkasdhf")
+    val githubConfig = project.buildGithubConfig(wmRuntimeInfo.httpBaseUrl, GITHUB_USER, "repo_xy", "asdfalkasdhf")
 
     val localJarName = "test-$releaseLabel.jar"
     val remoteJarName = "test.jar"
@@ -82,7 +77,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
     fun prepareAPIStub() {
       // stub for "get releases"
       val path1 = "/repos/$GITHUB_USER/${githubConfig.repositoryName}/releases"
-      server.stubFor(
+      wmRuntimeInfo.wireMock.register(
         get(urlPathEqualTo(path1))
           .inScenario("upload-non-existing-asset")
           .willReturn(
@@ -94,7 +89,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
       // stub get release assets
       val path2 = "/repos/$GITHUB_USER/${githubConfig.repositoryName}/releases/$releaseId/assets"
-      server.stubFor(
+      wmRuntimeInfo.wireMock.register(
         get(urlPathEqualTo(path2))
           .inScenario("upload-non-existing-asset")
           .willReturn(
@@ -107,7 +102,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
       // stub for "upload release asset"
       val path3 = "/repos/$GITHUB_USER/${githubConfig.repositoryName}/releases/$releaseId/assets"
-      server.stubFor(
+      wmRuntimeInfo.wireMock.register(
         post(urlPathEqualTo(path3))
           .inScenario("upload-non-existing-asset")
           .withHeader("Content-Type", equalTo(MEDIA_TYPE_JAR))
@@ -150,16 +145,12 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
    * command line using '--release-label'.
    */
   @Test
-  @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-  fun testDefaultPublishTask(
-    @WiremockResolver.Wiremock server: WireMockServer,
-    @WiremockUriResolver.WiremockUri uri: String) {
-
+  fun testDefaultPublishTask(wmRuntimeInfo: WireMockRuntimeInfo) {
     val minJosmVersion = 1111
     val releaseId = 12345678
     val releaseLabel = "v0.0.1"
 
-    val githubConfig = project.buildGithubConfig(uri, GITHUB_USER, "repo_xy", "asdfalkasdhf")
+    val githubConfig = project.buildGithubConfig(wmRuntimeInfo.httpBaseUrl, GITHUB_USER, "repo_xy", "asdfalkasdhf")
 
     // the standard pattern for the jar name the gradle-josm-plugin sets
     // for the plugin jar
@@ -196,7 +187,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
     fun prepareAPIStub() {
       // stub for "get releases"
       val leadingPath = "/repos/$GITHUB_USER/${githubConfig.repositoryName}/releases"
-      server.stubFor(
+      wmRuntimeInfo.wireMock.register(
         get(urlPathEqualTo(leadingPath))
           .inScenario("upload-asset")
           .willReturn(
@@ -215,7 +206,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
       // stub for get release assets for normal release
       val path2 = "$leadingPath/$releaseId/assets"
-      server.stubFor(
+      wmRuntimeInfo.wireMock.register(
         get(urlPathEqualTo(path2))
           .inScenario("upload-assets")
           .willReturn(
@@ -228,7 +219,7 @@ class PublishToGithubReleaseTaskTest : BaseGithubReleaseTaskTest() {
 
       // stub for "upload release asset"
       val path3 = "$leadingPath/$releaseId/assets"
-      server.stubFor(
+      wmRuntimeInfo.wireMock.register(
         post(urlPathEqualTo(path3))
           .inScenario("upload-assets")
           .withHeader("Content-Type", equalTo(MEDIA_TYPE_JAR))

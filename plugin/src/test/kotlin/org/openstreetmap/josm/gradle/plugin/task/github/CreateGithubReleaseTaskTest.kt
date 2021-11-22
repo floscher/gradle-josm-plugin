@@ -1,20 +1,19 @@
 package org.openstreetmap.josm.gradle.plugin.task.github
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
+import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
 import org.openstreetmap.josm.gradle.plugin.testutils.buildGithubConfig
 import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
-import ru.lanwen.wiremock.ext.WiremockResolver
-import ru.lanwen.wiremock.ext.WiremockUriResolver
 import java.net.HttpURLConnection.HTTP_CREATED
 import java.net.HttpURLConnection.HTTP_OK
 
+@WireMockTest
 class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
     /**
@@ -23,10 +22,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
      * - configured in a custom task in the build file
      */
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun test01(
-        @WiremockResolver.Wiremock server: WireMockServer,
-        @WiremockUriResolver.WiremockUri apiUri: String) {
+    fun test01(wmRuntimeInfo: WireMockRuntimeInfo) {
 
         val releaseName = "a test release"
         val releaseLabel = "v0.0.2"
@@ -40,7 +36,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         )
 
-        val githubConfig = project.buildGithubConfig(apiUri, "github_user", "repo", "aaaabbbb")
+        val githubConfig = project.buildGithubConfig(wmRuntimeInfo.httpBaseUrl, "github_user", "repo", "aaaabbbb")
 
         buildFile.writeText("""
             plugins {
@@ -63,7 +59,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
-        server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(WireMock.get(WireMock.urlPathEqualTo(path))
             .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
             .withStatus(200)
@@ -72,7 +68,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
             .withBody("""[{"id": 1, "label": "v0.0.1"}]""")
         ))
 
-        server.stubFor(WireMock.post(WireMock.urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(WireMock.post(WireMock.urlPathEqualTo(path))
             .withRequestBody(WireMock.matchingJsonPath(
                 "$[?(@.tag_name == '$releaseLabel')]"))
             .withRequestBody(WireMock.matchingJsonPath(
@@ -102,10 +98,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
      * - configured in the default task in the build file
      */
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun test02(
-        @WiremockResolver.Wiremock server: WireMockServer,
-        @WiremockUriResolver.WiremockUri apiUri: String) {
+    fun test02(wmRuntimeInfo: WireMockRuntimeInfo) {
 
         val releaseName = "a test release"
         val releaseLabel = "v0.0.2"
@@ -119,7 +112,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         )
 
-        val githubConfig = project.buildGithubConfig(apiUri, "JOSM", "some-repo", "abcdefghijklmnopqrstuvwxyz")
+        val githubConfig = project.buildGithubConfig(wmRuntimeInfo.httpBaseUrl, "JOSM", "some-repo", "abcdefghijklmnopqrstuvwxyz")
 
         buildFile.writeText("""
             plugins {
@@ -142,7 +135,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
-        server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(WireMock.get(WireMock.urlPathEqualTo(path))
             .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
                 .withStatus(HTTP_OK)
@@ -151,7 +144,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 .withBody("""[{"id": 1, "label": "v0.0.1"}]""")
             ))
 
-        server.stubFor(WireMock.post(WireMock.urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(WireMock.post(WireMock.urlPathEqualTo(path))
             .withRequestBody(WireMock.matchingJsonPath(
                 "$[?(@.tag_name == '$releaseLabel')]"))
             .withRequestBody(WireMock.matchingJsonPath(
@@ -183,11 +176,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
      * - when the repo name is not explicitly specified
      */
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun test03(
-        @WiremockResolver.Wiremock server: WireMockServer,
-        @WiremockUriResolver.WiremockUri apiUri: String) {
-
+    fun test03(wmRuntimeInfo: WireMockRuntimeInfo) {
         val releaseLabel = "v0.0.2"
 
         releaseFile.writeText("""
@@ -197,7 +186,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         )
 
-        val githubConfig = project.buildGithubConfig(apiUri, "github_user", "repoName", "aaaabbbb")
+        val githubConfig = project.buildGithubConfig(wmRuntimeInfo.httpBaseUrl, "github_user", "repoName", "aaaabbbb")
 
         buildFile.writeText("""
             plugins {
@@ -222,7 +211,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
-        server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(WireMock.get(WireMock.urlPathEqualTo(path))
             .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
                 .withStatus(HTTP_OK)
@@ -230,7 +219,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 .withBody("""[{"id": 1, "label": "v0.0.1"}]""")
             ))
 
-        server.stubFor(WireMock.post(WireMock.urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(WireMock.post(WireMock.urlPathEqualTo(path))
             .withRequestBody(WireMock.matchingJsonPath(
                 "$[?(@.tag_name == '$releaseLabel')]"))
             .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
@@ -259,10 +248,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
      * - configured with the command line option --release-label
      */
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun test04(
-        @WiremockResolver.Wiremock server: WireMockServer,
-        @WiremockUriResolver.WiremockUri apiUri: String) {
+    fun test04(wmRuntimeInfo: WireMockRuntimeInfo) {
 
         val releaseName = "a test release"
         val releaseLabel = "v0.0.2"
@@ -276,7 +262,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         )
 
-        val githubConfig = project.buildGithubConfig(apiUri, "github_user", "repo", "aaaabbbb")
+        val githubConfig = project.buildGithubConfig(wmRuntimeInfo.httpBaseUrl, "github_user", "repo", "aaaabbbb")
 
         buildFile.writeText("""
             plugins {
@@ -296,7 +282,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
-        server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(WireMock.get(WireMock.urlPathEqualTo(path))
             .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
                 .withStatus(HTTP_OK)
@@ -305,7 +291,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 .withBody("""[{"id": 1, "label": "v0.0.1"}]""")
             ))
 
-        server.stubFor(WireMock.post(WireMock.urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(WireMock.post(WireMock.urlPathEqualTo(path))
             .withRequestBody(WireMock.matchingJsonPath(
                 "$[?(@.tag_name == '$releaseLabel')]"))
             .withRequestBody(WireMock.matchingJsonPath(
@@ -337,10 +323,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
      * - using the standard task 'createGithubRelease'
      */
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun test05(
-        @WiremockResolver.Wiremock server: WireMockServer,
-        @WiremockUriResolver.WiremockUri apiUri: String) {
+    fun test05(wmRuntimeInfo: WireMockRuntimeInfo) {
 
         val releaseName = "a test release"
         val releaseLabel = "v0.0.2"
@@ -354,7 +337,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         )
 
-        val githubConfig = project.buildGithubConfig(apiUri, "github_user", "repo", "aaaabbbb")
+        val githubConfig = project.buildGithubConfig(wmRuntimeInfo.httpBaseUrl, "github_user", "repo", "aaaabbbb")
 
         buildFile.writeText("""
             plugins {
@@ -374,7 +357,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
 
         val path = "/repos/${githubConfig.repositoryOwner}/${githubConfig.repositoryName}/releases"
 
-        server.stubFor(WireMock.get(WireMock.urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(WireMock.get(WireMock.urlPathEqualTo(path))
             .withBasicAuth(githubConfig.repositoryOwner, githubConfig.accessToken)
             .willReturn(WireMock.aResponse()
                 .withStatus(HTTP_OK)
@@ -383,7 +366,7 @@ class CreateGithubReleaseTaskTest: BaseGithubReleaseTaskTest() {
                 .withBody("""[{"id": 1, "label": "v0.0.1"}]""")
             ))
 
-        server.stubFor(WireMock.post(WireMock.urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(WireMock.post(WireMock.urlPathEqualTo(path))
             .withRequestBody(WireMock.matchingJsonPath(
                 "$[?(@.tag_name == '$releaseLabel')]"))
             .withRequestBody(WireMock.matchingJsonPath(

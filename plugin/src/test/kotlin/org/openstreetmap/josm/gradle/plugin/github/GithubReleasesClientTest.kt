@@ -1,7 +1,6 @@
 package org.openstreetmap.josm.gradle.plugin.github
 
 import com.beust.klaxon.JsonObject
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.delete
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
@@ -12,6 +11,8 @@ import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
+import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -19,13 +20,8 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
-import org.junit.jupiter.api.extension.ExtendWith
 import org.openstreetmap.josm.gradle.plugin.testutils.GradleProjectUtil
 import org.openstreetmap.josm.gradle.plugin.util.Urls
-import ru.lanwen.wiremock.ext.WiremockResolver
-import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock
-import ru.lanwen.wiremock.ext.WiremockUriResolver
-import ru.lanwen.wiremock.ext.WiremockUriResolver.WiremockUri
 import java.net.HttpURLConnection.HTTP_CREATED
 import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
@@ -35,6 +31,7 @@ import java.net.HttpURLConnection.HTTP_OK
 const val GITHUB_USER = "a-user"
 const val GITHUB_ACCESS_TOKEN = "an-access-token"
 
+@WireMockTest
 class GithubReleasesClientTest {
 
     private fun buildClient(apiUri: String) = GithubReleasesClient(
@@ -61,14 +58,12 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `getLatestRelease should return a release for HTTP 200`(
-        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
-        val client = buildClient(uri)
+    fun `getLatestRelease should return a release for HTTP 200`(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val path = "/repos/${client.user}/${client.repository}/releases/latest"
 
         // replies two release in the first page
-        server.stubFor(get(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(get(urlPathEqualTo(path))
             .willReturn(aResponse()
             .withStatus(HTTP_OK)
             // link to the next page of releases
@@ -82,15 +77,12 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class
-    )
-    fun `getLatestRelease should return null for HTTP 404`(
-        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
-        val client = buildClient(uri)
+    fun `getLatestRelease should return null for HTTP 404`(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val path = "/repos/${client.user}/${client.repository}/releases/latest"
 
         // replies two release in the first page
-        server.stubFor(get(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(get(urlPathEqualTo(path))
             .willReturn(aResponse()
                 .withStatus(HTTP_NOT_FOUND)
                 // link to the next page of releases
@@ -102,14 +94,12 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `getLatestRelease should throw for an illegal http status code`(
-        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
-        val client = buildClient(uri)
+    fun `getLatestRelease should throw for an illegal http status code`(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val path = "/repos/${client.user}/${client.repository}/releases/latest"
 
         // replies two release in the first page
-        server.stubFor(get(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(get(urlPathEqualTo(path))
             .willReturn(aResponse()
                 .withStatus(HTTP_INTERNAL_ERROR)
                 // link to the next page of releases
@@ -122,16 +112,14 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `createRelease with only a tag name should work`(
-        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
-        val client = buildClient(uri)
+    fun `createRelease with only a tag name should work`(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val path = "/repos/${client.user}/${client.repository}/releases"
 
         val tagName = "v0.0.1"
 
         // replies two release in the first page
-        server.stubFor(post(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(post(urlPathEqualTo(path))
           .withRequestBody(matchingJsonPath("$[?(@.tag_name == '$tagName')]"))
             .willReturn(aResponse()
               .withStatus(HTTP_CREATED)
@@ -143,10 +131,8 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `createRelease should accept optional parameters`(
-        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
-        val client = buildClient(uri)
+    fun `createRelease should accept optional parameters`(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val path = "/repos/${client.user}/${client.repository}/releases"
 
         val tagName = "v0.0.1"
@@ -160,7 +146,7 @@ class GithubReleasesClientTest {
         val prerelease = true
 
         // replies two release in the first page
-        server.stubFor(post(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(post(urlPathEqualTo(path))
             .withRequestBody(matchingJsonPath(
                 "$[?(@.tag_name == '$tagName')]"))
             .withRequestBody(matchingJsonPath("$[?(@.name == '$name')]"))
@@ -181,10 +167,8 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `updateRelease updating all attributes should work`(
-        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
-        val client = buildClient(uri)
+    fun `updateRelease updating all attributes should work`(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val releaseId = 123456
 
         val tagName = "new-tag"
@@ -197,7 +181,7 @@ class GithubReleasesClientTest {
         val path = "/repos/${client.user}/${client.repository}/releases" +
             "/$releaseId"
 
-        server.stubFor(patch(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(patch(urlPathEqualTo(path))
             .withRequestBody(matchingJsonPath(
                 "$[?(@.tag_name == '$tagName')]"))
             .withRequestBody(matchingJsonPath("$[?(@.name == '$name')]"))
@@ -220,17 +204,15 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `updateRelease updating body only should work`(
-        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
-        val client = buildClient(uri)
+    fun `updateRelease updating body only should work`(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val releaseId = 123456
         val body = "new-body"
 
         val path = "/repos/${client.user}/${client.repository}/releases" +
             "/$releaseId"
 
-        server.stubFor(patch(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(patch(urlPathEqualTo(path))
             .withRequestBody(matchingJsonPath("$[?(@.body == '$body')]"))
             .willReturn(aResponse()
                 .withStatus(HTTP_OK)
@@ -243,14 +225,12 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `if a few releases are present, getReleases should work`(
-        @Wiremock server: WireMockServer, @WiremockUri uri: String) {
-        val client = buildClient(uri)
+    fun `if a few releases are present, getReleases should work`(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val path = "/repos/${client.user}/${client.repository}/releases"
 
         // replies two release in the first page
-        server.stubFor(get(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(get(urlPathEqualTo(path))
             .inScenario("paging")
             .willReturn(aResponse()
                 .withStatus(HTTP_OK)
@@ -264,7 +244,7 @@ class GithubReleasesClientTest {
                 )
             )
         // replies two more releases in the second page
-        server.stubFor(get(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(get(urlPathEqualTo(path))
             .withQueryParam("page", equalTo("2"))
             .inScenario("paging")
             .willReturn(aResponse()
@@ -280,13 +260,10 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
     fun `uploading a simple text file as release asset should work`(
       testInfo: TestInfo,
-      @Wiremock server: WireMockServer,
-      @WiremockUri uri: String
-    ) {
-        val client = buildClient(uri)
+      wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val releaseId = 12345
         val path = "/repos/${client.user}/${client.repository}" +
                     "/releases/$releaseId/assets"
@@ -295,7 +272,7 @@ class GithubReleasesClientTest {
         asset.writeText(content)
 
         // replies two release in the first page
-        server.stubFor(post(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(post(urlPathEqualTo(path))
             .withRequestBody(equalTo(content))
             .withHeader("Content-Type", equalTo("text/plain"))
             .willReturn(aResponse()
@@ -310,13 +287,10 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
     fun `uploading a simple text file + name and label should work`(
       testInfo: TestInfo,
-      @Wiremock server: WireMockServer,
-      @WiremockUri uri: String
-    ) {
-        val client = buildClient(uri)
+      wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val releaseId = 12345
         val asset = GradleProjectUtil.createTempFile(testInfo, suffix="txt")
         val content = "Hello World!"
@@ -326,7 +300,7 @@ class GithubReleasesClientTest {
         val path = "/repos/${client.user}/${client.repository}" +
                     "/releases/$releaseId/assets"
 
-        server.stubFor(post(urlPathMatching("$path.*"))
+        wmRuntimeInfo.wireMock.register(post(urlPathMatching("$path.*"))
             .withRequestBody(equalTo(content))
             .withHeader("Content-Type", equalTo("text/plain"))
             .withQueryParam("name", equalTo(newName))
@@ -344,13 +318,11 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun testGetReleases(@Wiremock server: WireMockServer,
-                        @WiremockUri uri: String) {
-        val client = buildClient(uri)
+    fun testGetReleases(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val url = "/repos/${client.user}/${client.repository}/releases"
 
-        server.stubFor(get(urlEqualTo(url))
+        wmRuntimeInfo.wireMock.register(get(urlEqualTo(url))
             .willReturn(aResponse()
                 .withStatus(HTTP_OK)
                 .withBody("""[
@@ -364,16 +336,14 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
     fun `getReleaseAssets() with one page should work`(
-                        @Wiremock server: WireMockServer,
-                        @WiremockUri uri: String) {
-        val client = buildClient(uri)
+                        wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val releaseId = 123456
         val url = "/repos/${client.user}/${client.repository}/releases" +
             "/$releaseId/assets"
 
-        server.stubFor(get(urlEqualTo(url))
+        wmRuntimeInfo.wireMock.register(get(urlEqualTo(url))
             .willReturn(aResponse()
                 .withStatus(HTTP_OK)
                 // no link header
@@ -393,17 +363,14 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `getReleaseAssets() with two pages should work`(
-        @Wiremock server: WireMockServer,
-        @WiremockUri uri: String) {
-        val client = buildClient(uri)
+    fun `getReleaseAssets() with two pages should work`(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val releaseId = 123456
         val path = "/repos/${client.user}/${client.repository}/releases" +
             "/$releaseId/assets"
 
         // replies two assets for the first page
-        server.stubFor(get(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(get(urlPathEqualTo(path))
             .inScenario("paging")
             .willReturn(aResponse()
                 .withStatus(HTTP_OK)
@@ -418,7 +385,7 @@ class GithubReleasesClientTest {
         )
 
         // replies two more assets in the second page
-        server.stubFor(get(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(get(urlPathEqualTo(path))
             .withQueryParam("page", equalTo("2"))
             .inScenario("paging")
             .willReturn(aResponse()
@@ -438,17 +405,14 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `getReleaseAssets() with no assets should work`(
-        @Wiremock server: WireMockServer,
-        @WiremockUri uri: String) {
-        val client = buildClient(uri)
+    fun `getReleaseAssets() with no assets should work`(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val releaseId = 123456
         val path = "/repos/${client.user}/${client.repository}/releases" +
             "/$releaseId/assets"
 
         // replies two assets for the first page
-        server.stubFor(get(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(get(urlPathEqualTo(path))
             .willReturn(aResponse()
                 .withStatus(HTTP_OK)
                 .withBody("[]")
@@ -461,17 +425,14 @@ class GithubReleasesClientTest {
 
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `deleteReleaseAsset() for existing asset should work`(
-        @Wiremock server: WireMockServer,
-        @WiremockUri uri: String) {
-        val client = buildClient(uri)
+    fun `deleteReleaseAsset() for existing asset should work`(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         val assetId = 123456
         val path = "/repos/${client.user}/${client.repository}/releases" +
             "/assets/$assetId"
 
         // replies two assets for the first page
-        server.stubFor(delete(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(delete(urlPathEqualTo(path))
             .willReturn(aResponse()
                 .withStatus(HTTP_NO_CONTENT)
                 .withBody("")
@@ -481,18 +442,15 @@ class GithubReleasesClientTest {
     }
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun `deleteReleaseAsset() for non existing asset should work`(
-        @Wiremock server: WireMockServer,
-        @WiremockUri uri: String) {
-        val client = buildClient(uri)
+    fun `deleteReleaseAsset() for non existing asset should work`(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val client = buildClient(wmRuntimeInfo.httpBaseUrl)
         // assumption: there's no asset with this id
         val assetId = 123456
         val path = "/repos/${client.user}/${client.repository}/releases" +
             "/assets/$assetId"
 
         // replies two assets for the first page
-        server.stubFor(delete(urlPathEqualTo(path))
+        wmRuntimeInfo.wireMock.register(delete(urlPathEqualTo(path))
             .willReturn(aResponse()
                 .withStatus(HTTP_NOT_FOUND)
                 .withBody("""

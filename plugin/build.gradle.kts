@@ -22,8 +22,7 @@ dependencies {
   testImplementation("org.eclipse.jgit", "org.eclipse.jgit", Versions.jgit)
   testImplementation("org.junit.jupiter", "junit-jupiter-api", Versions.junit)
   testImplementation("org.junit.jupiter", "junit-jupiter-params", Versions.junit)
-  testImplementation("com.github.tomakehurst","wiremock",Versions.wiremock)
-  testImplementation("ru.lanwen.wiremock", "wiremock-junit5", Versions.wiremockJunit5)
+  testImplementation("com.github.tomakehurst", "wiremock-jre8", Versions.wiremock)
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", Versions.junit)
 }
 
