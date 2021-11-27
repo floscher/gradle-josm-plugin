@@ -43,6 +43,8 @@ Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://floscher.gitlab.io
 * [Gubaer/josm-**scripting**-plugin](https://github.com/Gubaer/josm-scripting-plugin)
 * [JOSM/**pt_assistant**](https://gitlab.com/JOSM/plugin/pt_assistant)
 * [JOSM/**wikipedia**](https://gitlab.com/JOSM/plugin/wikipedia)
+* [Josm Review Plugin](https://github.com/DavidKarlas/JosmReviewPlugin)
+* [Josm Relation Validation](https://github.com/DavidKarlas/JosmRelationValidation)
 
 ## Deprecated links
 Alternatively to the default Gradle plugin repository, you can download this plugin from a Maven repository at `https://floscher.gitlab.io/gradle-josm-plugin/maven`.
