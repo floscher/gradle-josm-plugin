@@ -4,10 +4,10 @@ public final class Versions {
   public static final String bintray = "1.8.5";
   public static final String flexmark = "0.62.2";
   public static final String klaxon = "5.5";
-  public static final String kotlin = "1.6.0";
+  public static final String kotlin = "1.6.10";
   public static final String kotlinxHtml = "0.7.3";
-  public static final String dokka = "1.6.0";
-  public static final String kotlinSerialization = "1.3.1";
+  public static final String dokka = "1.6.10";
+  public static final String kotlinSerialization = "1.3.2";
   public static final String jackson = "2.13.1";
   public static final String jacoco = "0.8.7";
   public static final String jgit = "6.0.0.202111291000-r";
