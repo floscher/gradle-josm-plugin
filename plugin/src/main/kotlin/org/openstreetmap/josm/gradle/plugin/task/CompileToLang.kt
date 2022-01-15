@@ -37,6 +37,7 @@ public abstract class CompileToLang(
   @get:Internal
   abstract val decoder: I18nFileDecoder
 
+  @get:Internal
   public lateinit var translations: List<Pair<String, Map<MsgId, MsgStr>>>
 
   open fun filterIsExcludedBaseFile(file: File): Boolean = false
@@ -50,9 +51,11 @@ public abstract class CompileToLang(
   @OutputDirectory
   val outputDirectory: Provider<File> = project.provider { project.buildDir.resolve("i18n/${sourceSet.name}/$fileExtension") }
 
+  @Internal
   override fun getDescription(): String = "Compile the *.$fileExtension files of source set `${sourceSet.name}` to the *.lang format used by JOSM (${extractSources(sourceSet).files.size} files available)"
   override fun setDescription(description: String?) = throw IllegalArgumentException("Changing description of a ${this::class.simpleName} task is not allowed!")
 
+  @Internal
   override fun getGroup(): String = "JOSM-i18n"
   override fun setGroup(group: String?) = throw IllegalArgumentException("Changing group of a ${this::class.simpleName} task is not allowed!")
 
@@ -73,6 +76,7 @@ public abstract class CompileToLang(
         "No *.$fileExtension files found to be compiled for source set ${sourceSet.name} in:\n" +
           sourceSet.mo.srcDirs.joinToString("\n") { "  " + it.absolutePath }
       )
+      translations = emptyList()
     } else {
       require(inputFiles.map { it.nameWithoutExtension.toLowerCase(Locale.ROOT) }.let { it.size == it.distinct().size }) {
         "There are duplicate locales: ${ inputFiles.map { it.nameWithoutExtension }.sortedBy { it.toLowerCase(Locale.ROOT) }.joinToString() }"
@@ -101,18 +105,18 @@ public abstract class CompileToLang(
     val encoder = LangFileEncoder(keys)
     outputDirectory.resolve("$baseLanguage.lang").apply {
       writeBytes(encoder.encodeToBaseLanguageByteArray())
-      logger.lifecycle("$totalNumStrings strings for base language $name")
+      logger.lifecycle("$totalNumStrings strings for base language $nameWithoutExtension")
     }
 
     translations.sortedBy { it.first }.sortedByDescending { it.second.values.size }.forEach { (language, translation) ->
       outputDirectory.resolve("${language}.lang").apply {
         writeBytes(encoder.encodeToByteArray(translation))
-        translation.mapNotNull { it.value }.size.let { numCompleted ->
+        translation.filter { it.key != GETTEXT_HEADER_MSGID }.mapNotNull { it.value }.size.let { numCompleted ->
           logger.lifecycle("${
             formatAsProgressBar(numCompleted.toUInt(), totalNumStrings.toUInt())
           } (${
             numCompleted.toString().padStart(totalNumStrings.toString().length)
-          } of $totalNumStrings strings) for $name")
+          } of $totalNumStrings strings) for $nameWithoutExtension")
         }
       }
     }

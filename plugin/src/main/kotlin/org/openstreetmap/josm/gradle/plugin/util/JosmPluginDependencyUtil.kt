@@ -151,7 +151,7 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: UShort, alreadyRes
       alreadyResolvedPlugins.add(pluginName)
       val resolvedManifests = resolvedFiles.map { Manifest(ZipFile(it).let { it.getInputStream(it.getEntry("META-INF/MANIFEST.MF")) }) }
 
-      val requiredJava = resolvedManifests.mapNotNull { it.mainAttributes.getValue(JosmManifest.Attribute.PLUGIN_MIN_JAVA_VERSION)?.toString()?.toIntOrNull() }.min()
+      val requiredJava = resolvedManifests.mapNotNull { it.mainAttributes[JosmManifest.Attribute.PLUGIN_MIN_JAVA_VERSION]?.toString()?.toIntOrNull() }.min()
       val currentJava = JavaVersion.current().majorVersion.toIntOrNull()
       if (requiredJava != null && currentJava != null && requiredJava > currentJava) {
         // if any manifest has a minimum Java version larger than the current java version
