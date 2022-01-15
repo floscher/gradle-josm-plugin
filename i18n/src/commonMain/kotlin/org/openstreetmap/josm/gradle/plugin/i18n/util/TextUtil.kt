@@ -9,7 +9,7 @@ import kotlin.math.roundToInt
  *   * 1 character: if [numCompleted] == [numTotal] then ▒ else ░
  *   * 9 characters: percentage with 2 decimal places and percent sign
  *
- * @sample org.openstreetmap.josm.gradle.plugin.i18n.util.TextUtilTest.testFormatAsProgressBar
+ * @sample org.openstreetmap.josm.gradle.plugin.i18n.util.TextUtilTest.sampleFormatAsProgressBar
  *
  * @throws IllegalArgumentException if [numCompleted] > [numTotal]
  */
