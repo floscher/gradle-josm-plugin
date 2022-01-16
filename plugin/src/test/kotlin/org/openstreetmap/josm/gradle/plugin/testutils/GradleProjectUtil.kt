@@ -9,12 +9,17 @@ import org.junit.jupiter.api.TestInfo
 import org.openstreetmap.josm.gradle.plugin.JosmPlugin
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.createTempFile
 
+@OptIn(ExperimentalPathApi::class)
 class GradleProjectUtil private constructor() {
   companion object {
-    private val tmpRootDir: File by lazy { createTempDir("gradle-josm-plugin", "unit-test").also { it.deleteOnExit() } }
+    private val tmpRootDir: Path by lazy { createTempDirectory("gradle-josm-plugin_unit-test").also { it.toFile().deleteOnExit() } }
 
-    private val gradleUserHome: File by lazy { File(tmpRootDir, "gradleUserHome") }
+    private val gradleUserHome: File by lazy { tmpRootDir.toFile().resolve("gradleUserHome") }
 
     /**
      * Create a temporary directory below [tmpRootDir]
@@ -23,7 +28,7 @@ class GradleProjectUtil private constructor() {
      * @return the directory that was created as a [File]
      */
     fun createTempSubDir(testInfo: TestInfo, initGit: Boolean = false): File =
-      createTempDir(testInfo.toDirString() + '_', null, tmpRootDir).also {
+      createTempDirectory(tmpRootDir, testInfo.toDirString() + '_').toFile().also {
         if (initGit) {
           val git = Git.init().setDirectory(it).call()
           val author = PersonIdent("John Doe", "john@example.org", 0.toLong(), 0)
@@ -55,6 +60,6 @@ class GradleProjectUtil private constructor() {
       }
 
     fun createTempFile(testInfo: TestInfo, suffix: String): File =
-      createTempFile(testInfo.toDirString() + '_', suffix, tmpRootDir)
+      createTempFile(tmpRootDir, testInfo.toDirString() + '_', suffix).toFile()
   }
 }

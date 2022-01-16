@@ -1,6 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 import org.openstreetmap.josm.gradle.plugin.i18n.io.shortenPoFile
@@ -26,6 +27,7 @@ open class ShortenPoFiles @Inject constructor(private val sourceSet: I18nSourceS
     outputs.files(sourceSet.po)
   }
 
+  @Internal
   override fun getDescription(): String? =
     "Remove the paths from the *.po files to where a string can be found in the source code of source set `${sourceSet.name}`. " +
     "Also replaces placeholders in the *.po header."

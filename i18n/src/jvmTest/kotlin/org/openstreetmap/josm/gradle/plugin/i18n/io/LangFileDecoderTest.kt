@@ -63,6 +63,7 @@ val DUMMY_TRANSLATIONS: Map<String?, List<Map<String, MsgStr>>> = mapOf(
   )
 )
 
+@OptIn(ExperimentalUnsignedTypes::class)
 class LangFileDecoderTest {
 
   @Test

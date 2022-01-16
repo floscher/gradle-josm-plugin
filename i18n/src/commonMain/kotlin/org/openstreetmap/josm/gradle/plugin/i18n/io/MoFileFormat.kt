@@ -9,6 +9,7 @@ public object MoFileFormat {
    * Value: `0x950412de`
    */
   @JvmField
+  @OptIn(ExperimentalUnsignedTypes::class)
   public val BE_MAGIC: List<Byte> = listOf(0x95, 0x04, 0x12, 0xde).map { it.toUByte().toByte() }
 
   /**

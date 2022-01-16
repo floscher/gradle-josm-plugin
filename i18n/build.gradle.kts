@@ -16,7 +16,7 @@ tasks.withType(DokkaTask::class) {
 }
 
 kotlin {
-  explicitApiWarning()
+  explicitApi()
   js().browser {
     testTask {
       useKarma {
@@ -46,13 +46,10 @@ kotlin {
     dependencies {
       implementation(kotlin("test"))
       implementation(kotlin("test-junit5"))
+      implementation("org.junit.jupiter:junit-jupiter-api:${Versions.junit}")
+      runtimeOnly("org.junit.jupiter:junit-jupiter-engine:${Versions.junit}")
     }
   }
-}
-
-dependencies {
-  add("jvmTestImplementation", "org.junit.jupiter:junit-jupiter-api:${Versions.junit}")
-  add("jvmTestRuntimeOnly", "org.junit.jupiter:junit-jupiter-engine:${Versions.junit}")
 }
 
 val javadocJar by tasks.creating(Jar::class)

@@ -14,7 +14,7 @@ include:
 assemble:
   stage: build
   script:
-  - ./gradlew --stacktrace jar
+  - ./gradlew --stacktrace --info assemble
   artifacts:
     paths:
     - build/
@@ -23,7 +23,7 @@ test:
   stage: test
   image: registry.gitlab.com/josm/docker-library/openjdk-11-josmplugin
   script:
-  - ./gradlew --stacktrace --info build :dokkaHtmlMultimodule :jacocoTestReport
+  - ./gradlew --stacktrace --info :build
   artifacts:
     paths:
     - build/

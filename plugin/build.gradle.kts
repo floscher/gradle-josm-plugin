@@ -17,7 +17,7 @@ dependencies {
   implementation("com.squareup.okhttp3", "okhttp", Versions.okhttp)
   implementation("com.beust","klaxon", Versions.klaxon)
   implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", Versions.jackson)
-  implementation("com.vladsch.flexmark:flexmark:${Versions.flexmark}")
+  implementation("com.vladsch.flexmark", "flexmark", Versions.flexmark)
 
   testImplementation("org.eclipse.jgit", "org.eclipse.jgit", Versions.jgit)
   testImplementation("org.junit.jupiter", "junit-jupiter-api", Versions.junit)

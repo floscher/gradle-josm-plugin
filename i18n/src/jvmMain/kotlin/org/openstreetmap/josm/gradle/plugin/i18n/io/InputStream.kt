@@ -10,7 +10,7 @@ import java.io.InputStream
  *   can be read is lower than the length of the parameter [b].
  */
 @Throws(IOException::class)
-fun InputStream.readAllOrException(b: ByteArray): Int =
+public fun InputStream.readAllOrException(b: ByteArray): Int =
   if (b.isEmpty()) {
     0
   } else {
@@ -27,7 +27,7 @@ fun InputStream.readAllOrException(b: ByteArray): Int =
  */
 @ExperimentalUnsignedTypes
 @Throws(IOException::class)
-fun InputStream.skipAllOrException(n: kotlin.UInt): kotlin.UInt {
+public fun InputStream.skipAllOrException(n: UInt): UInt {
   val numBytes = this.skip(n.toLong())
   if (numBytes < n.toLong()) {
     throw IOException("Could not skip over $n bytes. The stream ended unexpectedly!")
@@ -42,7 +42,7 @@ fun InputStream.skipAllOrException(n: kotlin.UInt): kotlin.UInt {
  * @throws IOException if only one byte can be read from the [InputStream]
  */
 @Throws(IOException::class)
-fun InputStream.readTwoBytesAsInt(): Int {
+public fun InputStream.readTwoBytesAsInt(): Int {
   val bytes = Pair(read(), read())
   if (bytes.first < 0) {
     return -1

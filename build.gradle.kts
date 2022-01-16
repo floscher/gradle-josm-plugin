@@ -4,12 +4,12 @@ import org.jetbrains.dokka.Platform
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import org.openstreetmap.josm.gradle.plugin.api.gitlab.setupGitlabPublishingForAllProjects
 import org.openstreetmap.josm.gradle.plugin.logCoverage
 import org.openstreetmap.josm.gradle.plugin.logPublishedMavenArtifacts
 import org.openstreetmap.josm.gradle.plugin.logSkippedTasks
 import org.openstreetmap.josm.gradle.plugin.logTaskDuration
-import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import java.net.URL
 
 typealias IKotlinCompile<T> = org.jetbrains.kotlin.gradle.dsl.KotlinCompile<T>
@@ -42,6 +42,10 @@ gradle.projectsEvaluated {
         .map { project(it).extensions.getByType(SourceSetContainer::class).getByName(SourceSet.MAIN_SOURCE_SET_NAME) }
         .toTypedArray()
     )
+  }
+
+  val build by tasks.getting {
+    dependsOn(tasks.dokkaHtmlMultiModule, jacocoTestReport)
   }
 }
 

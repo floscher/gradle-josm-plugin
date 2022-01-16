@@ -14,7 +14,7 @@ dependencies {
   api(project(":i18n"))
 }
 
-application.mainClassName = "org.openstreetmap.josm.gradle.plugin.langconv.MainKt"
+application.mainClass.set("org.openstreetmap.josm.gradle.plugin.langconv.MainKt")
 
 val run by tasks.getting(JavaExec::class) {
   doFirst {
