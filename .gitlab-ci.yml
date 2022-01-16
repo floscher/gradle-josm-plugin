@@ -1,4 +1,4 @@
-image: registry.gitlab.com/josm/docker-library/openjdk-11-git:latest
+image: registry.gitlab.com/josm/docker-library/openjdk:8
 
 before_script:
 - export GRADLE_USER_HOME=`pwd`/.gradle
@@ -21,7 +21,7 @@ assemble:
 
 test:
   stage: test
-  image: registry.gitlab.com/josm/docker-library/openjdk-11-josmplugin
+  image: registry.gitlab.com/josm/docker-library/openjdk:8
   script:
   - apt-get update && apt-get install -y firefox-esr # Needed for i18n:jsBrowserTest
   - ./gradlew --stacktrace --info :build
