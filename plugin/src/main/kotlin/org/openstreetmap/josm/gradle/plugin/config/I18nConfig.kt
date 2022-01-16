@@ -68,9 +68,6 @@ class I18nConfig: Serializable {
     pathTransformer = { closure.call(it) }
   }
 
-  @Deprecated("This method now expects the project root directory (`project.projectDir`) as first parameter!", replaceWith = ReplaceWith("getPathTransformer(project.projectDir, repoUrl)"))
-  fun getPathTransformer(repoUrl: String): (String) -> String = throw IllegalAccessException("The API changed! Add the project root directory as first method parameter!")
-
   /**
    * Creates a path transformer that replaces an absolute file path of the *.pot file with a URL
    * to a hosted instance of the project.

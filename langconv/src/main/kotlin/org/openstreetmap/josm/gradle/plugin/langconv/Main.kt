@@ -1,17 +1,16 @@
 package org.openstreetmap.josm.gradle.plugin.langconv
 
-import org.openstreetmap.josm.gradle.plugin.i18n.io.MoFileFormat
+import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileDecoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MoFileDecoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MoFileEncoder
+import org.openstreetmap.josm.gradle.plugin.i18n.io.MoFileFormat
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
+import org.openstreetmap.josm.gradle.plugin.i18n.io.encodeToLangFiles
 import java.io.File
 import java.io.FileFilter
 import java.io.IOException
-import java.util.Locale
 import kotlin.system.exitProcess
-import org.openstreetmap.josm.gradle.plugin.i18n.io.encodeToLangFiles
-import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileDecoder
 
 @ExperimentalUnsignedTypes
 @Throws(IllegalArgumentException::class)
@@ -23,7 +22,7 @@ fun main(vararg args: String) {
 
   val mode: LangconvMode = LangconvMode.values().firstOrNull {
     args.isNotEmpty() && it.name.equals(args.first(), true)
-  } ?: failWithException(IllegalArgumentException("Unknown conversion mode '${args.firstOrNull() ?: ""}'! Only ${LangconvMode.values().joinToString(" or ") { it.name.toLowerCase(Locale.ENGLISH) }} are allowed!"))
+  } ?: failWithException(IllegalArgumentException("Unknown conversion mode '${args.firstOrNull() ?: ""}'! Only ${LangconvMode.values().joinToString(" or ") { it.name.lowercase() }} are allowed!"))
 
   val inputArg = args.getOrNull(1) ?: failWithException(IllegalArgumentException("No input file or directory is given!"))
   val outputArg = args.getOrNull(2)

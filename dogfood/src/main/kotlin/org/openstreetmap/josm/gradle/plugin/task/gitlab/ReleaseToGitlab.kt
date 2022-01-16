@@ -10,6 +10,7 @@ import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
 import org.openstreetmap.josm.gradle.plugin.api.gitlab.GitlabRelease
@@ -19,7 +20,6 @@ import java.io.FileNotFoundException
 import java.net.URL
 import javax.inject.Inject
 import javax.net.ssl.HttpsURLConnection
-import kotlin.math.max
 
 /**
  * Creates a Gitlab release from an already existing package in the Gitlab maven repository
@@ -30,8 +30,8 @@ import kotlin.math.max
  *   where the release will be created
  */
 open class ReleaseToGitlab @Inject constructor(
-  var trimLeadingV: () -> Boolean,
-  var names: Set<String>
+  private val trimLeadingV: () -> Boolean,
+  private val names: SetProperty<String>
 ) : DefaultTask(), Runnable {
 
   val gitlabSettingsBuilder = GitlabRepositorySettings.Builder()
@@ -43,12 +43,11 @@ open class ReleaseToGitlab @Inject constructor(
 
   @TaskAction
   override fun run() {
-    require(names.isNotEmpty()) {
-      "No package names given that should be included in the release!"
-    }
+    val names: Set<String> = names.orNull?.takeIf { it.isNotEmpty() }
+      ?: throw IllegalArgumentException("No package names given that should be included in the release!")
 
     val gitTagName = System.getenv("GITLAB_RELEASE_GIT_TAG_NAME") ?: System.getenv("CI_COMMIT_TAG")
-    val artifactVersion = System.getenv("GITLAB_RELEASE_ARTIFACT_VERSION") ?: gitTagName?.let { if (it.isNotEmpty() && trimLeadingV.invoke() && it[0].toLowerCase() == 'v') it.substring(1) else it }
+    val artifactVersion = System.getenv("GITLAB_RELEASE_ARTIFACT_VERSION") ?: gitTagName?.let { if (it.isNotEmpty() && trimLeadingV.invoke() && it[0].lowercaseChar() == 'v') it.substring(1) else it }
     val gitlabSettings = gitlabSettingsBuilder.build()
 
     require(gitlabSettings != null && gitTagName != null && artifactVersion != null) {
@@ -116,7 +115,7 @@ open class ReleaseToGitlab @Inject constructor(
           revTag.shortMessage,
           gitTagName,
           revTag.fullMessage
-            .substring(max(0, revTag.fullMessage.indexOf('\n') + 1))
+            .substring((revTag.fullMessage.indexOf('\n') + 1).coerceAtLeast(0))
             .replace("-----BEGIN PGP SIGNATURE-----", "\n```\n-----BEGIN PGP SIGNATURE-----")
             .replace("-----END PGP SIGNATURE-----", "-----END PGP SIGNATURE-----\n```")
             .trim(),

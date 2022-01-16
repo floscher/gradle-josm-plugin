@@ -13,7 +13,6 @@ import org.openstreetmap.josm.gradle.plugin.util.createJosmDependencyFuzzy
 import org.openstreetmap.josm.gradle.plugin.util.excludeJosm
 import org.openstreetmap.josm.gradle.plugin.util.getAllRequiredJosmPlugins
 import org.openstreetmap.josm.gradle.plugin.util.josm
-import java.lang.IllegalStateException
 
 @ExperimentalUnsignedTypes
 class ProjectExtensionsTest {

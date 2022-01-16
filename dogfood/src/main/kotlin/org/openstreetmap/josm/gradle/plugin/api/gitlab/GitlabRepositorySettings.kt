@@ -139,4 +139,7 @@ fun Project.setupGitlabPublishingForAllProjects(repoName: String) {
   } ?: logger.lifecycle(gitlabEnvVarHint(repoName))
 }
 
-private fun gitlabEnvVarHint(repoName: String): String = "Note: If you want to publish to a Gitlab Maven package repository, set the environment variables GITLAB_PROJECT_ID and GITLAB_PERSONAL_ACCESS_TOKEN . Then you can use the task `publishAllPublicationsTo${repoName.capitalize()}Repository`. In GitLab CI these environment variables are set automatically."
+private fun gitlabEnvVarHint(repoName: String): String =
+  "Note: If you want to publish to a Gitlab Maven package repository, set the environment variables GITLAB_PROJECT_ID and GITLAB_PERSONAL_ACCESS_TOKEN . " +
+  "Then you can use the task `publishAllPublicationsTo${repoName.replaceFirstChar { it.uppercaseChar() }}Repository`. " +
+  "In GitLab CI these environment variables are set automatically."

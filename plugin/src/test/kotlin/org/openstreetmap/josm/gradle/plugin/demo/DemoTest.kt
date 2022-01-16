@@ -1,5 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.demo
 
+import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -12,15 +14,13 @@ import java.security.MessageDigest
 
 class DemoTest {
 
+  /**
+   * Gradle >= 7.1 is required in order to use [JavaPluginExtension.getSourceSets], because [Project.getConvention]
+   * is now deprecated in favour of [Project.getExtensions].
+   */
   @Suppress("unused")
   enum class GradleVersion(val expectingSuccess: Boolean) {
-    // Gradle <= 6.7 uses Kotlin 1.3.x. We can only support versions with Kotlin 1.4+ (minOrNull is required, as 1.5 prohibits min)
-    GRADLE_5_6_4(false),
-    GRADLE_6_0_1(false),
-    GRADLE_6_7(false),
-    GRADLE_6_8_3(true),
-    GRADLE_6_9_2(true),
-    GRADLE_7_0_2(true),
+    GRADLE_7_0_2(false),
     GRADLE_7_1_1(true),
     GRADLE_7_2(true),
     GRADLE_7_3_3(true);

@@ -6,7 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.IvyArtifactRepository
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
-import org.gradle.api.plugins.BasePluginConvention
+import org.gradle.api.plugins.BasePluginExtension
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.util.PatternFilterable
 import org.openstreetmap.josm.gradle.plugin.util.ARTIFACT_JOSM
@@ -25,10 +25,8 @@ import java.io.File
  */
 open class JosmPluginExtension(val project: Project) {
   var pluginName: String
-    get() = project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName
-    set(value) {
-      project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName = value
-    }
+    get() = project.extensions.getByType(BasePluginExtension::class.java).archivesName.get()
+    set(value) = project.extensions.getByType(BasePluginExtension::class.java).archivesName.set(value)
 
   /**
    * The version number of JOSM against which the plugin should be compiled.
@@ -294,13 +292,6 @@ open class JosmPluginExtension(val project: Project) {
   val github: GithubConfig = GithubConfig(project)
 
   /**
-   * Configure the field [JosmPluginExtension.github] using a Groovy [Closure].
-   *
-   * @since 0.5.3
-   */
-  fun github(c: Closure<GithubConfig>): Any = project.configure(github, c)
-
-  /**
    * Configure the field [JosmPluginExtension.github] using an [Action].
    *
    * @since 0.5.3
@@ -315,13 +306,6 @@ open class JosmPluginExtension(val project: Project) {
   val gitlab: GitlabConfig = GitlabConfig(project)
 
   /**
-   * Configure the field [JosmPluginExtension.gitlab] using a Groovy [Closure]
-   *
-   * @since 0.6.2
-   */
-  fun gitlab(c: Closure<GitlabConfig>): Any = project.configure(gitlab, c)
-
-  /**
    * Configure the field [JosmPluginExtension.gitlab] using an [Action]
    *
    * @since 0.6.2
@@ -334,13 +318,6 @@ open class JosmPluginExtension(val project: Project) {
   val i18n: I18nConfig = I18nConfig()
 
   /**
-   * Configure the field [JosmPluginExtension.i18n] using a Groovy [Closure].
-   */
-  fun i18n(c: Closure<I18nConfig>) {
-    project.configure(i18n, c)
-  }
-
-  /**
    * Configure the field [JosmPluginExtension.i18n] using an [Action].
    */
   fun i18n(a: Action<I18nConfig>) {
@@ -351,13 +328,6 @@ open class JosmPluginExtension(val project: Project) {
    * The manifest for the JOSM plugin
    */
   val manifest: JosmManifest = JosmManifest(project)
-
-  /**
-   * Configure the field [manifest] using a Groovy [Closure].
-   */
-  fun manifest(c: Closure<JosmManifest>) {
-    project.configure(manifest, c)
-  }
 
   /**
    * Configure the field [manifest] using an [Action].

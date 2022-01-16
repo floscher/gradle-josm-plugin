@@ -3,7 +3,6 @@
  */
 package org.openstreetmap.josm.gradle.plugin.task
 
-import java.util.GregorianCalendar
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import groovy.lang.GroovySystem
@@ -20,6 +19,7 @@ import org.openstreetmap.josm.gradle.plugin.github.onlyFallbackVersions
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
 import org.openstreetmap.josm.gradle.plugin.util.josm
+import java.util.GregorianCalendar
 
 private data class RequiredAttribute(val key: Attribute, val value: String?, val description: String)
 
@@ -74,8 +74,6 @@ private fun buildAttributeMap(
         buildMapOfGitHubDownloadLinks(project)
       } else emptyMap()
     )
-    // Add the manually added translations of the plugin description
-    .plus(josmManifest.translatedDescriptions.map { Attribute.pluginDescriptionKey(it.key) to it.value })
     // Add manually specified links to older versions of the plugin
     .plus(
       josmManifest.oldVersionDownloadLinks

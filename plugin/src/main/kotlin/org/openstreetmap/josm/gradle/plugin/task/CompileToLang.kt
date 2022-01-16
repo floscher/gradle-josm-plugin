@@ -1,11 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
-import java.io.File
-import java.util.Locale
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.provider.MapProperty
-import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -15,12 +11,12 @@ import org.gradle.api.tasks.TaskAction
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 import org.openstreetmap.josm.gradle.plugin.i18n.io.GETTEXT_HEADER_MSGID
 import org.openstreetmap.josm.gradle.plugin.i18n.io.I18nFileDecoder
-import org.openstreetmap.josm.gradle.plugin.i18n.io.I18nFileEncoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileEncoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
 import org.openstreetmap.josm.gradle.plugin.i18n.util.formatAsProgressBar
 import org.openstreetmap.josm.gradle.plugin.util.josm
+import java.io.File
 
 /**
  * @param sourceSet the source set containing the i18n source files
@@ -64,9 +60,8 @@ public abstract class CompileToLang(
     val baseLanguage = baseLanguage.get()
     val inputFiles = inputFiles.get()
 
-    if (outputDirectory.get().exists() && outputDirectory.get().hasParent(project.buildDir)) { // Safeguard, only delete from build directory
-      org.gradle.util.GFileUtils.deleteDirectory(outputDirectory.get())
-    }
+    // Delete with safeguard, only delete from build directory
+    outputDirectory.orNull?.takeIf { it.exists() && it.hasParent(project.buildDir) }?.deleteRecursively()
 
     val outputDirectory = outputDirectory.get().resolve("data")
     outputDirectory.mkdirs()
@@ -78,11 +73,11 @@ public abstract class CompileToLang(
       )
       translations = emptyList()
     } else {
-      require(inputFiles.map { it.nameWithoutExtension.toLowerCase(Locale.ROOT) }.let { it.size == it.distinct().size }) {
-        "There are duplicate locales: ${ inputFiles.map { it.nameWithoutExtension }.sortedBy { it.toLowerCase(Locale.ROOT) }.joinToString() }"
+      require(inputFiles.map { it.nameWithoutExtension.lowercase() }.let { it.size == it.distinct().size }) {
+        "There are duplicate locales: ${ inputFiles.map { it.nameWithoutExtension }.sortedBy { it.lowercase() }.joinToString() }"
       }
 
-      require(inputFiles.filterNot(this::filterIsExcludedBaseFile).none { it.nameWithoutExtension.toLowerCase(Locale.ROOT) == baseLanguage }) {
+      require(inputFiles.filterNot(this::filterIsExcludedBaseFile).none { it.nameWithoutExtension.lowercase() == baseLanguage }) {
         "Do not provide a file `$baseLanguage.$fileExtension` for the base language! The strings of the base language are automatically inferred from the other languages."
       }
       compile(baseLanguage, inputFiles.filterNot(this::filterIsExcludedBaseFile).toSet(), outputDirectory)

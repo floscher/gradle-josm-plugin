@@ -1,5 +1,5 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   id("com.jfrog.bintray")
@@ -58,7 +58,7 @@ val jacocoTestReport by tasks.registering(JacocoReport::class) {
   group = "Verification"
 
   additionalSourceDirs(kotlin.sourceSets.getByName("jvmMain").kotlin.sourceDirectories)
-  additionalClassDirs(tasks.getByName<KotlinCompile>("compileKotlinJvm").destinationDir)
+  additionalClassDirs(tasks.getByName<KotlinCompile>("compileKotlinJvm").destinationDirectory.asFile.get())
   executionData(buildDir.resolve("jacoco/jvmTest.exec"))
 }
 

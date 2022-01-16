@@ -32,8 +32,9 @@ gradle.projectsEvaluated {
 
     executionData(* testTasks.toTypedArray())
     dependsOn(testTasks)
+    mustRunAfter(testTasks)
 
-    additionalClassDirs(project(":i18n").tasks.getByName<KotlinCompile>("compileKotlinJvm").destinationDir)
+    additionalClassDirs(project(":i18n").tasks.getByName<KotlinCompile>("compileKotlinJvm").destinationDirectory.asFile.get())
     additionalSourceDirs(project(":i18n").extensions.getByType(KotlinProjectExtension::class).sourceSets.getByName("commonMain").kotlin.sourceDirectories)
     additionalSourceDirs(project(":i18n").extensions.getByType(KotlinProjectExtension::class).sourceSets.getByName("jvmMain").kotlin.sourceDirectories)
 
@@ -45,7 +46,10 @@ gradle.projectsEvaluated {
   }
 
   val build by tasks.getting {
-    dependsOn(tasks.dokkaHtmlMultiModule, jacocoTestReport)
+    dependsOn(tasks.dokkaHtmlMultiModule)
+  }
+  val check by tasks.getting {
+    dependsOn(jacocoTestReport)
   }
 }
 
@@ -60,7 +64,6 @@ allprojects {
   group = "org.openstreetmap.josm" + if (name != "plugin") ".gradle-josm-plugin" else ""
   version = GitDescriber(rootProject.projectDir).describe()
 
-  repositories.jcenter()
   repositories.mavenCentral()
 
   tasks.withType(JacocoReport::class).all {

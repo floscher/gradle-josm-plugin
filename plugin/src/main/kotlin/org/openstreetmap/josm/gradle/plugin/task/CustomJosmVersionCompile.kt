@@ -8,7 +8,6 @@ import org.gradle.work.InputChanges
 import org.openstreetmap.josm.gradle.plugin.util.createJosm
 import org.openstreetmap.josm.gradle.plugin.util.createJosmDependencyFuzzy
 import org.openstreetmap.josm.gradle.plugin.util.excludeJosm
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -47,7 +46,7 @@ open class CustomJosmVersionCompile
       customVersion = customVersionProvider.invoke()
 
       description = "Compile the JOSM plugin against ${ if (findNextVersion) "the first available JOSM version since" else "JOSM version" } $customVersion"
-      destinationDir =  File(project.buildDir, "classes/java/${sourceSet.name}_$customVersion")
+      destinationDirectory.set(project.buildDir.resolve("classes/java/${sourceSet.name}_$customVersion"))
 
       classpath = project.files() // empty, will be filled later
     }

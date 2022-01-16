@@ -5,7 +5,7 @@ plugins {
   id("org.openstreetmap.josm") // append `.version("‹current version number›")` to this line when using in a real project
 }
 
-base.archivesBaseName = "MyAwesomePlugin"
+josm.pluginName = "MyAwesomePlugin"
 
 /**
  * For documentation about the `josm{}` block see

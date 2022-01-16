@@ -1,22 +1,17 @@
 package org.openstreetmap.josm.gradle.plugin
 
 import org.gradle.api.Project
-import org.gradle.api.internal.plugins.DslObject
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 import org.gradle.language.jvm.tasks.ProcessResources
-import org.openstreetmap.josm.gradle.plugin.config.JosmManifest
 import org.openstreetmap.josm.gradle.plugin.i18n.DefaultI18nSourceSet
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
-import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
-import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
 import org.openstreetmap.josm.gradle.plugin.task.LangCompile
 import org.openstreetmap.josm.gradle.plugin.task.MoCompile
 import org.openstreetmap.josm.gradle.plugin.task.PoCompile
 import org.openstreetmap.josm.gradle.plugin.task.ShortenPoFiles
 import org.openstreetmap.josm.gradle.plugin.task.addJosmManifest
-import org.openstreetmap.josm.gradle.plugin.util.josm
 
 /**
  * Add the [I18nSourceSet] and create the associated tasks ([PoCompile], [MoCompile], [LangCompile], [ShortenPoFiles]).
@@ -24,9 +19,9 @@ import org.openstreetmap.josm.gradle.plugin.util.josm
  * @param [project] the [Project] to which this source set belongs
  */
 fun SourceSet.setup(project: Project) {
-  // Inspired by https://github.com/gradle/gradle/blob/a6311b0530ca8e0070d85c42c7a44dfa0e872b13/subprojects/plugins/src/main/java/org/gradle/api/plugins/GroovyBasePlugin.java#L96-L143
+  // Inspired by https://github.com/gradle/gradle/blob/e654c956fab9e52205d4043e3244d87aac5586f8/subprojects/plugins/src/main/java/org/gradle/api/plugins/GroovyBasePlugin.java#L104-L105
   val i18nSourceSet: I18nSourceSet = DefaultI18nSourceSet(this, project.objects)
-  DslObject(this).convention.plugins["i18n"] = i18nSourceSet
+  extensions.add(I18nSourceSet::class.java, "i18n", i18nSourceSet)
 
   // Create "shortenPoFiles" task for the current i18n source set
   project.tasks.register(

@@ -1,10 +1,9 @@
 package org.openstreetmap.josm.gradle.plugin.task
-import org.gradle.api.tasks.Internal
 import org.openstreetmap.josm.gradle.plugin.config.I18nConfig
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
+import org.openstreetmap.josm.gradle.plugin.i18n.io.I18nFileDecoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MoFileDecoder
 import javax.inject.Inject
-import org.openstreetmap.josm.gradle.plugin.i18n.io.I18nFileDecoder
 
 /**
  * This task "compiles" several *.mo files to *.lang files.

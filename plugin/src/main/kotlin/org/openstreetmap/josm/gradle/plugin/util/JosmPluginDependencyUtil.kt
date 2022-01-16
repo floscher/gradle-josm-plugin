@@ -15,9 +15,8 @@ import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.IvyArtifactRepository
-import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.ExtensionContainer
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.JavaPluginExtension
 import org.openstreetmap.josm.gradle.plugin.config.JosmManifest
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.io.JosmPluginListParser
@@ -130,7 +129,7 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: UShort, alreadyRes
       logger.lifecycle("{}* {} (see above for dependencies)", indentation, pluginName)
     } else if (virtualPlugins.containsKey(pluginName)) {
       val suitableImplementation = virtualPlugins.getValue(pluginName).firstOrNull {
-        when (it.first.toUpperCase()) {
+        when (it.first.uppercase()) {
           JosmManifest.Platform.UNIXOID.toString() -> Os.isFamily(Os.FAMILY_UNIX)
           JosmManifest.Platform.OSX.toString() -> Os.isFamily(Os.FAMILY_MAC)
           JosmManifest.Platform.WINDOWS.toString() -> Os.isFamily(Os.FAMILY_WINDOWS) || Os.isFamily(Os.FAMILY_9X) || Os.isFamily(Os.FAMILY_NT)
@@ -151,7 +150,8 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: UShort, alreadyRes
       alreadyResolvedPlugins.add(pluginName)
       val resolvedManifests = resolvedFiles.map { Manifest(ZipFile(it).let { it.getInputStream(it.getEntry("META-INF/MANIFEST.MF")) }) }
 
-      val requiredJava = resolvedManifests.mapNotNull { it.mainAttributes[JosmManifest.Attribute.PLUGIN_MIN_JAVA_VERSION]?.toString()?.toIntOrNull() }
+      val requiredJava = resolvedManifests
+        .mapNotNull { it.mainAttributes[JosmManifest.Attribute.PLUGIN_MIN_JAVA_VERSION]?.toString()?.toIntOrNull() }
         .minOrNull()
       val currentJava = JavaVersion.current().majorVersion.toIntOrNull()
       if (requiredJava != null && currentJava != null && requiredJava > currentJava) {
@@ -188,8 +188,8 @@ val ExtensionContainer.josm : JosmPluginExtension
   get() = getByType(JosmPluginExtension::class.java)
 
 /**
- * Convenience method to access the Java plugin convention.
- * @return the [JavaPluginConvention] of the project
+ * Convenience method to access the Java plugin extension.
+ * @return the [JavaPluginExtension] of the project
  */
-val Convention.java : JavaPluginConvention
-  get() = getPlugin(JavaPluginConvention::class.java)
+val ExtensionContainer.java: JavaPluginExtension
+  get() = getByType(JavaPluginExtension::class.java)

@@ -6,8 +6,13 @@ plugins {
 
 repositories {
   gradlePluginPortal()
-  jcenter()
   mavenCentral()
+}
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java) {
+  kotlinOptions {
+    jvmTarget = java.sourceCompatibility.toString()
+  }
 }
 
 kotlin.sourceSets.main {

@@ -1,23 +1,8 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
-import com.beust.klaxon.JsonArray
-import com.beust.klaxon.JsonObject
-import groovy.lang.GroovySystem
-import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.openstreetmap.josm.gradle.plugin.github.GithubReleaseException
-import org.openstreetmap.josm.gradle.plugin.github.GithubReleasesClient
-import org.openstreetmap.josm.gradle.plugin.github.ReleaseSpec
-import org.openstreetmap.josm.gradle.plugin.github.onlyFallbackVersions
-import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
-import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
-import org.openstreetmap.josm.gradle.plugin.i18n.io.decodeLangFiles
-import org.openstreetmap.josm.gradle.plugin.task.LangCompile
-import org.openstreetmap.josm.gradle.plugin.util.josm
-import java.io.File
-import java.net.URL
-import java.util.GregorianCalendar
 import org.gradle.api.provider.SetProperty
+import java.net.URL
 
 /**
  * The info that will be written into the manifest file of the plugin *.jar
@@ -249,13 +234,6 @@ class JosmManifest(private val project: Project) {
   )
 
   /**
-   * Contains the [description] translated to languages other than English.
-   * Can be set via [translatedDescription].
-   */
-  @Deprecated("Will be removed soon!")
-  internal val translatedDescriptions: MutableMap<String, String> = mutableMapOf()
-
-  /**
    * A URL pointing to a web resource describing the plugin.
    *
    * **Default value:** The value of property `plugin.link` as URL (might error out with a [java.net.MalformedURLException] on malformed URLs), or `null` if that property is not set.
@@ -286,21 +264,5 @@ class JosmManifest(private val project: Project) {
    */
   fun oldVersionDownloadLink(minJosmVersion: Int, pluginVersion: String, downloadURL: URL) {
     oldVersionDownloadLinks.add(PluginDownloadLink(minJosmVersion, pluginVersion, downloadURL))
-  }
-
-  /**
-   * Add a translation of the plugin description for a certain language.
-   * @param language the language abbreviation (e.g. `de_AT` or `es`)
-   * @param translatedDescription the description in the language given by the `language` parameter
-   */
-  @Deprecated("This will be removed! You can add *.po files to `src/main/po` containing the translated descriptions instead.")
-  fun translatedDescription(language: String, translatedDescription: String) {
-    require(language.matches(Regex("[a-z]{2,3}((_[A-Z]{2})|(-[a-z]+))?"))) {
-      "The given language string '$language' is not a valid abbreviation for a language."
-    }
-    require(translatedDescription.isNotBlank()) {
-      "The translated description must not be blank!"
-    }
-    translatedDescriptions[language] = translatedDescription
   }
 }

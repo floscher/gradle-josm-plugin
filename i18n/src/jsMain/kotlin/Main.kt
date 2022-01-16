@@ -13,8 +13,11 @@ import org.khronos.webgl.Uint8Array
 import org.khronos.webgl.get
 import org.openstreetmap.josm.gradle.i18n.MimeType.LANG
 import org.openstreetmap.josm.gradle.i18n.MimeType.PO
+import org.openstreetmap.josm.gradle.plugin.i18n.io.I18nTranslationData
+import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileEncoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
+import org.openstreetmap.josm.gradle.plugin.i18n.io.PoFileDecoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.PoFileEncoder
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLDivElement
@@ -30,9 +33,6 @@ import org.w3c.files.FileReader
 import org.w3c.files.get
 import kotlin.js.Promise
 import kotlin.math.roundToInt
-import org.openstreetmap.josm.gradle.plugin.i18n.io.I18nTranslationData
-import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileEncoder
-import org.openstreetmap.josm.gradle.plugin.i18n.io.PoFileDecoder
 
 private val jsErrorMessage get() = document.getElementById("javascript-error") as HTMLDivElement
 private val inputFile get() = document.getElementById("po-input-file") as HTMLInputElement

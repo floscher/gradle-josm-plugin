@@ -11,7 +11,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
-import java.util.Locale
 
 /**
  * Convert all `*.md` files found among the source files of this task to *.html files.
@@ -33,7 +32,7 @@ open class MarkdownToHtml: SourceTask() {
     val parser = Parser.builder().build()
     val renderer = HtmlRenderer.builder().build()
 
-    val files = source.files.filter { it.extension.toLowerCase(Locale.ENGLISH) == "md" }
+    val files = source.files.filter { it.extension.lowercase() == "md" }
 
     if (files.map { it.nameWithoutExtension }.distinct().size < files.size) {
       throw TaskExecutionException(this, GradleException("There are multiple files with the same name for task ${this.name}!"))

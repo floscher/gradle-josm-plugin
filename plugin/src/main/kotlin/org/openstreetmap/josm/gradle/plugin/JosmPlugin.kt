@@ -2,7 +2,7 @@ package org.openstreetmap.josm.gradle.plugin
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.BasePluginConvention
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
@@ -56,10 +56,10 @@ class JosmPlugin: Plugin<Project> {
       )
     }
 
-    val mainConfigurationSetup = MainConfigurationSetup(project, project.convention.java.sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME))
+    val mainConfigurationSetup = MainConfigurationSetup(project, project.extensions.java.sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME))
     project.setupJosmTasks(mainConfigurationSetup)
 
-    project.convention.java.sourceSets.all {
+    project.extensions.java.sourceSets.all {
       it.setup(project)
     }
 
@@ -105,7 +105,7 @@ class JosmPlugin: Plugin<Project> {
         project.extensions.getByType(PublishingExtension::class.java).publications { publications ->
           publications.create("josmPlugin", MavenPublication::class.java) {
             it.groupId = GROUP_JOSM_PLUGIN
-            it.artifactId = project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName
+            it.artifactId = project.extensions.josm.pluginName
             project.afterEvaluate { project ->
               it.version = project.version.toString()
             }

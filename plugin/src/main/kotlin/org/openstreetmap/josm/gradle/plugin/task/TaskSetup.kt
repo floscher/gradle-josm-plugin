@@ -4,10 +4,9 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.plugins.BasePluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.Sync
-import org.gradle.api.tasks.bundling.AbstractArchiveTask
+import org.gradle.jvm.tasks.Jar
 import org.openstreetmap.josm.gradle.plugin.MainConfigurationSetup
 import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
 import org.openstreetmap.josm.gradle.plugin.task.github.PublishToGithubReleaseTask
@@ -20,7 +19,6 @@ import java.net.URLConnection
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.Base64
-import org.gradle.jvm.tasks.Jar
 
 /**
  * This method sets up all the [Task]s (and [Configuration]s) for a given project that should be there by default.
@@ -82,7 +80,7 @@ private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSe
     genListTask.dependsOn(archiverTask)
 
     project.afterEvaluate {
-      val localDistReleaseFile = File(localDistDir, project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName + "-dev.${archiverTask.archiveExtension.get()}")
+      val localDistReleaseFile = File(localDistDir, project.extensions.josm.pluginName + "-dev.${archiverTask.archiveExtension.get()}")
       genListTask.description += String.format(
         "Add '%s' as plugin site in JOSM preferences (expert mode) and you'll be able to install the current development state as plugin '%s'",
         genListTask.outputFile.toURI().toURL(),
@@ -136,7 +134,7 @@ private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSe
     distTask.into(distDir)
     distTask.duplicatesStrategy = DuplicatesStrategy.FAIL
     project.afterEvaluate {
-      val fileName = project.convention.getPlugin(BasePluginConvention::class.java).archivesBaseName + ".${archiverTask.archiveExtension.get()}"
+      val fileName = "${project.extensions.josm.pluginName}.${archiverTask.archiveExtension.get()}"
       distTask.doFirst {
         distTask.rename { fileName }
       }

@@ -1,6 +1,5 @@
 package org.openstreetmap.josm.gradle.plugin.i18n
 
-import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSet
@@ -29,29 +28,14 @@ interface I18nSourceSet {
   val name: String
 
   /**
-   * Configure the [SourceDirectorySet] for *.lang files using a [Closure].
-   */
-  fun lang(configureClosure: Closure<in SourceDirectorySet>): I18nSourceSet
-
-  /**
    * Configure the [SourceDirectorySet] for *.lang files using an [Action].
    */
   fun lang(configureAction: Action<in SourceDirectorySet>): I18nSourceSet
 
   /**
-   * Configure the [SourceDirectorySet] for *.mo files using a [Closure].
-   */
-  fun mo(configureClosure: Closure<in SourceDirectorySet>): I18nSourceSet
-
-  /**
    * Configure the [SourceDirectorySet] for *.mo files using an [Action].
    */
   fun mo(configureAction: Action<in SourceDirectorySet>): I18nSourceSet
-
-  /**
-   * Configure the [SourceDirectorySet] for *.po files using a [Closure].
-   */
-  fun po(configureClosure: Closure<in SourceDirectorySet>): I18nSourceSet
 
   /**
    * Configure the [SourceDirectorySet] for *.po files using an [Action].

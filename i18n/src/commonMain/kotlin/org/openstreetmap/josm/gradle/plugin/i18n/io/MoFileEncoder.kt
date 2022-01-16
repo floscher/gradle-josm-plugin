@@ -19,7 +19,7 @@ public class MoFileEncoder private constructor(public val isBigEndian: Boolean):
     public fun MsgId.toBytes(): List<Byte> = if (context == null) {
       id.toBytes()
     } else {
-      context.encodeToByteArray().toList() + MoFileFormat.CONTEXT_SEPARATOR.toByte() + id.toBytes()
+      context.encodeToByteArray().toList() + MoFileFormat.CONTEXT_SEPARATOR.code.toByte() + id.toBytes()
     }
 
     /**
@@ -68,7 +68,7 @@ public class MoFileEncoder private constructor(public val isBigEndian: Boolean):
       .fold(listOf<StringListEntry>()) { list, bytes ->
         list + StringListEntry(
           list.lastOrNull()?.nextOffset ?: hashTableOffset,
-          bytes + MoFileFormat.NULL_CHAR.toByte()
+          bytes + MoFileFormat.NULL_CHAR.code.toByte()
         )
       }
 

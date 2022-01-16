@@ -59,5 +59,7 @@ val releaseToGitlab = tasks.create(
   "releaseToGitlab",
   ReleaseToGitlab::class,
   { true },
-  setOf("org/openstreetmap/josm/gradle-josm-plugin", "org/openstreetmap/josm/langconv")
+  objects.setProperty(String::class)
+    .convention(setOf("org/openstreetmap/josm/gradle-josm-plugin", "org/openstreetmap/josm/langconv"))
+    .also { it.finalizeValue() }
 )
