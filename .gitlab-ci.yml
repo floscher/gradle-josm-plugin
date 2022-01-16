@@ -35,18 +35,6 @@ test:
   needs:
   - assemble
 
-publish to / Bintray:
-  stage: deploy
-  environment:
-    name: maven / Bintray
-    url: https://bintray.com/bintray/jcenter
-  script:
-  - ./gradlew bintrayUpload
-  needs:
-  - test
-  only:
-  - tags@floscher/gradle-josm-plugin
-
 publish to / Gradle Plugin Portal:
   stage: deploy
   environment:

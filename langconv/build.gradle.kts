@@ -2,7 +2,6 @@ import proguard.gradle.ProGuardTask
 import org.gradle.jvm.tasks.Jar
 
 plugins {
-  id("com.jfrog.bintray")
   application
   java
   kotlin("jvm")

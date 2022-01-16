@@ -2,7 +2,6 @@ import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("com.jfrog.bintray")
   kotlin("multiplatform")
   id("org.jetbrains.dokka")
   jacoco

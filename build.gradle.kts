@@ -127,6 +127,5 @@ tasks.dokkaHtmlMultiModule {
 }
 
 setupAwsPublishingForAllProjects()
-setupBintrayPublishing()
 setupBuildDirPublishingForAllProjects()
 setupGitlabPublishingForAllProjects("gitlab")

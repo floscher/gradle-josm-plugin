@@ -31,5 +31,4 @@ dependencies {
   implementation("com.guardsquare:proguard-gradle:${Versions.proguardGradle}")
   implementation("org.jetbrains.dokka:dokka-gradle-plugin:${Versions.dokka}")
   implementation("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
-  implementation("com.jfrog.bintray.gradle:gradle-bintray-plugin:${Versions.bintray}")
 }

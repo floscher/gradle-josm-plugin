@@ -1,7 +1,6 @@
 import org.openstreetmap.josm.gradle.plugin.task.gitlab.ReleaseToGitlab
 
 plugins {
-  id("com.jfrog.bintray")
   kotlin("jvm")
   id("com.gradle.plugin-publish")
   id("org.jetbrains.dokka")

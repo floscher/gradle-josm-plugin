@@ -1,7 +1,6 @@
 // No package to avoid having to use the fully qualified name in `buildscript{}` block (see https://github.com/gradle/gradle/issues/9270#issuecomment-400363045 )
 
 public final class Versions {
-  public static final String bintray = "1.8.5";
   public static final String flexmark = "0.62.2";
   public static final String klaxon = "5.5";
   public static final String kotlin = "1.6.10";
