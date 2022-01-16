@@ -32,7 +32,7 @@ class GradleProjectUtil private constructor() {
         if (initGit) {
           val git = Git.init().setDirectory(it).call()
           val author = PersonIdent("John Doe", "john@example.org", 0.toLong(), 0)
-          git.commit().setAllowEmpty(true).setAuthor(author).setCommitter(author).setMessage("Initial commit").call()
+          git.commit().setAllowEmpty(true).setAuthor(author).setCommitter(author).setMessage("Initial commit").setSign(false).call()
         }
       }
 

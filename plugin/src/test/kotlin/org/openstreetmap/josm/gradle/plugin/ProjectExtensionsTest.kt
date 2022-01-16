@@ -13,6 +13,7 @@ import org.openstreetmap.josm.gradle.plugin.util.createJosmDependencyFuzzy
 import org.openstreetmap.josm.gradle.plugin.util.excludeJosm
 import org.openstreetmap.josm.gradle.plugin.util.getAllRequiredJosmPlugins
 import org.openstreetmap.josm.gradle.plugin.util.josm
+import java.lang.IllegalStateException
 
 @ExperimentalUnsignedTypes
 class ProjectExtensionsTest {
@@ -90,10 +91,17 @@ class ProjectExtensionsTest {
 
   @Test
   fun testNextJosmStringFail(testInfo: TestInfo) {
-    assertThrows(GradleException::class.java) {
-      val project = createNextJosmTestRepo(testInfo)
-      val josmDep = project.dependencies.createJosm("ABC")
-      project.configurations.detachedConfiguration(josmDep).resolve()
+    val project = createNextJosmTestRepo(testInfo)
+    val josmDep = project.dependencies.createJosm("ABC")
+    val detachedConfiguration = project.configurations.detachedConfiguration(josmDep);
+    val exception = assertThrows(Exception::class.java) {
+      detachedConfiguration.resolve()
+    }
+    // Work around Gradle #18475 FIXME remove when bug is fixed
+    if (project.gradle.gradleVersion == "7.2") {
+      assertTrue(exception is IllegalStateException)
+    } else {
+      assertTrue(exception is GradleException)
     }
   }
 

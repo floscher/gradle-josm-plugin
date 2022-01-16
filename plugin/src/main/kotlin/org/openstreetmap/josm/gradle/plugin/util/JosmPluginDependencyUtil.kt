@@ -64,7 +64,7 @@ fun DependencyHandler.josmPluginList(withIcons: Boolean): ExternalModuleDependen
 
 /**
  * @return a map with the virtual plugin names as key, the values are a list of pairs, where the first element
- * is the platform, the seconds element of the pairs is the name of the real plugin providing the virtual plugin.
+ * is the platform, the second element of the pairs is the name of the real plugin providing the virtual plugin.
  */
 fun Project.getVirtualPlugins(): Map<String, List<Pair<String, String>>> = try {
   val parser = JosmPluginListParser(this, true)
@@ -151,7 +151,8 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: UShort, alreadyRes
       alreadyResolvedPlugins.add(pluginName)
       val resolvedManifests = resolvedFiles.map { Manifest(ZipFile(it).let { it.getInputStream(it.getEntry("META-INF/MANIFEST.MF")) }) }
 
-      val requiredJava = resolvedManifests.mapNotNull { it.mainAttributes[JosmManifest.Attribute.PLUGIN_MIN_JAVA_VERSION]?.toString()?.toIntOrNull() }.min()
+      val requiredJava = resolvedManifests.mapNotNull { it.mainAttributes[JosmManifest.Attribute.PLUGIN_MIN_JAVA_VERSION]?.toString()?.toIntOrNull() }
+        .minOrNull()
       val currentJava = JavaVersion.current().majorVersion.toIntOrNull()
       if (requiredJava != null && currentJava != null && requiredJava > currentJava) {
         // if any manifest has a minimum Java version larger than the current java version

@@ -1,33 +1,29 @@
 package org.openstreetmap.josm.gradle.plugin.github
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
+import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.openstreetmap.josm.gradle.plugin.config.GithubConfig
 import org.openstreetmap.josm.gradle.plugin.task.github.BaseGithubReleaseTaskTest
 import org.openstreetmap.josm.gradle.plugin.task.github.MEDIA_TYPE_JAR
 import org.openstreetmap.josm.gradle.plugin.testutils.buildGithubConfig
 import org.openstreetmap.josm.gradle.plugin.testutils.toGradleBuildscript
-import ru.lanwen.wiremock.ext.WiremockResolver
-import ru.lanwen.wiremock.ext.WiremockUriResolver
 import java.io.File
 import java.util.jar.Attributes
 import java.util.jar.JarInputStream
 
+@WireMockTest
 class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
     val GITHUB_REPO = "repo_xy"
 
     @Test
-    @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-    fun case01(
-        @WiremockResolver.Wiremock server: WireMockServer,
-        @WiremockUriResolver.WiremockUri apiUri: String) {
+    fun case01(wmRuntimeInfo: WireMockRuntimeInfo) {
 
         val currentMinJosmVersion = 2222
         val currentRelease = "v0.0.2"
@@ -49,7 +45,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
           """.trimIndent()
         )
 
-        val githubConfig = project.buildGithubConfig(apiUri, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
+        val githubConfig = project.buildGithubConfig(wmRuntimeInfo.httpBaseUrl, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
         // prepare build file
         buildFile.writeText("""
             plugins {
@@ -75,7 +71,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
         val path1 = "/repos/$GITHUB_USER/$GITHUB_REPO/releases"
         val assetUrl = "http://a.b.c/$GITHUB_USER/$GITHUB_REPO/download/v0.0.1/test.jar"
-        server.stubFor(WireMock.get(WireMock.urlPathMatching("$path1.*"))
+        wmRuntimeInfo.wireMock.register(WireMock.get(WireMock.urlPathMatching("$path1.*"))
             .willReturn(WireMock.aResponse()
                 .withStatus(200)
                 .withBody(
@@ -102,7 +98,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
             .withPluginClasspath()
             .build()
 
-        Assertions.assertEquals(
+        assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":build")?.outcome
         )
@@ -128,11 +124,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
   }
 
   @Test
-  @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-  fun case02(
-    @WiremockResolver.Wiremock server: WireMockServer,
-    @WiremockUriResolver.WiremockUri apiUri: String
-  ) {
+  fun case02(wmRuntimeInfo: WireMockRuntimeInfo) {
 
     val currentMinJosmVersion = 2222
     val currentRelease = "v0.1.0"
@@ -159,7 +151,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
       """.trimIndent()
     )
 
-    val githubConfig = project.buildGithubConfig(apiUri, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
+    val githubConfig = project.buildGithubConfig(wmRuntimeInfo.httpBaseUrl, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
 
     // prepare build file
     buildFile.writeText("""
@@ -187,7 +179,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         val path1 = "/repos/$GITHUB_USER/$GITHUB_REPO/releases"
         fun assetUrl(label: String) =
             "http://a.b.c/$GITHUB_USER/$GITHUB_REPO/download/$label/test.jar"
-        server.stubFor(WireMock.get(WireMock.urlPathMatching("$path1.*"))
+        wmRuntimeInfo.wireMock.register(WireMock.get(WireMock.urlPathMatching("$path1.*"))
             .willReturn(WireMock.aResponse()
                 .withStatus(200)
                 .withBody(
@@ -251,11 +243,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
 
 
   @Test
-  @ExtendWith(WiremockResolver::class, WiremockUriResolver::class)
-  fun case03(
-    @WiremockResolver.Wiremock server: WireMockServer,
-    @WiremockUriResolver.WiremockUri apiUri: String
-  ) {
+  fun case03(wmRuntimeInfo: WireMockRuntimeInfo) {
 
     val currentMinJosmVersion = 3000
     val currentRelease = "v0.2.0"
@@ -281,7 +269,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
       """.trimIndent()
     )
 
-        val githubConfig = project.buildGithubConfig(apiUri, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
+        val githubConfig = project.buildGithubConfig(wmRuntimeInfo.httpBaseUrl, GITHUB_USER, GITHUB_REPO, "42alsdkj-foiau_osf0123456789")
         // prepare build file
         buildFile.writeText("""
             plugins {
@@ -307,7 +295,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         val path1 = "/repos/$GITHUB_USER/$GITHUB_REPO/releases"
         fun assetUrl(label: String) =
             "http://a.b.c/$GITHUB_USER/$GITHUB_REPO/download/$label/test.jar"
-        server.stubFor(WireMock.get(WireMock.urlPathMatching("$path1.*"))
+        wmRuntimeInfo.wireMock.register(WireMock.get(WireMock.urlPathMatching("$path1.*"))
             .willReturn(WireMock.aResponse()
                 .withStatus(200)
                 .withBody(
@@ -350,7 +338,7 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
             .withPluginClasspath()
             .build()
 
-        Assertions.assertEquals(
+        assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":build")?.outcome
         )
@@ -362,12 +350,12 @@ class JarWithDownloadLinksTest: BaseGithubReleaseTaskTest() {
         // should include a download URL for release 2000
         var value: String? = manifest.mainAttributes.getValue(
             Attributes.Name("2000_Plugin-Url"))
-        Assertions.assertTrue(value?.contains("v0.1.2") ?: false,
+        assertTrue(value?.contains("v0.1.2") ?: false,
             "2000_Plugin-Url should include 'v0.1.2'")
         // should include a download URL for release 1000
         value = manifest.mainAttributes.getValue(
             Attributes.Name("1000_Plugin-Url"))
-        Assertions.assertTrue(value?.contains("v0.0.1") ?: false,
+        assertTrue(value?.contains("v0.0.1") ?: false,
             "1000_Plugin-Url should contain 'v0.0.1'")
     }
 }

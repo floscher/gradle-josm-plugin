@@ -61,6 +61,7 @@ allprojects {
   version = GitDescriber(rootProject.projectDir).describe()
 
   repositories.jcenter()
+  repositories.mavenCentral()
 
   tasks.withType(JacocoReport::class).all {
     tasks.findByName("test")?.let { dependsOn(it) }

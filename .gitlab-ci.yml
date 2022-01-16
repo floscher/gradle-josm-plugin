@@ -23,6 +23,7 @@ test:
   stage: test
   image: registry.gitlab.com/josm/docker-library/openjdk-11-josmplugin
   script:
+  - apt-get update && apt-get install -y firefox-esr # Needed for i18n:jsBrowserTest
   - ./gradlew --stacktrace --info :build
   artifacts:
     paths:
