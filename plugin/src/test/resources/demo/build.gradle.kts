@@ -7,10 +7,6 @@ plugins {
 
 base.archivesBaseName = "MyAwesomePlugin"
 
-sourceSets.main {
-  resources.exclude { it.name == "README.md" }
-}
-
 /**
  * For documentation about the `josm{}` block see
  * https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/
@@ -28,7 +24,7 @@ josm {
     iconPath = "path/to/my/icon.svg"
     loadEarly = false
     loadPriority = 50
-    pluginDependencies += setOf("apache-commons", "apache-http")
+    pluginDependencies.addAll("apache-commons", "apache-http")
     website = URL("https://example.org")
     oldVersionDownloadLink(123, "1.2.0", URL("https://example.org/download/v1.2.0/MyAwesomePlugin.jar"))
     oldVersionDownloadLink( 42, "1.0.0", URL("https://example.org/download/v1.0.0/MyAwesomePlugin.jar"))

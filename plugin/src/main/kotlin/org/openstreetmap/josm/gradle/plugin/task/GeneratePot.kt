@@ -73,8 +73,6 @@ open class GeneratePot
     group = "JOSM-i18n"
     description = "Extracts translatable strings from the source code into a *.pot file. Requires the command line utility xgettext (part of GNU gettext)"
 
-    workingDir = project.projectDir
-
     executable = "xgettext"
     // static arguments
     args(
@@ -85,6 +83,10 @@ open class GeneratePot
       "-k", "-ktrc:1c,2", "-kmarktrc:1c,2", "-ktr", "-kmarktr", "-ktrn:1,2", "-ktrnc:1c,2,3"
     )
   }
+
+  @Internal
+  final override fun getWorkingDir() = project.projectDir
+  final override fun setWorkingDir(dir: Any) = throw UnsupportedOperationException()
 
   @TaskAction
   final override fun exec() {
@@ -97,7 +99,9 @@ open class GeneratePot
     val srcFileListFile = srcFileListFile.get().asFile
 
     logger.lifecycle("Writing list of ${inFiles.get().size} files to ${srcFileListFile.absolutePath} …")
-    srcFileListFile.writeText(inFiles.get().joinToString("\n", postfix = "\n") { it.absolutePath })
+    srcFileListFile.writeText(inFiles.get().joinToString("\n", postfix = "\n") {
+      it.relativeTo(workingDir).path // using relative path, so the checksum is reproducible
+    })
 
     // dynamic arguments
     args(
