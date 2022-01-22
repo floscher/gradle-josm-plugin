@@ -26,7 +26,7 @@ class GithubConfig(project: Project) {
 
     const val PROPERTY_ACCESS_TOKEN = "josm.github.accessToken"
 
-    const val DEFAULT_TARGET_COMMITTISH = "master"
+    const val DEFAULT_TARGET_COMMITTISH = "main"
   }
 
   /**
@@ -90,7 +90,7 @@ class GithubConfig(project: Project) {
 
   /**
    * Specifies the commitish value that determines where the Git tag is created from.
-   * Can be any branch or commit SHA. Defaults to `master`.
+   * Can be any branch or commit SHA. Defaults to `main`.
    *
    * @since 0.5.3
    */

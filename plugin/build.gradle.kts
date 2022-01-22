@@ -27,8 +27,8 @@ dependencies {
 
 // for the plugin-publish (publish to plugins.gradle.org)
 pluginBundle {
-  website = "https://gitlab.com/floscher/gradle-josm-plugin#readme"
-  vcsUrl = "https://gitlab.com/floscher/gradle-josm-plugin.git"
+  website = "https://gitlab.com/JOSM/gradle-josm-plugin#readme"
+  vcsUrl = "https://gitlab.com/JOSM/gradle-josm-plugin.git"
   description = "This plugin helps with developing for the JOSM project."
   tags = listOf("josm", "openstreetmap", "osm")
 

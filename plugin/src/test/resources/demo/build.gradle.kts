@@ -9,7 +9,7 @@ josm.pluginName = "MyAwesomePlugin"
 
 /**
  * For documentation about the `josm{}` block see
- * https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/
+ * https://josm.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/
  */
 josm {
   josmCompileVersion = "tested" // you can use either numbers or one of the special values `tested` or `latest` here
@@ -31,7 +31,7 @@ josm {
   }
   // The following block is optional, only needed when doing i18n for the plugin
   i18n {
-    pathTransformer = getPathTransformer(projectDir, "gitlab.com/floscher/gradle-josm-plugin/-/blob/master/demo")
+    pathTransformer = getPathTransformer(projectDir, "gitlab.com/JOSM/gradle-josm-plugin/-/blob/main/demo")
     bugReportEmail = "me@example.com"
     copyrightHolder = "John Doe"
   }

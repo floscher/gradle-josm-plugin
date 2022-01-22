@@ -296,7 +296,7 @@ version="0.0.5"      //  the current release label
 
 //
 josm {
-  github { // for more configuration options, see https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/plugin/plugin/org.openstreetmap.josm.gradle.plugin.config/-github-config/index.html
+  github { // for more configuration options, see https://josm.gitlab.io/gradle-josm-plugin/kdoc/latest/plugin/plugin/org.openstreetmap.josm.gradle.plugin.config/-github-config/index.html
     repositoryOwner = "a-github-user"
     repositoryName = "my-repo"
     // the access token is configured either through the environment variable `GITHUB_ACCESS_TOKEN`,
@@ -316,7 +316,7 @@ createGithubRelease {
     // optional. if different from the project 'version'
     //releaseLabel = "v0.0.5-GA"
 
-    // optional. if different from 'master'
+    // optional. if different from 'main'
     //targetCommitish="deploy"
 }
 
@@ -328,7 +328,7 @@ publishToGithubRelease {
     // optional. if different from the project 'version'
     //releaseLabel = "v0.0.5-GA"
 
-    // optional. if different from 'master'
+    // optional. if different from 'main'
     //targetCommitish="deploy"
 
     // optional. if different from the standard path where gradle build

@@ -95,7 +95,7 @@ That's it, your project is now set up to build with the `gradle-josm-plugin`.
 
 [1]: https://josm.openstreetmap.de/wiki/DevelopersGuide/DevelopingPlugins
 [2]: https://plugins.gradle.org/plugin/org.openstreetmap.josm
-[3]: https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/plugin/plugin/org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/
-[4]: https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/plugin/plugin/org.openstreetmap.josm.gradle.plugin.config/-josm-manifest/
-[5]: https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/plugin/plugin/org.openstreetmap.josm.gradle.plugin.config/-i18n-config/
+[3]: https://josm.gitlab.io/gradle-josm-plugin/kdoc/latest/plugin/plugin/org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/
+[4]: https://josm.gitlab.io/gradle-josm-plugin/kdoc/latest/plugin/plugin/org.openstreetmap.josm.gradle.plugin.config/-josm-manifest/
+[5]: https://josm.gitlab.io/gradle-josm-plugin/kdoc/latest/plugin/plugin/org.openstreetmap.josm.gradle.plugin.config/-i18n-config/
 [6]: https://josm.openstreetmap.de/wiki/DevelopersGuide/DevelopingPlugins#ThemanifestfileforaJOSMplugin

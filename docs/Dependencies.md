@@ -16,7 +16,7 @@ If your plugin has dependencies to java libraries that are not available as JOSM
 ```kotlin
 repositories {
   // Define any additional repositories here (see https://docs.gradle.org/6.8.1/userguide/declaring_repositories.html)
-  // For the repositories that are automatically available with the gradle-josm-plugin, see https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/plugin/plugin/org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/index.html#org.openstreetmap.josm.gradle.plugin.config/JosmPluginExtension/repositories/#/PointingToDeclaration/
+  // For the repositories that are automatically available with the gradle-josm-plugin, see https://josm.gitlab.io/gradle-josm-plugin/kdoc/latest/plugin/plugin/org.openstreetmap.josm.gradle.plugin.config/-josm-plugin-extension/index.html#org.openstreetmap.josm.gradle.plugin.config/JosmPluginExtension/repositories/#/PointingToDeclaration/
 }
 dependencies {
   packIntoJar("groupId:artifactId:1.2.3")

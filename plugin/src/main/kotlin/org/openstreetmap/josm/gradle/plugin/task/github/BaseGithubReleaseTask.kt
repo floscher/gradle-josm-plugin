@@ -45,7 +45,7 @@ abstract class BaseGithubReleaseTask: DefaultTask() {
   @get:Internal
   @Option(
     option = CMDLINE_OPT_TARGET_COMMITISH,
-    description = "the target commitish for the release, e.g. 'master' "
+    description = "the target commitish for the release, e.g. 'main' "
       + "or 'deploy'. Default: '${GithubConfig.DEFAULT_TARGET_COMMITTISH}' (if not configured differently)")
   var targetCommitish: String? = null
 

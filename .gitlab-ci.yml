@@ -45,33 +45,33 @@ publish to / Gradle Plugin Portal:
   needs:
   - test
   only:
-  - tags@floscher/gradle-josm-plugin
+  - tags@JOSM/gradle-josm-plugin
 
 publish to / GitLab.com Maven:
   stage: deploy
   environment:
     name: maven / gitlab.com
-    url: https://gitlab.com/floscher/gradle-josm-plugin/-/packages
+    url: https://gitlab.com/JOSM/gradle-josm-plugin/-/packages
   script:
   - ./gradlew publishAllPublicationsToGitlabRepository
   - ./gradlew releaseToGitlab
   needs:
   - test
   only:
-  - tags@floscher/gradle-josm-plugin
+  - tags@JOSM/gradle-josm-plugin
 
 publish to / pages branch:
   stage: deploy
   environment:
     name: maven / pages branch plus KDoc
-    url: https://gitlab.com/floscher/gradle-josm-plugin/tree/pages
+    url: https://gitlab.com/JOSM/gradle-josm-plugin/tree/pages
   script:
   - |
     mkdir -p ~/.ssh/
     echo "$SSH_GITLAB_PUBLIC_KEY" >> ~/.ssh/known_hosts
     echo "$SSH_DEPLOY_PRIVATE_KEY" > ~/.ssh/id_rsa
     chmod -R 600 ~/.ssh
-    git clone --depth 1 --branch pages git@gitlab.com:floscher/gradle-josm-plugin.git public
+    git clone --depth 1 --branch pages git@gitlab.com:JOSM/gradle-josm-plugin.git public
   - |
     version=`git describe --always --dirty`
     longVersion=`git describe --always --long --dirty`
@@ -88,10 +88,10 @@ publish to / pages branch:
     git stage .
   - |
     git config user.name "Deploy with GitLab CI"
-    git config user.email "incoming+floscher/gradle-josm-plugin@incoming.gitlab.com"
+    git config user.email "contact-project+josm-gradle-josm-plugin-5042462-issue-@incoming.gitlab.com"
     git commit -a -m "Update Maven repository and KDoc documentation to $longVersion"
     git push origin pages
   needs:
   - test
   only:
-  - tags@floscher/gradle-josm-plugin
+  - tags@JOSM/gradle-josm-plugin

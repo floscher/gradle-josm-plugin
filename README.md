@@ -7,8 +7,8 @@ Things like test driving your JOSM plugins before releasing them becomes as easy
 See the [`docs`](./docs/) below for many more things you can do. And you don't even need to abandon the Ant build, which is used for most of the JOSM plugins. Option 2 in [the guide for setting up the `gradle-josm-plugin`](docs/Setup.md) explains how a JOSM plugin can support building with either build system (many configuration options can be shared between both).
 
 If you miss something here, found something that's broken, or need more info about this project:
-* Feel free to [open issues on this project](https://gitlab.com/floscher/gradle-josm-plugin/issues/new)!
-* Or you can reach out via email: `incoming+floscher/gradle-josm-plugin (at) incoming.gitlab.com`
+* Feel free to [open issues on this project](https://gitlab.com/JOSM/gradle-josm-plugin/issues/new)!
+* Or you can reach out via email: `contact-project+josm-gradle-josm-plugin-5042462-issue- (at) incoming.gitlab.com`
 
 ## Getting started
 
@@ -22,7 +22,7 @@ And if you need **external dependencies** for your plugin, maybe [`docs/Dependen
 
 If you want to know how **i18n** works, have a look at [`docs/I18n.md`](docs/I18n.md).
 
-Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://floscher.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/) for this Gradle plugin is available online.
+Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://josm.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/) for this Gradle plugin is available online.
 
 ## Projects using this Gradle plugin
 * [JOSM/**areaselector**](https://www.github.com/JOSM/areaselector)
@@ -45,7 +45,7 @@ Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://floscher.gitlab.io
 * [JOSM/**wikipedia**](https://gitlab.com/JOSM/plugin/wikipedia)
 
 ## Deprecated links
-Alternatively to the default Gradle plugin repository, you can download this plugin from a Maven repository at `https://floscher.gitlab.io/gradle-josm-plugin/maven`.
-That link gives a 404 HTTP status, but the repository is still there. The contents can be viewed at https://gitlab.com/floscher/gradle-josm-plugin/tree/pages/maven .
+Alternatively to the default Gradle plugin repository, you can download this plugin from a Maven repository at `https://josm.gitlab.io/gradle-josm-plugin/maven`.
+That link gives a 404 HTTP status, but the repository is still there. The contents can be viewed at https://gitlab.com/JOSM/gradle-josm-plugin/tree/pages/maven .
 
 Under https://plugins.gradle.org/plugin/org.openstreetmap.josm.gradle.plugin you can find the versions < `v0.2.0` of the plugin. Later versions have the shorter plugin ID [`org.openstreetmap.josm`](https://plugins.gradle.org/plugin/org.openstreetmap.josm).
