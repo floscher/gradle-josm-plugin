@@ -9,6 +9,7 @@ import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.plugins.BasePluginExtension
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.util.PatternFilterable
+import org.openstreetmap.josm.gradle.plugin.io.JosmPluginListParser
 import org.openstreetmap.josm.gradle.plugin.util.ARTIFACT_JOSM
 import org.openstreetmap.josm.gradle.plugin.util.ARTIFACT_JOSM_UNITTEST
 import org.openstreetmap.josm.gradle.plugin.util.GROUP_JMAPVIEWER
@@ -17,6 +18,7 @@ import org.openstreetmap.josm.gradle.plugin.util.GROUP_JOSM_PLUGIN
 import org.openstreetmap.josm.gradle.plugin.util.Urls
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
+import java.net.URI
 
 /**
  * This extension is added to the project as `project.josm`
@@ -223,6 +225,7 @@ open class JosmPluginExtension(val project: Project) {
    * 3. Nexus repo for JOSM snapshots: [https://josm.openstreetmap.de/nexus/content/repositories/snapshots/](https://josm.openstreetmap.de/nexus/content/repositories/snapshots/) (as [MavenArtifactRepository])
    * 4. Directory in SVN repo where JOSM plugins are published: [https://josm.openstreetmap.de/osmsvn/applications/editors/josm/dist](https://josm.openstreetmap.de/osmsvn/applications/editors/josm/dist) (as custom [IvyArtifactRepository])
    * 5. GitLab Maven repository containing some plugins that are neither in SVN nor in the Nexus repository: [https://gitlab.com/api/v4/groups/JOSM/-/packages/maven](https://gitlab.com/api/v4/groups/JOSM/-/packages/maven) (as [MavenArtifactRepository])
+   * 6. JOSM Plugin List: [https://josm.openstreetmap.de/plugin]. This covers all plugins not in SVN, Nexus, or Maven repositories.
    *
    * @see RepositoryHandler
    */
@@ -273,6 +276,23 @@ open class JosmPluginExtension(val project: Project) {
       repo.url = Urls.GITLAB_JOSM_PLUGINS_REPO.toURI()
       repo.content {
         it.includeGroup(GROUP_JOSM_PLUGIN)
+      }
+    }
+    // Fallback to JOSM Plugin list. Technically this should be able to replace GITLAB_JOSM_PLUGINS_REPO and PLUGIN_DIST_DIR.
+    val parser = JosmPluginListParser(this.project, false)
+    for (pluginInfo in parser.plugins) {
+      rh.ivy { repo ->
+        repo.url = URI(pluginInfo.downloadUrl.toExternalForm().removeSuffix(pluginInfo.pluginName))
+        repo.content {
+          // This constrains the repo to this specific plugin.
+          it.includeModule(GROUP_JOSM_PLUGIN, pluginInfo.pluginName.removeSuffix(".jar"))
+        }
+        repo.patternLayout{
+          it.artifact("[artifact].jar")
+        }
+        repo.metadataSources {
+          it.artifact()
+        }
       }
     }
   }
