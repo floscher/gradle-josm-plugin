@@ -279,21 +279,25 @@ open class JosmPluginExtension(val project: Project) {
       }
     }
     // Fallback to JOSM Plugin list. Technically this should be able to replace GITLAB_JOSM_PLUGINS_REPO and PLUGIN_DIST_DIR.
-    val parser = JosmPluginListParser(this.project, false)
-    for (pluginInfo in parser.plugins) {
-      rh.ivy { repo ->
-        repo.url = URI(pluginInfo.downloadUrl.toExternalForm().removeSuffix(pluginInfo.pluginName))
-        repo.content {
-          // This constrains the repo to this specific plugin.
-          it.includeModule(GROUP_JOSM_PLUGIN, pluginInfo.pluginName.removeSuffix(".jar"))
-        }
-        repo.patternLayout{
-          it.artifact("[artifact].jar")
-        }
-        repo.metadataSources {
-          it.artifact()
+    try {
+      val parser = JosmPluginListParser(this.project, false)
+      for (pluginInfo in parser.plugins) {
+        rh.ivy { repo ->
+          repo.url = URI(pluginInfo.downloadUrl.toExternalForm().removeSuffix(pluginInfo.pluginName))
+          repo.content {
+            // This constrains the repo to this specific plugin.
+            it.includeModule(GROUP_JOSM_PLUGIN, pluginInfo.pluginName.removeSuffix(".jar"))
+          }
+          repo.patternLayout {
+            it.artifact("[artifact].jar")
+          }
+          repo.metadataSources {
+            it.artifact()
+          }
         }
       }
+    } catch (e: IllegalArgumentException) {
+      project.logger.warn("The JOSM plugin could not be read and added as a repository.")
     }
   }
 
