@@ -151,24 +151,29 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: UShort, alreadyRes
       val resolvedManifests = resolvedFiles.map { Manifest(ZipFile(it).let { it.getInputStream(it.getEntry("META-INF/MANIFEST.MF")) }) }
 
       val requiredJava = resolvedManifests
-        .mapNotNull { it.mainAttributes[JosmManifest.Attribute.PLUGIN_MIN_JAVA_VERSION]?.toString()?.toIntOrNull() }
+        .mapNotNull { it.mainAttributes.getValue(JosmManifest.Attribute.PLUGIN_MIN_JAVA_VERSION.manifestKey)?.toString()?.toIntOrNull() }
         .minOrNull()
+      val pluginVersion = resolvedManifests
+        .mapNotNull { it.mainAttributes.getValue(JosmManifest.Attribute.PLUGIN_VERSION.manifestKey)?.toString() }
+        .distinct()
+        .singleOrNull()
       val currentJava = JavaVersion.current().majorVersion.toIntOrNull()
       if (requiredJava != null && currentJava != null && requiredJava > currentJava) {
         // if any manifest has a minimum Java version larger than the current java version
         logger.lifecycle("{}* {} (ignored): requires Java {} instead of {}", indentation, pluginName, requiredJava, currentJava)
       } else {
-        logger.lifecycle("{}* {}", indentation, pluginName)
+        logger.lifecycle("{}* {}{}", indentation, pluginName, if (pluginVersion == null) "" else " ($pluginVersion)")
         result.add(dep)
       }
 
-      resolvedManifests.forEach {
+      resolvedManifests.forEach { manifest ->
         result.addAll(
           getAllRequiredJosmPlugins(
             recursionDepth.inc(),
             alreadyResolvedPlugins,
-            it.mainAttributes.getValue(JosmManifest.Attribute.PLUGIN_DEPENDENCIES.manifestKey)
+            manifest.mainAttributes.getValue(JosmManifest.Attribute.PLUGIN_DEPENDENCIES.manifestKey)
               ?.split(";")
+              ?.filter { it.isNotBlank() }
               ?.map { it.trim() }
               ?.toSet()
               ?: setOf()

@@ -12,8 +12,6 @@ import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 import org.openstreetmap.josm.gradle.plugin.i18n.io.GETTEXT_HEADER_MSGID
 import org.openstreetmap.josm.gradle.plugin.i18n.io.I18nFileDecoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileEncoder
-import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
-import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
 import org.openstreetmap.josm.gradle.plugin.i18n.util.formatAsProgressBar
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
