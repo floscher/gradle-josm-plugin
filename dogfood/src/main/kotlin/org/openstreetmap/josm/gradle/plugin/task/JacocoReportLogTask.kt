@@ -8,9 +8,9 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.util.Locale
 import javax.inject.Inject
 
-public open class JacocoReportLogTask @Inject constructor(@get:Input val reportTask: JacocoReport): DefaultTask() {
+public open class JacocoReportLogTask @Inject constructor(@get:Input public val reportTask: JacocoReport): DefaultTask() {
   @TaskAction
-  fun action() {
+  public fun action() {
     val allLines = reportTask.reports.csv.outputLocation.asFile.get().readLines()
     val headerLine = allLines[0].split(',')
     val colNames = arrayOf(

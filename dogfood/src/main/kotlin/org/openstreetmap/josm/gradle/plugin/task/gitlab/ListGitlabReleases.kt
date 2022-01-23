@@ -10,10 +10,10 @@ import java.io.IOException
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
-open class ListGitlabReleases(): DefaultTask() {
+public open class ListGitlabReleases(): DefaultTask() {
 
   @TaskAction
-  fun action() {
+  public fun action() {
     val list = parsePaginatedApiList(URL("https://gitlab.com/api/v4/projects/JOSM%2Fplugin%2Fwikipedia/releases"), GitlabRelease.serializer(GitlabRelease.Assets.Link.Existing.serializer()))
     list.forEach {
       println("${it.name} ${it.tagName}")
@@ -26,10 +26,10 @@ open class ListGitlabReleases(): DefaultTask() {
     }
   }
 
-  val linkHeaderRegex = Regex("""\s*<([^>]+)>\s*;\s*rel\s*=\s*"([a-z]+)"\s*""")
+  private val linkHeaderRegex = Regex("""\s*<([^>]+)>\s*;\s*rel\s*=\s*"([a-z]+)"\s*""")
 
   @Throws(IOException::class)
-  fun <T> parsePaginatedApiList(url: URL, serializer: KSerializer<T>, depth: Int = 0): List<T> {
+  private fun <T> parsePaginatedApiList(url: URL, serializer: KSerializer<T>, depth: Int = 0): List<T> {
     require(depth < 100) { "Max. recursion depth for querying paginated lists from APIs is currently 100!" }
     println(url.toString())
     val connection = (url.openConnection() as HttpsURLConnection)

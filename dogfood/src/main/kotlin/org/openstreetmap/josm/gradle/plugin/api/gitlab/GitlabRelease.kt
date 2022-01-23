@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import org.openstreetmap.josm.gradle.plugin.api.Release
 
 @Serializable
-data class GitlabRelease<T: GitlabRelease.Assets.Link>(
+public data class GitlabRelease<T: GitlabRelease.Assets.Link>(
   override val name: String,
   @SerialName("tag_name") override val tagName: String,
   override val description: String,
@@ -14,21 +14,21 @@ data class GitlabRelease<T: GitlabRelease.Assets.Link>(
 ): Release() {
 
   @Serializable
-  data class Assets<T: Assets.Link>(val links: List<T>) {
+  public data class Assets<T: Assets.Link>(val links: List<T>) {
 
-    sealed class Link() {
-      abstract val name: String
-      abstract val url: String
+    public sealed class Link() {
+      public abstract val name: String
+      public abstract val url: String
 
       @Serializable
-      data class Existing(
+      public data class Existing(
         override val name: String,
         override val url: String,
         val external: Boolean
       ): Link()
 
       @Serializable
-      data class New(
+      public data class New(
         override val name: String,
         override val url: String
       ): Link()

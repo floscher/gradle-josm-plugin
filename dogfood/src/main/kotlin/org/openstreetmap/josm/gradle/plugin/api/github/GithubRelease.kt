@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import org.openstreetmap.josm.gradle.plugin.api.Release
 
 @Serializable
-data class GithubRelease(
+public data class GithubRelease(
   override val name: String?,
   @SerialName("body") override val description: String?,
   @SerialName("tag_name") override val tagName: String,
@@ -15,7 +15,7 @@ data class GithubRelease(
   val assets: List<Asset>
 ): Release() {
   @Serializable
-  data class Asset(
+  public data class Asset(
     val name: String,
     @SerialName("browser_download_url") val url: String,
     val size: Long

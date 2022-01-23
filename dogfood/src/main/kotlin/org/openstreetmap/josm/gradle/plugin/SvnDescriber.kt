@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
  * Use the command `svn info` to determine the SVN revision.
  * @param [workTree] the root directory of the SVN repository that you want to describe
  */
-class SvnDescriber(val workTree: File): Describer {
+public class SvnDescriber(private val workTree: File): Describer {
 
   /**
    * @param [markSnapshots] if this is true, the revision number is appended with [Describer.SNAPSHOT_SUFFIX],
@@ -40,7 +40,7 @@ class SvnDescriber(val workTree: File): Describer {
    * @throws [IOException] if `svn status` does not execute successfully within 2 minutes
    */
   @Throws(IOException::class)
-  fun isDirty(): Boolean {
+  private fun isDirty(): Boolean {
     val process = ProcessBuilder("svn", "status", "-q").directory(workTree).start()
     if (process.waitFor(2, TimeUnit.MINUTES) && process.exitValue() == 0) {
       val linesCount = process.inputStream.bufferedReader().lines().count()

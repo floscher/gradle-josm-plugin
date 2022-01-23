@@ -16,7 +16,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java) {
 }
 
 kotlin {
-  explicitApiWarning()
+  explicitApi()
   sourceSets.main {
     kotlin.srcDir(projectDir.resolve("../dogfood/src/main/kotlin/"))
   }

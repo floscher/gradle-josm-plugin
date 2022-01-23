@@ -11,7 +11,7 @@ import java.io.IOException
  * @param workTree the directory where the work tree of the git repository is
  *   (typically the parent directory of the `.git` directory)
  */
-class GitDescriber(val workTree: File) : Describer {
+public class GitDescriber(private val workTree: File) : Describer {
   private val git = Git(FileRepositoryBuilder().findGitDir(workTree).readEnvironment().build())
 
   /**
@@ -39,7 +39,7 @@ class GitDescriber(val workTree: File) : Describer {
   /**
    * @return the abbreviated but unique commit hash of the current HEAD
    */
-  fun commitHash(): String =
+  public fun commitHash(): String =
     git.repository.newObjectReader().abbreviate(
       git.log().setMaxCount(1).call().first().toObjectId()
     ).name()

@@ -3,13 +3,13 @@ package org.openstreetmap.josm.gradle.plugin.api
 import kotlinx.serialization.Transient
 import java.time.Instant
 
-abstract class Release {
-  abstract val name: String?
-  abstract val description: String?
-  abstract val tagName: String
-  abstract val releasedAt: String?
+public abstract class Release {
+  public abstract val name: String?
+  public abstract val description: String?
+  public abstract val tagName: String
+  public abstract val releasedAt: String?
 
   @Transient
-  val releasedAtEpoch
+  public val releasedAtEpoch: Instant?
     get() = releasedAt?.let { Instant.parse(it) }
 }

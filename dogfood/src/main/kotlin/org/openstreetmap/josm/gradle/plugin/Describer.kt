@@ -7,9 +7,9 @@ import java.io.IOException
  * There is a [GitDescriber] and an [SvnDescriber], which use the information
  * from the respective version control repository.
  */
-interface Describer {
-  companion object {
-    internal const val SNAPSHOT_SUFFIX = "-SNAPSHOT";
+public interface Describer {
+  public companion object {
+    public const val SNAPSHOT_SUFFIX: String = "-SNAPSHOT";
   }
 
   /**
@@ -19,5 +19,5 @@ interface Describer {
    * @return an identifier of the current version of the repository
    */
   @Throws(IOException::class)
-  fun describe(markSnapshots: Boolean = true, trimLeading: Boolean = true): String
+  public fun describe(markSnapshots: Boolean = true, trimLeading: Boolean = true): String
 }

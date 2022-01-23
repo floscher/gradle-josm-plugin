@@ -13,7 +13,7 @@ import java.time.Instant
 /**
  * Add logging of the task duration right after each task finishes.
  */
-fun TaskExecutionGraph.logTaskDuration() {
+public fun TaskExecutionGraph.logTaskDuration() {
   val startTimePropKey = "taskStartTime"
   beforeTask {
     it.extensions.extraProperties.set(startTimePropKey, Instant.now())
@@ -32,7 +32,7 @@ fun TaskExecutionGraph.logTaskDuration() {
 /**
  * Adds a log message to the end of each task of type [PublishToMavenRepository] that contains which artifact was published and to where
  */
-fun TaskExecutionGraph.logPublishedMavenArtifacts() {
+public fun TaskExecutionGraph.logPublishedMavenArtifacts() {
   afterTask {
     if (it is AbstractPublishToMaven) {
       val url = if (it is PublishToMavenRepository) {
@@ -58,7 +58,7 @@ fun TaskExecutionGraph.logPublishedMavenArtifacts() {
 /**
  * Enable logging of all skipped tasks after the build of the project finishes.
  */
-fun Project.logSkippedTasks() {
+public fun Project.logSkippedTasks() {
   gradle.buildFinished {
     var wereTasksSkipped = false
     rootProject.allprojects.flatMap { it.tasks }.forEach {
@@ -79,7 +79,7 @@ fun Project.logSkippedTasks() {
  * For better machine-readability, the coverage numbers are always printed with
  * decimal point (never decimal comma) and four decimal places.
  */
-fun JacocoReport.logCoverage() {
+public fun JacocoReport.logCoverage() {
   doFirst {
     reports {
       it.csv.required.value(true).finalizeValue()
