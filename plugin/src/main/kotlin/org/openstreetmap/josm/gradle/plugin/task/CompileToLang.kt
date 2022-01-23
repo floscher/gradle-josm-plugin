@@ -33,9 +33,6 @@ public abstract class CompileToLang(
   @get:Internal
   abstract val decoder: I18nFileDecoder
 
-  @get:Internal
-  public lateinit var translations: List<Pair<String, Map<MsgId, MsgStr>>>
-
   open fun filterIsExcludedBaseFile(file: File): Boolean = false
 
   @Input
@@ -71,7 +68,6 @@ public abstract class CompileToLang(
         "No *.$fileExtension files found to be compiled for source set ${sourceSet.name} in:\n" +
           sourceSet.mo.srcDirs.joinToString("\n") { "  " + it.absolutePath }
       )
-      translations = emptyList()
     } else {
       require(inputFiles.map { it.nameWithoutExtension.lowercase() }.let { it.size == it.distinct().size }) {
         "There are duplicate locales: ${ inputFiles.map { it.nameWithoutExtension }.sortedBy { it.lowercase() }.joinToString() }"
@@ -89,7 +85,7 @@ public abstract class CompileToLang(
     logger.lifecycle(extractSources(sourceSet).srcDirs.joinToString("\n") { "from: ${it.absolutePath}" })
     logger.lifecycle("into: $outputDirectory")
 
-    this.translations = inputFiles.map {
+    val translations = inputFiles.map {
       it.nameWithoutExtension to decoder.decodeToTranslations(it.readBytes())
     }.also {
       logger.lifecycle("locales: ${it.map { it.first }.sorted().joinToString()} (+ $baseLanguage)")
