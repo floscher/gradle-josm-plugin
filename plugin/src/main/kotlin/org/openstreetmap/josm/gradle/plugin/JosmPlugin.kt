@@ -2,7 +2,6 @@ package org.openstreetmap.josm.gradle.plugin
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
@@ -98,7 +97,7 @@ class JosmPlugin: Plugin<Project> {
       if (project.plugins.hasPlugin(MavenPublishPlugin::class.java)) {
         val prevPublishRepos = project.extensions.josm.publishRepositories
         project.extensions.josm.publishRepositories = {
-          it.gitlabRepository("gitlab", project.logger)
+          it.gitlabRepository("gitlab", project)
           prevPublishRepos.invoke(it)
         }
         project.extensions.josm.publishRepositories.invoke(project.extensions.getByType(PublishingExtension::class.java).repositories)

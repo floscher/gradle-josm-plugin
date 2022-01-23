@@ -29,12 +29,12 @@ import javax.net.ssl.HttpsURLConnection
  * @property gitlabSettingsBuilder the settings defining a specific project on a specific GitLab instance
  *   where the release will be created
  */
-open class ReleaseToGitlab @Inject constructor(
+public open class ReleaseToGitlab @Inject constructor(
   private val trimLeadingV: () -> Boolean,
   private val names: SetProperty<String>
 ) : DefaultTask(), Runnable {
 
-  val gitlabSettingsBuilder = GitlabRepositorySettings.Builder()
+  private val gitlabSettingsBuilder = GitlabRepositorySettings.Builder(project)
 
   init {
     group = "publishing"

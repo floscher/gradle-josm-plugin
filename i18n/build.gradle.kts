@@ -51,7 +51,7 @@ kotlin {
   }
 }
 
-val javadocJar by tasks.creating(Jar::class)
+val javadocJar by tasks.registering(Jar::class)
 
 val jacocoTestReport by tasks.registering(JacocoReport::class) {
   group = "Verification"
@@ -63,8 +63,9 @@ val jacocoTestReport by tasks.registering(JacocoReport::class) {
 
 publishing {
   publications {
-    named<MavenPublication>("jvm") {
-      artifact(javadocJar.archiveFile) {
+    // Add the javadoc artifact to all Maven artifacts
+    withType(MavenPublication::class) {
+      artifact(javadocJar.map { it.archiveFile }.get()) {
         classifier = "javadoc"
       }
     }

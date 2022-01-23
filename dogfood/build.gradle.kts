@@ -5,6 +5,10 @@ plugins {
   `maven-publish`
 }
 
+kotlin {
+  explicitApiWarning()
+}
+
 dependencies {
   implementation(gradleApi())
   api("org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}")

@@ -2,12 +2,25 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.credentials.AwsCredentials
 import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPom
+import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+import org.gradle.api.publish.plugins.PublishingPlugin
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.findByType
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.withType
+import org.gradle.plugins.signing.SigningExtension
+import org.gradle.plugins.signing.SigningPlugin
+import java.io.File
 
 /**
- * Sets up
+ * Adds a Maven repo in the directory `./maven` inside the [Project.getBuildDir] of the [Project.getRootProject]
+ * to which artifacts can be published.
  */
-fun Project.setupBuildDirPublishingForAllProjects() {
-  allprojectsPublishingRepositories {
+public fun Project.setupBuildDirPublishing() {
+  addPublishingRepositories {
     maven {
       it.name = "buildDir"
       it.url = uri(rootProject.buildDir.resolve("maven"))
@@ -15,12 +28,12 @@ fun Project.setupBuildDirPublishingForAllProjects() {
   }
 }
 
-fun Project.setupAwsPublishingForAllProjects() {
-  System.getenv("AWS_ACCESS_KEY_ID")?.let { awsAccessKeyId ->
-    System.getenv("AWS_SECRET_ACCESS_KEY")?.let { awsSecretAccessKey ->
-      allprojectsPublishingRepositories {
+public fun Project.setupAwsPublishing() {
+  addPublishingRepositories {
+    val repository = project.providers.environmentVariable("AWS_ACCESS_KEY_ID").forUseAtConfigurationTime().orNull?.let { awsAccessKeyId ->
+      project.providers.environmentVariable("AWS_SECRET_ACCESS_KEY").forUseAtConfigurationTime().orNull?.let { awsSecretAccessKey ->
         maven {
-          it.url = uri("s3://gradle-josm-plugin")
+          it.url = project.uri("s3://gradle-josm-plugin")
           it.name = "s3"
           it.credentials(AwsCredentials::class.java) {
             it.accessKey = awsAccessKeyId
@@ -28,8 +41,13 @@ fun Project.setupAwsPublishingForAllProjects() {
           }
         }
       }
-    } ?: logger.lifecycle("Note: If you want to publish to s3://gradle-josm-plugin , set the environment variable AWS_SECRET_ACCESS_KEY")
-  }?: logger.lifecycle("Note: If you want to publish to s3://gradle-josm-plugin , set the environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY")
+    }
+    if (repository == null) {
+      logger.lifecycle(
+        "Note: If you set the environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY , then you can publish to s3://gradle-josm-plugin ."
+      )
+    }
+  }
 }
 
 /**
@@ -37,10 +55,58 @@ fun Project.setupAwsPublishingForAllProjects() {
  * in the project and all of its subprojects. If there is no `publishing` extension in on of the projects,
  * this function just does nothing.
  */
-private fun Project.allprojectsPublishingRepositories(configurationFun: (RepositoryHandler).() -> Unit) {
-  allprojects { p ->
-    p.pluginManager.withPlugin("publishing") {
-      p.extensions.getByType(PublishingExtension::class.java).repositories(configurationFun)
+private fun Project.addPublishingRepositories(conf: (RepositoryHandler).() -> Unit) {
+  plugins.withType(PublishingPlugin::class).whenPluginAdded {
+    extensions.getByType(PublishingExtension::class).repositories(conf)
+  }
+}
+
+/**
+ * This can be passed e.g. to [Project.subprojects] or [Project.allprojects] to setup signing for all
+ * [PublishToMavenRepository] tasks in the project.
+ * The path to the private PGP key file is read from the environment variable `SIGNING_PGP_PRIVATE_KEY_PATH`,
+ * the passphrase for it is read from `SIGNING_PGP_PASSWORD`.
+ * @return a consumer function that sets up the [SigningPlugin] for projects that are passed as argument.
+ */
+public fun Project.setupMavenArtifactSigning() {
+  plugins.withType(MavenPublishPlugin::class).whenPluginAdded {
+    providers.environmentVariable("SIGNING_PGP_PRIVATE_KEY_PATH").forUseAtConfigurationTime().orNull
+      ?.let { File(it) }
+      ?.takeIf { it.canRead() }
+      ?.readText()
+      ?.let { privateKey ->
+        apply<SigningPlugin>()
+        extensions.findByType<SigningExtension>()!!.let { signingExtension ->
+          signingExtension.useInMemoryPgpKeys(
+            privateKey,
+            System.getenv("SIGNING_PGP_PASSWORD") ?: ""
+          )
+          gradle.projectsEvaluated { // needed, so the publication isn't null
+            tasks.withType(PublishToMavenRepository::class).all { publishTask ->
+              publishTask.publication?.let {
+                signingExtension.sign(it)
+              } ?: throw NullPointerException("The publication of task ${publishTask.path} is null!")
+            }
+          }
+        }
+      }
+      ?: logger.lifecycle(
+        "Note: If you set the environment variable SIGNING_PGP_PRIVATE_KEY_PATH to the file path of a PGP private key, "
+        + "then your maven artifacts will be signed."
+      )
+  }
+}
+
+public fun Project.addMavenPomContent(pomContent: (MavenPom).() -> Unit) {
+  plugins.withType(MavenPublishPlugin::class).whenPluginAdded {
+    extensions.getByType(PublishingExtension::class).publications.withType(MavenPublication::class).all {
+      it.pom(pomContent)
     }
+  }
+}
+
+public fun Project.setMavenPomDescription(descriptionOfProject: String) {
+  addMavenPomContent {
+    description.set(descriptionOfProject)
   }
 }

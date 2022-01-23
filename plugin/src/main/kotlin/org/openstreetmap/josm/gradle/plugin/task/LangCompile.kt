@@ -1,11 +1,11 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
-import java.io.File
-import javax.inject.Inject
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 import org.openstreetmap.josm.gradle.plugin.i18n.io.I18nFileDecoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileDecoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileEncoder
+import java.io.File
+import javax.inject.Inject
 
 /**
  * This "compiles" the *.lang files in [sourceSet] into `$buildDir/i18n/${sourceSet.name}/lang/data`.

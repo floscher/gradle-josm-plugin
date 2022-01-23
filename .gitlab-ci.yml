@@ -9,7 +9,7 @@ cache:
   - .gradle/caches/build-cache-*
 
 include:
-  - template: Dependency-Scanning.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
 
 assemble:
   stage: build
@@ -21,7 +21,6 @@ assemble:
 
 test:
   stage: test
-  image: registry.gitlab.com/josm/docker-library/openjdk:8
   script:
   - apt-get update && apt-get install -y firefox-esr # Needed for i18n:jsBrowserTest
   - ./gradlew --stacktrace --info :build

@@ -1,9 +1,9 @@
 package org.openstreetmap.josm.gradle.plugin.i18n.io
 
-import java.io.IOException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.io.IOException
 
 @ExperimentalUnsignedTypes
 class InputStreamTest {

@@ -1,11 +1,10 @@
-import Build_gradle.IKotlinCompile
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.dokka.Platform
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
-import org.openstreetmap.josm.gradle.plugin.api.gitlab.setupGitlabPublishingForAllProjects
+import org.openstreetmap.josm.gradle.plugin.api.gitlab.setupGitlabPublishing
 import org.openstreetmap.josm.gradle.plugin.logCoverage
 import org.openstreetmap.josm.gradle.plugin.logPublishedMavenArtifacts
 import org.openstreetmap.josm.gradle.plugin.logSkippedTasks
@@ -126,6 +125,13 @@ tasks.dokkaHtmlMultiModule {
   outputDirectory.set(buildDir.resolve("docs/kdoc"))
 }
 
-setupAwsPublishingForAllProjects()
-setupBuildDirPublishingForAllProjects()
-setupGitlabPublishingForAllProjects("gitlab")
+allprojects {
+  setupBuildDirPublishing()
+  setupAwsPublishing()
+  setupMavenArtifactSigning()
+  setupGitlabPublishing("gitlab")
+}
+
+allprojects {
+  addMavenPomContent(gradleJosmPluginMetadata())
+}

@@ -1,5 +1,5 @@
-import proguard.gradle.ProGuardTask
 import org.gradle.jvm.tasks.Jar
+import proguard.gradle.ProGuardTask
 
 plugins {
   application

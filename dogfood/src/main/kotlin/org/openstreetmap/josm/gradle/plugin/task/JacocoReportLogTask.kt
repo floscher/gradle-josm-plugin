@@ -1,12 +1,12 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
-import java.util.Locale
-import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.testing.jacoco.tasks.JacocoReport
+import java.util.Locale
+import javax.inject.Inject
 
 public open class JacocoReportLogTask @Inject constructor(@get:Input val reportTask: JacocoReport): DefaultTask() {
   @TaskAction
