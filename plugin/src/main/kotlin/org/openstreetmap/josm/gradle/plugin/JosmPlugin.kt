@@ -116,7 +116,7 @@ class JosmPlugin: Plugin<Project> {
       }
 
       // Add the repositories defined in the JOSM configuration
-      project.extensions.josm.repositories.invoke(project.repositories)
+      project.extensions.josm.repositories(project.repositories)
 
       mainConfigurationSetup.afterEvaluate()
 

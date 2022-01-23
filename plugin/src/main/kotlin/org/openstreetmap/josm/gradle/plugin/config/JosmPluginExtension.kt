@@ -281,23 +281,28 @@ open class JosmPluginExtension(val project: Project) {
     // Fallback to JOSM Plugin list. Technically this should be able to replace GITLAB_JOSM_PLUGINS_REPO and PLUGIN_DIST_DIR.
     try {
       val parser = JosmPluginListParser(this.project, false)
-      for (pluginInfo in parser.plugins) {
-        rh.ivy { repo ->
-          repo.url = URI(pluginInfo.downloadUrl.toExternalForm().removeSuffix(pluginInfo.pluginName))
-          repo.content {
-            // This constrains the repo to this specific plugin.
-            it.includeModule(GROUP_JOSM_PLUGIN, pluginInfo.pluginName.removeSuffix(".jar"))
-          }
-          repo.patternLayout {
-            it.artifact("[artifact].jar")
-          }
-          repo.metadataSources {
-            it.artifact()
+      parser.plugins
+        .filter { !it.downloadUrl.toExternalForm().startsWith(Urls.MainJosmWebsite.PLUGIN_DIST_DIR.toExternalForm()) }
+        .forEach { pluginInfo ->
+          rh.ivy { repo ->
+            repo.url = URI(pluginInfo.downloadUrl.toExternalForm().replaceAfterLast('/', ""))
+            repo.content {
+              // This constrains the repo to this specific plugin.
+              it.includeModule(GROUP_JOSM_PLUGIN, pluginInfo.pluginName)
+            }
+            repo.patternLayout {
+              it.artifact("[artifact].jar")
+            }
+            repo.metadataSources {
+              it.artifact()
+            }
           }
         }
-      }
     } catch (e: IllegalArgumentException) {
-      project.logger.warn("The JOSM plugin could not be read and added as a repository.")
+      project.logger.warn(
+        "The JOSM plugin list could not be read and added as a repository. Some external plugins might not be " +
+        "available as dependencies. Are you connected to the internet?"
+      )
     }
   }
 

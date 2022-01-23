@@ -72,7 +72,7 @@ fun Project.getVirtualPlugins(): Map<String, List<Pair<String, String>>> = try {
     .mapNotNull {
       it.manifestAtts["Plugin-Platform"]?.let { platform ->
         it.manifestAtts["Plugin-Provides"]?.let { provides ->
-          Triple(provides, platform, if (it.pluginName.endsWith(".jar")) it.pluginName.substring(0 until it.pluginName.length - 4) else it.pluginName)
+          Triple(provides, platform, it.pluginName)
         }
       }
     }

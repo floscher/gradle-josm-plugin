@@ -17,7 +17,7 @@ import java.net.URL
 class JosmPluginListParser(val project: Project, val withIcons: Boolean = false) {
 
   companion object {
-    val TITLE_LINE_REGEX = Regex("^([^;]+)(\\.jar)?;(.+)$")
+    val TITLE_LINE_REGEX = Regex("^([^;]+);(.+)$")
     val MANIFEST_LINE_REGEX = Regex("^\t([^:]+): (.*)$")
   }
 
@@ -61,9 +61,9 @@ class JosmPluginListParser(val project: Project, val withIcons: Boolean = false)
             errors.add("Line $i: The plugin before this line was incomplete (name: $pluginName, URL $downloadUrl, ${manifestAtts.size} manifest attributes)")
           }
           manifestAtts.clear()
-          pluginName = titleLineMatch.groupValues[1]
+          pluginName = titleLineMatch.groupValues[1].removeSuffix(".jar")
           try {
-            downloadUrl = URL(titleLineMatch.groupValues[3])
+            downloadUrl = URL(titleLineMatch.groupValues[2])
           } catch (e: MalformedURLException) {
             errors.add("Line $i: Plugin $pluginName has a malformed download URL set!")
             pluginName = null
