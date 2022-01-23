@@ -86,18 +86,21 @@ private fun buildAttributeMap(
       if (baseLanguageDescription == null || i18nCompileTask == null) {
         listOf()
       } else {
-        LangFileDecoder.decodeMultipleLanguages(
-          "en",
-          i18nCompileTask.outputDirectory.get().resolve("data/en.lang").readBytes(),
-          i18nCompileTask.outputDirectory.get().resolve("data").listFiles { it: File -> it.extension == "lang" && it.nameWithoutExtension != "en" }
-            ?.toList()
-            ?.filter { it.canRead() }
-            ?.associate { it.nameWithoutExtension to it.readBytes() }
-            ?: mapOf()
-        ).mapNotNull { (language, translations) ->
-          val translatedDescription = translations.entries.firstOrNull { it.key == MsgId(MsgStr(baseLanguageDescription)) }?.value?.strings?.joinToString("\n")
-          if (translatedDescription == null) null else {
-            Attribute.pluginDescriptionKey(language) to translatedDescription
+        val baseLanguageFile = i18nCompileTask.outputDirectory.get().resolve("data/en.lang")
+        if (!baseLanguageFile.canRead()) listOf() else {
+          LangFileDecoder.decodeMultipleLanguages(
+            "en",
+            baseLanguageFile.readBytes(),
+            i18nCompileTask.outputDirectory.get().resolve("data").listFiles { it: File -> it.extension == "lang" && it.nameWithoutExtension != "en" }
+              ?.toList()
+              ?.filter { it.canRead() }
+              ?.associate { it.nameWithoutExtension to it.readBytes() }
+              ?: mapOf()
+          ).mapNotNull { (language, translations) ->
+            val translatedDescription = translations.entries.firstOrNull { it.key == MsgId(MsgStr(baseLanguageDescription)) }?.value?.strings?.joinToString("\n")
+            if (translatedDescription == null) null else {
+              Attribute.pluginDescriptionKey(language) to translatedDescription
+            }
           }
         }
       }
