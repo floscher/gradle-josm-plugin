@@ -63,12 +63,12 @@ class DemoTest {
       assertTrue {
         buildResult.output.contains("""
           Resolving required JOSM plugins…
-          * apache-commons
-          * apache-http
-            * apache-commons (see above for dependencies)
-            * jna
+          \* apache-commons \([^)]+\)
+          \* apache-http \([^)]+\)
+            \* apache-commons \(see above for dependencies\)
+            \* jna \([^)]+\)
            → 3 JOSM plugins are required: apache-commons, apache-http, jna
-          """.trimIndent()
+          """.trimIndent().toRegex(RegexOption.MULTILINE)
         )
       }
       assertTrue {

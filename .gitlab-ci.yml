@@ -14,7 +14,7 @@ include:
 assemble:
   stage: build
   script:
-  - ./gradlew --stacktrace --info assemble
+  - ./gradlew --stacktrace assemble
   artifacts:
     paths:
     - build/
@@ -23,7 +23,7 @@ test:
   stage: test
   script:
   - apt-get update && apt-get install -y firefox-esr # Needed for i18n:jsBrowserTest
-  - ./gradlew --stacktrace --info :build
+  - ./gradlew --stacktrace :build
   artifacts:
     paths:
     - build/
