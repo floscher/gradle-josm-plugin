@@ -158,7 +158,10 @@ private fun setupI18nTasks(project: Project, sourceSetJosmPlugin: SourceSet) {
   project.tasks.create(
     "generatePot",
     GeneratePot::class.java,
-    project.provider { sourceSetJosmPlugin.java.asFileTree.files }
+    project.provider {
+      sourceSetJosmPlugin.allSource.filter { it.isFile && it.extension.lowercase() in setOf("java", "kt") }.asFileTree.files
+        .minus(sourceSetJosmPlugin.resources.asFileTree.files)
+    }
   )
 
   project.tasks.create("transifexDownload", TransifexDownload::class.java)
