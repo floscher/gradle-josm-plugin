@@ -43,11 +43,14 @@ public open class ReleaseToGitlab @Inject constructor(
 
   @TaskAction
   override fun run() {
-    val names: Set<String> = names.orNull?.takeIf { it.isNotEmpty() }
-      ?: throw IllegalArgumentException("No package names given that should be included in the release!")
+    val names: Set<String> = requireNotNull(names.orNull?.takeIf { it.isNotEmpty() }) {
+      "No package names given that should be included in the release!"
+    }
 
-    val gitTagName = System.getenv("GITLAB_RELEASE_GIT_TAG_NAME") ?: System.getenv("CI_COMMIT_TAG")
-    val artifactVersion = System.getenv("GITLAB_RELEASE_ARTIFACT_VERSION") ?: gitTagName?.let { if (it.isNotEmpty() && trimLeadingV.invoke() && it[0].lowercaseChar() == 'v') it.substring(1) else it }
+    val gitTagName = project.providers.environmentVariable("GITLAB_RELEASE_GIT_TAG_NAME").orNull
+      ?: project.providers.environmentVariable("CI_COMMIT_TAG").orNull
+    val artifactVersion = project.providers.environmentVariable("GITLAB_RELEASE_ARTIFACT_VERSION").orNull
+      ?: gitTagName?.let { if (it.isNotEmpty() && trimLeadingV() && it[0].lowercaseChar() == 'v') it.substring(1) else it }
     val gitlabSettings = gitlabSettingsBuilder.build()
 
     require(gitlabSettings != null && gitTagName != null && artifactVersion != null) {

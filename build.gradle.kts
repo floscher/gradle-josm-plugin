@@ -130,6 +130,7 @@ allprojects {
   setupAwsPublishing()
   setupMavenArtifactSigning()
   setupGitlabPublishing("gitlab")
+  setupOssSonatypeStagingPublishing()
 }
 
 allprojects {

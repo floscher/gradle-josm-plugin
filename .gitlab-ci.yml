@@ -34,6 +34,23 @@ test:
   needs:
   - assemble
 
+publish to / OSS Sonatype Staging:
+  stage: deploy
+  environment:
+    name: maven / OSS Sonatype Staging
+    url: https://oss.sonatype.org/content/groups/staging/org/openstreetmap/josm
+  script:
+    - ./gradlew publishAllPublicationsToOssSonatypeStagingRepository
+  needs:
+    - test
+  only:
+    refs:
+      - tags@JOSM/gradle-josm-plugin
+    variables:
+      - $SONATYPE_USERNAME
+      - $SONATYPE_PASSWORD
+
+
 publish to / Gradle Plugin Portal:
   stage: deploy
   environment:
@@ -44,7 +61,11 @@ publish to / Gradle Plugin Portal:
   needs:
   - test
   only:
-  - tags@JOSM/gradle-josm-plugin
+    refs:
+      - tags@JOSM/gradle-josm-plugin
+    variables:
+      - $GRADLE_PUBLISH_KEY
+      - $GRADLE_PUBLISH_SECRET
 
 publish to / GitLab.com Maven:
   stage: deploy

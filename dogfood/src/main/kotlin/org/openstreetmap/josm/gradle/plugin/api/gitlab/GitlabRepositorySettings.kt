@@ -81,19 +81,18 @@ public class GitlabRepositorySettings private constructor(
     var ciJobToken: String? = project.providers.environmentVariable("CI_JOB_TOKEN").orNull,
     var personalAccessToken: String? = project.providers.environmentVariable("GITLAB_PERSONAL_ACCESS_TOKEN").orNull
   ) {
-    public fun build(): GitlabRepositorySettings? {
-      // Can be null
-      val ciJobToken = ciJobToken
-      // Check if these are null
-      val projectId = projectId
-      val token = personalAccessToken ?: ciJobToken
-
-      return if (projectId != null && token != null) {
-        GitlabRepositorySettings(projectId, gitlabUrl, gitlabApiUrl, if (personalAccessToken != null) "Private-Token" else "Job-Token", token)
-      } else {
-        null
+    /**
+     * @return a [GitlabRepositorySettings] instance. Will return `null` when [projectId] is null or if
+     * [personalAccessToken] and [ciJobToken] are simultaneously `null`.
+     */
+    public fun build(): GitlabRepositorySettings? =
+      projectId?.let {  projectId: Int ->
+        personalAccessToken.let { personalAccessToken: String? ->
+          (personalAccessToken ?: ciJobToken)?.let { token: String ->
+            GitlabRepositorySettings(projectId, gitlabUrl, gitlabApiUrl, if (personalAccessToken != null) "Private-Token" else "Job-Token", token)
+          }
+        }
       }
-    }
   }
 }
 

@@ -44,9 +44,26 @@ public fun Project.setupAwsPublishing() {
     }
     if (repository == null) {
       logger.lifecycle(
-        "Note: If you set the environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY , then you can publish to s3://gradle-josm-plugin ."
+        "Note: Set the environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in order to publish to s3://gradle-josm-plugin ."
       )
     }
+  }
+}
+
+public fun Project.setupOssSonatypeStagingPublishing() {
+  addPublishingRepositories {
+    providers.environmentVariable("SONATYPE_USERNAME").forUseAtConfigurationTime().orNull?.let { sonatypeUsername ->
+      providers.environmentVariable("SONATYPE_PASSWORD").forUseAtConfigurationTime().orNull?.let { sonatypePassword ->
+        maven {
+          it.name = "OssSonatypeStaging"
+          it.url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+          it.credentials {
+            it.username = sonatypeUsername
+            it.password = sonatypePassword
+          }
+        }
+      }
+    } ?: logger.lifecycle("Note: Set the environment variables SONATYPE_USERNAME and SONATYPE_PASSWORD in order to publish to https://oss.sonatype.org/content/groups/staging/")
   }
 }
 
@@ -87,8 +104,8 @@ public fun Project.setupMavenArtifactSigning() {
         }
       }
       ?: logger.lifecycle(
-        "Note: If you set the environment variable SIGNING_PGP_PRIVATE_KEY_PATH to the file path of a PGP private key, "
-        + "then your maven artifacts will be signed."
+        "Note: Set the environment variable SIGNING_PGP_PRIVATE_KEY_PATH to the file path of a PGP private key "
+        + "in order to your maven artifacts will be signed."
       )
   }
 }
