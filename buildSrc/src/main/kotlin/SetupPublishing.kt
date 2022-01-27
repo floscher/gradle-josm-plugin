@@ -56,7 +56,7 @@ public fun Project.setupOssSonatypeStagingPublishing() {
       providers.environmentVariable("SONATYPE_PASSWORD").forUseAtConfigurationTime().orNull?.let { sonatypePassword ->
         maven {
           it.name = "OssSonatypeStaging"
-          it.url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+          it.url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
           it.credentials {
             it.username = sonatypeUsername
             it.password = sonatypePassword
