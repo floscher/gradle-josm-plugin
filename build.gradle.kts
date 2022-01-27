@@ -101,6 +101,12 @@ allprojects {
         ?.let { packagesFile ->
           includes.from(packagesFile)
         }
+
+      sourceLink {
+        remoteUrl.set(URL("https://gitlab.com/JOSM/gradle-josm-plugin/-/tree/main/${project.name}/src/${this@all.name}/kotlin"))
+        localDirectory.set(file("src/${this@all.name}/kotlin"))
+        remoteLineSuffix.set("#L")
+      }
     }
   }
 
@@ -114,8 +120,8 @@ allprojects {
 
   pluginManager.withPlugin("publishing") {
     afterEvaluate {
-      tasks.withType(Jar::class).findByName("javadocJar")?.apply {
-        from(tasks.named<DokkaTask>("dokkaHtml").map { it.outputDirectory })
+      tasks.named<Jar>("javadocJar") {
+        from(tasks.named<DokkaTask>("dokkaHtml"))
       }
     }
   }
