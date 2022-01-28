@@ -1,0 +1,367 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>JosmManifest</title>
+</head><body><link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><link href="../../../styles/prism.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script><script type="text/javascript" src="../../../scripts/main.js" defer></script><script type="text/javascript" src="../../../scripts/prism.js" async></script><script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+
+  
+    <div class="navigation-wrapper" id="navigation-wrapper">
+      <div id="leftToggler"><span class="icon-toggler"></span></div>
+      <div class="library-name"><a href="../../../index.html"><span>gradle-josm-plugin</span></a></div>
+      <div>0.8.0</div>
+      <div class="pull-right d-flex"><button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+      </div>
+    </div>
+    <div id="container">
+      <div id="leftColumn">
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <div class="main-content" id="content" pageids="plugin::org.openstreetmap.josm.gradle.plugin.config/JosmManifest///PointingToDeclaration//-1452242315">
+          <div class="breadcrumbs"><a href="../../index.html">plugin</a>/<a href="../index.html">org.openstreetmap.josm.gradle.plugin.config</a>/<a href="index.html">JosmManifest</a></div>
+          <div class="cover ">
+            <h1 class="cover"><span>Josm</span><wbr><span><span>Manifest</span></span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">JosmManifest</a><span class="token punctuation">(</span>project<span class="token operator">: </span><span data-unresolved-link="org.gradle.api/Project///PointingToDeclaration/">Project</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">The info that will be written into the manifest file of the plugin *.jar</p><p class="paragraph">Most of the attributes are corresponding to the ones listed in <a href="https://josm.openstreetmap.de/wiki/DevelopersGuide/DevelopingPlugins#ThemanifestfileforaJOSMplugin">the documentation for developing JOSM plugins</a>. But note that some of them have been renamed a bit to better express what each attribute is good for.</p><p class="paragraph">The properties used by the Ant build (e.g. <code class="lang-kotlin">plugin.author</code> or <code class="lang-kotlin">plugin.description</code>) are automatically picked up by both Ant and Gradle, if you define them in your <code class="lang-kotlin">gradle.properties</code> file and load them into your <code class="lang-kotlin">build.xml</code> file using the following snippet:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">&lt;!-- edit the properties of this plugin in the file `gradle.properties` --&gt;<br>&lt;property file="${basedir}/gradle.properties"/&gt;</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">The detailed documentation for each field below tells you, which one corresponds to which Ant/Gradle property and to which attribute in the <code class="lang-kotlin">MANIFEST.MF</code> file.</p><p class="paragraph">For a successful build you'll have to at least set the following properties in this class: <a href="main-class.html">mainClass</a>, <a href="description.html">description</a>, <a href="min-josm-version.html">minJosmVersion</a> Your project also has to set a value for <span data-unresolved-link="org.gradle.api/Project///PointingToDeclaration/">Project.getVersion()</span></p></div></div>
+          </div>
+          <div class="tabbedcontent">
+            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+            <div class="tabs-section-body">
+              <h2 class="tabbedcontent">Constructors</h2>
+              <div class="table" data-togglable="Constructors"><a data-name="1456687225%2FConstructors%2F-1452242315" anchor-label="JosmManifest" id="1456687225%2FConstructors%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue TabbedContent">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="-josm-manifest.html"><span>Josm</span><wbr><span><span>Manifest</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1456687225%2FConstructors%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-josm-manifest.html"><span class="token function">JosmManifest</span></a><span class="token punctuation">(</span>project<span class="token operator">: </span><span data-unresolved-link="org.gradle.api/Project///PointingToDeclaration/">Project</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Types</h2>
+              <div class="table" data-togglable="Types"><a data-name="398166434%2FClasslikes%2F-1452242315" anchor-label="Attribute" id="398166434%2FClasslikes%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="-attribute/index.html"><span><span>Attribute</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="398166434%2FClasslikes%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-attribute/index.html">Attribute</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-attribute/index.html">JosmManifest.Attribute</a><span class="token operator">&gt; </span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-884225807%2FClasslikes%2F-1452242315" anchor-label="Platform" id="-884225807%2FClasslikes%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="-platform/index.html"><span><span>Platform</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-884225807%2FClasslikes%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-platform/index.html">Platform</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-platform/index.html">JosmManifest.Platform</a><span class="token operator">&gt; </span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">The three platforms for which JOSM supports virtual plugins.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Functions</h2>
+              <div class="table" data-togglable="Functions"><a data-name="-427893546%2FFunctions%2F-1452242315" anchor-label="classpath" id="-427893546%2FFunctions%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="classpath.html"><span><span>classpath</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-427893546%2FFunctions%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="classpath.html"><span class="token function">classpath</span></a><span class="token punctuation">(</span>path<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1290126290%2FFunctions%2F-1452242315" anchor-label="oldVersionDownloadLink" id="-1290126290%2FFunctions%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="old-version-download-link.html"><span>old</span><wbr><span>Version</span><wbr><span>Download</span><wbr><span><span>Link</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1290126290%2FFunctions%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="old-version-download-link.html"><span class="token function">oldVersionDownloadLink</span></a><span class="token punctuation">(</span>minJosmVersion<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span>pluginVersion<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>downloadURL<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/net/URL.html">URL</a><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Add a link to an earlier release of the plugin, that is compatible with JOSM versions, with which the current version is no longer compatible.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-698502226%2FFunctions%2F-1452242315" anchor-label="setPlatform" id="-698502226%2FFunctions%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="set-platform.html"><span>set</span><wbr><span><span>Platform</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-698502226%2FFunctions%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="set-platform.html"><span class="token function">setPlatform</span></a><span class="token punctuation">(</span>name<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Convenience method to set the platform using a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a> instead of a <a href="-platform/index.html">Platform</a> enum value.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Properties</h2>
+              <div class="table" data-togglable="Properties"><a data-name="1049192740%2FProperties%2F-1452242315" anchor-label="author" id="1049192740%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="author.html">author</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1049192740%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="1049192740%2FProperties%2F-1452242315" anchor-label="author" id="1049192740%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="author.html">author</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1049192740%2FProperties%2F-1452242315" anchor-label="author" id="1049192740%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">The author of the plugin.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1036318528%2FProperties%2F-1452242315" anchor-label="canLoadAtRuntime" id="-1036318528%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="can-load-at-runtime.html">canLoadAtRuntime</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1036318528%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="-1036318528%2FProperties%2F-1452242315" anchor-label="canLoadAtRuntime" id="-1036318528%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="can-load-at-runtime.html">canLoadAtRuntime</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-1036318528%2FProperties%2F-1452242315" anchor-label="canLoadAtRuntime" id="-1036318528%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">Determines if the plugin needs a restart after installation. <code class="lang-kotlin">true</code> if no restart is required, <code class="lang-kotlin">false</code> otherwise.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1436837614%2FProperties%2F-1452242315" anchor-label="classpath" id="1436837614%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="classpath.html">classpath</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1436837614%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="1436837614%2FProperties%2F-1452242315" anchor-label="classpath" id="1436837614%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="classpath.html">classpath</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1436837614%2FProperties%2F-1452242315" anchor-label="classpath" id="1436837614%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">Additional paths that will be added to the classpath when JOSM is running.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="779860463%2FProperties%2F-1452242315" anchor-label="description" id="779860463%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="description.html">description</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="779860463%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="779860463%2FProperties%2F-1452242315" anchor-label="description" id="779860463%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="description.html">description</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="779860463%2FProperties%2F-1452242315" anchor-label="description" id="779860463%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">The description of what the plugin does.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1971430063%2FProperties%2F-1452242315" anchor-label="iconPath" id="-1971430063%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="icon-path.html">iconPath</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1971430063%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="-1971430063%2FProperties%2F-1452242315" anchor-label="iconPath" id="-1971430063%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="icon-path.html">iconPath</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-1971430063%2FProperties%2F-1452242315" anchor-label="iconPath" id="-1971430063%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">Path to the logo of the plugin. Relative to the root of the released jar-file, so that it can be loaded via <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getResource(java.lang.String)">Class.getResource</a>.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1072979084%2FProperties%2F-1452242315" anchor-label="includeLinksToGithubReleases" id="-1072979084%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="include-links-to-github-releases.html">includeLinksToGithubReleases</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1072979084%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="-1072979084%2FProperties%2F-1452242315" anchor-label="includeLinksToGithubReleases" id="-1072979084%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="include-links-to-github-releases.html">includeLinksToGithubReleases</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-1072979084%2FProperties%2F-1452242315" anchor-label="includeLinksToGithubReleases" id="-1072979084%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">If <code class="lang-kotlin">true</code>, load the old version download links from GitHub releases (see <a href="../-github-config/index.html">GithubConfig</a>). Values added through <a href="old-version-download-link.html">oldVersionDownloadLink</a> are ignored, if this is set to <code class="lang-kotlin">true</code>.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-2085091730%2FProperties%2F-1452242315" anchor-label="loadEarly" id="-2085091730%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="load-early.html">loadEarly</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2085091730%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="-2085091730%2FProperties%2F-1452242315" anchor-label="loadEarly" id="-2085091730%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="load-early.html">loadEarly</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-2085091730%2FProperties%2F-1452242315" anchor-label="loadEarly" id="-2085091730%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">This can be set to <code class="lang-kotlin">true</code>, when the plugin should load before the GUI classes of JOSM.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-685414043%2FProperties%2F-1452242315" anchor-label="loadPriority" id="-685414043%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="load-priority.html">loadPriority</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-685414043%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="-685414043%2FProperties%2F-1452242315" anchor-label="loadPriority" id="-685414043%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="load-priority.html">loadPriority</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-685414043%2FProperties%2F-1452242315" anchor-label="loadPriority" id="-685414043%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">A number indicating the order in which the plugins should be loaded. Lower numbers first, higher numbers later, then the plugins with this field set to <code class="lang-kotlin">null</code>.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1056494476%2FProperties%2F-1452242315" anchor-label="mainClass" id="1056494476%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="main-class.html">mainClass</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1056494476%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="1056494476%2FProperties%2F-1452242315" anchor-label="mainClass" id="1056494476%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="main-class.html">mainClass</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1056494476%2FProperties%2F-1452242315" anchor-label="mainClass" id="1056494476%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">The full name of the main class of the plugin.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1607277611%2FProperties%2F-1452242315" anchor-label="minJavaVersion" id="1607277611%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="min-java-version.html">minJavaVersion</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1607277611%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="1607277611%2FProperties%2F-1452242315" anchor-label="minJavaVersion" id="1607277611%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="min-java-version.html">minJavaVersion</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1607277611%2FProperties%2F-1452242315" anchor-label="minJavaVersion" id="1607277611%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">The minimum Java version needed to run this plugin.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="778378344%2FProperties%2F-1452242315" anchor-label="minJosmVersion" id="778378344%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="min-josm-version.html">minJosmVersion</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="778378344%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="778378344%2FProperties%2F-1452242315" anchor-label="minJosmVersion" id="778378344%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="min-josm-version.html">minJosmVersion</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="778378344%2FProperties%2F-1452242315" anchor-label="minJosmVersion" id="778378344%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">The minimum JOSM version with which the plugin is compatible.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-212837700%2FProperties%2F-1452242315" anchor-label="platform" id="-212837700%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="platform.html">platform</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-212837700%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="-212837700%2FProperties%2F-1452242315" anchor-label="platform" id="-212837700%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="platform.html">platform</a><span class="token operator">: </span><a href="-platform/index.html">JosmManifest.Platform</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-212837700%2FProperties%2F-1452242315" anchor-label="platform" id="-212837700%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">The platform for which this native implementation of a virtual plugin is made. Must be set in conjunction with <a href="provides.html">provides</a>.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-521296685%2FProperties%2F-1452242315" anchor-label="pluginDependencies" id="-521296685%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="plugin-dependencies.html">pluginDependencies</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-521296685%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="-521296685%2FProperties%2F-1452242315" anchor-label="pluginDependencies" id="-521296685%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="plugin-dependencies.html">pluginDependencies</a><span class="token operator">: </span><span data-unresolved-link="org.gradle.api.provider/SetProperty///PointingToDeclaration/">SetProperty</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-521296685%2FProperties%2F-1452242315" anchor-label="pluginDependencies" id="-521296685%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">A collection of the names of all JOSM plugins that must be installed for this JOSM plugin to work</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1888183779%2FProperties%2F-1452242315" anchor-label="provides" id="-1888183779%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="provides.html">provides</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1888183779%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="-1888183779%2FProperties%2F-1452242315" anchor-label="provides" id="-1888183779%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="provides.html">provides</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-1888183779%2FProperties%2F-1452242315" anchor-label="provides" id="-1888183779%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">The name of a virtual plugin for which this plugin is a native implementation. Must be set in conjunction with <a href="platform.html">platform</a>.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1011088080%2FProperties%2F-1452242315" anchor-label="website" id="-1011088080%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="website.html">website</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1011088080%2FProperties%2F-1452242315"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><a data-name="-1011088080%2FProperties%2F-1452242315" anchor-label="website" id="-1011088080%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="website.html">website</a><span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/net/URL.html">URL</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-1011088080%2FProperties%2F-1452242315" anchor-label="website" id="-1011088080%2FProperties%2F-1452242315" data-filterable-set=":plugin:dokkaHtmlPartial/main"></a><p class="paragraph">A URL pointing to a web resource describing the plugin.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  
+</body></html>
+
+

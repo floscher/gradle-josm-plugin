@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>repositories</title>
+</head><body><link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><link href="../../../styles/prism.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script><script type="text/javascript" src="../../../scripts/main.js" defer></script><script type="text/javascript" src="../../../scripts/prism.js" async></script><script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+
+  
+    <div class="navigation-wrapper" id="navigation-wrapper">
+      <div id="leftToggler"><span class="icon-toggler"></span></div>
+      <div class="library-name"><a href="../../../index.html"><span>gradle-josm-plugin</span></a></div>
+      <div>0.8.0</div>
+      <div class="pull-right d-flex"><button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+      </div>
+    </div>
+    <div id="container">
+      <div id="leftColumn">
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <div class="main-content" id="content" pageids="plugin::org.openstreetmap.josm.gradle.plugin.config/JosmPluginExtension/repositories/#groovy.lang.Closure[org.gradle.api.artifacts.dsl.RepositoryHandler]/PointingToDeclaration//-1452242315">
+          <div class="breadcrumbs"><a href="../../index.html">plugin</a>/<a href="../index.html">org.openstreetmap.josm.gradle.plugin.config</a>/<a href="index.html">JosmPluginExtension</a>/<a href="repositories.html">repositories</a></div>
+          <div class="cover ">
+            <h1 class="cover"><span><span>repositories</span></span></h1>
+          </div>
+          <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="repositories.html"><span class="token function">repositories</span></a><span class="token punctuation">(</span>closure<span class="token operator">: </span><span data-unresolved-link="groovy.lang/Closure///PointingToDeclaration/">Closure</span><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.gradle.api.artifacts.dsl/RepositoryHandler///PointingToDeclaration/">RepositoryHandler</span><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Set the <a href="repositories.html">repositories</a> with a Groovy <span data-unresolved-link="groovy.lang/Closure///PointingToDeclaration/">Closure</span> (replaces any previous setting).</p><br><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="repositories.html">repositories</a><span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><span data-unresolved-link="org.gradle.api.artifacts.dsl/RepositoryHandler///PointingToDeclaration/">RepositoryHandler</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">The repositories that are added to the repository list.</p><p class="paragraph"><strong>Default value (in this order):</strong></p><ol><li><p class="paragraph">Nexus repo for JOSM releases: <a href="https://josm.openstreetmap.de/nexus/content/repositories/releases/">https://josm.openstreetmap.de/nexus/content/repositories/releases/</a> (as <span data-unresolved-link="org.gradle.api.artifacts.repositories/MavenArtifactRepository///PointingToDeclaration/">MavenArtifactRepository</span>)</p></li><li><p class="paragraph">Download page for JOSM releases and snapshots: <a href="https://josm.openstreetmap.de/download/">https://josm.openstreetmap.de/download/</a> (as custom <span data-unresolved-link="org.gradle.api.artifacts.repositories/IvyArtifactRepository///PointingToDeclaration/">IvyArtifactRepository</span>, the <code class="lang-kotlin">Archiv</code> subdirectory is also included)</p></li><li><p class="paragraph">Nexus repo for JOSM snapshots: <a href="https://josm.openstreetmap.de/nexus/content/repositories/snapshots/">https://josm.openstreetmap.de/nexus/content/repositories/snapshots/</a> (as <span data-unresolved-link="org.gradle.api.artifacts.repositories/MavenArtifactRepository///PointingToDeclaration/">MavenArtifactRepository</span>)</p></li><li><p class="paragraph">Directory in SVN repo where JOSM plugins are published: <a href="https://josm.openstreetmap.de/osmsvn/applications/editors/josm/dist">https://josm.openstreetmap.de/osmsvn/applications/editors/josm/dist</a> (as custom <span data-unresolved-link="org.gradle.api.artifacts.repositories/IvyArtifactRepository///PointingToDeclaration/">IvyArtifactRepository</span>)</p></li><li><p class="paragraph">GitLab Maven repository containing some plugins that are neither in SVN nor in the Nexus repository: <a href="https://gitlab.com/api/v4/groups/JOSM/-/packages/maven">https://gitlab.com/api/v4/groups/JOSM/-/packages/maven</a> (as <span data-unresolved-link="org.gradle.api.artifacts.repositories/MavenArtifactRepository///PointingToDeclaration/">MavenArtifactRepository</span>)</p></li><li><p class="paragraph">JOSM Plugin List: https://josm.openstreetmap.de/plugin. This covers all plugins not in SVN, Nexus, or Maven repositories.</p></li></ol><h2 class="">See also</h2><div data-togglable="See also"><div class="table" data-togglable="See also"><div class="table-row" data-filterable-current=":plugin:dokkaHtmlPartial/main" data-filterable-set=":plugin:dokkaHtmlPartial/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span data-unresolved-link="org.gradle.api.artifacts.dsl/RepositoryHandler///PointingToDeclaration/"><span>org.</span><wbr><span>gradle.</span><wbr><span>api.</span><wbr><span>artifacts.</span><wbr><span>dsl.</span><wbr><span>Repository</span><wbr><span><span>Handler</span></span></span></div></span></div><div><div class="title"><div data-togglable="See also"></div></div></div></div></div></div></div></div></div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  
+</body></html>
+
+

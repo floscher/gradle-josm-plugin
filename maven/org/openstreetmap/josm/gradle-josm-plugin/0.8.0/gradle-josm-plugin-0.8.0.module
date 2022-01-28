@@ -1,0 +1,226 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.openstreetmap.josm",
+    "module": "gradle-josm-plugin",
+    "version": "0.8.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.3.3"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.openstreetmap.josm.gradle-josm-plugin",
+          "module": "dogfood",
+          "version": {
+            "requires": "0.8.0"
+          }
+        },
+        {
+          "group": "org.openstreetmap.josm.gradle-josm-plugin",
+          "module": "i18n",
+          "version": {
+            "requires": "0.8.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.6.10"
+          }
+        }
+      ],
+      "dependencyConstraints": [
+        {
+          "group": "org.apache.logging.log4j",
+          "module": "log4j-core",
+          "version": {
+            "rejects": [
+              "[2.+,2.17.1)"
+            ]
+          },
+          "reason": "Cannot publish a plugin which resolves a vulnerable Log4j version (https://blog.gradle.org/log4j-vulnerability). Make sure to update your configuration so it does not happen."
+        }
+      ],
+      "files": [
+        {
+          "name": "gradle-josm-plugin-0.8.0.jar",
+          "url": "gradle-josm-plugin-0.8.0.jar",
+          "size": 253276,
+          "sha512": "d5aebd74c6ec81835281946f00ce56504d70df3f39a1530650d67a2e6688072cb92b5fd3d10f4b0aa1f90c46316d52ae2634841b8d760cd4a64de3431927589e",
+          "sha256": "e8b9a609c90313b6b8105f3b7082726c12c5c3dc6bb668f15f11da4a16d54c90",
+          "sha1": "3c7eaafc45c55679b29f4135bc3158a896be21ea",
+          "md5": "59a9ead30b40bcb66935f61a62a4993a"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.squareup.okhttp3",
+          "module": "okhttp",
+          "version": {
+            "requires": "4.9.3"
+          }
+        },
+        {
+          "group": "com.beust",
+          "module": "klaxon",
+          "version": {
+            "requires": "5.5"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.dataformat",
+          "module": "jackson-dataformat-yaml",
+          "version": {
+            "requires": "2.13.1"
+          }
+        },
+        {
+          "group": "com.vladsch.flexmark",
+          "module": "flexmark",
+          "version": {
+            "requires": "0.62.2"
+          }
+        },
+        {
+          "group": "org.openstreetmap.josm.gradle-josm-plugin",
+          "module": "dogfood",
+          "version": {
+            "requires": "0.8.0"
+          }
+        },
+        {
+          "group": "org.openstreetmap.josm.gradle-josm-plugin",
+          "module": "i18n",
+          "version": {
+            "requires": "0.8.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.6.10"
+          }
+        }
+      ],
+      "dependencyConstraints": [
+        {
+          "group": "org.apache.logging.log4j",
+          "module": "log4j-core",
+          "version": {
+            "rejects": [
+              "[2.+,2.17.1)"
+            ]
+          },
+          "reason": "Cannot publish a plugin which resolves a vulnerable Log4j version (https://blog.gradle.org/log4j-vulnerability). Make sure to update your configuration so it does not happen."
+        }
+      ],
+      "files": [
+        {
+          "name": "gradle-josm-plugin-0.8.0.jar",
+          "url": "gradle-josm-plugin-0.8.0.jar",
+          "size": 253276,
+          "sha512": "d5aebd74c6ec81835281946f00ce56504d70df3f39a1530650d67a2e6688072cb92b5fd3d10f4b0aa1f90c46316d52ae2634841b8d760cd4a64de3431927589e",
+          "sha256": "e8b9a609c90313b6b8105f3b7082726c12c5c3dc6bb668f15f11da4a16d54c90",
+          "sha1": "3c7eaafc45c55679b29f4135bc3158a896be21ea",
+          "md5": "59a9ead30b40bcb66935f61a62a4993a"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencyConstraints": [
+        {
+          "group": "org.apache.logging.log4j",
+          "module": "log4j-core",
+          "version": {
+            "rejects": [
+              "[2.+,2.17.1)"
+            ]
+          },
+          "reason": "Cannot publish a plugin which resolves a vulnerable Log4j version (https://blog.gradle.org/log4j-vulnerability). Make sure to update your configuration so it does not happen."
+        }
+      ],
+      "files": [
+        {
+          "name": "gradle-josm-plugin-0.8.0-javadoc.jar",
+          "url": "gradle-josm-plugin-0.8.0-javadoc.jar",
+          "size": 999117,
+          "sha512": "3cb7edafa9e87ba04d230354bfda5d0b065b48d02992a74e45035a15798a6a9b3532064536d17606337be0af28f9ddaf980e111ad67990b07bdcee8928fcd223",
+          "sha256": "299de2a70f3862eeaa5036783d3f9f3814886e99bb10d5b958433043f9deb6d8",
+          "sha1": "ca6767030e55f76aed87fd0bca88fb058a630155",
+          "md5": "a92ee86c8f5bdf316c1ff0eb9779412e"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencyConstraints": [
+        {
+          "group": "org.apache.logging.log4j",
+          "module": "log4j-core",
+          "version": {
+            "rejects": [
+              "[2.+,2.17.1)"
+            ]
+          },
+          "reason": "Cannot publish a plugin which resolves a vulnerable Log4j version (https://blog.gradle.org/log4j-vulnerability). Make sure to update your configuration so it does not happen."
+        }
+      ],
+      "files": [
+        {
+          "name": "gradle-josm-plugin-0.8.0-sources.jar",
+          "url": "gradle-josm-plugin-0.8.0-sources.jar",
+          "size": 61487,
+          "sha512": "7ebf39deaaef9247b444578e2848d0e390fd6bed1b55c1bfe5132ed8328360477fd864fa651773abffe9d867a036e6bf09d6fc4d9af156ebcfa64a422753853b",
+          "sha256": "d0a369bc4817995253a8c7811af062583453aaa23a2fd87cf2d46376cf4bedbc",
+          "sha1": "988acb145d14965d64e9b098453e390d40be67a1",
+          "md5": "35bd86fd03c880b5cead6ea12764237b"
+        }
+      ]
+    }
+  ]
+}

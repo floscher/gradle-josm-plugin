@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!-- This module was also published with a richer model, Gradle metadata,  -->
+  <!-- which should be used instead. Do not delete the following line which  -->
+  <!-- is to indicate to Gradle or any Gradle module metadata file consumer  -->
+  <!-- that they should prefer consuming it instead. -->
+  <!-- do_not_remove: published-with-gradle-metadata -->
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.openstreetmap.josm.gradle-josm-plugin</groupId>
+  <artifactId>i18n</artifactId>
+  <version>0.8.0</version>
+  <description>A multiplatform (JavaScript &amp; Java) library for reading and writing GNU gettext files (*.mo and *.po files) as well as a custom i18n file format used by JOSM (*.lang files).</description>
+  <url>https://josm.gitlab.io/gradle-josm-plugin</url>
+  <inceptionYear>2017</inceptionYear>
+  <organization>
+    <name>JOSM</name>
+    <url>https://josm.openstreetmap.de</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>GPL-3.0-or-later</name>
+      <url>https://www.gnu.org/licenses/gpl-3.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>floscher</id>
+      <name>Florian Schäfer</name>
+      <url>https://gitlab.com/floscher</url>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor>
+      <name>Karl Guggisberg</name>
+      <url>https://github.com/Gubaer</url>
+    </contributor>
+    <contributor>
+      <name>Taylor Smock</name>
+      <url>https://gitlab.com/smocktaylor</url>
+    </contributor>
+  </contributors>
+  <scm>
+    <connection>scm:git:https://gitlab.com/JOSM/gradle-josm-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@gitlab.com/JOSM/gradle-josm-plugin.git</developerConnection>
+    <url>https://gitlab.com/JOSM/gradle-josm-plugin</url>
+  </scm>
+  <issueManagement>
+    <system>GitLab</system>
+    <url>https://gitlab.com/JOSM/gradle-josm-plugin/-/issues</url>
+  </issueManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-stdlib-common</artifactId>
+      <version>1.6.10</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,1 @@
+sourceset_dependencies = '{":plugin:dokkaHtmlPartial/main":[],":langconv:dokkaHtmlPartial/main":[],":dogfood:dokkaHtmlPartial/main":[],":i18n:dokkaHtmlPartial/commonMain":[],":i18n:dokkaHtmlPartial/jsMain":[":i18n:dokkaHtmlPartial/commonMain"],":i18n:dokkaHtmlPartial/jvmMain":[":i18n:dokkaHtmlPartial/commonMain"]}'

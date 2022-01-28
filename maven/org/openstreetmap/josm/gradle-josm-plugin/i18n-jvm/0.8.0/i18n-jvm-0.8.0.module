@@ -1,0 +1,91 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "url": "../../i18n/0.8.0/i18n-0.8.0.module",
+    "group": "org.openstreetmap.josm.gradle-josm-plugin",
+    "module": "i18n",
+    "version": "0.8.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.3.3"
+    }
+  },
+  "variants": [
+    {
+      "name": "jvmApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.6.10"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-common",
+          "version": {
+            "requires": "1.6.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "i18n-jvm-0.8.0.jar",
+          "url": "i18n-jvm-0.8.0.jar",
+          "size": 92902,
+          "sha512": "2f795b840a7374ec9266d52bba80dcf0b9e91256580fc96c814a6ef5f828e206fe6fc1fbd051179509780d540e2658ae7ba0cf9931889b61950f4e687a8cab20",
+          "sha256": "4cc6580fcdaa2629d75cd23f7c85ca46310d7399ed3e311fd2ff4709d7dbd638",
+          "sha1": "2c622e2d17ca18c1e2617b3ea2ef74d8b5231e31",
+          "md5": "c38d38721da55ba80931140ca5044cd2"
+        }
+      ]
+    },
+    {
+      "name": "jvmRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.6.10"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-common",
+          "version": {
+            "requires": "1.6.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "i18n-jvm-0.8.0.jar",
+          "url": "i18n-jvm-0.8.0.jar",
+          "size": 92902,
+          "sha512": "2f795b840a7374ec9266d52bba80dcf0b9e91256580fc96c814a6ef5f828e206fe6fc1fbd051179509780d540e2658ae7ba0cf9931889b61950f4e687a8cab20",
+          "sha256": "4cc6580fcdaa2629d75cd23f7c85ca46310d7399ed3e311fd2ff4709d7dbd638",
+          "sha1": "2c622e2d17ca18c1e2617b3ea2ef74d8b5231e31",
+          "md5": "c38d38721da55ba80931140ca5044cd2"
+        }
+      ]
+    }
+  ]
+}
