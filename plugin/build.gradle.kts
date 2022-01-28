@@ -42,6 +42,8 @@ gradlePlugin {
   plugins.create("josmPlugin") {
     id = project.group.toString()
     implementationClass = "org.openstreetmap.josm.gradle.plugin.JosmPlugin"
+    displayName = "gradle-josm-plugin"
+    description = "A Gradle plugin for development of JOSM plugins"
   }
 }
 

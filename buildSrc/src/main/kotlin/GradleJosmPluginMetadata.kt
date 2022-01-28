@@ -2,8 +2,9 @@ import org.gradle.api.Project
 import org.gradle.api.publish.maven.MavenPom
 
 public fun Project.gradleJosmPluginMetadata(): (MavenPom) -> Unit = { pom ->
+  pom.name.set("gradle-josm-plugin$path")
   pom.description.set(
-    when (this.path) {
+    when (path) {
       ":dogfood" ->
         "A library that contains functionality, which is on the one hand used by the gradle-josm-plugin, " +
         "but on the other hand also used in the process of building the gradle-josm-plugin itself."
@@ -14,7 +15,7 @@ public fun Project.gradleJosmPluginMetadata(): (MavenPom) -> Unit = { pom ->
         "A self-contained Java command line utility for reading and writing GNU gettext files (*.mo and *.po files) " +
         "as well as a custom i18n file format used by JOSM (*.lang files)."
       ":plugin" -> "A Gradle plugin that helps with building plugins for the OpenStreetMap editor JOSM."
-      else -> TODO("Add module description to pom.xml of project `${this.path}`")
+      else -> TODO("Add module description to pom.xml of project `${path}`")
     }
   )
   pom.url.set("https://josm.gitlab.io/gradle-josm-plugin")
