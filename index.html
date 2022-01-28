@@ -3,7 +3,7 @@
 <link rel=stylesheet href="css/bootstrap.min.css">
 <div class=container vocab="http://schema.org" typeof="SoftwareApplication">
   <meta property="license" content="https://www.gnu.org/licenses/gpl-3.0.txt"/>
-  <meta property="url" content="https://floscher.gitlab.io/gradle-josm-plugin"/>
+  <meta property="url" content="https://josm.gitlab.io/gradle-josm-plugin"/>
   <meta property="isAccessibleForFree" content="http://schema.org/True"/>
   <header>
     <h1 class="display-1 mt-5" property="name">gradle-josm-plugin</h1>
@@ -13,9 +13,9 @@
     <div class="card-body">
       <h2 class="card-title">Source code</h2>
       <p class="card-text">The source code is hosted at GitLab. The repository is mirrored to GitHub as well, but the one on GitLab is the primary one.</p>
-      <a class="card-link btn btn-primary" href="https://gitlab.com/floscher/gradle-josm-plugin">GitLab repository</a>
-      <a class="card-link btn btn-success" href="https://gitlab.com/floscher/gradle-josm-plugin/issues/new">Open an issue</a>
-      <a class="card-link btn btn-info" href="https://gitlab.com/floscher/gradle-josm-plugin/blob/master/README.md#getting-started">See user documentation</a>
+      <a class="card-link btn btn-primary" href="https://gitlab.com/JOSM/gradle-josm-plugin">GitLab repository</a>
+      <a class="card-link btn btn-success" href="https://gitlab.com/JOSM/gradle-josm-plugin/-/issues/new">Open an issue</a>
+      <a class="card-link btn btn-info" href="https://gitlab.com/JOSM/gradle-josm-plugin/blob/master/README.md#getting-started">See user documentation</a>
       <a class="card-link btn btn-link" href="https://github.com/floscher/gradle-josm-plugin">GitHub mirror</a>
     </div>
   </div>
@@ -29,15 +29,21 @@
   <div class="card mb-4">
     <div class="card-body">
       <h2 class="card-title">Maven repositories</h2>
-      <p class="card-text">The <code>gradle-josm-plugin</code> is published to the following two Maven repositories:
-      <ul>
-        <li>Gradle Plugins repo <code>https://plugins.gradle.org/m2</code> <a class="btn btn-sm btn-outline-primary" href="https://plugins.gradle.org/plugin/org.openstreetmap.josm">View contents</a></li>
-        <li>GitLab Maven repo: <code>https://gitlab.com/api/v4/projects/5042462/packages/maven</code> <a class="btn btn-sm btn-outline-primary" href="https://gitlab.com/floscher/gradle-josm-plugin/-/packages">View contents</a></li>
-        <li>Maven repo on GitLab Pages: <code>https://floscher.gitlab.io/gradle-josm-plugin/maven</code> <a class="btn btn-sm btn-outline-primary" href="https://gitlab.com/floscher/gradle-josm-plugin/tree/pages/maven">View contents</a></li>
-        <li>Bintray: <code>https://dl.bintray.com/floscher/gradle-josm-plugin</code> <a class="btn btn-sm btn-outline-primary" href="https://bintray.com/floscher/gradle-josm-plugin/">View contents</a></li>
-      </ul></p>
-      <a class="card-link btn btn-primary" href="https://plugins.gradle.org/plugin/org.openstreetmap.josm">Gradle plugins repo</a>
-      <a class="card-link btn btn-secondary" href="https://gitlab.com/floscher/gradle-josm-plugin/tree/pages/maven/">Contents of dedicated Maven repo</a>
+      <div class="card-text">The <code>gradle-josm-plugin</code> is published to the following two Maven repositories:
+        <ul>
+          <li>Gradle Plugins repo <code>https://plugins.gradle.org/m2</code> <a class="btn btn-sm btn-outline-primary" href="https://plugins.gradle.org/m2/org/openstreetmap/josm/">Browse contents</a> <a class="btn btn-sm btn-outline-primary" href="https://plugins.gradle.org/plugin/org.openstreetmap.josm">Info page</a></li>
+          <li>GitLab Maven repo: <code>https://gitlab.com/api/v4/projects/5042462/packages/maven</code> <a class="btn btn-sm btn-outline-primary" href="https://gitlab.com/floscher/gradle-josm-plugin/-/packages">View contents</a></li>
+          <li>Maven repo on GitLab Pages: <code>https://josm.gitlab.io/gradle-josm-plugin/maven</code> <a class="btn btn-sm btn-outline-primary" href="https://gitlab.com/floscher/gradle-josm-plugin/tree/pages/maven">View contents</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-body">
+      <h2>Release signing</h2>
+      <div>
+        Starting with release <code>0.8.0</code> the releases will be signed with the PGP key
+        <code>185E7B776DAB989CA970DC112FDDD2CA252D512C</code>:
+        <a href="https://josm.gitlab.io/gradle-josm-plugin/release-key.pub" class="btn btn-outline-primary">🔑 Download key</a>
+      </div>
     </div>
   </div>
 </div>
