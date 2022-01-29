@@ -5,7 +5,7 @@ import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.SourceSet
-import org.gradle.api.tasks.Sync
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 import org.openstreetmap.josm.gradle.plugin.MainConfigurationSetup
 import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
@@ -24,7 +24,7 @@ import java.util.Base64
  * This method sets up all the [Task]s (and [Configuration]s) for a given project that should be there by default.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
+public fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
 
   tasks.create("listJosmVersions", ListJosmVersions::class.java)
 
@@ -70,14 +70,15 @@ fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
 
 private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSet) {
   val archiverTask = project.tasks.withType(Jar::class.java).getByName(sourceSetJosmPlugin.jarTaskName)
-  val distDir = File(project.buildDir, "dist")
+  val archiverTaskProvider: TaskProvider<Jar> = project.tasks.named(sourceSetJosmPlugin.jarTaskName, Jar::class.java)
+  val distDir = project.layout.buildDirectory.map { it.dir("dist") }
   val localDistDir = File(project.buildDir, "localDist")
 
   val localDistTask = project.tasks.create("localDist", GeneratePluginList::class.java) { genListTask ->
     genListTask.group = "JOSM"
     genListTask.outputFile = File(localDistDir, "list")
     genListTask.description = "Generate a local plugin site."
-    genListTask.dependsOn(archiverTask)
+    genListTask.dependsOn(archiverTaskProvider)
 
     project.afterEvaluate {
       val localDistReleaseFile = File(localDistDir, project.extensions.josm.pluginName + "-dev.${archiverTask.archiveExtension.get()}")
@@ -129,25 +130,13 @@ private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSe
     }
   }
 
-  val distTask = project.tasks.create("dist", Sync::class.java) { distTask ->
-    distTask.from(project.tasks.getByName(sourceSetJosmPlugin.jarTaskName))
-    distTask.into(distDir)
-    distTask.duplicatesStrategy = DuplicatesStrategy.FAIL
-    project.afterEvaluate {
-      val fileName = "${project.extensions.josm.pluginName}.${archiverTask.archiveExtension.get()}"
-      distTask.doFirst {
-        distTask.rename { fileName }
-      }
-      distTask.doLast {
-        distTask.logger.lifecycle(
-          "Distribution {} (version {}) has been written into {}",
-          fileName,
-          project.version,
-          distDir.absolutePath
-        )
-      }
-    }
-  }
+  val distTask = project.tasks.register(
+    "dist",
+    RenameArchiveFile::class.java,
+    archiverTaskProvider,
+    distDir,
+    project.provider { project.extensions.josm.pluginName }
+  )
 
   project.tasks.getByName(sourceSetJosmPlugin.jarTaskName).finalizedBy(distTask, localDistTask)
 }
