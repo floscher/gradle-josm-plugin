@@ -139,7 +139,7 @@ open class GeneratePot
         project.extensions.findByType(JosmPluginExtension::class.java)?.let {
           """
           |
-          |#. Plugin description for $project.name
+          |#. Plugin description for ${project.name}
           |msgid "${it.manifest.description}"
           |msgstr ""
           |
