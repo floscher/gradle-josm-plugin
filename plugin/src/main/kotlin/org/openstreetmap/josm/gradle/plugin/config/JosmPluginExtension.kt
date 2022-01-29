@@ -282,10 +282,10 @@ open class JosmPluginExtension(val project: Project) {
     try {
       val parser = JosmPluginListParser(this.project, false)
       parser.plugins
-        .filter { !it.downloadUrl.toExternalForm().startsWith(Urls.MainJosmWebsite.PLUGIN_DIST_DIR.toExternalForm()) }
+        .filter { !it.downloadUri.toString().startsWith(Urls.MainJosmWebsite.PLUGIN_DIST_DIR.toURI().toString()) }
         .forEach { pluginInfo ->
           rh.ivy { repo ->
-            repo.url = URI(pluginInfo.downloadUrl.toExternalForm().replaceAfterLast('/', ""))
+            repo.url = URI(pluginInfo.downloadUri.toString().replaceAfterLast('/', ""))
             repo.content {
               // This constrains the repo to this specific plugin.
               it.includeModule(GROUP_JOSM_PLUGIN, pluginInfo.pluginName)

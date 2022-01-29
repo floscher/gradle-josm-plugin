@@ -4,7 +4,7 @@ import org.gradle.api.Project
 import org.openstreetmap.josm.gradle.plugin.task.GeneratePluginList
 import org.openstreetmap.josm.gradle.plugin.util.josmPluginList
 import java.net.MalformedURLException
-import java.net.URL
+import java.net.URI
 
 /**
  * Reads a plugin info file like it is found at [https://josm.openstreetmap.de/plugin]
@@ -40,7 +40,7 @@ class JosmPluginListParser(val project: Project, val withIcons: Boolean = false)
 
     // Temporary variables to collect properties of the next PluginInfo object
     var pluginName: String? = null
-    var downloadUrl: URL? = null
+    var downloadUrl: URI? = null
     val manifestAtts: MutableMap<String, String> = mutableMapOf()
 
     resolvedFiles.first().readLines().forEachIndexed { i, line ->
@@ -63,7 +63,7 @@ class JosmPluginListParser(val project: Project, val withIcons: Boolean = false)
           manifestAtts.clear()
           pluginName = titleLineMatch.groupValues[1].removeSuffix(".jar")
           try {
-            downloadUrl = URL(titleLineMatch.groupValues[2])
+            downloadUrl = URI(titleLineMatch.groupValues[2])
           } catch (e: MalformedURLException) {
             errors.add("Line $i: Plugin $pluginName has a malformed download URL set!")
             pluginName = null

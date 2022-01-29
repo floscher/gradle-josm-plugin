@@ -1,6 +1,7 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
@@ -25,7 +26,7 @@ import java.io.File
  */
 open class InitJosmPreferences: DefaultTask() {
   @get:InputFiles
-  val pluginDistTask: TaskProvider<out Sync> = project.tasks.named("dist", Sync::class.java)
+  val pluginDistTask: TaskProvider<Task> = project.tasks.named("dist")
 
   @get:Input
   val pluginName: Provider<String> = project.provider { project.extensions.josm.pluginName }

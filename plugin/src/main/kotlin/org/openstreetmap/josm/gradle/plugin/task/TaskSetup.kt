@@ -3,22 +3,17 @@ package org.openstreetmap.josm.gradle.plugin.task
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 import org.openstreetmap.josm.gradle.plugin.MainConfigurationSetup
+import org.openstreetmap.josm.gradle.plugin.io.PluginInfo
 import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
 import org.openstreetmap.josm.gradle.plugin.task.github.PublishToGithubReleaseTask
 import org.openstreetmap.josm.gradle.plugin.task.gitlab.ReleaseToGitlab
 import org.openstreetmap.josm.gradle.plugin.util.josm
-import java.io.File
-import java.io.FileInputStream
-import java.io.IOException
-import java.net.URLConnection
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.Base64
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * This method sets up all the [Task]s (and [Configuration]s) for a given project that should be there by default.
@@ -69,71 +64,44 @@ public fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
 }
 
 private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSet) {
-  val archiverTask = project.tasks.withType(Jar::class.java).getByName(sourceSetJosmPlugin.jarTaskName)
-  val archiverTaskProvider: TaskProvider<Jar> = project.tasks.named(sourceSetJosmPlugin.jarTaskName, Jar::class.java)
+  val archiverTask: TaskProvider<Jar> = project.tasks.named(sourceSetJosmPlugin.jarTaskName, Jar::class.java)
   val distDir = project.layout.buildDirectory.map { it.dir("dist") }
-  val localDistDir = File(project.buildDir, "localDist")
+  val localDistDir = project.layout.buildDirectory.map { it.dir("localDist") }
 
-  val localDistTask = project.tasks.create("localDist", GeneratePluginList::class.java) { genListTask ->
-    genListTask.group = "JOSM"
-    genListTask.outputFile = File(localDistDir, "list")
-    genListTask.description = "Generate a local plugin site."
-    genListTask.dependsOn(archiverTaskProvider)
-
-    project.afterEvaluate {
-      val localDistReleaseFile = File(localDistDir, project.extensions.josm.pluginName + "-dev.${archiverTask.archiveExtension.get()}")
-      genListTask.description += String.format(
-        "Add '%s' as plugin site in JOSM preferences (expert mode) and you'll be able to install the current development state as plugin '%s'",
-        genListTask.outputFile.toURI().toURL(),
-        localDistReleaseFile.nameWithoutExtension
-      )
-
-      genListTask.doFirst {
-        project.copy {
-          it.from(archiverTask)
-          it.into(localDistDir)
-          it.duplicatesStrategy = DuplicatesStrategy.FAIL
-          it.rename { localDistReleaseFile.name }
-        }
-        genListTask.addPlugin(
-          localDistReleaseFile.nameWithoutExtension,
-          archiverTask.manifest.attributes.map { it.key to it.value.toString() }.toMap(),
-          localDistReleaseFile.toURI().toURL()
+  val localDistJarTask = project.tasks.register(
+    "localDistJar",
+    RenameArchiveFile::class.java,
+    archiverTask,
+    localDistDir,
+    project.provider { project.extensions.josm.pluginName + "-dev" }
+  )
+  val localDistTask = project.tasks.register(
+    "localDist",
+    GeneratePluginList::class.java,
+    { relPath: String -> sourceSetJosmPlugin.resources.srcDirs.map { it.resolve(relPath) }.firstOrNull { it.exists() } }
+  ).apply {
+    configure { t ->
+      t.description = "Creates a local plugin update site containing just the current development state of the ${project.extensions.josm.pluginName} plugin"
+      t.outputFile.set(localDistDir.map { it.file("list") })
+      //t.versionSuffix.set("#${DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now())}")
+      t.plugins.add(localDistJarTask.map { localDistJarTask ->
+        PluginInfo(
+          localDistJarTask.fileBaseName.get(),
+          localDistJarTask.targetFile.get().asFile.toURI(),
+          (localDistJarTask.archiverTask.get() as? Jar)
+            ?.manifest
+            ?.attributes
+            ?.mapValues { it.value.toString() }
+            ?: mapOf()
         )
-      }
-
-      genListTask.doLast {
-        it.logger.lifecycle(
-          "A local JOSM update site for plugin '{}' (version {}) has been written to {}",
-          localDistReleaseFile.nameWithoutExtension,
-          project.version,
-          genListTask.outputFile.absolutePath
-        )
-      }
-    }
-    genListTask.iconBase64Provider = { iconPath ->
-      try {
-        val iconFile = sourceSetJosmPlugin.resources.srcDirs.map { File(it, iconPath) }.firstOrNull { it.exists() }
-        if (iconFile != null) {
-          val contentType = Files.probeContentType(Paths.get(iconFile.toURI()))
-            ?: FileInputStream(iconFile).use {
-              URLConnection.guessContentTypeFromStream(it)
-            }
-          "data:$contentType;base64,${Base64.getEncoder().encodeToString(iconFile.readBytes())}"
-        } else {
-          null
-        }
-      } catch (e: IOException) {
-        genListTask.logger.lifecycle("Error reading icon file!", e)
-        null
-      }
+      })
     }
   }
 
   val distTask = project.tasks.register(
     "dist",
     RenameArchiveFile::class.java,
-    archiverTaskProvider,
+    archiverTask,
     distDir,
     project.provider { project.extensions.josm.pluginName }
   )
@@ -169,4 +137,3 @@ private fun setupGithubReleaseTasks(project: Project) {
         "to a GitHub release"
   }
 }
-
