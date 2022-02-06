@@ -7,19 +7,20 @@ package org.openstreetmap.josm.gradle.plugin.i18n.io
  *   (e.g. for disambiguation of multiple identicals strings that should be translated differently in different situations)
  */
 public data class MsgId(val id: MsgStr, val context: String? = null): Comparable<MsgId> {
-  override fun compareTo(other: MsgId): Int {
-    val grammaticalFormsComparison = id.strings.size.compareTo(other.id.strings.size)
-    if (grammaticalFormsComparison != 0) {
-      return grammaticalFormsComparison
+  override fun compareTo(other: MsgId): Int =
+    // first sort IDs with fewer grammatical forms first
+    id.strings.size.compareTo(other.id.strings.size).takeIf { it != 0 }
+    // fallback to comparing contexts
+    ?: when {
+      // If my context is null, while the other's context is non-null: I go first. Otherwise fallback to next check.
+      context == null -> other.context?.let { -1 }
+      // If my context is non-null, while the other's context is null: The other one goes first
+      other.context == null -> 1
+      // If both contexts are non-null: If they are different, use the order of the contexts. Otherwise fallback to next check.
+      else -> context.compareTo(other.context).takeIf { it != 0 }
     }
-
-    if (context == null && other.context != null) {
-      return -1
-    } else if (context != null && other.context == null) {
-      return 1
-    } else if (context != null && other.context != null) {
-      context.compareTo(other.context).takeIf { it != 0 }?.apply { return this }
-    }
-    return id.strings.zip(other.id.strings).map { (myString, otherString) -> myString.compareTo(otherString) }.firstOrNull { it != 0 } ?: 0
-  }
+    // Go through all the strings and compare to the corresponding string of the other object. Return the comparison result of the first difference.
+    ?: id.strings.zip(other.id.strings).map { (myString, otherString) -> myString.compareTo(otherString) }.firstOrNull { it != 0 }
+    // At this point the objects are identical (same number of strings, same context and all strings are the same)
+    ?: 0
 }

@@ -5,7 +5,8 @@ public object PoFileDecoder: I18nFileDecoder {
   private val REGEX_MSGID = Regex("^msgid \"(.*)\"$")
   private val REGEX_MSGID_PLURAL = Regex("^msgid_plural \"(.*)\"$")
   private val REGEX_MSGSTR = Regex("^msgstr \"(.*)\"$")
-  private val REGEX_MSGSTR_INDEXED = Regex("^msgstr\\[([0-9]+)] \"(.*)\"$")
+  @Suppress("RegExpRedundantEscape") // Actually when compiling to JS, we need to escape the closing bracket `\\]`
+  private val REGEX_MSGSTR_INDEXED = Regex("^msgstr\\[([0-9]+)\\] \"(.*)\"$")
 
   /**
    * Matches every time a line ends with a double quote and the next line starts with a double quote.
