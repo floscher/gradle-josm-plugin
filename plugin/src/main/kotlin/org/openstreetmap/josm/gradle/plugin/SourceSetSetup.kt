@@ -7,11 +7,12 @@ import org.gradle.jvm.tasks.Jar
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.openstreetmap.josm.gradle.plugin.i18n.DefaultI18nSourceSet
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
+import org.openstreetmap.josm.gradle.plugin.task.GenerateJarManifest
 import org.openstreetmap.josm.gradle.plugin.task.LangCompile
 import org.openstreetmap.josm.gradle.plugin.task.MoCompile
 import org.openstreetmap.josm.gradle.plugin.task.PoCompile
 import org.openstreetmap.josm.gradle.plugin.task.ShortenPoFiles
-import org.openstreetmap.josm.gradle.plugin.task.addJosmManifest
+import org.openstreetmap.josm.gradle.plugin.util.doFirst
 
 /**
  * Add the [I18nSourceSet] and create the associated tasks ([PoCompile], [MoCompile], [LangCompile], [ShortenPoFiles]).
@@ -46,6 +47,15 @@ fun SourceSet.setup(project: Project) {
   }
 
   if (this.name == SourceSet.MAIN_SOURCE_SET_NAME) {
-    project.tasks.withType(Jar::class.java).getByName("jar").addJosmManifest(i18nCompileTask)
+    val generateManifest = project.tasks.register("generateManifest", GenerateJarManifest::class.java, i18nCompileTask)
+    project.tasks.named(this.jarTaskName, Jar::class.java).configure { jar ->
+      jar.isPreserveFileTimestamps = false
+      jar.isReproducibleFileOrder = true
+      jar.doFirst<Jar> {
+        jar.manifest {
+          it.attributes(generateManifest.get().predefinedAttributes.get().toSortedMap())
+        }
+      }
+    }
   }
 }

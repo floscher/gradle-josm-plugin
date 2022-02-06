@@ -7,7 +7,6 @@ import java.net.URLConnection
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.Base64
-import kotlin.jvm.Throws
 
 @Throws(IOException::class)
 public fun File.toBase64DataUrl(): String =

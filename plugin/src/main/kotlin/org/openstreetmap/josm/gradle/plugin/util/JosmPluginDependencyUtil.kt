@@ -20,6 +20,7 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.openstreetmap.josm.gradle.plugin.config.JosmManifest
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.io.JosmPluginListParser
+import org.openstreetmap.josm.gradle.plugin.task.GenerateJarManifest
 import java.util.jar.Manifest
 import java.util.zip.ZipFile
 
@@ -148,7 +149,7 @@ private fun Project.getAllRequiredJosmPlugins(recursionDepth: UShort, alreadyRes
       val dep = dependencies.createJosmPlugin(pluginName)
       val resolvedFiles = configurations.detachedConfiguration(dep).files
       alreadyResolvedPlugins.add(pluginName)
-      val resolvedManifests = resolvedFiles.map { Manifest(ZipFile(it).let { it.getInputStream(it.getEntry("META-INF/MANIFEST.MF")) }) }
+      val resolvedManifests = resolvedFiles.map { Manifest(ZipFile(it).let { it.getInputStream(it.getEntry(GenerateJarManifest.MANIFEST_PATH)) }) }
 
       val requiredJava = resolvedManifests
         .mapNotNull { it.mainAttributes.getValue(JosmManifest.Attribute.PLUGIN_MIN_JAVA_VERSION.manifestKey)?.toString()?.toIntOrNull() }

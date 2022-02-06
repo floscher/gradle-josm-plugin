@@ -14,6 +14,7 @@ import org.openstreetmap.josm.gradle.plugin.api.gitlab.gitlabRepository
 import org.openstreetmap.josm.gradle.plugin.config.JosmPluginExtension
 import org.openstreetmap.josm.gradle.plugin.task.setupJosmTasks
 import org.openstreetmap.josm.gradle.plugin.util.GROUP_JOSM_PLUGIN
+import org.openstreetmap.josm.gradle.plugin.util.doFirst
 import org.openstreetmap.josm.gradle.plugin.util.java
 import org.openstreetmap.josm.gradle.plugin.util.josm
 
@@ -41,9 +42,9 @@ class JosmPlugin: Plugin<Project> {
 
     val jarTask = project.tasks.withType(Jar::class.java).getByName("jar")
     jarTask.outputs.upToDateWhen { false }
-    jarTask.doFirst { task ->
-      jarTask.from(
-        task.project.configurations.getByName("packIntoJar").files.map { file ->
+    jarTask.doFirst<Jar> { task ->
+      task.from(
+        project.configurations.getByName("packIntoJar").files.map { file ->
           if (file.isDirectory) {
             project.fileTree(file)
           } else {
