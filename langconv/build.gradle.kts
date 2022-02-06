@@ -3,17 +3,20 @@ import proguard.gradle.ProGuardTask
 
 plugins {
   application
-  java
   kotlin("jvm")
   `maven-publish`
   id("org.jetbrains.dokka")
 }
 
 dependencies {
-  api(project(":i18n"))
+  implementation(project(":common"))
+  implementation(project(":i18n"))
 }
 
 application.mainClass.set("org.openstreetmap.josm.gradle.plugin.langconv.MainKt")
+tasks.jar {
+  manifest.attributes(mapOf("Main-Class" to application.mainClass))
+}
 
 val run by tasks.getting(JavaExec::class) {
   doFirst {
@@ -48,11 +51,8 @@ tasks.sourcesJar {
 
 publishing {
   publications {
-    create<MavenPublication>("langconv") {
-      artifact(standaloneJar.map { it.outJarFiles.first() as File })
-      artifact(tasks.javadocJar.flatMap { it.archiveFile }) {
-        classifier = "javadoc"
-      }
+    register<MavenPublication>(project.name) {
+      artifact(standaloneJar.map { it.outJarFiles.filterNotNull().single() })
       artifact(tasks.sourcesJar.flatMap { it.archiveFile }) {
         classifier = "sources"
       }

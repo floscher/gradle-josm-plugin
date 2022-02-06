@@ -16,7 +16,7 @@ dependencies {
 }
 
 publishing {
-  publications.create("dogfood", MavenPublication::class) {
+  publications.create(project.name, MavenPublication::class) {
     from(components.getByName("java"))
   }
 }

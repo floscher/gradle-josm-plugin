@@ -1,3 +1,3 @@
-include(":dogfood", ":i18n", ":langconv", ":plugin")
+include(":common", ":dogfood", ":i18n", ":langconv", ":plugin")
 
 rootProject.name = "gradle-josm-plugin"

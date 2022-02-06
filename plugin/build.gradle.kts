@@ -11,6 +11,7 @@ plugins {
 }
 
 dependencies {
+  api(project(":common"))
   api(project(":dogfood"))
   api(project(":i18n"))
   implementation("com.squareup.okhttp3", "okhttp", Versions.okhttp)

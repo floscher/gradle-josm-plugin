@@ -1,17 +1,15 @@
-package org.openstreetmap.josm.gradle.plugin.i18n.util
+package org.openstreetmap.josm.gradle.plugin.common
 
 import kotlin.math.roundToInt
 
 /**
  * Takes two numbers and returns a Unicode progress bar of exactly length 36:
- *   * 1 character: if [numCompleted] == [numTotal] then ▒ else ░
+ *   * 1 character: if [numCompleted] == [numTotal] then ▓ else ░
  *   * 25 characters: the progress bar itself (see [toRawProgressBar])
- *   * 1 character: if [numCompleted] == [numTotal] then ▒ else ░
+ *   * 1 character: if [numCompleted] == [numTotal] then ▓ else ░
  *   * 9 characters: percentage with 2 decimal places and percent sign
  *
- * @sample org.openstreetmap.josm.gradle.plugin.i18n.util.TextUtilTest.sampleFormatAsProgressBar
- *
- * @throws IllegalArgumentException if [numCompleted] > [numTotal]
+ * @throws IllegalArgumentException if [numCompleted] &gt; [numTotal]
  */
 @ExperimentalUnsignedTypes
 public fun formatAsProgressBar(numCompleted: UInt, numTotal: UInt): String {
@@ -20,7 +18,7 @@ public fun formatAsProgressBar(numCompleted: UInt, numTotal: UInt): String {
   }
   val proportion = if (numTotal == 0u) 1.0 else numCompleted.toDouble() / numTotal.toDouble()
   return proportion.toRawProgressBar(25u)
-    .run { if (numCompleted == numTotal) "▒$this▒" else "░$this░" } // highlight when fully completed
+    .run { if (numCompleted == numTotal) "▓$this▓" else "░$this░" } // highlight when fully completed
     .run {
       "$this ${
         (proportion * 10000).roundToInt().toString() // format to number with always 2 decimal places

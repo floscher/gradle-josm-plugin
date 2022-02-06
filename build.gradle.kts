@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.dokka.Platform
-import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import org.openstreetmap.josm.gradle.plugin.api.gitlab.setupGitlabPublishing
@@ -24,22 +24,29 @@ gradle.projectsEvaluated {
   }
   val jacocoTestReport by tasks.registering(JacocoReport::class) {
     group = "Verification"
-    val testTasks = setOf(
+    setOf(
+      project(":common").tasks.getByName<Test>("jvmTest"),
       project(":i18n").tasks.getByName<Test>("jvmTest"),
       project(":plugin").tasks.getByName<Test>("test")
-    )
+    ).forEach {
+      executionData(it)
+      dependsOn(it)
+    }
 
-    executionData(* testTasks.toTypedArray())
-    dependsOn(testTasks)
-    mustRunAfter(testTasks)
-
-    additionalClassDirs(project(":i18n").tasks.getByName<KotlinCompile>("compileKotlinJvm").destinationDirectory.asFile.get())
-    additionalSourceDirs(project(":i18n").extensions.getByType(KotlinProjectExtension::class).sourceSets.getByName("commonMain").kotlin.sourceDirectories)
-    additionalSourceDirs(project(":i18n").extensions.getByType(KotlinProjectExtension::class).sourceSets.getByName("jvmMain").kotlin.sourceDirectories)
+    setOf(":common", ":i18n").map { project(it) }.let { mppProjects ->
+      mppProjects.forEach { mppProject ->
+        sourceDirectories.from(
+          mppProject.extensions.getByType(KotlinMultiplatformExtension::class).sourceSets
+            .filter { it.name.endsWith("Main") }
+            .map { it.kotlin.sourceDirectories }
+        )
+      }
+      mppProjects.forEach { classDirectories.from(it.layout.buildDirectory.dir("classes/kotlin/jvm")) }
+    }
 
     sourceSets(*
-      setOf(":dogfood", ":langconv", ":plugin")
-        .map { project(it).extensions.getByType(SourceSetContainer::class).getByName(SourceSet.MAIN_SOURCE_SET_NAME) }
+      subprojects
+        .mapNotNull { it.extensions.getByType(SourceSetContainer::class).findByName(SourceSet.MAIN_SOURCE_SET_NAME) }
         .toTypedArray()
     )
   }
@@ -69,6 +76,9 @@ allprojects {
     tasks.findByName("test")?.let { dependsOn(it) }
     logCoverage()
   }
+}
+
+subprojects {
 
   tasks.withType(Test::class).all {
     useJUnitPlatform()
@@ -86,10 +96,8 @@ allprojects {
       freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
     }
   }
-  tasks.withType(DokkaTask::class) {
+  tasks.withType(AbstractDokkaLeafTask::class) {
     dokkaSourceSets.all {
-      skipEmptyPackages.set(false)
-
       if (platform.get() == Platform.jvm) {
         jdkVersion.set(javaVersion.ordinal + 1)
         externalDocumentationLink(URL("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/"))
@@ -102,10 +110,12 @@ allprojects {
           includes.from(packagesFile)
         }
 
-      sourceLink {
-        remoteUrl.set(URL("https://gitlab.com/JOSM/gradle-josm-plugin/-/tree/main/${project.name}/src/${this@all.name}/kotlin"))
-        localDirectory.set(file("src/${this@all.name}/kotlin"))
-        remoteLineSuffix.set("#L")
+      file("src/${this@all.name}/kotlin").takeIf { it.exists() }?.let { localSrcDir ->
+        sourceLink {
+          remoteUrl.set(URL("https://gitlab.com/JOSM/gradle-josm-plugin/-/tree/v${project.version}/${project.name}/src/${this@all.name}/kotlin"))
+          localDirectory.set(localSrcDir)
+          remoteLineSuffix.set("#L")
+        }
       }
     }
   }
@@ -113,15 +123,43 @@ allprojects {
   pluginManager.withPlugin("java") {
     extensions.findByType(JavaPluginExtension::class)?.apply {
       sourceCompatibility = javaVersion
-      withJavadocJar()
       withSourcesJar()
     }
   }
 
-  pluginManager.withPlugin("publishing") {
-    afterEvaluate {
-      tasks.named<Jar>("javadocJar") {
-        from(tasks.named<DokkaTask>("dokkaHtml"))
+  configureIfMultiplatform { multiplatformExtension ->
+    multiplatformExtension.configureMultiplatformDefaults()
+
+    configureIfJacoco {
+      tasks.register("jacocoTestReport", JacocoReport::class).configure {
+        group = "Verification"
+        dependsOn(tasks.getByName("jvmTest"))
+        classDirectories.from(layout.buildDirectory.dir("classes/kotlin/jvm"))
+        sourceDirectories.from(
+          multiplatformExtension.sourceSets
+            .filter { it.name.endsWith("Main") }
+            .map { it.kotlin.sourceDirectories }
+        )
+        executionData(tasks.getByName("jvmTest"))
+        reports {
+          html.required.set(true)
+        }
+      }
+    }
+  }
+
+  val javadocJar by project.tasks.registering(Jar::class) {
+    group = "Documentation"
+    from(project.provider { tasks.named("dokkaHtml") })
+    archiveClassifier.set("javadoc")
+  }
+
+  configureIfMavenPublishing {
+    it.publications {
+      withType(MavenPublication::class) {
+        artifact(javadocJar.flatMap { it.archiveFile }) {
+          classifier = "javadoc"
+        }
       }
     }
   }
@@ -137,8 +175,6 @@ allprojects {
   setupMavenArtifactSigning()
   setupGitlabPublishing("gitlab")
   setupOssSonatypeStagingPublishing()
-}
 
-allprojects {
   addMavenPomContent(gradleJosmPluginMetadata())
 }

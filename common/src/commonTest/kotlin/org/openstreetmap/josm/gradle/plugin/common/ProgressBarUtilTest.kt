@@ -1,24 +1,17 @@
-package org.openstreetmap.josm.gradle.plugin.i18n.util
+package org.openstreetmap.josm.gradle.plugin.common
 
 import kotlin.math.roundToLong
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @ExperimentalUnsignedTypes
-class TextUtilTest {
-
-  @Test
-  fun sampleFormatAsProgressBar() {
-    println(formatAsProgressBar(0u, 100u))
-    println(formatAsProgressBar(42u, 50u))
-    println(formatAsProgressBar(1234u, 1234u))
-  }
+class ProgressBarUtilTest {
 
   @Test
   fun testFormatAsProgressBar() {
     assertEquals("░                         ░   0.00 %", formatAsProgressBar(0u, 1u))
-    assertEquals("▒█████████████████████████▒ 100.00 %", formatAsProgressBar(0u, 0u))
-    assertEquals("▒█████████████████████████▒ 100.00 %", formatAsProgressBar(1u, 1u))
+    assertEquals("▓█████████████████████████▓ 100.00 %", formatAsProgressBar(0u, 0u))
+    assertEquals("▓█████████████████████████▓ 100.00 %", formatAsProgressBar(1u, 1u))
 
     assertEquals("░▏                        ░   0.50 %", formatAsProgressBar(1u, 200u))
     assertEquals("░▎                        ░   1.00 %", formatAsProgressBar(2u, 200u))
@@ -37,7 +30,7 @@ class TextUtilTest {
         .let { "${it.substring(0, it.length - 2)}.${it.substring(it.length - 2)} %" }
         .padStart(8, ' ')
       when {
-        i >= 100000u -> assertEquals("▒█████████████████████████▒ 100.00 %", formattedProgressbar)
+        i >= 100000u -> assertEquals("▓█████████████████████████▓ 100.00 %", formattedProgressbar)
         i >=  99995u -> assertEquals("░█████████████████████████░ 100.00 %", formattedProgressbar)
         i >=  99750u -> assertEquals("░█████████████████████████░ $percentage",  formattedProgressbar)
         i >=  99250u -> assertEquals("░████████████████████████▉░ $percentage", formattedProgressbar)
@@ -46,6 +39,6 @@ class TextUtilTest {
       }
     }
 
-    assertEquals("▒█████████████████████████▒ 100.00 %", formatAsProgressBar(1729u, 1729u))
+    assertEquals("▓█████████████████████████▓ 100.00 %", formatAsProgressBar(1729u, 1729u))
   }
 }

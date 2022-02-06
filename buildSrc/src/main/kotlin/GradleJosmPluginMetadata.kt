@@ -5,6 +5,9 @@ public fun Project.gradleJosmPluginMetadata(): (MavenPom) -> Unit = { pom ->
   pom.name.set("gradle-josm-plugin$path")
   pom.description.set(
     when (path) {
+      ":common" ->
+        "A small multiplatform (JavaScript & Java) library that provides a few useful tools for the " +
+        "`gradle-josm-plugin` and the `langconv` CLI."
       ":dogfood" ->
         "A library that contains functionality, which is on the one hand used by the gradle-josm-plugin, " +
         "but on the other hand also used in the process of building the gradle-josm-plugin itself."
@@ -48,7 +51,14 @@ public fun Project.gradleJosmPluginMetadata(): (MavenPom) -> Unit = { pom ->
       contrib.url.set("https://gitlab.com/smocktaylor")
     }
   }
-  pom.inceptionYear.set("2017")
+  pom.inceptionYear.set(
+    when (path) {
+      ":plugin" -> "2017"
+      ":dogfood", ":i18n", ":langconv" -> "2020"
+      ":common" -> "2022"
+      else -> TODO("Add inception year for module $path")
+    }
+  )
   pom.scm { scm ->
     scm.developerConnection.set("scm:git:ssh://git@gitlab.com/JOSM/gradle-josm-plugin.git")
     scm.connection.set("scm:git:https://gitlab.com/JOSM/gradle-josm-plugin.git")

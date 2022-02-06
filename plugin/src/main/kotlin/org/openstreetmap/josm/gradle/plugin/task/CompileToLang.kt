@@ -8,11 +8,11 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.openstreetmap.josm.gradle.plugin.common.formatAsProgressBar
 import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 import org.openstreetmap.josm.gradle.plugin.i18n.io.GETTEXT_HEADER_MSGID
 import org.openstreetmap.josm.gradle.plugin.i18n.io.I18nFileDecoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileEncoder
-import org.openstreetmap.josm.gradle.plugin.i18n.util.formatAsProgressBar
 import org.openstreetmap.josm.gradle.plugin.util.josm
 import java.io.File
 
@@ -37,6 +37,7 @@ public abstract class CompileToLang(
   val baseLanguage: Provider<String> = project.provider { project.extensions.josm.i18n.mainLanguage }
 
   @InputFiles
+  // @PathSensitive() // TODO: Make the CompileToLang tasks cacheable (needs adjustments with input/output files)
   val inputFiles: Provider<Set<File>> = project.provider { extractSources(sourceSet).files }
 
   @OutputDirectory
@@ -64,7 +65,7 @@ public abstract class CompileToLang(
     if (inputFiles.isEmpty()) {
       logger.lifecycle(
         "No *.$fileExtension files found to be compiled for source set ${sourceSet.name} in:\n" +
-          sourceSet.mo.srcDirs.joinToString("\n") { "  " + it.absolutePath }
+          extractSources(sourceSet).srcDirs.joinToString("\n") { "  " + it.absolutePath }
       )
     } else {
       require(inputFiles.map { it.nameWithoutExtension.lowercase() }.let { it.size == it.distinct().size }) {

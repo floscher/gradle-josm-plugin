@@ -9,6 +9,11 @@ import java.util.Locale
 import javax.inject.Inject
 
 public open class JacocoReportLogTask @Inject constructor(@get:Input public val reportTask: JacocoReport): DefaultTask() {
+
+  init {
+    group = "Verification"
+  }
+
   @TaskAction
   public fun action() {
     val allLines = reportTask.reports.csv.outputLocation.asFile.get().readLines()

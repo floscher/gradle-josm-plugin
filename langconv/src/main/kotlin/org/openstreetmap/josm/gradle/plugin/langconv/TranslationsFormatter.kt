@@ -1,11 +1,11 @@
 package org.openstreetmap.josm.gradle.plugin.langconv
 
+import org.openstreetmap.josm.gradle.plugin.common.formatAsProgressBar
 import org.openstreetmap.josm.gradle.plugin.i18n.io.GETTEXT_HEADER_MSGID
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgStr
-import org.openstreetmap.josm.gradle.plugin.i18n.util.formatAsProgressBar
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 fun <R : Comparable<R>> Map<String, Map<MsgId, MsgStr>>.getTranslationStatsString(
   baseLangKey: String,
   needsBaseLanguage: Boolean = false,
