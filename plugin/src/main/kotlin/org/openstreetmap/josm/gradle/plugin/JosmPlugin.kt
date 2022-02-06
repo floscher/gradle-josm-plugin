@@ -41,7 +41,6 @@ class JosmPlugin: Plugin<Project> {
     project.extensions.create("josm", JosmPluginExtension::class.java, project)
 
     val jarTask = project.tasks.withType(Jar::class.java).getByName("jar")
-    jarTask.outputs.upToDateWhen { false }
     jarTask.doFirst<Jar> { task ->
       task.from(
         project.configurations.getByName("packIntoJar").files.map { file ->

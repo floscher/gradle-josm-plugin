@@ -26,7 +26,8 @@ import java.net.URI
  * @constructor instantiates the extension, takes project properties into account
  */
 open class JosmPluginExtension(val project: Project) {
-  var pluginName: String
+
+  public var pluginName: String
     get() = project.extensions.getByType(BasePluginExtension::class.java).archivesName.get()
     set(value) = project.extensions.getByType(BasePluginExtension::class.java).archivesName.set(value)
 

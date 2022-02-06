@@ -10,7 +10,9 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskExecutionException
+import org.gradle.api.tasks.TaskProvider
 import org.openstreetmap.josm.gradle.plugin.config.JosmManifest
 import org.openstreetmap.josm.gradle.plugin.io.PluginInfo
 import org.openstreetmap.josm.gradle.plugin.util.toBase64DataUrl
@@ -29,6 +31,15 @@ import javax.inject.Inject
 public open class GeneratePluginList @Inject constructor(
   private val iconPathToFile: (String) -> File?
 ): DefaultTask() {
+
+  public companion object {
+    /** Typesafe constructor for [GeneratePluginList] task */
+    public fun <G:GeneratePluginList> TaskContainer.register(
+      name: String,
+      iconPathToFile: (String) -> File?,
+      config: (GeneratePluginList).() -> Unit
+    ): TaskProvider<GeneratePluginList> = register(name, GeneratePluginList::class.java, iconPathToFile).also { it.configure(config) }
+  }
 
   /**
    * All plugins that should appear in the list (as [PluginInfo]s).
@@ -80,28 +91,30 @@ public open class GeneratePluginList @Inject constructor(
     val plugins: Set<PluginInfo> = plugins.also{ it.finalizeValue() }.get()
     val outputFile: File = outputFile.also { it.finalizeValue() }.asFile.get()
 
-    logger.lifecycle("Writing list of ${plugins.size} plugin${if (plugins.size > 1) "s" else ""} to ${outputFile.absolutePath} …")
+    logger.lifecycle("Writing list of ${plugins.size.takeIf { it != 1 }?.let { "$it plugins" } ?: "one plugin"} to ${outputFile.absolutePath} …")
 
     if (!outputFile.parentFile.exists() && !outputFile.parentFile.mkdirs()) {
       throw TaskExecutionException(this, IOException("Can't create directory ${outputFile.parentFile.absolutePath}!"))
     }
 
     outputFile.writeText(
-      plugins.sortedBy { it.pluginName }.flatMap {
-        listOf("${it.pluginName}.jar;${it.downloadUri}") +
-        it.manifestAtts.map { (key, value) ->
-          "\t$key: " +
-          when (key) {
-            JosmManifest.Attribute.PLUGIN_ICON.manifestKey ->
+      plugins.sortedBy { it.pluginName }.flatMap { pluginInfo ->
+        listOf("${pluginInfo.pluginName}.jar;${pluginInfo.downloadUri}") +
+        pluginInfo.manifestAtts.map { (key, value) ->
+          "\t$key: " + (
+            if (key == JosmManifest.Attribute.PLUGIN_ICON.manifestKey) {
               try {
-                iconFileMap.get()[it]?.toBase64DataUrl()
+                iconFileMap.get()[pluginInfo]?.toBase64DataUrl()
               } catch (e: IOException) {
-                logger.lifecycle("Error reading")
-              } ?: value
-            JosmManifest.Attribute.PLUGIN_VERSION.manifestKey ->
+                logger.lifecycle("Error reading icon file $value . Falling back to the relative path instead of data-URL.")
+                null
+              }
+            } else if (key == JosmManifest.Attribute.PLUGIN_VERSION.manifestKey) {
               value + versionSuffix.get()
-            else -> value
-          }
+            } else {
+              null
+            } ?: value
+          )
         }
       }.joinToString("\n", "", "\n")
     )

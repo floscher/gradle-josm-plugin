@@ -1,17 +1,16 @@
 package org.openstreetmap.josm.gradle.plugin.task
 
-import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
+import org.gradle.api.tasks.bundling.Zip
 import javax.inject.Inject
 
 /**
@@ -19,33 +18,59 @@ import javax.inject.Inject
  */
 public open class RenameArchiveFile @Inject constructor(
   @get:InputFiles
-  public val archiverTask: TaskProvider<AbstractArchiveTask>,
+  public val archiverTask: TaskProvider<out AbstractArchiveTask>,
+  @get:InputFiles
+  public val manifestTask: Provider<GenerateJarManifest>,
   @get:Internal
-  public val targetDir: Provider<out Directory>,
+  public val targetDir: Provider<Directory>,
   @get:Input
-  public val fileBaseName: Provider<out String>
-): DefaultTask() {
+  public val fileBaseName: Provider<String>
+): Zip() {
+  // TODO: Add option to append file hash to manifest version number (useful for local update site, so JOSM detects changed plugin)
 
-
-  private val fileName: String by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    "${fileBaseName.get()}.${archiverTask.get().archiveExtension.get()}"
+  public companion object {
+    /** Typesafe constructor for [RenameArchiveFile] task */
+    public fun <R: RenameArchiveFile> TaskContainer.register(
+      name: String,
+      archiverTask: TaskProvider<out AbstractArchiveTask>,
+      manifestTask: Provider<GenerateJarManifest>,
+      targetDir: Provider<Directory>,
+      fileBaseName: Provider<String>
+    ): TaskProvider<RenameArchiveFile> =
+      register(name, RenameArchiveFile::class.java, archiverTask, manifestTask, targetDir, fileBaseName)
   }
-  @get:OutputFile
-  public val targetFile: Provider<RegularFile> = targetDir.map { it.file(fileName) }
+
+  init {
+    archiveFileName.let {
+      it.set(fileBaseName.map { fileBaseName ->  "$fileBaseName.${archiverTask.get().archiveExtension.get()}" })
+      it.finalizeValue()
+    }
+  }
+
+  init {
+    from(
+      archiverTask.map { project.zipTree(it.archiveFile).matching { it.exclude(GenerateJarManifest.MANIFEST_PATH) } },
+      manifestTask.map { project.fileTree(it.outputDirectory) { it.include(GenerateJarManifest.MANIFEST_PATH) } }
+    )
+    destinationDirectory.set(targetDir)
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
+    includeEmptyDirs = false
+  }
 
   @TaskAction
-  public fun copy() {
-    project.sync {
-      it.from(archiverTask.map { it.archiveFile })
-      it.into(targetDir)
-      it.rename { fileName }
-      it.duplicatesStrategy = DuplicatesStrategy.FAIL
-    }
+  public override fun copy() {
+    super.copy()
     logger.lifecycle(
       """
         Copied file
-          from ${archiverTask.get().archiveFile.get()}
-          into ${targetDir.get().asFile.canonicalPath}/$fileName
+          from ${archiverTask.get().archiveFile.get().asFile.canonicalPath}
+          into ${archiveFile.get().asFile.canonicalPath}
+
+        The file `${GenerateJarManifest.MANIFEST_PATH}` within the archive was swapped for ${
+          manifestTask.get().outputFile.get().asFile.canonicalPath
+        }
       """.trimIndent()
     )
   }

@@ -33,13 +33,7 @@ class ProjectExtensionsTest {
   @Test
   fun testRequiredPlugins(testInfo: TestInfo) {
     val result = createRequiredPluginsTestRepo(testInfo).getAllRequiredJosmPlugins(setOf("A"))
-    assertEquals(6, result.size)
-    assertEquals(1, result.count{ it.name == "A" })
-    assertEquals(1, result.count{ it.name == "B" })
-    assertEquals(1, result.count{ it.name == "C" })
-    assertEquals(1, result.count{ it.name == "D" })
-    assertEquals(1, result.count{ it.name == "E" })
-    assertEquals(1, result.count{ it.name == "F" })
+    assertEquals(listOf("A", "B", "C", "D", "E", "F"), result.map { it.name }.sorted().toList())
   }
 
   private fun createNextJosmTestRepo(testInfo: TestInfo): Project =

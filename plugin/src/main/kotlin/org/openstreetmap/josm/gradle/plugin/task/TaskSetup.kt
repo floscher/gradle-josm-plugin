@@ -8,6 +8,8 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 import org.openstreetmap.josm.gradle.plugin.MainConfigurationSetup
 import org.openstreetmap.josm.gradle.plugin.io.PluginInfo
+import org.openstreetmap.josm.gradle.plugin.task.GeneratePluginList.Companion.register
+import org.openstreetmap.josm.gradle.plugin.task.RenameArchiveFile.Companion.register
 import org.openstreetmap.josm.gradle.plugin.task.github.CreateGithubReleaseTask
 import org.openstreetmap.josm.gradle.plugin.task.github.PublishToGithubReleaseTask
 import org.openstreetmap.josm.gradle.plugin.task.gitlab.ReleaseToGitlab
@@ -41,10 +43,10 @@ public fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
     )
   }
   project.afterEvaluate {
-    tasks.create(
+    tasks.register(
       "${mainConfigSetup.mainSourceSet.compileJavaTaskName}_minJosm",
       CustomJosmVersionCompile::class.java,
-      { project.extensions.josm.manifest.minJosmVersion as String },
+      { project.extensions.josm.manifest.minJosmVersion },
       true,
       mainConfigSetup.mainSourceSet,
       setOf(mainConfigSetup.requiredPluginConfiguration, mainConfigSetup.packIntoJarConfiguration)
@@ -68,40 +70,36 @@ private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSe
   val distDir = project.layout.buildDirectory.map { it.dir("dist") }
   val localDistDir = project.layout.buildDirectory.map { it.dir("localDist") }
 
-  val localDistJarTask = project.tasks.register(
+  val localDistJarTask = project.tasks.register<RenameArchiveFile>(
     "localDistJar",
-    RenameArchiveFile::class.java,
     archiverTask,
+    project.provider { project.tasks.named("generateManifest", GenerateJarManifest::class.java).get() }, // TODO: Don't reference by name
     localDistDir,
     project.provider { project.extensions.josm.pluginName + "-dev" }
   )
-  val localDistTask = project.tasks.register(
+  val localDistTask = project.tasks.register<GeneratePluginList>(
     "localDist",
-    GeneratePluginList::class.java,
     { relPath: String -> sourceSetJosmPlugin.resources.srcDirs.map { it.resolve(relPath) }.firstOrNull { it.exists() } }
-  ).apply {
-    configure { t ->
-      t.description = "Creates a local plugin update site containing just the current development state of the ${project.extensions.josm.pluginName} plugin"
-      t.outputFile.set(localDistDir.map { it.file("list") })
-      //t.versionSuffix.set("#${DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now())}")
-      t.plugins.add(localDistJarTask.map { localDistJarTask ->
-        PluginInfo(
-          localDistJarTask.fileBaseName.get(),
-          localDistJarTask.targetFile.get().asFile.toURI(),
-          (localDistJarTask.archiverTask.get() as? Jar)
-            ?.manifest
-            ?.attributes
-            ?.mapValues { it.value.toString() }
-            ?: mapOf()
-        )
-      })
-    }
+  ) {
+    description = "Creates a local plugin update site containing just the current development state of the ${project.extensions.josm.pluginName} plugin"
+    outputFile.set(localDistDir.map { it.file("list") })
+    plugins.add(localDistJarTask.map { localDistJarTask ->
+      PluginInfo(
+        localDistJarTask.fileBaseName.get(),
+        localDistJarTask.archiveFile.get().asFile.toURI(),
+        project.provider { project.tasks.named("generateManifest", GenerateJarManifest::class.java).get() } // TODO: Don't reference by name
+          ?.flatMap { it.predefinedAttributes }
+          ?.get()
+          ?: mapOf()
+      )
+    })
+    versionSuffix.set("#${DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now())}")
   }
 
-  val distTask = project.tasks.register(
+  val distTask = project.tasks.register<RenameArchiveFile>(
     "dist",
-    RenameArchiveFile::class.java,
     archiverTask,
+    project.provider { project.tasks.named("generateManifest", GenerateJarManifest::class.java).get() }, // TODO: Don't reference by name
     distDir,
     project.provider { project.extensions.josm.pluginName }
   )
@@ -111,7 +109,7 @@ private fun setupPluginDistTasks(project: Project, sourceSetJosmPlugin: SourceSe
 
 private fun setupI18nTasks(project: Project, sourceSetJosmPlugin: SourceSet) {
 
-  // Generates a *.pot file out of all *.java source files
+  // Generates a *.pot file out of all *.java and *.kt source files
   project.tasks.create(
     "generatePot",
     GeneratePot::class.java,
