@@ -75,7 +75,7 @@ class DemoTest {
         buildResult.output.contains("""
           locales: de (+ en)
           2 strings for base language en
-          ▒█████████████████████████▒ 100.00 % (2 of 2 strings) for de
+          ▓█████████████████████████▓ 100.00 % (2 of 2 strings) for de
           """.trimIndent()
         )
       }
