@@ -12,6 +12,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
+import org.openstreetmap.josm.gradle.plugin.common.SplitStringToMaxByteLengthIterator
 import org.openstreetmap.josm.gradle.plugin.config.JosmManifest
 import org.openstreetmap.josm.gradle.plugin.i18n.io.LangFileDecoder
 import org.openstreetmap.josm.gradle.plugin.i18n.io.MsgId
@@ -21,7 +22,6 @@ import java.io.File
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.jar.Manifest
 import javax.inject.Inject
 
 @CacheableTask
@@ -162,12 +162,23 @@ public open class GenerateJarManifest @Inject constructor(
 
   @TaskAction
   public fun action() {
-    Manifest().let { manifest ->
-      manifest.mainAttributes.putAll(predefinedAttributes.get())
-      outputFile.get().asFile.outputStream().use {
-        manifest.write(it)
+    outputFile.get().asFile.writeText(
+      predefinedAttributes.get().entries.joinToString("\n", postfix = "\n") {
+        mainAttributeLine(it.key, it.value)
       }
+    )
+  }
+
+  private fun mainAttributeLine(key: String, value: String): String {
+    require(key.toByteArray().size <= 70) {
+      "Main attributes in a MANIFEST.MF file must not be longer than 70 bytes"
     }
+    require(!key.contains(Regex("[:\n\r\u0000]"))) {
+      "Main attributes in a MANIFEST.MF file must not contain characters `CR`, `LF`, `NUL` or `:`!"
+    }
+    return SplitStringToMaxByteLengthIterator("$key: $value", 72, 71)
+      .asSequence()
+      .joinToString("\n ")
   }
 
   private sealed class RequiredAttribute {
