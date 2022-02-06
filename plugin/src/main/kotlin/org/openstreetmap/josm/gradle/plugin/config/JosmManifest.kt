@@ -1,8 +1,12 @@
 package org.openstreetmap.josm.gradle.plugin.config
 
+import org.eclipse.jgit.api.Git
 import org.gradle.api.Project
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import java.io.IOException
 import java.net.URL
+import java.time.Instant
 
 /**
  * The info that will be written into the manifest file of the plugin *.jar
@@ -201,6 +205,33 @@ class JosmManifest(private val project: Project) {
   enum class Platform {
     OSX, WINDOWS, UNIXOID
   }
+
+  /**
+   * Provides an [Instant] that is supposed to reflect the point in time when the plugin was created.
+   * If available, we use the timestamp from version control, because that makes the build more reproducible,
+   * which amongst other things enables better build caching in Gradle. Also it's probably more meaningful to
+   * anyone reading the manifest, than the time the *.jar file was built from the sources.
+   *
+   * **Default value:** If you build in a git-repository, then the commit timestamp of the current `HEAD` commit is used.
+   * Otherwise the current time is used.
+   *
+   * **Influenced MANIFEST.MF attribute:** `Plugin-Date` ([Attribute.PLUGIN_DATE])
+   *
+   * @since 0.8.1
+   */
+  public val pluginDate: Property<Instant> = project.objects.property(Instant::class.java)
+    .convention(
+      project.provider {
+        try {
+          Git.open(project.projectDir).repository.let { repo ->
+            Instant.ofEpochSecond(repo.parseCommit(repo.resolve("HEAD")).commitTime.toLong())
+          }
+        } catch (e: IOException) {
+          project.logger.warn("Failed to determine git committer timestamp. Falling back to the current time.")
+          Instant.now()
+        }
+      }
+    )
 
   /**
    * The name of a virtual plugin for which this plugin is a native implementation.
