@@ -45,6 +45,13 @@ josm {
     // website = java.net.URL("https://example.org")
     // oldVersionDownloadLink(123, "v1.2.0", java.net.URL("https://example.org/download/v1.2.0/MyAwesomePlugin.jar"))
     // oldVersionDownloadLink( 42, "v1.0.0", java.net.URL("https://example.org/download/v1.0.0/MyAwesomePlugin.jar"))
+
+    // to populate the 'Class-Path' attribute in the JOSM plugin manifest invoke
+    // the function 'classpath', i.e.
+    //   classpath "foo.jar"
+    //   classpath "sub/dir/bar.jar"
+    // This results in 'Class-Path: foo.jar sub/dir/bar.jar' in the
+    // manifest file. Added class path entries must not contain blanks.
   }
   // i18n {
   //   bugReportEmail = "me@example.com"

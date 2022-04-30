@@ -87,13 +87,13 @@ class JosmManifest(private val project: Project) {
    *
    * **Influenced MANIFEST.MF attribute:** [Attribute.CLASSPATH] (`Class-Path`)
    */
-  val classpath: List<String> = listOf()
+  val classpath: MutableList<String> = mutableListOf()
 
   public fun classpath(path: String) {
     require(!path.contains(' ')) {
       "A classpath must not contain space characters! If you want to add more than one, add them separately."
     }
-    (classpath as MutableList).add(path)
+    classpath.add(path)
   }
 
   /**
