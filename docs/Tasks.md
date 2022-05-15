@@ -55,6 +55,16 @@ These are three variants of the `compileJava` task, which compile against specia
 ```
 This task creates a 'plugin site' inside your `build/localDist/` directory. Point any JOSM instance at the URL, that this task reports to you and you can "download" your plugin from your `build/` directory into that JOSM instance.
 
+1. In JOSM open `Edit` > `Preferences` > `Plugins`
+2. Click `Configure sites` (bottom right corner)
+3. Click `Add`
+4. Add the full absolute path to the `build/localDist/list` file, prefixing the path with `file:/`
+    - Example for Windows: `file:/C:/my-josm-plugin/build/localDist/list`
+5. Click `Ok` to confirm
+6. Click the `Download list` button in the bottom bar
+7. Search for your plugin, and enable it using the checkbox
+8. Click `Ok` to close the preferences
+
 The task `runJosm` is the preferred (and easier) method to test drive your plugin, but in some circumstances you might not want to test in an isolated environment, but in your normal JOSM setup. If that's the case, this task is for you.
 
 ## Group JOSM-i18n
