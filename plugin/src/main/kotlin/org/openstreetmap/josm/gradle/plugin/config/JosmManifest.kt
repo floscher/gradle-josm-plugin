@@ -87,13 +87,22 @@ class JosmManifest(private val project: Project) {
    *
    * **Influenced MANIFEST.MF attribute:** [Attribute.CLASSPATH] (`Class-Path`)
    */
-  val classpath: MutableList<String> = mutableListOf()
+  val classpath: List<String>
+    get() = _classpath.toList()
+  private val _classpath: MutableList<String> = mutableListOf()
 
-  public fun classpath(path: String) {
-    require(!path.contains(' ')) {
+  /**
+   * Add one or more paths to [classpath].
+   * None of the paths can contain any whitespace!
+   * @param path a path to add
+   * @param morePaths more paths to add (if any)
+   */
+  public fun classpath(path: String, vararg morePaths: String) {
+    val allPaths = (listOf(path) + morePaths)
+    require(allPaths.none { it.isBlank() || it.contains(Regex("\\s")) }) {
       "A classpath must not contain space characters! If you want to add more than one, add them separately."
     }
-    classpath.add(path)
+    _classpath.addAll(allPaths)
   }
 
   /**

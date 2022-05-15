@@ -28,6 +28,7 @@ josm {
     website = URL("https://example.org")
     oldVersionDownloadLink(123, "1.2.0", URL("https://example.org/download/v1.2.0/MyAwesomePlugin.jar"))
     oldVersionDownloadLink( 42, "1.0.0", URL("https://example.org/download/v1.0.0/MyAwesomePlugin.jar"))
+    classpath("./additional/path/for/the/classpath")
   }
   // The following block is optional, only needed when doing i18n for the plugin
   i18n {
