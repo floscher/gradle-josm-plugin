@@ -143,6 +143,10 @@ open class GeneratePot
           |msgid "${it.manifest.description}"
           |msgstr ""
           |
+          |#. Translator credits (translators who want to be credited for their contributions can add their names here as the translation)
+          |msgid "translator-credits"
+          |msgstr ""
+          |
           """.trimMargin()
         } ?: ""
       )

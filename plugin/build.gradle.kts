@@ -10,6 +10,10 @@ plugins {
   `maven-publish`
 }
 
+kotlin {
+  explicitApiWarning()
+}
+
 dependencies {
   api(project(":common"))
   api(project(":dogfood"))
