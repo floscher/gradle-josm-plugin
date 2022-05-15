@@ -13,18 +13,17 @@ public object PoFileDecoder: I18nFileDecoder {
    * Every such match will be removed in the process of decoding, so multiline strings appear as oneline strings.
    */
   private val REGEX_MULTILINE_STRING_SEPARATOR = Regex("\"[ \t\r]*\n[ \t\r]*\"")
+  private val REGEX_COMMENT_LINE = Regex("(\n#[^\n]*)+")
 
   override fun decodeToTranslations(bytes: ByteArray): Map<MsgId, MsgStr> = decodeToTranslations(bytes.decodeToString())
 
   public fun decodeToTranslations(poFileContent: String): Map<MsgId, MsgStr> {
-    val lines = poFileContent
+    val lines = ("\n" + poFileContent)
+      .replace(REGEX_COMMENT_LINE, "")
       .replace(REGEX_MULTILINE_STRING_SEPARATOR, "")
       .lines()
       .map { it.trim() }
-      .filter {
-        it.isNotBlank() &&
-          !it.startsWith("#")
-      }
+      .filter { it.isNotEmpty() }
 
     val result = mutableMapOf<MsgId, MsgStr>()
 
