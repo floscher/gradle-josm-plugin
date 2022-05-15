@@ -138,6 +138,8 @@ public open class GeneratePluginList @Inject constructor(
       |${"By adding the following URL as a JOSM plugin update site (see tab 'Plugins' in expert mode), " +
         "you can load the current development state into a JOSM instance via the regular plugin update mechanism:"}
       |  ${outputFile.toURI()}
+      |
+      |(see https://gitlab.com/JOSM/gradle-josm-plugin/-/blob/main/docs/Tasks.md#localdist for more detailed instructions)
     """.trimMargin())
   }
 }
