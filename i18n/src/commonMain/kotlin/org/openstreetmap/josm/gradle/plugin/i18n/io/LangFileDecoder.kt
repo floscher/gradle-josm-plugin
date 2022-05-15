@@ -7,9 +7,9 @@ package org.openstreetmap.josm.gradle.plugin.i18n.io
 public class LangFileDecoder(baseLanguageBytes: ByteArray): I18nFileDecoder {
 
   public companion object {
-    private const val ERROR_MESSAGE_NONBASE_UNTRANSLATED = "This is not a base language!" +
+    private const val ERROR_MESSAGE_NONBASE_UNTRANSLATED = "This is not a base language! " +
       "There is a string in this supposed base language that indicates it is not translated from the base language (which does not make sense)."
-    private const val ERROR_MESSAGE_NONBASE_SAME_AS_BASE = "This is not a base language!" +
+    private const val ERROR_MESSAGE_NONBASE_SAME_AS_BASE = "This is not a base language! " +
       "There is a string in this supposed base language that indicates it is the same as in the base language (which does not make sense)."
 
     /**
@@ -102,6 +102,9 @@ public class LangFileDecoder(baseLanguageBytes: ByteArray): I18nFileDecoder {
           resultList.add(transformToListElement(currentBaseString, null))
         }
         else -> {
+          require(currentByteIndex + stringLength <= bytes.size) {
+            "String length is too long! $stringLength bytes starting at offset $currentByteIndex does not fit in a file of ${bytes.size} bytes"
+          }
           val msgstr = MsgStr(bytes.sliceArray(currentByteIndex until currentByteIndex + stringLength).decodeToString())
           if (currentBaseString == null) {
             resultList.add(transformToListElement(MsgId(msgstr), null))

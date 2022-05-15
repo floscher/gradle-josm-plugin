@@ -4,7 +4,11 @@ package org.openstreetmap.josm.gradle.plugin.i18n.io
  * Encoder for the *.lang file format used by JOSM.
  * @param baseMsgIds the [MsgId]s in the base language for which translations will be encoded
  */
-public class LangFileEncoder(baseMsgIds: List<MsgId>): I18nFileEncoder {
+public class LangFileEncoder(
+  singularMsgIds: List<MsgId>,
+  private val pluralMsgIds: List<MsgId>
+): I18nFileEncoder {
+  private val singularMsgIds = singularMsgIds.minus(GETTEXT_HEADER_MSGID)
   public companion object {
     /**
      * The language code `en` for English, which is considered to be the base language by default,
@@ -15,14 +19,13 @@ public class LangFileEncoder(baseMsgIds: List<MsgId>): I18nFileEncoder {
     private val SINGULAR_PLURAL_SEPARATOR: List<Byte> = listOf(0xFF, 0xFF).map { it.toByte() }
   }
 
-  private val singularMsgIds: List<MsgId>
-  private val pluralMsgIds: List<MsgId>
-
-  init {
-    val baseMsgIdPartitions = baseMsgIds.distinct().minus(GETTEXT_HEADER_MSGID).sorted().partition { it.id.strings.size <= 1 }
-    singularMsgIds = baseMsgIdPartitions.first
-    pluralMsgIds = baseMsgIdPartitions.second
-  }
+  private constructor(singularPluralMsgIds: Pair<List<MsgId>, List<MsgId>>): this(
+    singularPluralMsgIds.first,
+    singularPluralMsgIds.second
+  )
+  public constructor(baseMsgIds: Collection<MsgId>): this(
+    baseMsgIds.distinct().sorted().partition { it.id.strings.size <= 1 }
+  )
 
   /**
    * Converts the [MsgId]s of the base language (see constructor parameter) to the *.lang file format.
