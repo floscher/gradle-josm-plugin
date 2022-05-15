@@ -22,6 +22,8 @@ And if you need **external dependencies** for your plugin, maybe [`docs/Dependen
 
 If you want to know how **i18n** works, have a look at [`docs/I18n.md`](docs/I18n.md).
 
+In [`docs/Versioning.md`](docs/Versioning.md) it is described, how the **version number of your plugin** is determined and how you can increment it.
+
 Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://josm.gitlab.io/gradle-josm-plugin/kdoc/latest/gradle-josm-plugin/org.openstreetmap.josm.gradle.plugin.config/) for this Gradle plugin is available online.
 
 ## Projects using this Gradle plugin
