@@ -16,7 +16,7 @@ private const val CMDLINE_OPT_TARGET_COMMITISH = "target-commitish"
  *
  * Note: This is currently in beta stage, so expect sudden changes to this class anytime.
  */
-abstract class BaseGithubReleaseTask: DefaultTask() {
+public abstract class BaseGithubReleaseTask: DefaultTask() {
 
   init {
     outputs.upToDateWhen { false } // never consider this up-to-date, since this task interacts with a remote server, so the outputs can't be checked easily
@@ -40,24 +40,24 @@ abstract class BaseGithubReleaseTask: DefaultTask() {
   @Option(
     option = CMDLINE_OPT_RELEASE_LABEL,
     description = "the release label. Example: v0.0.1")
-  var releaseLabel: String? = null
+  public var releaseLabel: String? = null
 
   @get:Internal
   @Option(
     option = CMDLINE_OPT_TARGET_COMMITISH,
     description = "the target commitish for the release, e.g. 'main' "
       + "or 'deploy'. Default: '${GithubConfig.DEFAULT_TARGET_COMMITTISH}' (if not configured differently)")
-  var targetCommitish: String? = null
+  public var targetCommitish: String? = null
 
   @get:Internal
-  val configuredReleaseLabel: String by lazy {
+  public val configuredReleaseLabel: String by lazy {
     releaseLabel.takeIf { !it.isNullOrBlank() }
       ?: project.version.toString().takeIf { !it.isBlank() && it != Project.DEFAULT_VERSION }
       ?: throw releaseLabelNotConfigured
   }
 
   @get:Internal
-  val configuredTargetCommitish: String by lazy {
+  public val configuredTargetCommitish: String by lazy {
     targetCommitish.takeIf { !it.isNullOrBlank() } ?: project.extensions.josm.github.targetCommitish
   }
 }

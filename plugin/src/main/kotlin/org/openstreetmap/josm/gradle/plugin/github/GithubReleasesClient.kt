@@ -35,7 +35,7 @@ private fun Response.toFormattedErrorMessage() : String {
  *
  * Limited in functionality. Only considers paging links of type "next"
  */
-class Pagination(linkHeader: String?) {
+public class Pagination(linkHeader: String?) {
 
   private var _nextUrl: String? = null
 
@@ -72,16 +72,16 @@ class Pagination(linkHeader: String?) {
   }
 
   /** the url to retrieve the next content page, or null */
-  val nextUrl: String? by lazy {_nextUrl}
+  public val nextUrl: String? by lazy {_nextUrl}
 }
 
-class GithubReleasesClient(
-  val repository: String,
-  val user: String,
-  val accessToken: String,
-  val apiUrl: String
+public class GithubReleasesClient(
+  public val repository: String,
+  public val user: String,
+  public val accessToken: String,
+  public val apiUrl: String
 ) {
-  constructor(github: GithubConfig, apiUrl: String): this(
+  public constructor(github: GithubConfig, apiUrl: String): this(
     github.repositoryName,
     github.repositoryOwner,
     github.accessToken,
@@ -102,7 +102,7 @@ class GithubReleasesClient(
    * Fetches the list of releases
    */
   @Throws(GithubReleaseException::class)
-  fun getReleases(): JsonArray<JsonObject> {
+  public fun getReleases(): JsonArray<JsonObject> {
     var requestUrl: String? = "$apiUrl/repos/$user/$repository/releases"
     val ret = JsonArray<JsonObject>()
     while(requestUrl != null){
@@ -158,7 +158,7 @@ class GithubReleasesClient(
    * Replies the latest release or null, if no such release exists.
    */
   @Throws(GithubReleaseException::class)
-  fun getLatestRelease(): JsonObject? {
+  public fun getLatestRelease(): JsonObject? {
     val request =  createBaseRequestBuilder()
       .url("$apiUrl/repos/$user/$repository/releases/latest")
       .build()
@@ -186,9 +186,9 @@ class GithubReleasesClient(
    * @return the JSON object that should be sent to the GitHub API
    */
   @Throws(GithubReleaseException::class)
-  fun createRelease(tagName: String, targetCommitish: String? = null,
-                    name: String? = null, body: String? = null,
-                    draft: Boolean = false, prerelease: Boolean = false
+  public fun createRelease(tagName: String, targetCommitish: String? = null,
+                           name: String? = null, body: String? = null,
+                           draft: Boolean = false, prerelease: Boolean = false
   ): JsonObject {
 
     val requestJson = JsonObject()
@@ -229,10 +229,10 @@ class GithubReleasesClient(
    * See [GitHub API documentation](https://developer.github.com/v3/repos/releases/#edit-a-release).
    */
   @Throws(GithubReleaseException::class)
-  fun updateRelease(releaseId: Int,
-                    tagName: String? = null, targetCommitish: String? = null,
-                    name: String? = null, body: String? = null,
-                    draft: Boolean? = null, prerelease: Boolean? = null
+  public fun updateRelease(releaseId: Int,
+                           tagName: String? = null, targetCommitish: String? = null,
+                           name: String? = null, body: String? = null,
+                           draft: Boolean? = null, prerelease: Boolean? = null
   ): JsonObject {
 
     val requestJson = JsonObject()
@@ -269,7 +269,7 @@ class GithubReleasesClient(
    * Fetch the list of release assets for the release `releaseId`.
    */
   @Throws(GithubReleaseException::class)
-  fun getReleaseAssets(releaseId: Int) : JsonArray<JsonObject> {
+  public fun getReleaseAssets(releaseId: Int) : JsonArray<JsonObject> {
     try {
       var requestUrl: String? =
         "$apiUrl/repos/$user/$repository/releases/$releaseId/assets"
@@ -310,8 +310,8 @@ class GithubReleasesClient(
    * description for the asset.
    */
   @Throws(GithubReleaseException::class)
-  fun uploadReleaseAsset(releaseId: Int, file: File, contentType: String,
-                         name: String? = null, label: String? = null)
+  public fun uploadReleaseAsset(releaseId: Int, file: File, contentType: String,
+                                name: String? = null, label: String? = null)
     : JsonObject {
 
     @Suppress("NAME_SHADOWING")
@@ -352,7 +352,7 @@ class GithubReleasesClient(
    * Deletes the release asset `assetId`
    */
   @Throws(GithubReleaseException::class)
-  fun deleteReleaseAsset(assetId: Int) {
+  public fun deleteReleaseAsset(assetId: Int) {
     val url = "$apiUrl/repos/$user/$repository/releases/assets/$assetId"
     val request = createBaseRequestBuilder()
       .delete()

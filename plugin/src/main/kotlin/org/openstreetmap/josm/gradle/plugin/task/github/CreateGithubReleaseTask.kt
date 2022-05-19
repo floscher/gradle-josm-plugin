@@ -12,10 +12,10 @@ import org.openstreetmap.josm.gradle.plugin.util.josm
  *
  * Note: This is currently in beta stage, so expect sudden changes to this class anytime.
  */
-open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
+public open class CreateGithubReleaseTask : BaseGithubReleaseTask() {
 
   @TaskAction
-  fun createGithubRelease() {
+  public fun createGithubRelease() {
     val releaseConfigFile = project.extensions.josm.github.releasesConfig
     val releaseLabel = configuredReleaseLabel
     val releaseConfig = ReleaseSpec.loadListFrom(releaseConfigFile.inputStream())

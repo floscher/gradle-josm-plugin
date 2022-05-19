@@ -14,7 +14,7 @@ import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
 
-const val MEDIA_TYPE_JAR = "application/java-archive"
+public const val MEDIA_TYPE_JAR: String = "application/java-archive"
 
 private const val CMDLINE_OPT_LOCAL_JAR_PATH = "local-jar-path"
 private const val CMDLINE_OPT_REMOTE_JAR_NAME = "remote-jar-name"
@@ -24,21 +24,21 @@ private const val CMDLINE_OPT_REMOTE_JAR_NAME = "remote-jar-name"
  *
  * Note: This is currently in beta stage, so expect sudden changes to this class anytime.
  */
-open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
+public open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
 
   @get:Internal
   @Option(
     option = CMDLINE_OPT_LOCAL_JAR_PATH,
     description = "the local path to the jar which should be uploaded.\n"
       + "Default: the path of the jar built in the project")
-  var localJarPath: String? = null
+  public var localJarPath: String? = null
 
   @get:Internal
   @Option(
     option = CMDLINE_OPT_REMOTE_JAR_NAME,
     description = "the name of the jar after uploading.\n"
       + "Default: the name of the local jar")
-  var remoteJarName: String? = null
+  public var remoteJarName: String? = null
 
   private val jarArchivePath: String?  by lazy {
     project.tasks.withType(Jar::class.java).getByName("jar")
@@ -157,7 +157,7 @@ open class PublishToGithubReleaseTask : BaseGithubReleaseTask() {
   }
 
   @TaskAction
-  fun publishToGithubRelease() {
+  public fun publishToGithubRelease() {
 
     val releaseLabel = configuredReleaseLabel
     val githubClient = GithubReleasesClient(project.extensions.josm.github, project.extensions.josm.github.apiUrl)

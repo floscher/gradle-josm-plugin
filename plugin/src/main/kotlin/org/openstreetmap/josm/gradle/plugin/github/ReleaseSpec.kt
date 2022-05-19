@@ -12,10 +12,10 @@ import java.io.InputStream
  * @param [name] a name for the release. If omitted, null or blank, it's set to "Release [label]".
  */
 
-open class ReleaseSpec(
-  val label: String,
-  val minJosmVersion: Int,
-  val description: String? = null,
+public open class ReleaseSpec(
+  public val label: String,
+  public val minJosmVersion: Int,
+  public val description: String? = null,
   name: String? = null
 ) {
   init {
@@ -27,9 +27,9 @@ open class ReleaseSpec(
    * An optional name for the release. Used as a "headline" for the description.
    * Defaults to "Release [label]", if missing.
    */
-  val name = name?.takeIf { it.isNotBlank() } ?: "Release $label"
+  public val name: String = name?.takeIf { it.isNotBlank() } ?: "Release $label"
 
-  companion object {
+  public companion object {
     private const val KEY_RELEASES = "releases"
     private const val KEY_RELEASE_LABEL = "label"
     private const val KEY_RELEASE_MIN_JOSM_VERSION = "minJosmVersion"
@@ -41,7 +41,7 @@ open class ReleaseSpec(
      * @param [stream] the [InputStream] from which the configuration is read
      * @return the list of all releases from the input stream
      */
-    fun loadListFrom(stream: InputStream): List<ReleaseSpec> =
+    public fun loadListFrom(stream: InputStream): List<ReleaseSpec> =
       ObjectMapper(YAMLFactory()).readTree(stream)
         ?.takeIf { !it.isNull } // null, if root node has null type
         ?.get(KEY_RELEASES) // get releases node
@@ -88,9 +88,10 @@ open class ReleaseSpec(
  * For each of the resulting releases, it is true that there is no
  * other release with the same `minJosmVersion` that is newer.
  */
-fun List<ReleaseSpec>.onlyFallbackVersions() =
-  this.asSequence()
-    .groupBy { it.minJosmVersion }
+public fun List<ReleaseSpec>.onlyFallbackVersions() : List<ReleaseSpec> =
+  this.groupBy { it.minJosmVersion }
     .map { it.value.last() }
 
-operator fun List<ReleaseSpec>.get(label: String) = find { it.label == label }
+public operator fun List<ReleaseSpec>.get(label: String): ReleaseSpec? = find {
+  it.label == label
+}
