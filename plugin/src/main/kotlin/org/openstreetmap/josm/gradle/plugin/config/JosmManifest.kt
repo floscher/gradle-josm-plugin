@@ -353,6 +353,7 @@ public class JosmManifest(private val project: Project) {
           .filter { it.isNotBlank() }
           .map { it.trim() }
       }
+      ?: listOf()
   )
 
   /**

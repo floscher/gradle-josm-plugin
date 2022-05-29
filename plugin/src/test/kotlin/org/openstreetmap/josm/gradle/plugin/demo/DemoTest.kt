@@ -23,7 +23,9 @@ class DemoTest {
     GRADLE_7_0_2(false),
     GRADLE_7_1_1(true),
     GRADLE_7_2(true),
-    GRADLE_7_3_3(true);
+    GRADLE_7_3_3(true),
+    GRADLE_7_4_2(true),
+    ;
 
     val version = name.substring(name.indexOf('_') + 1).replace('_', '.')
   }
