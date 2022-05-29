@@ -25,13 +25,18 @@ kotlin {
 dependencies {
   implementation(gradleApi())
   implementation(gradleKotlinDsl())
-  implementation("org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}")
+  implementation(kotlin("stdlib"))
+  implementation("org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}") {
+    because("Newer versions require Java 11")
+  }
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinSerialization}")
 
   // Version management for plugins used in subprojects
   implementation("com.gradle.publish:plugin-publish-plugin:${Versions.pluginPublish}")
   implementation(kotlin("gradle-plugin", Versions.kotlin))
-  implementation("com.guardsquare:proguard-gradle:${Versions.proguardGradle}")
+  implementation("com.guardsquare:proguard-gradle:${Versions.proguardGradle}") {
+    because("Newer versions require Java 11")
+  }
   implementation("org.jetbrains.dokka:dokka-gradle-plugin:${Versions.dokka}")
   implementation("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
 }
