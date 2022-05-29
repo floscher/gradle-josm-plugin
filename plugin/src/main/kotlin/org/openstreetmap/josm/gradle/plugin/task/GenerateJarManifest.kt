@@ -69,32 +69,41 @@ public open class GenerateJarManifest @Inject constructor(
     val requiredFields = setOfNotNull(
       RequiredAttribute.create(
         JosmManifest.Attribute.PLUGIN_MIN_JOSM_VERSION,
-        josmManifest.minJosmVersion,
+        josmManifest._minJosmVersion.orNull,
         "the minimum JOSM version your plugin is compatible with"
       ),
       RequiredAttribute.create(
         JosmManifest.Attribute.PLUGIN_MAIN_CLASS,
-        josmManifest.mainClass,
+        josmManifest._mainClass.orNull,
         "the full name of the main class of your plugin"
       ),
       RequiredAttribute.create(
         JosmManifest.Attribute.PLUGIN_DESCRIPTION,
-        josmManifest.description,
+        josmManifest._description.orNull,
         "the textual description of your plugin"
-      ),
-      if (josmManifest.provides == null) null else {
-        RequiredAttribute.create(
-          JosmManifest.Attribute.PLUGIN_PLATFORM,
-          josmManifest.platform?.toString(),
-          "the platform for which this plugin is written (must be either Osx, Windows or Unixoid)"
-        )
-      },
-      if (josmManifest.platform == null) null else {
-        RequiredAttribute.create(
-          JosmManifest.Attribute.PLUGIN_PROVIDES,
-          josmManifest.provides,
-          "the name of the virtual plugin for which this is an implementation"
-        )
+      )
+    ).plus(
+      josmManifest._provides.orNull.let { provides: String? ->
+        josmManifest._platform.orNull.let { platform: JosmManifest.Platform? ->
+          setOfNotNull(
+            // Iff `provides` is not-null, only then is `platform` a required attribute
+            provides?.let {
+              RequiredAttribute.create(
+                JosmManifest.Attribute.PLUGIN_PLATFORM,
+                platform?.toString(),
+                "the platform for which this plugin is written (must be either Osx, Windows or Unixoid)"
+              )
+            },
+            // Iff `platform` is not-null, only then is `provides` a required attribute
+            platform?.let {
+              RequiredAttribute.create(
+                JosmManifest.Attribute.PLUGIN_PROVIDES,
+                provides,
+                "the name of the virtual plugin for which this is an implementation"
+              )
+            }
+          )
+        }
       }
     )
 
@@ -123,26 +132,26 @@ public open class GenerateJarManifest @Inject constructor(
           JosmManifest.Attribute.PLUGIN_DATE to DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
             ZonedDateTime.ofInstant(project.extensions.josm.manifest.pluginDate.get(), ZoneOffset.UTC)
           ),
-          JosmManifest.Attribute.PLUGIN_VERSION to project.version.toString(),
-          JosmManifest.Attribute.PLUGIN_EARLY to josmManifest.loadEarly.toString(),
-          JosmManifest.Attribute.PLUGIN_CAN_LOAD_AT_RUNTIME to josmManifest.canLoadAtRuntime.toString(),
+          JosmManifest.Attribute.PLUGIN_VERSION to josmManifest.version.get().toString(),
+          JosmManifest.Attribute.PLUGIN_EARLY to josmManifest._loadEarly.get().toString(),
+          JosmManifest.Attribute.PLUGIN_CAN_LOAD_AT_RUNTIME to josmManifest._canLoadAtRuntime.get().toString(),
 
           // Optional attributes (can be null)
-          JosmManifest.Attribute.AUTHOR to josmManifest.author,
-          JosmManifest.Attribute.CLASSPATH to josmManifest.classpath.joinToString(" ").takeIf { it.isNotBlank() },
-          JosmManifest.Attribute.PLUGIN_ICON to josmManifest.iconPath,
-          JosmManifest.Attribute.PLUGIN_LOAD_PRIORITY to josmManifest.loadPriority?.toString(),
-          JosmManifest.Attribute.PLUGIN_MIN_JAVA_VERSION to josmManifest.minJavaVersion?.toString(),
-          JosmManifest.Attribute.PLUGIN_PLATFORM to josmManifest.platform?.toString(),
-          JosmManifest.Attribute.PLUGIN_PROVIDES to josmManifest.provides,
-          JosmManifest.Attribute.PLUGIN_WEBSITE to josmManifest.website?.toString(),
-          JosmManifest.Attribute.PLUGIN_DEPENDENCIES to josmManifest.pluginDependencies.getOrElse(emptySet()).ifEmpty { null }?.joinToString(";")
+          JosmManifest.Attribute.AUTHOR to josmManifest._author.orNull,
+          JosmManifest.Attribute.CLASSPATH to josmManifest._classpath.get().takeIf { it.isNotEmpty() }?.joinToString(" "),
+          JosmManifest.Attribute.PLUGIN_ICON to josmManifest._iconPath.orNull,
+          JosmManifest.Attribute.PLUGIN_LOAD_PRIORITY to josmManifest._loadPriority.orNull?.toString(),
+          JosmManifest.Attribute.PLUGIN_MIN_JAVA_VERSION to josmManifest._minJavaVersion.orNull?.toString(),
+          JosmManifest.Attribute.PLUGIN_PLATFORM to josmManifest._platform.orNull?.toString()?.lowercase()?.replaceFirstChar { it.titlecaseChar() },
+          JosmManifest.Attribute.PLUGIN_PROVIDES to josmManifest._provides.orNull,
+          JosmManifest.Attribute.PLUGIN_WEBSITE to josmManifest._website.orNull?.toString(),
+          JosmManifest.Attribute.PLUGIN_DEPENDENCIES to josmManifest.pluginDependencies.get().takeIf { it.isNotEmpty() }?.joinToString(";")
         )
       )
       .mapNotNull { (key, value) -> value?.let { key.manifestKey to it } }
       .toMap()
       // Add download links to older GitHub releases
-      .plus(if (josmManifest.includeLinksToGithubReleases) buildMapOfGitHubDownloadLinks(project) else mapOf())
+      .plus(if (josmManifest._includeLinksToGithubReleases.get()) buildMapOfGitHubDownloadLinks(project) else mapOf())
       .toSortedMap()
       // Add manually specified links to older versions of the plugin
       .plus(

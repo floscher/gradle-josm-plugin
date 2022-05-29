@@ -46,7 +46,7 @@ public fun Project.setupJosmTasks(mainConfigSetup: MainConfigurationSetup) {
     tasks.register(
       "${mainConfigSetup.mainSourceSet.compileJavaTaskName}_minJosm",
       CustomJosmVersionCompile::class.java,
-      { project.extensions.josm.manifest.minJosmVersion },
+      { project.extensions.josm.manifest._minJosmVersion.get() },
       true,
       mainConfigSetup.mainSourceSet,
       setOf(mainConfigSetup.requiredPluginConfiguration, mainConfigSetup.packIntoJarConfiguration)
