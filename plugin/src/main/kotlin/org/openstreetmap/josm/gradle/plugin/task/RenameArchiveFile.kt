@@ -11,6 +11,7 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.bundling.Zip
+import java.util.jar.JarInputStream
 import javax.inject.Inject
 
 /**
@@ -49,8 +50,11 @@ public open class RenameArchiveFile @Inject constructor(
 
   init {
     from(
-      archiverTask.map { project.zipTree(it.archiveFile).matching { it.exclude(GenerateJarManifest.MANIFEST_PATH) } },
-      manifestTask.map { project.fileTree(it.outputDirectory) { it.include(GenerateJarManifest.MANIFEST_PATH) } }
+      /* It is very important that the MANIFEST.MF file comes first!
+       * Otherwise it can't be read by a [JarInputStream]. See https://github.com/floscher/gradle-josm-plugin/pull/15
+       */
+      manifestTask.map { project.fileTree(it.outputDirectory) { it.include(GenerateJarManifest.MANIFEST_PATH) } },
+      archiverTask.map { project.zipTree(it.archiveFile).matching { it.exclude(GenerateJarManifest.MANIFEST_PATH) } }
     )
     destinationDirectory.set(targetDir)
     duplicatesStrategy = DuplicatesStrategy.FAIL
