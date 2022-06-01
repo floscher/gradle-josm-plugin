@@ -4,13 +4,18 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.openstreetmap.josm.gradle.plugin.testutils.GradleProjectUtil
 import java.io.File
+import java.io.FileInputStream
 import java.security.MessageDigest
+import java.util.jar.JarFile
+import java.util.jar.JarInputStream
+import java.util.stream.Collectors
 
 class DemoTest {
 
@@ -107,6 +112,23 @@ class DemoTest {
         File(tmpDir, "build/localDist/list").exists() &&
         File(tmpDir, "build/localDist/MyAwesomePlugin-dev.jar").exists()
       }
+
+      println("Checking whether Manifest can be read from 'build/dist/MyAwesomePlugin.jar' ...")
+      // can read Manifest from build/dist/MyAwesomePlugin.jar using
+      // JarFile::getManifest().
+      //
+      // Already works.
+      val jarFile = tmpDir.resolve("build/dist/MyAwesomePlugin.jar")
+      var manifest = JarFile(jarFile).manifest
+      assertNotNull(manifest)
+
+      // can read Manifest from build/dist/MyAwesomePlugin.jar the way
+      // JOSM does it in PlugInformation using JarInputStream, see
+      // https://github.com/JOSM/josm/blob/9a72aaa8ff6264c00b1cc1186a5ac85f750ee8ad/src/org/openstreetmap/josm/plugins/PluginInformation.java#L128
+      //
+      // Doesn't work yet.
+      manifest = jarFile.inputStream().use {inputStream -> JarInputStream(inputStream).manifest}
+      assertNotNull(manifest)
     }
   }
 
