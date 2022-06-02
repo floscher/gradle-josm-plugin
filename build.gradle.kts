@@ -76,6 +76,12 @@ allprojects {
     tasks.findByName("test")?.let { dependsOn(it) }
     logCoverage()
   }
+
+  tasks.withType(Zip::class).all {
+    // make the produces archives (more) reproducible
+    isReproducibleFileOrder = true
+    isPreserveFileTimestamps = false
+  }
 }
 
 subprojects {
