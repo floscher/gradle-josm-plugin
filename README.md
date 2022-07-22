@@ -42,6 +42,7 @@ Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://josm.gitlab.io/gra
 * [iandees/josm-**mbtiles**](https://github.com/iandees/josm-mbtiles)
 * [microsoft/**MicrosoftStreetsidePlugin**](https://github.com/microsoft/MicrosoftStreetsidePlugin)
 * [gokaart/JOSM_**OpenQA**](https://gitlab.com/gokaart/JOSM_OpenQA)
+* [praszuk/josm-plbuildings-plugin](https://github.com/praszuk/josm-plbuildings-plugin)
 * [DavidKarlas/JosmRelationValidation (**Relation Validation Plugin**)](https://github.com/DavidKarlas/JosmRelationValidation)
 * [DavidKarlas/JosmReviewPlugin (**Review Changes**)](https://github.com/DavidKarlas/JosmReviewPlugin)
 * [Gubaer/josm-**scripting**-plugin](https://github.com/Gubaer/josm-scripting-plugin)
