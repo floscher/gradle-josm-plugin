@@ -29,7 +29,6 @@ Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://josm.gitlab.io/gra
 ## Projects using this Gradle plugin
 * [JOSM/**areaselector**](https://www.github.com/JOSM/areaselector)
 * [Jamalek/josm-**batch-downloader**](https://gitlab.com/Jamalek/josm-batch-downloader)
-* [Gubaer/josm-**contourmerge**-plugin](https://github.com/Gubaer/josm-contourmerge-plugin)
 * [fieldpapers/josm-**fieldpapers**](https://github.com/fieldpapers/josm-fieldpapers)
 * ~~[JOSM/**geojson**](https://github.com/JOSM/geojson)~~
 * [gokaart/JOSM_**highwayNameModification**](https://gitlab.com/gokaart/JOSM_highwayNameModification)
