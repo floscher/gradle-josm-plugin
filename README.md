@@ -29,9 +29,7 @@ Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://josm.gitlab.io/gra
 ## Projects using this Gradle plugin
 * [JOSM/**areaselector**](https://www.github.com/JOSM/areaselector)
 * [Jamalek/josm-**batch-downloader**](https://gitlab.com/Jamalek/josm-batch-downloader)
-* [Gubaer/josm-**contourmerge**-plugin](https://github.com/Gubaer/josm-contourmerge-plugin)
 * [fieldpapers/josm-**fieldpapers**](https://github.com/fieldpapers/josm-fieldpapers)
-* ~~[JOSM/**geojson**](https://github.com/JOSM/geojson)~~
 * [gokaart/JOSM_**highwayNameModification**](https://gitlab.com/gokaart/JOSM_highwayNameModification)
 * [osmlab/**josm-atlas**](https://github.com/osmlab/josm-atlas)
 * [gokaart/JOSM_**lane-connectivity**](https://gitlab.com/gokaart/JOSM_lane-connectivity)
@@ -44,7 +42,6 @@ Also, the [KDoc (similar to Javadoc, but for Kotlin)](https://josm.gitlab.io/gra
 * [gokaart/JOSM_**OpenQA**](https://gitlab.com/gokaart/JOSM_OpenQA)
 * [DavidKarlas/JosmRelationValidation (**Relation Validation Plugin**)](https://github.com/DavidKarlas/JosmRelationValidation)
 * [DavidKarlas/JosmReviewPlugin (**Review Changes**)](https://github.com/DavidKarlas/JosmReviewPlugin)
-* [Gubaer/josm-**scripting**-plugin](https://github.com/Gubaer/josm-scripting-plugin)
 * [JOSM/**pt_assistant**](https://gitlab.com/JOSM/plugin/pt_assistant)
 * [JOSM/**wikipedia**](https://gitlab.com/JOSM/plugin/wikipedia)
 
